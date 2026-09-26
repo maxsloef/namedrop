@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f3e9" />
+  <meta name="description" content="Acme helps manufacturing operations teams configure, order, and track custom widgets in one calm place." />
+  <title>Acme — Keep the little things moving</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,500,50,1;9..144,600,50,1;9..144,700,50,1&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f7f3e9;
+      --ink: #252820;
+      --muted: #62665b;
+      --blue: #284ca2;
+      --pale-blue: #dce7f4;
+      --yellow: #f4c854;
+      --pink: #f1d2ca;
+      --green: #dae5cd;
+      --line: rgba(37, 40, 32, .22);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    ::selection { background: var(--yellow); color: var(--ink); }
+    .shell { width: min(1280px, calc(100% - 112px)); margin-inline: auto; }
+
+    .announcement {
+      min-height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 20px;
+      background: var(--blue);
+      color: #fffdf6;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .085em;
+      text-align: center;
+    }
+    .announcement span { color: #f7d57a; margin: 0 9px; }
+
+    header {
+      height: 92px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 33px;
+      font-weight: 700;
+      letter-spacing: -.075em;
+      line-height: 1;
+    }
+    .brand-mark { width: 32px; height: 33px; flex: none; }
+    nav { display: flex; align-items: center; gap: 39px; }
+    nav a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color .2s;
+    }
+    nav a:hover { color: var(--blue); }
+    .button {
+      appearance: none;
+      border: 1.5px solid var(--ink);
+      border-radius: 2px 8px 3px 7px;
+      background: var(--ink);
+      color: #fffdf6;
+      padding: 14px 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 19px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.15;
+      transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .button:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--yellow); }
+    .button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 3px solid var(--blue);
+      outline-offset: 3px;
+    }
+    .button-light { background: var(--paper); color: var(--ink); }
+    .button-light:hover { box-shadow: 4px 4px 0 #e79b88; }
+    .arrow { font-size: 19px; font-weight: 400; line-height: .7; }
+
+    .hero {
+      min-height: 646px;
+      display: grid;
+      grid-template-columns: 48% 52%;
+      align-items: center;
+      position: relative;
+      padding: 45px 0 74px;
+    }
+    .hero-copy { position: relative; z-index: 2; padding-top: 27px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 25px;
+      height: 1.5px;
+      background: currentColor;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: "Fraunces", Georgia, serif; }
+    h1 {
+      max-width: 690px;
+      margin: 28px 0 24px;
+      font-size: clamp(62px, 5.25vw, 78px);
+      font-weight: 600;
+      letter-spacing: -.069em;
+      line-height: 1.075;
+    }
+    .hero-title-last { white-space: nowrap; }
+    .hero-title-last em {
+      position: relative;
+      color: var(--blue);
+      font-weight: 500;
+      font-style: italic;
+    }
+    .hero-title-last em::after {
+      content: "";
+      position: absolute;
+      left: 2%;
+      bottom: -8px;
+      width: 98%;
+      height: 12px;
+      border-top: 3px solid #db806b;
+      border-radius: 50%;
+      transform: rotate(-2deg);
+    }
+    .hero-description {
+      max-width: 465px;
+      color: #4a4d44;
+      font-size: 16px;
+      line-height: 1.75;
+      margin-bottom: 29px;
+    }
+    .hero-actions { display: flex; align-items: center; gap: 23px; }
+    .text-link {
+      font-size: 13px;
+      font-weight: 700;
+      text-underline-offset: 5px;
+      text-decoration-thickness: 1px;
+    }
+    .text-link:hover { color: var(--blue); }
+    .hero-aside {
+      margin: 38px 0 0 3px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: #696b60;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .hero-aside svg { width: 31px; flex: none; }
+
+    .hero-art {
+      height: 540px;
+      position: relative;
+      margin-left: -6px;
+    }
+    .hero-art svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .scribble {
+      font-family: "Caveat", cursive;
+      font-size: 23px;
+      fill: var(--ink);
+    }
+    .art-note {
+      position: absolute;
+      bottom: 6px;
+      right: 24px;
+      transform: rotate(-5deg);
+      font-family: "Caveat", cursive;
+      font-size: 20px;
+      color: #51574b;
+    }
+
+    .trust-strip {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      min-height: 85px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+    }
+    .trust-intro {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -.025em;
+    }
+    .trust-items { display: flex; gap: 58px; align-items: center; }
+    .trust-items span {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #454940;
+    }
+    .trust-items svg { width: 23px; height: 23px; }
+
+    .section { padding: 108px 0; }
+    .section-heading { max-width: 725px; margin-bottom: 49px; }
+    h2 {
+      margin: 19px 0 19px;
+      font-size: clamp(43px, 4vw, 59px);
+      font-weight: 600;
+      letter-spacing: -.06em;
+      line-height: 1.12;
+    }
+    .section-heading > p, .process-copy > p {
+      max-width: 570px;
+      color: #55594f;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .feature-card {
+      min-height: 371px;
+      padding: 27px 29px 29px;
+      border: 1px solid var(--line);
+      border-radius: 3px 13px 4px 10px;
+      background: #fbf9f2;
+      display: flex;
+      flex-direction: column;
+    }
+    .feature-card:nth-child(2) { border-radius: 12px 3px 12px 4px; }
+    .feature-card:nth-child(3) { border-radius: 4px 11px 3px 13px; }
+    .feature-illustration {
+      height: 162px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 21px;
+    }
+    .feature-illustration svg { height: 100%; max-width: 100%; }
+    .feature-number {
+      color: var(--blue);
+      font-family: "Caveat", cursive;
+      font-size: 20px;
+      line-height: 1;
+    }
+    .feature-card h3 {
+      margin: 8px 0 9px;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -.045em;
+    }
+    .feature-card p {
+      margin: 0;
+      color: #5d6056;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .process-wrap { background: var(--pale-blue); }
+    .process {
+      min-height: 566px;
+      display: grid;
+      grid-template-columns: 46% 54%;
+      gap: 30px;
+      align-items: center;
+      padding: 88px 0 91px;
+    }
+    .process-copy h2 { max-width: 450px; }
+    .process-copy > p { max-width: 420px; }
+    .process-note {
+      display: inline-block;
+      margin-top: 25px;
+      font-family: "Caveat", cursive;
+      font-size: 25px;
+      transform: rotate(-4deg);
+    }
+    .steps {
+      position: relative;
+      padding: 9px 0 2px 44px;
+      margin-left: 42px;
+    }
+    .steps::before {
+      content: "";
+      position: absolute;
+      top: 35px;
+      bottom: 38px;
+      left: 16px;
+      border-left: 1.5px dashed #6c87bb;
+    }
+    .step {
+      position: relative;
+      padding: 22px 20px 25px 32px;
+      border-bottom: 1px solid rgba(40,76,162,.24);
+    }
+    .step:last-child { border-bottom: 0; }
+    .step-badge {
+      position: absolute;
+      left: -44px;
+      top: 24px;
+      z-index: 1;
+      width: 33px;
+      height: 33px;
+      border: 1.5px solid var(--blue);
+      border-radius: 48% 52% 45% 55%;
+      background: var(--paper);
+      display: grid;
+      place-items: center;
+      color: var(--blue);
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .step:nth-child(2) .step-badge { border-radius: 55% 40% 53% 43%; }
+    .step h3 { margin: 0 0 7px; font-size: 25px; letter-spacing: -.045em; }
+    .step p { max-width: 425px; margin: 0; font-size: 13px; line-height: 1.7; color: #4d5a6b; }
+
+    .quote-section { padding: 104px 0; }
+    .quote-box {
+      position: relative;
+      min-height: 345px;
+      padding: 66px 92px;
+      background: var(--pink);
+      border-radius: 4px 17px 5px 14px;
+      overflow: hidden;
+    }
+    .quote-box::before {
+      content: "“";
+      position: absolute;
+      top: 22px;
+      left: 41px;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 150px;
+      line-height: 1;
+      color: rgba(137,70,65,.2);
+    }
+    .quote-label { position: relative; font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+    blockquote {
+      position: relative;
+      max-width: 790px;
+      margin: 21px 0 25px;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(30px, 3vw, 43px);
+      line-height: 1.32;
+      letter-spacing: -.042em;
+    }
+    .quote-attribution { position: relative; font-size: 12px; font-weight: 700; }
+    .quote-flower { position: absolute; right: 42px; bottom: -20px; width: 205px; height: 235px; }
+
+    .closing {
+      padding: 85px 0 92px;
+      background: var(--yellow);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .closing .eyebrow { justify-content: center; color: var(--ink); }
+    .closing h2 { max-width: 750px; margin: 19px auto 15px; font-size: clamp(47px, 4.7vw, 67px); }
+    .closing p { font-size: 15px; line-height: 1.7; margin-bottom: 27px; }
+    .closing .button { background: var(--blue); border-color: var(--blue); }
+    .closing .button:hover { box-shadow: 4px 4px 0 var(--paper); }
+    .closing-small { display: block; margin-top: 16px; font-family: "Caveat", cursive; font-size: 21px; transform: rotate(-3deg); }
+    .closing-doodle { position: absolute; width: 150px; height: 150px; opacity: .55; }
+    .closing-doodle.left { left: 8%; top: 93px; transform: rotate(-16deg); }
+    .closing-doodle.right { right: 8%; bottom: 49px; transform: rotate(24deg); }
+
+    footer {
+      padding: 34px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 25px;
+    }
+    footer .brand { font-size: 25px; }
+    footer .brand-mark { width: 25px; height: 25px; }
+    footer p { margin: 0; color: #696c61; font-size: 11px; }
+    footer a:not(.brand) { color: #55584f; font-size: 11px; text-decoration: none; }
+    footer a:not(.brand):hover { text-decoration: underline; }
+    .footer-links { display: flex; gap: 25px; }
+
+    .modal {
+      position: fixed;
+      z-index: 10;
+      inset: 0;
+      background: rgba(25, 30, 29, .62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal.is-open { display: flex; }
+    .modal-panel {
+      position: relative;
+      width: min(100%, 510px);
+      padding: 42px;
+      background: var(--paper);
+      border-radius: 4px 16px 5px 12px;
+      box-shadow: 12px 13px 0 rgba(24, 28, 25, .22);
+    }
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 17px;
+      width: 36px;
+      height: 36px;
+      border: 0;
+      background: transparent;
+      font-size: 27px;
+      line-height: 1;
+    }
+    .modal-panel h2 { font-size: 41px; margin: 13px 0 9px; }
+    .modal-panel > p { color: var(--muted); font-size: 13px; line-height: 1.65; margin-bottom: 24px; }
+    .field { display: block; margin: 16px 0; font-size: 12px; font-weight: 700; }
+    .field input, .field textarea {
+      width: 100%;
+      display: block;
+      margin-top: 7px;
+      padding: 12px 13px;
+      border: 1px solid #a6a89e;
+      border-radius: 3px 7px 3px 5px;
+      background: #fffdf7;
+      color: var(--ink);
+      font-size: 14px;
+    }
+    .field textarea { min-height: 91px; resize: vertical; }
+    .modal-panel .button { margin-top: 8px; }
+    .form-note { color: var(--muted); font-size: 11px; line-height: 1.5; margin: 14px 0 0; }
+
+    @media (max-width: 1000px) {
+      .shell { width: min(100% - 56px, 1280px); }
+      .hero { grid-template-columns: 52% 48%; }
+      h1 { font-size: clamp(53px, 6vw, 70px); }
+      .hero-art { margin-left: -30px; }
+      .trust-items { gap: 18px; }
+      .quote-flower { opacity: .4; }
+    }
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 38px, 1280px); }
+      header { height: 73px; }
+      nav { gap: 0; }
+      nav a:not(.button) { display: none; }
+      nav .button { padding: 12px 13px; font-size: 11px; }
+      .brand { font-size: 28px; }
+      .hero { display: flex; flex-direction: column; align-items: stretch; padding: 60px 0 35px; }
+      .hero-copy { padding: 0; }
+      h1 { font-size: clamp(49px, 11vw, 72px); }
+      .hero-title-last { white-space: normal; }
+      .hero-description { font-size: 15px; }
+      .hero-art { width: 100%; height: auto; aspect-ratio: 1.2; margin: 16px 0 0; }
+      .art-note { right: 0; bottom: -6px; }
+      .trust-strip { align-items: flex-start; flex-direction: column; padding: 22px 0; gap: 14px; }
+      .trust-items { flex-wrap: wrap; gap: 13px 23px; }
+      .section { padding: 75px 0; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 0; }
+      .feature-illustration { height: 140px; }
+      .process { grid-template-columns: 1fr; padding: 70px 0; gap: 15px; }
+      .steps { margin-left: 0; }
+      .quote-section { padding: 70px 0; }
+      .quote-box { padding: 53px 30px 105px; }
+      .quote-box::before { left: 12px; }
+      .quote-flower { width: 125px; height: 150px; right: 7px; opacity: .55; }
+      .closing { padding: 75px 20px; }
+      .closing-doodle { display: none; }
+      footer { flex-wrap: wrap; }
+      .modal-panel { padding: 34px 24px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement">FOR THE PEOPLE BEHIND EVERY PART <span>✳</span> A LITTLE LESS CHAOS. A LOT MORE CLARITY.</div>
+
+  <header class="shell">
+    <a class="brand" href="#top" aria-label="Acme home">
+      <svg class="brand-mark" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <path d="M17 2.5 21.5 8l7-.4-.7 7 4.1 5.5-6.4 3-1.6 7-6.9-2-6.9 2-1.6-7-6.4-3 4.1-5.5-.7-7 7 .4L17 2.5Z" fill="#F4C854" stroke="#252820" stroke-width="1.6" stroke-linejoin="round"/>
+        <circle cx="17" cy="17" r="5.2" fill="#F7F3E9" stroke="#252820" stroke-width="1.5"/>
+      </svg>
+      acme
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="#platform">The platform</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#why-acme">Why Acme</a>
+      <a href="#demo" class="button" data-open-demo>Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow">A better way to make things happen</div>
+        <h1 id="hero-title">The little things make <span class="hero-title-last">everything <em>move.</em></span></h1>
+        <p class="hero-description">Custom widgets have a way of becoming complicated. Acme brings configuring, ordering, and tracking together—so your team can spend less time chasing parts and more time making what matters.</p>
+        <div class="hero-actions">
+          <a href="#demo" class="button" data-open-demo>Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+          <a href="#platform" class="text-link">Take a look around</a>
+        </div>
+        <div class="hero-aside">
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M16 2.5c1.2 7 2.5 8.2 13.5 13.5C18.5 17.2 17.2 18.5 16 29.5 14.8 18.5 13.5 17.2 2.5 16 13.5 14.8 14.8 13.5 16 2.5Z" stroke="#284CA2" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="2" fill="#F4C854"/>
+          </svg>
+          Made for operations teams who hold it all together.
+        </div>
+      </div>
+
+      <div class="hero-art" role="img" aria-label="Playful drawing of custom parts moving through a workshop from a configuration card to a delivery box">
+        <svg viewBox="0 0 670 570" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- soft irregular backdrop -->
+          <path d="M113 98C192 34 349 53 472 87c105 29 166 114 150 218-16 111-82 198-212 212-133 15-280-14-345-113C9 317 30 165 113 98Z" fill="#E4EBCF"/>
+          <path d="M65 380c52 67 137 106 255 110" stroke="#B8CAAF" stroke-width="2" stroke-dasharray="3 9"/>
+          <!-- sun and little marks -->
+          <circle cx="521" cy="117" r="35" fill="#F4C854" stroke="#252820" stroke-width="2"/>
+          <path d="M520 65v-12m0 128v-12m-64-52h-13m154 0h-12m-109-43-9-9m109 109-8-8m9-92 9-9m-110 109 9-9" stroke="#252820" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M126 140c8-11 19-11 27 0m-18 9c7-9 16-8 22 0" stroke="#284CA2" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- drawn shelf -->
+          <path d="M161 223c79-4 223-6 367-1l7 10c-125 4-257 3-381 2l7-11Z" fill="#D68E70" stroke="#252820" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="m177 233-8 218m340-218 10 218M163 452c119 4 241 5 365 0" stroke="#252820" stroke-width="4" stroke-linecap="round"/>
+          <path d="M174 352c118-3 227-1 341 1" stroke="#252820" stroke-width="3" stroke-linecap="round"/>
+          <path d="M177 357c101 5 214 5 336 1" stroke="#D68E70" stroke-width="9" stroke-linecap="round"/>
+          <!-- top shelf: configuration sheet -->
+          <path d="m185 131 90-7 12 96-91 5-11-94Z" fill="#FFFDF5" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+          <path d="m201 148 51-4m-48 15 61-4m-59 16 43-4" stroke="#252820" stroke-width="1.7" stroke-linecap="round"/>
+          <circle cx="216" cy="199" r="10" fill="#F4C854" stroke="#252820" stroke-width="1.5"/>
+          <path d="m212 199 3 3 6-7m10 3 38-2" stroke="#252820" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="175" y="102" class="scribble" transform="rotate(-8 175 102)">just right</text>
+          <path d="M240 107c-5 7-6 12-6 17m-5-9 5 9 6-7" stroke="#252820" stroke-width="1.3" stroke-linecap="round"/>
+          <!-- top shelf: widgets -->
+          <path d="m329 174 20-26 32 2 18 23-12 46-46 1-12-46Z" fill="#F4C854" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+          <ellipse cx="364" cy="174" rx="35" ry="12" fill="#F7D881" stroke="#252820" stroke-width="2"/>
+          <ellipse cx="364" cy="173" rx="12" ry="4" fill="#F7F3E9" stroke="#252820" stroke-width="1.5"/>
+          <path d="m418 175 16-23 31 1 18 22-7 44-49 1-9-45Z" fill="#9DB5DF" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+          <ellipse cx="450" cy="175" rx="33" ry="11" fill="#B9CAE8" stroke="#252820" stroke-width="2"/>
+          <ellipse cx="450" cy="174" rx="10" ry="3.5" fill="#F7F3E9" stroke="#252820" stroke-width="1.5"/>
+          <!-- middle shelf: blue machine -->
+          <path d="m208 283 71-6 4 72-75 2v-68Z" fill="#284CA2" stroke="#252820" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="m216 290 58-4v17l-58 3v-16Z" fill="#A9C0E7" stroke="#252820" stroke-width="1.7"/>
+          <circle cx="226" cy="327" r="8" fill="#F4C854" stroke="#252820" stroke-width="1.6"/>
+          <path d="M247 324h22m-22 8h17" stroke="#F7F3E9" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="m215 351-4 9m63-10 4 9" stroke="#252820" stroke-width="2"/>
+          <!-- middle shelf: multiple small parts -->
+          <path d="m318 320 8-15 20-2 10 16-7 28-26 1-5-28Z" fill="#ECA992" stroke="#252820" stroke-width="2"/>
+          <ellipse cx="337" cy="320" rx="19" ry="6" fill="#F4BCA7" stroke="#252820" stroke-width="1.7"/>
+          <path d="m369 317 8-14 20-1 10 15-6 30-27 1-5-31Z" fill="#ECA992" stroke="#252820" stroke-width="2"/>
+          <ellipse cx="388" cy="317" rx="19" ry="6" fill="#F4BCA7" stroke="#252820" stroke-width="1.7"/>
+          <!-- tracking tag -->
+          <path d="m441 272 56 4-5 67-58-5 7-66Z" fill="#FFFDF5" stroke="#252820" stroke-width="2.2"/>
+          <circle cx="469" cy="286" r="3.5" fill="#F4C854" stroke="#252820"/>
+          <path d="m451 304 29 2m-31 8 33 2m-34 8 18 1" stroke="#252820" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="m470 287 14-28" stroke="#252820" stroke-width="1.4"/>
+          <text x="500" y="294" class="scribble" transform="rotate(7 500 294)">on its way!</text>
+          <path d="M498 304c-9 7-15 11-23 14m8-1-8 1 3-8" stroke="#252820" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- bottom shelf: cardboard box -->
+          <path d="m221 385 84-3 4 67-85 2-3-66Z" fill="#D7A96A" stroke="#252820" stroke-width="2.4" stroke-linejoin="round"/>
+          <path d="m221 385 24-18 84-2-24 17m0 0 24-17 3 67-23 17m-64-82 2 68" fill="#E5BC80" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+          <path d="m268 370 1 31 17-1-1-32" fill="#F2D69A" stroke="#252820" stroke-width="1.5"/>
+          <path d="m269 416 18-1m-15 7 13-1" stroke="#252820" stroke-width="1.5"/>
+          <!-- bottom shelf: little plant -->
+          <path d="m414 418 45 0-6 33-33 0-6-33Z" fill="#D78974" stroke="#252820" stroke-width="2"/>
+          <ellipse cx="436" cy="418" rx="23" ry="6" fill="#ECAA94" stroke="#252820" stroke-width="1.8"/>
+          <path d="M435 415c-1-32 4-50 18-68m-18 64c-15-21-23-29-31-33" stroke="#47755D" stroke-width="2.3" stroke-linecap="round"/>
+          <path d="M440 384c-18-12-18-26-13-34 13 4 20 19 13 34Zm-5 19c13-22 27-24 35-20-5 16-17 23-35 20Zm-11-10c-23-2-30-12-31-22 18-4 28 6 31 22Z" fill="#719471" stroke="#252820" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M452 353c-7-14-4-22 1-26 10 8 10 17-1 26Z" fill="#F4C854" stroke="#252820" stroke-width="1.5"/>
+          <!-- floor and wandering path -->
+          <path d="M116 467c139 8 332 11 457-1" stroke="#252820" stroke-width="2" stroke-linecap="round"/>
+          <path d="M98 488c34 35 94 33 123 16 30-19 83-22 119 1 33 22 92 23 128 0 31-20 70-19 99-6" stroke="#284CA2" stroke-width="1.8" stroke-dasharray="5 8" stroke-linecap="round"/>
+          <path d="m563 498-9-5m9 5-10 4" stroke="#284CA2" stroke-width="1.7" stroke-linecap="round"/>
+          <!-- floating tiny sparks -->
+          <path d="m97 251 4-13 5 13 13 4-13 4-5 13-4-13-13-4 13-4Zm455 105 3-9 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z" fill="#F4C854" stroke="#252820" stroke-width="1.4" stroke-linejoin="round"/>
+          <circle cx="116" cy="337" r="3" fill="#284CA2"/>
+          <circle cx="563" cy="213" r="3" fill="#D78974"/>
+          <path d="m555 430 12 5m-9 7 14-2" stroke="#252820" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="art-note">everything in its place (finally)</span>
+      </div>
+    </section>
+
+    <div class="trust-strip shell" aria-label="Platform benefits">
+      <span class="trust-intro">A little more room to breathe.</span>
+      <div class="trust-items">
+        <span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 12 5 5L20 6" stroke="#284CA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="#284CA2" stroke-width="1.3"/></svg> Fewer back-and-forths</span>
+        <span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 12 5 5L20 6" stroke="#284CA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="#284CA2" stroke-width="1.3"/></svg> Clearer order status</span>
+        <span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m4 12 5 5L20 6" stroke="#284CA2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="#284CA2" stroke-width="1.3"/></svg> Happier Tuesdays</span>
+      </div>
+    </div>
+
+    <section class="section shell" id="platform" aria-labelledby="platform-title">
+      <div class="section-heading">
+        <div class="eyebrow">Meet your new everyday tool</div>
+        <h2 id="platform-title">A lot of moving pieces.<br />One lovely place for them.</h2>
+        <p>From the first specification to the final delivery, Acme gives your team a shared view of the work. No mystery spreadsheets. No wondering who has the latest update.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-illustration" aria-hidden="true">
+            <svg viewBox="0 0 260 155" fill="none">
+              <path d="M35 31 176 24l10 113-140 7L35 31Z" fill="#E5EBCF" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="m70 18 137 7-7 115-140-8L70 18Z" fill="#FFFDF5" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="m89 44 57 3m-59 14 94 4m-95 13 62 4" stroke="#252820" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="m92 100 15-17 18 17-16 17-17-17Z" fill="#F4C854" stroke="#252820" stroke-width="1.7"/>
+              <circle cx="109" cy="100" r="5" fill="#FFFDF5" stroke="#252820" stroke-width="1.3"/>
+              <path d="m139 102 37 2m-37 9 26 2" stroke="#252820" stroke-width="1.7" stroke-linecap="round"/>
+              <path d="m210 39 18-8m-13 22 20-2" stroke="#284CA2" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="feature-number">01 / make it yours</span>
+          <h3>Configure with confidence.</h3>
+          <p>Capture the details your custom widgets need in one clear place, so everyone starts from the same plan.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-illustration" aria-hidden="true">
+            <svg viewBox="0 0 260 155" fill="none">
+              <path d="m51 59 75-35 86 31-75 38-86-34Z" fill="#F4D477" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="m51 59 86 34 1 52-87-34V59Z" fill="#DCA86B" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="m137 93 75-38-1 56-73 34-1-52Z" fill="#EDBD7B" stroke="#252820" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="m88 42 86 33-14 7-85-33 13-7Z" fill="#FAE7B3" stroke="#252820" stroke-width="1.5"/>
+              <path d="m174 75-1 22-13 6V82" fill="#FAE7B3" stroke="#252820" stroke-width="1.5"/>
+              <path d="m79 81 27 11m-27 1 17 7" stroke="#252820" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="m220 23 3-10 4 10 10 3-10 4-4 10-3-10-10-4 10-3Z" fill="#F4C854" stroke="#252820" stroke-width="1.4"/>
+            </svg>
+          </div>
+          <span class="feature-number">02 / send it along</span>
+          <h3>Order without the chase.</h3>
+          <p>Turn approved configurations into orders without losing the context, details, or your afternoon.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-illustration" aria-hidden="true">
+            <svg viewBox="0 0 260 155" fill="none">
+              <path d="M32 98c30-62 57-64 86-21 28 42 59 47 106-29" stroke="#284CA2" stroke-width="2.5" stroke-dasharray="5 7" stroke-linecap="round"/>
+              <circle cx="43" cy="83" r="17" fill="#F4C854" stroke="#252820" stroke-width="2"/>
+              <path d="m36 83 5 5 9-11" stroke="#252820" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="124" cy="83" r="17" fill="#ECA992" stroke="#252820" stroke-width="2"/>
+              <path d="m117 83 5 5 9-11" stroke="#252820" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="211" cy="66" r="20" fill="#E5EBCF" stroke="#252820" stroke-width="2"/>
+              <path d="m203 66 6 6 11-13" stroke="#252820" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M39 115v12m84-17v17m88-34v34M27 128h194" stroke="#252820" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="m77 36 3-9 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z" fill="#F4C854" stroke="#252820" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <span class="feature-number">03 / know where it is</span>
+          <h3>See what’s happening.</h3>
+          <p>Follow each order across your supply chain, with the visibility to answer “where is it?” before anyone asks.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="process-wrap" id="how-it-works" aria-labelledby="process-title">
+      <div class="process shell">
+        <div class="process-copy">
+          <div class="eyebrow">Simple on purpose</div>
+          <h2 id="process-title">Good work doesn’t need more guesswork.</h2>
+          <p>Your team already knows how to keep things moving. Acme just makes the path a little easier to see—and a whole lot easier to share.</p>
+          <span class="process-note">A clear path is a beautiful thing. ↗</span>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <span class="step-badge">1</span>
+            <h3>Bring the details together</h3>
+            <p>Build a custom widget configuration with the specs and context your team needs.</p>
+          </div>
+          <div class="step">
+            <span class="step-badge">2</span>
+            <h3>Give the go-ahead</h3>
+            <p>Place the order from the same shared workspace. No re-entering the important bits.</p>
+          </div>
+          <div class="step">
+            <span class="step-badge">3</span>
+            <h3>Follow it all the way home</h3>
+            <p>Keep an eye on progress and give everyone a clearer picture of what comes next.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-section shell" id="why-acme" aria-labelledby="why-title">
+      <div class="quote-box">
+        <div class="quote-label" id="why-title">A thought we keep close</div>
+        <blockquote>Behind every finished product is someone making sure a hundred little things go right. We built Acme for them.</blockquote>
+        <div class="quote-attribution">— The Acme team</div>
+        <svg class="quote-flower" viewBox="0 0 205 235" fill="none" aria-hidden="true">
+          <path d="M96 237c5-69 8-128 6-177m0 137c-37-35-58-37-75-31m75 10c32-44 52-48 74-47" stroke="#405C43" stroke-width="3" stroke-linecap="round"/>
+          <path d="M99 192c-26-40-49-42-62-37 8 26 31 41 62 37Zm5-17c20-45 43-52 60-48-3 27-27 47-60 48Z" fill="#759075" stroke="#252820" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M103 79c-24-4-37-21-32-37 18-1 30 13 32 37Zm1-1c21-11 28-31 18-44-18 6-24 23-18 44Zm-1-1C92 56 98 35 114 30c13 13 11 30-11 47Z" fill="#E8A684" stroke="#252820" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="103" cy="77" r="10" fill="#F4C854" stroke="#252820" stroke-width="2"/>
+          <path d="m28 92 4-10 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z" fill="#F4C854" stroke="#252820" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </section>
+
+    <section class="closing" id="demo" aria-labelledby="closing-title">
+      <svg class="closing-doodle left" viewBox="0 0 150 150" fill="none" aria-hidden="true"><path d="M76 14c-8 23-11 38-11 57-19-5-33-5-49-1 20 6 32 14 45 28-12 12-19 23-25 37 17-12 28-18 43-23 10 14 21 22 38 29-9-16-13-29-14-44 15-8 25-18 35-32-18 6-30 8-46 6-3-19-7-35-16-57Z" stroke="#252820" stroke-width="2" stroke-linejoin="round"/></svg>
+      <svg class="closing-doodle right" viewBox="0 0 150 150" fill="none" aria-hidden="true"><path d="M24 77c24-3 42-6 53-21 9-12 21-20 48-22M99 15l26 19-22 22M30 108c23-3 39-1 58 12m-8-21 8 21-19 12" stroke="#252820" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="shell">
+        <div class="eyebrow">Let’s make room for better days</div>
+        <h2 id="closing-title">Your next order could feel a whole lot lighter.</h2>
+        <p>Come see what a calmer way to manage custom widgets looks like.</p>
+        <a href="#demo" class="button" data-open-demo>Let’s book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+        <span class="closing-small">No pressure. Just a good conversation.</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <a class="brand" href="#top" aria-label="Acme home">
+      <svg class="brand-mark" viewBox="0 0 34 34" fill="none" aria-hidden="true"><path d="M17 2.5 21.5 8l7-.4-.7 7 4.1 5.5-6.4 3-1.6 7-6.9-2-6.9 2-1.6-7-6.4-3 4.1-5.5-.7-7 7 .4L17 2.5Z" fill="#F4C854" stroke="#252820" stroke-width="1.6" stroke-linejoin="round"/><circle cx="17" cy="17" r="5.2" fill="#F7F3E9" stroke="#252820" stroke-width="1.5"/></svg>
+      acme
+    </a>
+    <p>For all the people who keep things moving. © 2026 Acme.</p>
+    <div class="footer-links"><a href="#platform">Platform</a><a href="#how-it-works">How it works</a><a href="mailto:hello@acme.com">Say hello ↗</a></div>
+  </footer>
+
+  <div class="modal" id="demo-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal-panel">
+      <button class="modal-close" type="button" aria-label="Close demo form">×</button>
+      <div class="eyebrow">A good place to start</div>
+      <h2 id="modal-title">Let’s talk widgets.</h2>
+      <p>Tell us a little about your team. We’ll prepare an email you can send to start the conversation.</p>
+      <form id="demo-form">
+        <label class="field">Your name
+          <input name="name" type="text" autocomplete="name" required placeholder="Your name" />
+        </label>
+        <label class="field">Work email
+          <input name="email" type="email" autocomplete="email" required placeholder="you@company.com" />
+        </label>
+        <label class="field">What’s on your mind? <span style="font-weight:400">(optional)</span>
+          <textarea name="message" placeholder="Tell us about your custom widgets or what you'd like to see."></textarea>
+        </label>
+        <button class="button" type="submit">Prepare my email <span class="arrow" aria-hidden="true">↗</span></button>
+        <p class="form-note" id="form-note">This opens your email app. Nothing is sent until you choose to send it.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const modal = document.getElementById('demo-modal');
+      const closeButton = modal.querySelector('.modal-close');
+      const form = document.getElementById('demo-form');
+      const note = document.getElementById('form-note');
+      let previousFocus = null;
+
+      function openModal(event) {
+        event.preventDefault();
+        previousFocus = document.activeElement;
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        modal.querySelector('input').focus();
+      }
+
+      function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (previousFocus) previousFocus.focus();
+      }
+
+      document.querySelectorAll('[data-open-demo]').forEach(link => link.addEventListener('click', openModal));
+      closeButton.addEventListener('click', closeModal);
+      modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+      document.addEventListener('keydown', event => {
+        if (!modal.classList.contains('is-open')) return;
+        if (event.key === 'Escape') closeModal();
+        if (event.key === 'Tab') {
+          const focusable = [...modal.querySelectorAll('button, input, textarea')];
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        const data = new FormData(form);
+        const name = String(data.get('name')).trim();
+        const email = String(data.get('email')).trim();
+        const message = String(data.get('message')).trim();
+        const subject = encodeURIComponent('Acme demo request from ' + name);
+        const body = encodeURIComponent(
+          'Hello Acme,\n\nI’d like to learn more about your platform and book a demo.\n\n' +
+          'Name: ' + name + '\nWork email: ' + email +
+          (message ? '\n\nWhat’s on my mind:\n' + message : '') +
+          '\n\nThanks!'
+        );
+        note.textContent = 'Your email app should open with your request ready to send.';
+        window.location.href = 'mailto:hello@acme.com?subject=' + subject + '&body=' + body;
+      });
+    })();
+  </script>
+</body>
+</html>

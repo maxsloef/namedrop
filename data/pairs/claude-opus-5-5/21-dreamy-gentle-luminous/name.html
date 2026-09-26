@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, seen clearly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#f6f1ff;
+    --ink-soft:rgba(246,241,255,.72);
+    --ink-faint:rgba(246,241,255,.45);
+    --night:#120b24;
+    --indigo:#23164a;
+    --violet:#8a6cff;
+    --magenta:#ff5fa2;
+    --rose:#ffb3c7;
+    --amber:#ffb36b;
+    --cyan:#8fdcff;
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Manrope', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    font-weight:300;
+    color:var(--ink);
+    background:var(--night);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    line-height:1.6;
+  }
+  a{color:inherit;text-decoration:none}
+  em{font-family:var(--serif);font-style:italic;font-weight:300}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:28px 72px;
+    transition:background .8s ease, padding .6s ease, backdrop-filter .8s;
+  }
+  nav.scrolled{
+    background:rgba(18,11,36,.45);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    padding:18px 72px;
+  }
+  .logo{display:flex;align-items:center;gap:14px;font-weight:500;letter-spacing:.34em;font-size:14px}
+  .logo-mark{
+    width:26px;height:26px;border-radius:6px;
+    background:radial-gradient(circle at 50% 50%, #fff 0%, var(--rose) 35%, var(--magenta) 70%, transparent 100%);
+    box-shadow:0 0 24px rgba(255,95,162,.7);
+  }
+  .nav-links{display:flex;gap:44px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+  .nav-links a{transition:color .4s}
+  .nav-links a:hover{color:#fff}
+  .btn{
+    display:inline-flex;align-items:center;gap:12px;
+    font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+    padding:16px 30px;border-radius:999px;border:none;cursor:pointer;
+    color:#1b0f33;
+    background:linear-gradient(120deg,#fff 0%, #ffe3ee 50%, #fff4e6 100%);
+    box-shadow:0 0 0 1px rgba(255,255,255,.6), 0 0 40px rgba(255,179,199,.55), 0 0 90px rgba(255,95,162,.25);
+    transition:box-shadow .6s ease, transform .6s ease;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 0 0 1px #fff, 0 0 60px rgba(255,179,199,.85), 0 0 140px rgba(255,95,162,.45)}
+  .btn .dot{width:6px;height:6px;border-radius:50%;background:var(--magenta);box-shadow:0 0 10px var(--magenta)}
+  .btn-ghost{
+    background:transparent;color:var(--ink);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);
+  }
+  .btn-ghost:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.8), 0 0 40px rgba(255,255,255,.15)}
+  nav .btn{padding:12px 24px;font-size:12px}
+
+  /* ---------- HERO: GANZFELD ---------- */
+  .hero{
+    position:relative;min-height:100vh;overflow:hidden;
+    display:flex;align-items:center;
+    padding:140px 72px 100px;
+    background:#2a1650;
+    animation:field 28s ease-in-out infinite alternate;
+  }
+  @keyframes field{
+    0%{background:#2a1650}
+    33%{background:#4a1a5e}
+    66%{background:#1c2a66}
+    100%{background:#3a1846}
+  }
+  .hero::before{
+    content:"";position:absolute;inset:-20%;
+    background:
+      radial-gradient(ellipse 60% 50% at 75% 45%, rgba(255,95,162,.55), transparent 70%),
+      radial-gradient(ellipse 50% 60% at 15% 90%, rgba(138,108,255,.45), transparent 70%),
+      radial-gradient(ellipse 40% 40% at 90% 100%, rgba(255,179,107,.35), transparent 70%);
+    filter:blur(40px);
+    animation:drift 36s ease-in-out infinite alternate;
+  }
+  @keyframes drift{
+    0%{transform:translate(0,0) scale(1)}
+    50%{transform:translate(-3%,2%) scale(1.06)}
+    100%{transform:translate(2%,-2%) scale(1.02)}
+  }
+  .hero-glow{
+    position:absolute;width:700px;height:700px;border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,.12), transparent 60%);
+    pointer-events:none;transform:translate(-50%,-50%);
+    left:50%;top:50%;transition:left 1.8s cubic-bezier(.2,.7,.2,1), top 1.8s cubic-bezier(.2,.7,.2,1);
+    mix-blend-mode:screen;
+  }
+  .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:80px;align-items:center;width:100%;max-width:1296px;margin:0 auto}
+  .eyebrow{
+    font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-soft);
+    display:flex;align-items:center;gap:16px;margin-bottom:34px;
+  }
+  .eyebrow::before{content:"";width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--rose))}
+  h1{
+    font-weight:200;font-size:84px;line-height:1.02;letter-spacing:-.025em;margin-bottom:34px;
+  }
+  h1 em{font-size:1.08em;color:#ffe6f0;text-shadow:0 0 40px rgba(255,179,199,.6)}
+  .lede{font-size:20px;line-height:1.65;color:var(--ink-soft);max-width:540px;margin-bottom:48px}
+  .cta-row{display:flex;gap:18px;align-items:center}
+  .hero-note{margin-top:40px;font-size:13px;color:var(--ink-faint);letter-spacing:.04em}
+
+  /* The aperture: a rectangle of light that reads as a solid */
+  .aperture-wrap{position:relative;height:620px;display:flex;align-items:center;justify-content:center}
+  .aperture{
+    position:relative;width:420px;height:560px;border-radius:4px;
+    background:#ffc2d6;
+    box-shadow:
+      0 0 60px 10px rgba(255,194,214,.55),
+      0 0 160px 40px rgba(255,95,162,.35),
+      0 0 320px 80px rgba(138,108,255,.25);
+    animation:aperture 28s ease-in-out infinite alternate;
+    overflow:hidden;
+  }
+  .aperture::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse 80% 70% at 50% 45%, rgba(255,255,255,.75), rgba(255,255,255,0) 70%);
+    animation:breathe 9s ease-in-out infinite;
+  }
+  .aperture::after{
+    content:"";position:absolute;inset:0;
+    box-shadow:inset 0 0 80px 20px rgba(255,255,255,.35);
+  }
+  @keyframes aperture{
+    0%{background:#ffc2d6;box-shadow:0 0 60px 10px rgba(255,194,214,.55),0 0 160px 40px rgba(255,95,162,.35),0 0 320px 80px rgba(138,108,255,.25)}
+    33%{background:#ffd0a8;box-shadow:0 0 60px 10px rgba(255,208,168,.55),0 0 160px 40px rgba(255,140,107,.35),0 0 320px 80px rgba(255,95,162,.25)}
+    66%{background:#bcd9ff;box-shadow:0 0 60px 10px rgba(188,217,255,.55),0 0 160px 40px rgba(138,108,255,.35),0 0 320px 80px rgba(143,220,255,.25)}
+    100%{background:#e3c6ff;box-shadow:0 0 60px 10px rgba(227,198,255,.55),0 0 160px 40px rgba(170,108,255,.35),0 0 320px 80px rgba(255,95,162,.25)}
+  }
+  @keyframes breathe{0%,100%{opacity:.55}50%{opacity:1}}
+  .aperture-card{
+    position:absolute;z-index:3;
+    background:rgba(255,255,255,.14);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:16px;padding:18px 22px;
+    color:#2a1650;font-size:13px;
+    box-shadow:0 20px 60px rgba(40,10,70,.2);
+  }
+  .aperture-card .k{font-size:10px;letter-spacing:.24em;text-transform:uppercase;opacity:.65;margin-bottom:6px}
+  .aperture-card .v{font-size:22px;font-weight:400;letter-spacing:-.01em;color:#1b0f33}
+  .aperture-card .bar{height:3px;border-radius:3px;background:rgba(27,15,51,.12);margin-top:12px;overflow:hidden}
+  .aperture-card .bar span{display:block;height:100%;width:72%;background:linear-gradient(90deg,var(--violet),var(--magenta));border-radius:3px}
+  .card-a{top:84px;left:-10px;width:230px;animation:float 10s ease-in-out infinite}
+  .card-b{bottom:96px;right:-20px;width:250px;animation:float 12s ease-in-out infinite reverse}
+  .card-b .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(27,15,51,.08)}
+  .card-b .row:last-child{border:none}
+  .pill{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:rgba(27,15,51,.08)}
+  .pill.live{background:rgba(255,95,162,.2);color:#8a1a4d}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+  .scroll-hint{
+    position:absolute;bottom:36px;left:50%;transform:translateX(-50%);z-index:3;
+    font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-faint);
+    display:flex;flex-direction:column;align-items:center;gap:14px;
+  }
+  .scroll-hint span{width:1px;height:48px;background:linear-gradient(var(--ink-soft),transparent);animation:drip 3s ease-in-out infinite}
+  @keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* ---------- LOGOS ---------- */
+  .trust{
+    padding:56px 72px;background:var(--night);
+    display:flex;align-items:center;justify-content:center;gap:72px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+  }
+  .trust p{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint)}
+  .trust .names{display:flex;gap:64px;font-size:18px;letter-spacing:.14em;color:rgba(246,241,255,.5);font-weight:400}
+  .trust .names span:nth-child(odd){font-family:var(--serif);font-style:italic;letter-spacing:.02em;font-size:22px}
+
+  /* ---------- SECTIONS ---------- */
+  section{position:relative}
+  .wrap{max-width:1296px;margin:0 auto;padding:0 72px}
+  .section-label{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--rose);margin-bottom:28px}
+  h2{font-weight:200;font-size:60px;line-height:1.08;letter-spacing:-.02em}
+  h2 em{color:#ffe6f0}
+  .body{font-size:18px;color:var(--ink-soft);line-height:1.75}
+
+  /* ---------- SKYSPACE ---------- */
+  .skyspace{
+    padding:180px 0;
+    background:linear-gradient(180deg,var(--night) 0%, #1a1036 100%);
+    overflow:hidden;
+  }
+  .sky-grid{display:grid;grid-template-columns:1fr 1fr;gap:110px;align-items:center}
+  .room{
+    position:relative;width:560px;height:560px;margin:0 auto;
+    background:linear-gradient(160deg,#efe6f4 0%, #d9cde6 60%, #c7b8d8 100%);
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 60px 140px rgba(0,0,0,.45), inset 0 0 120px rgba(90,60,130,.25);
+    animation:room 24s ease-in-out infinite alternate;
+  }
+  @keyframes room{
+    0%{background:linear-gradient(160deg,#efe6f4 0%, #d9cde6 60%, #c7b8d8 100%)}
+    100%{background:linear-gradient(160deg,#f6e3dc 0%, #e6c9cf 60%, #cfb1c4 100%)}
+  }
+  .oculus{
+    width:340px;height:340px;border-radius:50%;
+    background:#6fa8ff;
+    box-shadow:0 0 0 1px rgba(255,255,255,.5), inset 0 0 60px rgba(255,255,255,.35);
+    animation:sky 24s ease-in-out infinite alternate;
+    position:relative;overflow:hidden;
+  }
+  .oculus::after{
+    content:"";position:absolute;inset:-10%;
+    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 55%);
+    animation:drift 18s ease-in-out infinite alternate;
+  }
+  @keyframes sky{
+    0%{background:#7fb4ff}
+    35%{background:#4f7fe0}
+    65%{background:#9a6fd6}
+    100%{background:#ff8fb1}
+  }
+  .room-caption{
+    position:absolute;bottom:-44px;left:0;right:0;text-align:center;
+    font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-faint);
+  }
+  .sky-copy h2{margin-bottom:30px}
+  .sky-copy .body{margin-bottom:40px;max-width:500px}
+  .pain{list-style:none;display:flex;flex-direction:column;gap:18px}
+  .pain li{display:flex;gap:18px;align-items:flex-start;font-size:16px;color:var(--ink-soft)}
+  .pain li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;margin-top:9px;background:var(--rose);box-shadow:0 0 14px var(--magenta)}
+
+  /* ---------- CAPABILITIES: LIGHT ROOMS ---------- */
+  .rooms{padding:160px 0 180px;background:#1a1036}
+  .rooms-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:80px;gap:60px}
+  .rooms-head .body{max-width:420px}
+  .panels{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .panel{
+    position:relative;min-height:560px;border-radius:6px;overflow:hidden;
+    padding:44px 40px;display:flex;flex-direction:column;justify-content:flex-end;
+    background:#140c2a;
+    isolation:isolate;
+    transition:transform 1s cubic-bezier(.2,.7,.2,1);
+  }
+  .panel:hover{transform:translateY(-6px)}
+  .panel .light{
+    position:absolute;inset:0;z-index:-1;
+    transition:opacity 1.2s ease, transform 1.6s ease;
+  }
+  .panel .light::before{
+    content:"";position:absolute;left:12%;right:12%;top:10%;height:52%;
+    border-radius:3px;filter:blur(2px);
+    transition:filter 1.2s ease, transform 1.6s ease;
+  }
+  .panel .light::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 35%, rgba(20,12,42,.92) 78%);
+  }
+  .panel:hover .light::before{filter:blur(0);transform:scale(1.04)}
+  .p1 .light{background:radial-gradient(ellipse at 50% 30%, rgba(255,95,162,.55), transparent 70%)}
+  .p1 .light::before{background:#ff8fbd;box-shadow:0 0 80px 20px rgba(255,95,162,.6)}
+  .p2 .light{background:radial-gradient(ellipse at 50% 30%, rgba(138,108,255,.6), transparent 70%)}
+  .p2 .light::before{background:#b3a2ff;box-shadow:0 0 80px 20px rgba(138,108,255,.65)}
+  .p3 .light{background:radial-gradient(ellipse at 50% 30%, rgba(255,179,107,.5), transparent 70%)}
+  .p3 .light::before{background:#ffc995;box-shadow:0 0 80px 20px rgba(255,160,90,.55)}
+  .panel .num{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ink-soft);margin-bottom:14px}
+  .panel h3{font-weight:300;font-size:34px;letter-spacing:-.01em;margin-bottom:16px}
+  .panel p{font-size:15.5px;color:var(--ink-soft);line-height:1.7;margin-bottom:22px}
+  .panel ul{list-style:none;display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:var(--ink-faint);letter-spacing:.02em}
+  .panel ul li{padding-left:18px;position:relative}
+  .panel ul li::before{content:"";position:absolute;left:0;top:10px;width:8px;height:1px;background:currentColor}
+
+  /* ---------- JOURNEY ---------- */
+  .journey{padding:170px 0;background:linear-gradient(180deg,#1a1036 0%, #2a1650 100%);overflow:hidden}
+  .journey-head{text-align:center;max-width:760px;margin:0 auto 100px}
+  .journey-head .body{margin-top:26px}
+  .line{
+    position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:40px;
+  }
+  .line::before{
+    content:"";position:absolute;top:13px;left:6%;right:6%;height:2px;
+    background:linear-gradient(90deg,var(--magenta),var(--violet),var(--cyan),var(--amber));
+    box-shadow:0 0 24px rgba(255,95,162,.6), 0 0 60px rgba(138,108,255,.4);
+    border-radius:2px;
+  }
+  .stop{text-align:center;position:relative;padding:0 10px}
+  .stop .node{
+    width:28px;height:28px;border-radius:50%;margin:0 auto 34px;
+    background:#fff;box-shadow:0 0 0 6px rgba(255,255,255,.1),0 0 30px rgba(255,255,255,.8);
+    position:relative;z-index:1;
+  }
+  .stop:nth-child(1) .node{box-shadow:0 0 0 6px rgba(255,95,162,.2),0 0 34px var(--magenta)}
+  .stop:nth-child(2) .node{box-shadow:0 0 0 6px rgba(138,108,255,.2),0 0 34px var(--violet)}
+  .stop:nth-child(3) .node{box-shadow:0 0 0 6px rgba(143,220,255,.2),0 0 34px var(--cyan)}
+  .stop:nth-child(4) .node{box-shadow:0 0 0 6px rgba(255,179,107,.2),0 0 34px var(--amber)}
+  .stop .when{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px}
+  .stop h4{font-weight:300;font-size:24px;margin-bottom:12px}
+  .stop p{font-size:15px;color:var(--ink-soft);line-height:1.7}
+
+  /* ---------- METRICS ---------- */
+  .metrics{padding:140px 0;background:#2a1650;position:relative;overflow:hidden}
+  .metrics::before{
+    content:"";position:absolute;left:50%;top:50%;width:1400px;height:500px;transform:translate(-50%,-50%);
+    background:radial-gradient(ellipse, rgba(255,95,162,.25), transparent 65%);filter:blur(30px);
+  }
+  .metric-grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12)}
+  .metric{padding:60px 36px;border-right:1px solid rgba(255,255,255,.08)}
+  .metric:last-child{border-right:none}
+  .metric .n{font-weight:200;font-size:76px;letter-spacing:-.04em;line-height:1;margin-bottom:18px;
+    background:linear-gradient(180deg,#fff 20%, #ffc2d6 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 24px rgba(255,179,199,.4));
+  }
+  .metric .n small{font-size:.45em;letter-spacing:0}
+  .metric p{font-size:14.5px;color:var(--ink-soft);max-width:220px}
+  .metrics-foot{position:relative;margin-top:28px;font-size:12px;color:var(--ink-faint);letter-spacing:.04em}
+
+  /* ---------- QUOTE ---------- */
+  .quote{padding:190px 0;background:linear-gradient(180deg,#2a1650 0%, #3a1846 100%);text-align:center;overflow:hidden}
+  .quote-halo{
+    position:absolute;left:50%;top:50%;width:900px;height:900px;transform:translate(-50%,-50%);border-radius:50%;
+    background:radial-gradient(circle, rgba(255,208,168,.18), transparent 60%);
+    animation:breathe 10s ease-in-out infinite;
+  }
+  blockquote{position:relative;font-family:var(--serif);font-style:italic;font-weight:300;font-size:50px;line-height:1.28;max-width:1000px;margin:0 auto 48px;color:#fff3f7}
+  blockquote::before{content:"“";display:block;font-size:120px;line-height:.6;color:var(--rose);opacity:.6;margin-bottom:20px}
+  .cite{position:relative;display:inline-flex;align-items:center;gap:18px;text-align:left}
+  .avatar{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 35%, #ffe0c2, #ff8fb1 60%, #8a6cff);box-shadow:0 0 30px rgba(255,143,177,.5)}
+  .cite strong{display:block;font-weight:500;font-size:15px;letter-spacing:.02em}
+  .cite span{font-size:13.5px;color:var(--ink-soft)}
+
+  /* ---------- DEMO: ATEN REIGN ---------- */
+  .demo{
+    position:relative;padding:160px 0 180px;overflow:hidden;
+    background:#3a1846;
+  }
+  .rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .ring{
+    position:absolute;border-radius:50%;
+    animation:ringshift 30s ease-in-out infinite alternate;
+  }
+  .ring:nth-child(1){width:2200px;height:1500px;background:#4a1a5e;animation-delay:0s}
+  .ring:nth-child(2){width:1800px;height:1220px;background:#5c2170;animation-delay:-4s}
+  .ring:nth-child(3){width:1440px;height:980px;background:#7a2c7e;animation-delay:-8s}
+  .ring:nth-child(4){width:1120px;height:760px;background:#a1428c;animation-delay:-12s}
+  .ring:nth-child(5){width:820px;height:560px;background:#c9689b;animation-delay:-16s}
+  .ring:nth-child(6){width:540px;height:370px;background:#eea0b8;animation-delay:-20s;box-shadow:0 0 120px 40px rgba(255,200,215,.35)}
+  .ring{box-shadow:0 0 60px 10px rgba(0,0,0,.08)}
+  @keyframes ringshift{
+    0%{filter:hue-rotate(0deg) brightness(1)}
+    50%{filter:hue-rotate(-40deg) brightness(1.05)}
+    100%{filter:hue-rotate(25deg) brightness(.98)}
+  }
+  .demo-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 520px;gap:90px;align-items:center}
+  .demo-copy h2{font-size:64px;margin-bottom:28px;text-shadow:0 0 60px rgba(60,10,70,.4)}
+  .demo-copy .body{color:rgba(255,245,250,.85);margin-bottom:40px;max-width:500px}
+  .expect{list-style:none;display:flex;flex-direction:column;gap:22px}
+  .expect li{display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start}
+  .expect .t{font-family:var(--serif);font-style:italic;font-size:22px;color:#ffe6f0;line-height:1.3}
+  .expect strong{display:block;font-weight:500;font-size:16px;margin-bottom:2px}
+  .expect span{font-size:14.5px;color:rgba(255,245,250,.75)}
+
+  form{
+    background:rgba(255,255,255,.12);
+    backdrop-filter:blur(28px) saturate(1.2);-webkit-backdrop-filter:blur(28px) saturate(1.2);
+    border:1px solid rgba(255,255,255,.3);
+    border-radius:22px;padding:46px 44px;
+    box-shadow:0 40px 120px rgba(40,5,50,.35), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  form h3{font-weight:300;font-size:28px;margin-bottom:6px}
+  form .sub{font-size:14px;color:rgba(255,245,250,.75);margin-bottom:30px}
+  .field{margin-bottom:18px}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  label{display:block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,245,250,.75);margin-bottom:8px}
+  input,select,textarea{
+    width:100%;font-family:var(--sans);font-size:15px;font-weight:400;color:#fff;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-radius:10px;
+    padding:14px 16px;outline:none;transition:border-color .4s, box-shadow .4s, background .4s;
+  }
+  select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,#fff 50%),linear-gradient(135deg,#fff 50%,transparent 50%);background-position:calc(100% - 20px) 50%, calc(100% - 15px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+  select option{color:#1b0f33}
+  textarea{resize:none;height:88px}
+  input::placeholder,textarea::placeholder{color:rgba(255,245,250,.45)}
+  input:focus,select:focus,textarea:focus{border-color:rgba(255,255,255,.7);background:rgba(255,255,255,.14);box-shadow:0 0 0 4px rgba(255,200,215,.15), 0 0 30px rgba(255,200,215,.25)}
+  form .btn{width:100%;justify-content:center;margin-top:10px;padding:18px}
+  .fine{margin-top:16px;font-size:12px;color:rgba(255,245,250,.6);text-align:center}
+  .thanks{display:none;text-align:center;padding:40px 10px}
+  .thanks .orb{width:90px;height:90px;border-radius:50%;margin:0 auto 28px;background:radial-gradient(circle,#fff,#ffc2d6 50%,transparent 72%);box-shadow:0 0 80px rgba(255,194,214,.9);animation:breathe 4s ease-in-out infinite}
+  .thanks h3{font-size:30px;margin-bottom:12px}
+  .thanks p{color:rgba(255,245,250,.8);font-size:15px}
+  form.sent .form-body{display:none}
+  form.sent .thanks{display:block}
+
+  /* ---------- FAQ ---------- */
+  .faq{padding:150px 0;background:#1a1036}
+  .faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:100px}
+  details{border-bottom:1px solid rgba(255,255,255,.1);padding:28px 0}
+  details:first-child{border-top:1px solid rgba(255,255,255,.1)}
+  summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:20px;font-weight:300}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"";width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.25);transition:background .5s, box-shadow .5s;flex:none;margin-left:24px}
+  details[open] summary::after{background:var(--rose);box-shadow:0 0 16px var(--magenta)}
+  details p{margin-top:16px;color:var(--ink-soft);font-size:16px;line-height:1.75;max-width:680px}
+
+  /* ---------- FOOTER ---------- */
+  footer{padding:80px 0 50px;background:var(--night);border-top:1px solid rgba(255,255,255,.05)}
+  .foot{display:flex;justify-content:space-between;align-items:flex-start;gap:60px}
+  .foot-cols{display:flex;gap:90px}
+  .foot-cols h5{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;margin-bottom:18px}
+  .foot-cols a{display:block;font-size:14px;color:var(--ink-soft);margin-bottom:10px;transition:color .3s}
+  .foot-cols a:hover{color:#fff}
+  .foot-tag{margin-top:18px;font-size:14px;color:var(--ink-faint);max-width:300px}
+  .legal{margin-top:70px;display:flex;justify-content:space-between;font-size:12px;color:var(--ink-faint);letter-spacing:.04em}
+  .horizon{height:3px;background:linear-gradient(90deg,transparent,var(--magenta),var(--violet),var(--amber),transparent);box-shadow:0 0 30px rgba(255,95,162,.6);opacity:.7}
+
+  /* ---------- REVEAL ---------- */
+  .reveal{opacity:0;transform:translateY(28px);filter:blur(6px);transition:opacity 1.6s ease, transform 1.6s cubic-bezier(.2,.7,.2,1), filter 1.6s ease}
+  .reveal.in{opacity:1;transform:none;filter:none}
+  .d1{transition-delay:.15s}.d2{transition-delay:.3s}.d3{transition-delay:.45s}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    .reveal{opacity:1;transform:none;filter:none}
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#" class="logo"><span class="logo-mark"></span>ACME</a>
+  <div class="nav-links">
+    <a href="#platform">Platform</a>
+    <a href="#journey">How it works</a>
+    <a href="#proof">Customers</a>
+    <a href="#faq">Questions</a>
+  </div>
+  <a href="#demo" class="btn"><span class="dot"></span>Book a demo</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="hero">
+  <div class="hero-glow" id="glow"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow reveal">Widget operations for modern manufacturers</div>
+      <h1 class="reveal d1">Every widget,<br>in <em>clear light.</em></h1>
+      <p class="lede reveal d2">Acme gives operations teams one calm place to configure custom widgets, place orders with suppliers, and watch each unit travel from spec to loading dock — without the spreadsheets, the email chains, or the guesswork.</p>
+      <div class="cta-row reveal d3">
+        <a href="#demo" class="btn"><span class="dot"></span>Book a 30-minute demo</a>
+        <a href="#platform" class="btn btn-ghost">See the platform</a>
+      </div>
+      <p class="hero-note reveal d3">Trusted by 340+ mid-sized manufacturers · SOC 2 Type II · Live in under six weeks</p>
+    </div>
+    <div class="aperture-wrap reveal d2">
+      <div class="aperture"></div>
+      <div class="aperture-card card-a">
+        <div class="k">Order WX-20418</div>
+        <div class="v">1,200 hex couplers</div>
+        <div class="bar"><span></span></div>
+        <div class="k" style="margin-top:10px;margin-bottom:0">In machining · ships Thu</div>
+      </div>
+      <div class="aperture-card card-b">
+        <div class="k">Today across 4 plants</div>
+        <div class="row"><span>Configured</span><span class="pill">38</span></div>
+        <div class="row"><span>In transit</span><span class="pill live">112 live</span></div>
+        <div class="row"><span>At risk</span><span class="pill">2</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Step inside<span></span></div>
+</header>
+
+<div class="trust">
+  <p>Running on Acme</p>
+  <div class="names">
+    <span>Halvorsen</span><span>NORTHGATE FAB</span><span>Castellan</span><span>BRIGHTWATER</span><span>Okafor &amp; Sons</span>
+  </div>
+</div>
+
+<!-- SKYSPACE -->
+<section class="skyspace">
+  <div class="wrap sky-grid">
+    <div class="reveal">
+      <div class="room">
+        <div class="oculus"></div>
+        <div class="room-caption">One opening. The whole sky.</div>
+      </div>
+    </div>
+    <div class="sky-copy">
+      <div class="section-label reveal">The problem</div>
+      <h2 class="reveal d1">Your supply chain shouldn't feel like <em>working in the dark.</em></h2>
+      <p class="body reveal d2">Custom widgets pass through a dozen hands before they reach your line — engineers, buyers, suppliers, carriers. Each one keeps their own version of the truth. By the time a delay surfaces, it's already a line-down emergency.</p>
+      <ul class="pain reveal d3">
+        <li>Specs live in PDFs, revisions live in inboxes, and nobody is sure which one the supplier quoted.</li>
+        <li>Order status means calling three vendors and waiting on a callback.</li>
+        <li>Expedite fees quietly eat into margin every single quarter.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORM -->
+<section class="rooms" id="platform">
+  <div class="wrap">
+    <div class="rooms-head">
+      <div>
+        <div class="section-label reveal">The platform</div>
+        <h2 class="reveal d1">Three rooms.<br><em>One continuous light.</em></h2>
+      </div>
+      <p class="body reveal d2">Acme connects the moment a widget is imagined to the moment it's installed. Each stage hands its data forward, so nothing is retyped, lost, or left to memory.</p>
+    </div>
+    <div class="panels">
+      <article class="panel p1 reveal">
+        <div class="light"></div>
+        <div class="num">i.</div>
+        <h3>Configure</h3>
+        <p>Build custom widgets from approved materials, tolerances, and finishes. Acme checks every spec against your engineering rules before it ever reaches a supplier.</p>
+        <ul>
+          <li>Guided configurator with live pricing</li>
+          <li>Revision history with approvals</li>
+          <li>CAD and drawing attachments</li>
+        </ul>
+      </article>
+      <article class="panel p2 reveal d1">
+        <div class="light"></div>
+        <div class="num">ii.</div>
+        <h3>Order</h3>
+        <p>Send clean, complete POs to your supplier network in a click. Compare quotes side by side and route approvals to the right people automatically.</p>
+        <ul>
+          <li>Multi-supplier quoting</li>
+          <li>Approval workflows by spend</li>
+          <li>Two-way sync with your ERP</li>
+        </ul>
+      </article>
+      <article class="panel p3 reveal d2">
+        <div class="light"></div>
+        <div class="num">iii.</div>
+        <h3>Track</h3>
+        <p>Watch every unit move through production, QA, and freight in real time. Acme flags risk days before a delivery slips, while there's still time to act.</p>
+        <ul>
+          <li>Milestone tracking by supplier</li>
+          <li>Predictive delay alerts</li>
+          <li>Dock-to-line receiving</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section class="journey" id="journey">
+  <div class="wrap">
+    <div class="journey-head">
+      <div class="section-label reveal">How it works</div>
+      <h2 class="reveal d1">From first spec to <em>loading dock.</em></h2>
+      <p class="body reveal d2">A typical custom widget order on Acme, start to finish — each step visible to everyone who needs it.</p>
+    </div>
+    <div class="line">
+      <div class="stop reveal">
+        <div class="node"></div>
+        <div class="when">Monday</div>
+        <h4>Spec it</h4>
+        <p>An engineer configures a stainless coupler. Acme validates tolerances and attaches the approved drawing.</p>
+      </div>
+      <div class="stop reveal d1">
+        <div class="node"></div>
+        <div class="when">Tuesday</div>
+        <h4>Quote it</h4>
+        <p>Three qualified suppliers respond inside Acme. Your buyer compares lead time and cost at a glance.</p>
+      </div>
+      <div class="stop reveal d2">
+        <div class="node"></div>
+        <div class="when">Weeks 1–3</div>
+        <h4>Watch it</h4>
+        <p>Production milestones stream in. A late raw-material shipment is flagged eleven days before it matters.</p>
+      </div>
+      <div class="stop reveal d3">
+        <div class="node"></div>
+        <div class="when">Arrival</div>
+        <h4>Receive it</h4>
+        <p>Receiving scans the pallet, matches it to the PO, and the widgets go straight to the line.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="metrics" id="proof">
+  <div class="wrap">
+    <div class="metric-grid">
+      <div class="metric reveal"><div class="n">41<small>%</small></div><p>fewer expedited shipments in the first year</p></div>
+      <div class="metric reveal d1"><div class="n">9<small>days</small></div><p>average early warning on supplier delays</p></div>
+      <div class="metric reveal d2"><div class="n">6<small>hrs</small></div><p>saved per buyer, per week, on status chasing</p></div>
+      <div class="metric reveal d3"><div class="n">99.2<small>%</small></div><p>order accuracy from spec to receiving</p></div>
+    </div>
+    <p class="metrics-foot">Median results reported by Acme customers with 200–2,000 employees, 2024 customer survey.</p>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote">
+  <div class="quote-halo"></div>
+  <div class="wrap">
+    <blockquote class="reveal">We used to find out about late parts when the line stopped. Now we see it coming a week and a half out, and it's just… quiet. My team finally gets to plan instead of react.</blockquote>
+    <div class="cite reveal d1">
+      <div class="avatar"></div>
+      <div><strong>Renata Albright</strong><span>VP of Operations, Northgate Fabrication · 4 plants</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="rings">
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+  </div>
+  <div class="wrap demo-inner">
+    <div class="demo-copy">
+      <div class="section-label reveal" style="color:#fff">Book a demo</div>
+      <h2 class="reveal d1">See your own supply chain, <em>illuminated.</em></h2>
+      <p class="body reveal d2">In thirty minutes, a product specialist will walk you through Acme using widgets and suppliers that look like yours. No slide decks, no pressure — just a clear look at what changes.</p>
+      <ul class="expect reveal d3">
+        <li><div class="t">01</div><div><strong>A tailored walkthrough</strong><span>Configure, order, and track a widget modeled on your product line.</span></div></li>
+        <li><div class="t">02</div><div><strong>An honest fit check</strong><span>We'll map Acme against your ERP, suppliers, and approval process.</span></div></li>
+        <li><div class="t">03</div><div><strong>A rollout sketch</strong><span>Leave with a realistic timeline and what your team would need.</span></div></li>
+      </ul>
+    </div>
+    <form id="demoForm" class="reveal d2" novalidate>
+      <div class="form-body">
+        <h3>Reserve your time</h3>
+        <p class="sub">We'll reply within one business day with times that suit you.</p>
+        <div class="field-row">
+          <div class="field"><label for="name">Full name</label><input id="name" required placeholder="Jordan Reyes"></div>
+          <div class="field"><label for="role">Role</label><input id="role" placeholder="Ops Manager"></div>
+        </div>
+        <div class="field"><label for="email">Work email</label><input id="email" type="email" required placeholder="jordan@yourcompany.com"></div>
+        <div class="field-row">
+          <div class="field"><label for="company">Company</label><input id="company" required placeholder="Company name"></div>
+          <div class="field"><label for="plants">Plants</label>
+            <select id="plants">
+              <option>1 plant</option><option selected>2–5 plants</option><option>6–15 plants</option><option>16+ plants</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label for="notes">What's hardest right now?</label><textarea id="notes" placeholder="e.g. tracking custom orders across six suppliers"></textarea></div>
+        <button type="submit" class="btn"><span class="dot"></span>Book my demo</button>
+        <p class="fine">No spam, ever. Your details stay with Acme.</p>
+      </div>
+      <div class="thanks">
+        <div class="orb"></div>
+        <h3>Thank you<span id="thanksName"></span>.</h3>
+        <p>Your request is in. A product specialist will email you within one business day to find a time that works.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="wrap faq-grid">
+    <div>
+      <div class="section-label reveal">Questions</div>
+      <h2 class="reveal d1">Things people <em>often ask.</em></h2>
+    </div>
+    <div class="reveal d2">
+      <details open><summary>Does Acme work with our existing ERP?</summary><p>Yes. Acme offers native two-way connectors for SAP Business One, NetSuite, Microsoft Dynamics 365, Epicor, and Plex, plus a REST API for everything else. Orders, receipts, and item masters stay in sync automatically.</p></details>
+      <details><summary>Do our suppliers need to pay for or learn new software?</summary><p>No. Suppliers join free through a lightweight portal, or keep working by email — Acme reads their replies and updates order status for you. Most suppliers are onboarded in a single afternoon.</p></details>
+      <details><summary>How long does implementation take?</summary><p>Most mid-sized manufacturers are live within four to six weeks. A dedicated implementation lead handles data migration, configurator setup, and training for your team.</p></details>
+      <details><summary>How is Acme priced?</summary><p>Pricing is an annual platform subscription based on the number of plants and active users, with unlimited supplier seats. We'll share exact numbers during your demo once we understand your setup.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a href="#" class="logo"><span class="logo-mark"></span>ACME</a>
+        <p class="foot-tag">Configure, order, and track custom widgets across your supply chain — all in one clear view.</p>
+      </div>
+      <div class="foot-cols">
+        <div><h5>Platform</h5><a href="#platform">Configure</a><a href="#platform">Order</a><a href="#platform">Track</a><a href="#faq">Integrations</a></div>
+        <div><h5>Company</h5><a href="#proof">Customers</a><a href="#">Careers</a><a href="#">Security</a><a href="#">Contact</a></div>
+        <div><h5>Start</h5><a href="#demo">Book a demo</a><a href="#faq">Pricing questions</a></div>
+      </div>
+    </div>
+    <div class="legal"><span>© 2025 Acme Widget Systems, Inc.</span><span>Privacy · Terms · SOC 2 Type II</span></div>
+  </div>
+</footer>
+<div class="horizon"></div>
+
+<script>
+  // Nav state
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 40);
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  // Soft light that drifts toward the cursor in the hero
+  const hero = document.getElementById('hero'), glow = document.getElementById('glow');
+  hero.addEventListener('mousemove', e => {
+    const r = hero.getBoundingClientRect();
+    glow.style.left = (e.clientX - r.left) + 'px';
+    glow.style.top = (e.clientY - r.top) + 'px';
+  });
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+  }, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Demo form
+  const form = document.getElementById('demoForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true;
+    ['name','email','company'].forEach(id => {
+      const f = document.getElementById(id);
+      const valid = id === 'email' ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value.trim()) : f.value.trim().length > 1;
+      f.style.borderColor = valid ? '' : 'rgba(255,220,120,.9)';
+      f.style.boxShadow = valid ? '' : '0 0 24px rgba(255,210,120,.35)';
+      if (!valid) ok = false;
+    });
+    if (!ok) return;
+    const first = document.getElementById('name').value.trim().split(' ')[0];
+    document.getElementById('thanksName').textContent = first ? ', ' + first : '';
+    form.classList.add('sent');
+  });
+</script>
+</body>
+</html>

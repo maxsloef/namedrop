@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, made with care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#faf6ef;
+    --paper-deep:#f3ecdf;
+    --ink:#3b3630;
+    --ink-soft:#6b6358;
+    --rose:#d97a6c;
+    --rose-soft:#f2d5cf;
+    --sage:#8a9b7e;
+    --sage-soft:#dde5d6;
+    --gold:#d9a441;
+    --blue:#7a94a8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Fraunces', serif;
+    font-weight:400;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  /* paper grain */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    pointer-events:none;
+    z-index:999;
+    opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .hand{font-family:'Caveat', cursive;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 48px;}
+
+  /* ---------- NAV ---------- */
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:28px 48px;max-width:1280px;margin:0 auto;
+  }
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+  .logo svg{transform:rotate(-4deg);}
+  .logo span{font-size:26px;font-weight:600;letter-spacing:-.5px;}
+  .nav-links{display:flex;gap:36px;align-items:center;}
+  .nav-links a{
+    color:var(--ink-soft);text-decoration:none;font-size:16px;
+    transition:color .2s;
+  }
+  .nav-links a:hover{color:var(--ink);}
+  .btn{
+    display:inline-block;
+    font-family:'Fraunces',serif;
+    font-size:17px;font-weight:500;
+    color:var(--ink);
+    background:var(--rose-soft);
+    border:2px solid var(--ink);
+    border-radius:255px 15px 225px 15px/15px 225px 15px 255px;
+    padding:12px 28px;
+    text-decoration:none;
+    cursor:pointer;
+    transition:transform .15s, box-shadow .15s, background .2s;
+    box-shadow:3px 3px 0 rgba(59,54,48,.18);
+  }
+  .btn:hover{transform:translate(-1px,-2px) rotate(-.5deg);box-shadow:5px 6px 0 rgba(59,54,48,.18);background:#f5dcd6;}
+  .btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 rgba(59,54,48,.18);}
+  .btn.primary{background:var(--rose);color:#fff8f3;}
+  .btn.primary:hover{background:#e08577;}
+  .btn.small{padding:8px 20px;font-size:15px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:70px 0 90px;
+  }
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center;}
+  .hero-tag{
+    font-family:'Caveat',cursive;
+    font-size:24px;color:var(--rose);
+    transform:rotate(-2deg);display:inline-block;margin-bottom:14px;
+  }
+  h1{
+    font-size:64px;font-weight:500;line-height:1.08;letter-spacing:-1.5px;
+    margin-bottom:26px;
+  }
+  h1 em{font-style:italic;font-weight:400;color:var(--rose);}
+  .hero p.lede{
+    font-size:20px;color:var(--ink-soft);max-width:480px;margin-bottom:36px;font-weight:300;
+  }
+  .hero-cta{display:flex;gap:18px;align-items:center;}
+  .hero-note{
+    font-family:'Caveat',cursive;font-size:20px;color:var(--ink-soft);
+    transform:rotate(-1.5deg);
+  }
+  /* hero illustration */
+  .hero-art{position:relative;}
+  .hero-art svg{width:100%;height:auto;display:block;}
+  .tape{
+    position:absolute;width:110px;height:32px;
+    background:rgba(217,164,65,.35);
+    transform:rotate(-6deg);
+    top:-14px;left:38%;
+    border-left:1px dashed rgba(59,54,48,.2);
+    border-right:1px dashed rgba(59,54,48,.2);
+  }
+  .float{animation:floaty 6s ease-in-out infinite;}
+  .float2{animation:floaty 7s ease-in-out infinite reverse;}
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-9px) rotate(1.2deg);}}
+
+  /* ---------- TICKER ---------- */
+  .ticker{
+    border-top:2px solid var(--ink);
+    border-bottom:2px solid var(--ink);
+    background:var(--paper-deep);
+    overflow:hidden;padding:14px 0;
+    transform:rotate(-.6deg) scale(1.02);
+  }
+  .ticker-inner{display:flex;gap:56px;white-space:nowrap;animation:tick 30s linear infinite;width:max-content;}
+  .ticker span{font-family:'Caveat',cursive;font-size:22px;color:var(--ink-soft);}
+  .ticker b{color:var(--rose);font-weight:600;}
+  @keyframes tick{to{transform:translateX(-50%);}}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:100px 0;}
+  .sec-head{max-width:640px;margin-bottom:60px;}
+  .sec-kicker{font-family:'Caveat',cursive;font-size:24px;color:var(--sage);transform:rotate(-1.5deg);display:inline-block;margin-bottom:8px;}
+  h2{font-size:44px;font-weight:500;letter-spacing:-1px;line-height:1.15;margin-bottom:16px;}
+  h2 em{font-style:italic;color:var(--rose);font-weight:400;}
+  .sec-head p{font-size:18px;color:var(--ink-soft);font-weight:300;}
+
+  /* problem cards */
+  .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+  .card{
+    background:#fffdf8;
+    border:2px solid var(--ink);
+    border-radius:15px 225px 15px 255px/255px 15px 225px 15px;
+    padding:34px 30px;
+    box-shadow:4px 4px 0 rgba(59,54,48,.12);
+    transition:transform .2s, box-shadow .2s;
+    position:relative;
+  }
+  .card:hover{transform:translateY(-5px) rotate(-.4deg);box-shadow:6px 9px 0 rgba(59,54,48,.12);}
+  .card:nth-child(2){transform:rotate(.6deg);}
+  .card:nth-child(2):hover{transform:translateY(-5px) rotate(.2deg);}
+  .card:nth-child(3){transform:rotate(-.5deg);}
+  .card .num{font-family:'Caveat',cursive;font-size:30px;color:var(--rose);margin-bottom:10px;}
+  .card h3{font-size:22px;font-weight:600;margin-bottom:10px;letter-spacing:-.3px;}
+  .card p{font-size:16px;color:var(--ink-soft);font-weight:300;}
+  .strike{position:relative;display:inline-block;}
+  .strike::after{
+    content:"";position:absolute;left:-3%;right:-3%;top:55%;height:3px;
+    background:var(--rose);border-radius:3px;transform:rotate(-2deg);
+  }
+
+  /* how it works */
+  .how{background:var(--sage-soft);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;position:relative;}
+  .step{text-align:left;position:relative;}
+  .step .blob{
+    width:76px;height:76px;margin-bottom:20px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Caveat',cursive;font-size:36px;font-weight:600;color:var(--ink);
+    background:#fffdf8;border:2px solid var(--ink);
+    border-radius:58% 42% 55% 45%/48% 55% 45% 52%;
+    box-shadow:3px 3px 0 rgba(59,54,48,.15);
+  }
+  .step h3{font-size:24px;font-weight:600;margin-bottom:10px;}
+  .step p{font-size:16px;color:var(--ink-soft);font-weight:300;}
+  .connector{position:absolute;top:38px;left:76px;right:-40px;height:30px;pointer-events:none;}
+  .connector svg{width:100%;height:100%;overflow:visible;}
+  .connector path{stroke:var(--ink-soft);stroke-width:2;fill:none;stroke-dasharray:6 7;stroke-linecap:round;}
+
+  /* quote */
+  .quote-sec{text-align:center;}
+  .quote-mark{font-family:'Caveat',cursive;font-size:80px;color:var(--rose);line-height:.4;display:block;margin-bottom:24px;}
+  blockquote{font-size:32px;font-weight:400;font-style:italic;max-width:820px;margin:0 auto 28px;line-height:1.4;letter-spacing:-.5px;}
+  .attrib{font-family:'Caveat',cursive;font-size:22px;color:var(--ink-soft);}
+  .attrib b{color:var(--ink);}
+
+  /* features list */
+  .feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;}
+  .feat-list{list-style:none;}
+  .feat-list li{
+    display:flex;gap:18px;padding:22px 0;
+    border-bottom:2px dashed rgba(59,54,48,.2);
+  }
+  .feat-list li:last-child{border-bottom:none;}
+  .feat-icon{flex-shrink:0;width:34px;height:34px;margin-top:3px;}
+  .feat-list h4{font-size:20px;font-weight:600;margin-bottom:4px;}
+  .feat-list p{font-size:16px;color:var(--ink-soft);font-weight:300;}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  /* demo form */
+  .demo{background:var(--paper-deep);border-top:2px solid var(--ink);}
+  .demo-box{
+    max-width:760px;margin:0 auto;
+    background:#fffdf8;border:2px solid var(--ink);
+    border-radius:15px 255px 15px 225px/225px 15px 255px 15px;
+    padding:56px 60px;position:relative;
+    box-shadow:6px 6px 0 rgba(59,54,48,.12);
+  }
+  .demo-box .tape{top:-16px;left:44%;}
+  .demo-box h2{text-align:center;}
+  .demo-sub{text-align:center;font-family:'Caveat',cursive;font-size:23px;color:var(--ink-soft);margin-bottom:36px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px;}
+  label{display:block;font-size:15px;font-weight:500;margin-bottom:6px;}
+  input,select{
+    width:100%;padding:13px 16px;font-family:'Fraunces',serif;font-size:16px;color:var(--ink);
+    background:var(--paper);border:2px solid var(--ink);
+    border-radius:12px 4px 14px 4px/4px 14px 4px 12px;
+    outline:none;transition:box-shadow .15s;
+  }
+  input:focus,select:focus{box-shadow:3px 3px 0 rgba(217,122,108,.4);}
+  .form-btn{width:100%;margin-top:8px;font-size:19px;padding:16px;}
+  .form-fine{text-align:center;font-family:'Caveat',cursive;font-size:19px;color:var(--ink-soft);margin-top:16px;}
+  .form-success{display:none;text-align:center;padding:30px 0;}
+  .form-success .big{font-family:'Caveat',cursive;font-size:44px;color:var(--sage);margin-bottom:10px;}
+  .form-success p{color:var(--ink-soft);font-size:18px;}
+
+  footer{
+    padding:44px 48px;display:flex;justify-content:space-between;align-items:center;
+    max-width:1280px;margin:0 auto;color:var(--ink-soft);font-size:15px;
+  }
+  footer .hand{font-size:20px;}
+
+  .underline-svg{position:relative;}
+  .underline-svg svg{position:absolute;left:0;bottom:-6px;width:100%;height:14px;overflow:visible;}
+  .underline-svg path{stroke:var(--gold);stroke-width:4;fill:none;stroke-linecap:round;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">
+    <svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="#3b3630" stroke-width="2.5" stroke-dasharray="70 8" stroke-linecap="round" transform="rotate(-30 17 17)"/><circle cx="17" cy="17" r="5" fill="#d97a6c"/></svg>
+    <span>Acme</span>
+  </a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#story">Why us</a>
+    <a class="btn small" href="#demo">Book a demo</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <span class="hero-tag">for the folks who keep the line running ♡</span>
+      <h1>Custom widgets, ordered without the <em>heartache.</em></h1>
+      <p class="lede">Acme helps operations teams at mid-sized manufacturers configure, order, and track custom widgets across the whole supply chain — so nothing gets lost between the drawing and the dock.</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="#demo">Book a demo</a>
+        <span class="hero-note">takes 20 minutes, we promise →</span>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="tape"></div>
+      <svg viewBox="0 0 520 420" fill="none">
+        <!-- sketchy factory -->
+        <g stroke="#3b3630" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M60 340 L60 200 L140 250 L140 200 L220 250 L220 200 L300 250 L300 340" fill="#fffdf8"/>
+          <path d="M90 340 L90 290 L130 290 L130 340" fill="#f2d5cf"/>
+          <rect x="170" y="285" width="34" height="30" fill="#dde5d6"/>
+          <rect x="240" y="285" width="34" height="30" fill="#dde5d6"/>
+          <path d="M320 340 L320 160 L352 160 L352 340" fill="#fffdf8"/>
+          <path d="M318 160 Q336 148 354 160" />
+        </g>
+        <!-- smoke puffs -->
+        <g class="float" stroke="#7a94a8" stroke-width="2" fill="none" stroke-linecap="round">
+          <path d="M336 130 q-10 -14 2 -22 q14 -8 10 -22"/>
+          <path d="M348 108 q-8 -12 4 -18"/>
+        </g>
+        <!-- conveyor + widgets -->
+        <g class="float2">
+          <path d="M40 380 L480 380" stroke="#3b3630" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 10"/>
+          <g stroke="#3b3630" stroke-width="2.5">
+            <circle cx="120" cy="364" r="16" fill="#f2d5cf"/>
+            <circle cx="120" cy="364" r="5" fill="none"/>
+            <circle cx="230" cy="364" r="16" fill="#dde5d6"/>
+            <circle cx="230" cy="364" r="5" fill="none"/>
+            <circle cx="340" cy="364" r="16" fill="#f5e6c8"/>
+            <circle cx="340" cy="364" r="5" fill="none"/>
+          </g>
+        </g>
+        <!-- heart -->
+        <g class="float" transform="translate(430 90)">
+          <path d="M0 14 C-16 -4 -34 10 -20 28 L0 46 L20 28 C34 10 16 -4 0 14 Z" fill="#d97a6c" stroke="#3b3630" stroke-width="2.5" transform="scale(.8)"/>
+        </g>
+        <!-- sparkles -->
+        <g stroke="#d9a441" stroke-width="2.5" stroke-linecap="round">
+          <path d="M420 200 l0 16 M412 208 l16 0"/>
+          <path d="M80 120 l0 12 M74 126 l12 0"/>
+        </g>
+        <!-- hand-written annotation -->
+        <text x="330" y="60" font-family="Caveat, cursive" font-size="26" fill="#6b6358" transform="rotate(-4 330 60)">your widgets, on their way</text>
+        <path d="M400 70 q30 20 18 60" stroke="#6b6358" stroke-width="1.8" fill="none" stroke-dasharray="4 5" stroke-linecap="round"/>
+        <path d="M416 122 l4 12 l-12 -4" stroke="#6b6358" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <span><b>12,400+</b> widgets tracked last month</span>
+    <span>avg. reorder time: <b>4 minutes</b></span>
+    <span><b>98.2%</b> on-time delivery visibility</span>
+    <span>loved by ops teams at <b>300+</b> manufacturers</span>
+    <span>zero spreadsheets harmed</span>
+  </div>
+</div>
+
+<section id="story">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">we've been there</span>
+      <h2>Ordering custom widgets shouldn't feel like <em>yelling into the void.</em></h2>
+      <p>You know the drill. Specs buried in email threads. A PO nobody can find. A supplier who swears it shipped last Tuesday. We built Acme because we lived that — and we believed it could feel different.</p>
+    </div>
+    <div class="pain-grid">
+      <div class="card reveal">
+        <div class="num">no. 1</div>
+        <h3>The spec shuffle</h3>
+        <p>Version 7 of the drawing is in someone's inbox. Version 9 is on the shop floor. Acme keeps <span class="strike">every revision ever</span> one living configuration everyone actually sees.</p>
+      </div>
+      <div class="card reveal">
+        <div class="num">no. 2</div>
+        <h3>The black hole</h3>
+        <p>Between "ordered" and "received" there was... nothing. Now every widget carries a status you can check without making three phone calls and a prayer.</p>
+      </div>
+      <div class="card reveal">
+        <div class="num">no. 3</div>
+        <h3>The reorder scramble</h3>
+        <p>Reorder points lived in a spreadsheet named FINAL_v2_REAL.xlsx. Acme watches your inventory and nudges you gently before the line ever stops.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-kicker">soft &amp; simple</span>
+      <h2>Three small steps. <em>That's the whole thing.</em></h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="blob">1</div>
+        <div class="connector"><svg viewBox="0 0 200 30" preserveAspectRatio="none"><path d="M0 20 Q 50 5, 100 15 T 200 12"/></svg></div>
+        <h3>Configure</h3>
+        <p>Build your widget from a friendly guided form — materials, tolerances, finishes. No engineering degree required, though we respect yours if you have one.</p>
+      </div>
+      <div class="step reveal">
+        <div class="blob">2</div>
+        <div class="connector"><svg viewBox="0 0 200 30" preserveAspectRatio="none"><path d="M0 12 Q 50 25, 100 14 T 200 18"/></svg></div>
+        <h3>Order</h3>
+        <p>Send it to vetted suppliers with one click. Pricing, lead times, and approvals all in one place — signed, sealed, and actually findable later.</p>
+      </div>
+      <div class="step reveal">
+        <div class="blob">3</div>
+        <h3>Track</h3>
+        <p>Watch every order move from supplier to dock in real time. When something slips, you hear it from us first — with a plan, not just an apology.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quote-sec">
+  <div class="wrap reveal">
+    <span class="quote-mark">"</span>
+    <blockquote>For the first time in eleven years, I know where every widget is. I didn't think software could make me feel <span class="underline-svg">calm<svg viewBox="0 0 100 14" preserveAspectRatio="none"><path d="M2 9 Q 25 3, 50 8 T 98 7"/></svg></span>, but here we are.</blockquote>
+    <div class="attrib">— <b>Marta Ellison</b>, Operations Director, Halloran Fabrication Co.</div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap feat-grid">
+    <div class="reveal">
+      <span class="sec-kicker">the good stuff</span>
+      <h2>Built gentle, <em>built to last.</em></h2>
+      <p style="font-size:18px;color:var(--ink-soft);font-weight:300;">Every feature exists because a real ops manager asked for it — usually more than once, sometimes with feeling.</p>
+    </div>
+    <ul class="feat-list">
+      <li class="reveal">
+        <svg class="feat-icon" viewBox="0 0 34 34"><path d="M6 17 L14 25 L28 8" stroke="#8a9b7e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div><h4>Living configurations</h4><p>One source of truth for every spec, revision, and approval.</p></div>
+      </li>
+      <li class="reveal">
+        <svg class="feat-icon" viewBox="0 0 34 34"><circle cx="17" cy="17" r="12" stroke="#d97a6c" stroke-width="2.5" fill="none"/><path d="M17 10 L17 17 L22 20" stroke="#d97a6c" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div><h4>Real-time tracking</h4><p>Milestone updates from supplier floor to your receiving dock.</p></div>
+      </li>
+      <li class="reveal">
+        <svg class="feat-icon" viewBox="0 0 34 34"><path d="M17 4 C10 12 6 16 6 21 A11 11 0 0 0 28 21 C28 16 24 12 17 4 Z" stroke="#7a94a8" stroke-width="2.5" fill="none" stroke-linejoin="round"/></svg>
+        <div><h4>Gentle reorder nudges</h4><p>Low-stock alerts timed to real lead times, not panic.</p></div>
+      </li>
+      <li class="reveal">
+        <svg class="feat-icon" viewBox="0 0 34 34"><rect x="5" y="8" width="24" height="18" rx="3" stroke="#d9a441" stroke-width="2.5" fill="none"/><path d="M5 14 L29 14" stroke="#d9a441" stroke-width="2.5"/></svg>
+        <div><h4>Supplier scorecards</h4><p>On-time rates and quality history, shared kindly and clearly.</p></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="demo-box reveal">
+      <div class="tape"></div>
+      <h2>Come see it. <em>Bring your messiest order.</em></h2>
+      <p class="demo-sub">we'll trace it together, start to finish — no slides, just your real work</p>
+      <form id="demoForm" novalidate>
+        <div class="form-row">
+          <div><label for="name">Your name</label><input id="name" type="text" placeholder="Sam Whitaker" required></div>
+          <div><label for="email">Work email</label><input id="email" type="email" placeholder="sam@yourcompany.com" required></div>
+        </div>
+        <div class="form-row">
+          <div><label for="company">Company</label><input id="company" type="text" placeholder="Whitaker &amp; Sons Mfg." required></div>
+          <div><label for="size">Team size</label>
+            <select id="size">
+              <option>Just me, mostly</option>
+              <option>2 – 10 people</option>
+              <option>11 – 50 people</option>
+              <option>50+ people</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn primary form-btn" type="submit">Book my demo</button>
+        <p class="form-fine">no pressure, no 47-email sequence. just a conversation.</p>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <div class="big">thank you! ♡</div>
+        <p>We've got your note. Someone kind from our team will write back within one business day to find a time that suits you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2025 Acme Widget Co. Made with care in Ohio.</span>
+  <span class="hand">every widget has a story — let's make yours a good one.</span>
+</footer>
+
+<script>
+  // duplicate ticker for seamless loop
+  const t = document.getElementById('ticker');
+  t.innerHTML += t.innerHTML;
+
+  // scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // demo form
+  document.getElementById('demoForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('name');
+    const email = document.getElementById('email');
+    const company = document.getElementById('company');
+    let ok = true;
+    [name, email, company].forEach(f => {
+      const bad = !f.value.trim() || (f.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value));
+      f.style.boxShadow = bad ? '3px 3px 0 rgba(217,122,108,.8)' : '';
+      if (bad) ok = false;
+    });
+    if (!ok) return;
+    e.target.style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, made in order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f7f4ee;
+    --paper-deep:#f1ede4;
+    --ink:#2b2824;
+    --ink-soft:#6e675e;
+    --ink-faint:#a89f93;
+    --line:#ddd5c7;
+    --accent:#b35c33;
+    --accent-soft:#c98d6f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--accent);color:var(--paper);}
+
+  /* ---------- grain ---------- */
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.35;
+  }
+
+  /* ---------- type ---------- */
+  .serif{font-family:'Cormorant Garamond',serif;}
+  .label{
+    font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--ink-faint);font-weight:400;
+  }
+  .rule{width:56px;height:1px;background:var(--ink);opacity:.6;}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:28px 64px;
+    transition:background .5s ease, box-shadow .5s ease, padding .5s ease;
+  }
+  nav.scrolled{
+    background:rgba(247,244,238,.92);
+    backdrop-filter:blur(12px);
+    box-shadow:0 1px 0 var(--line);
+    padding:18px 64px;
+  }
+  .brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink);}
+  .brand-mark{width:26px;height:26px;}
+  .brand-name{font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;}
+  .nav-links{display:flex;align-items:center;gap:44px;list-style:none;}
+  .nav-links a{
+    text-decoration:none;color:var(--ink-soft);font-size:12.5px;letter-spacing:.14em;
+    text-transform:uppercase;position:relative;transition:color .3s;
+  }
+  .nav-links a::after{
+    content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--accent);transition:width .4s cubic-bezier(.22,1,.36,1);
+  }
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a:hover::after{width:100%;}
+  .nav-cta{
+    border:1px solid var(--ink);border-radius:999px;padding:11px 26px;
+    font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)!important;
+    background:transparent;transition:background .4s,color .4s,border-color .4s;
+  }
+  .nav-cta:hover{background:var(--ink);color:var(--paper)!important;}
+  .nav-cta::after{display:none;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;position:relative;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:0 64px;
+  }
+  .hero-inner{max-width:1200px;margin:0 auto;width:100%;position:relative;z-index:2;}
+  .hero .label{display:flex;align-items:center;gap:18px;margin-bottom:44px;}
+  h1{
+    font-family:'Cormorant Garamond',serif;font-weight:300;
+    font-size:clamp(56px,6.4vw,96px);line-height:1.04;letter-spacing:-.01em;
+    max-width:14ch;
+  }
+  h1 em{font-style:italic;color:var(--accent);}
+  .hero-sub{
+    margin-top:40px;max-width:46ch;font-size:16px;line-height:1.9;color:var(--ink-soft);
+  }
+  .hero-actions{margin-top:56px;display:flex;align-items:center;gap:36px;}
+  .btn-primary{
+    display:inline-flex;align-items:center;gap:16px;
+    background:var(--ink);color:var(--paper);text-decoration:none;
+    border-radius:999px;padding:20px 40px;
+    font-size:13px;letter-spacing:.16em;text-transform:uppercase;font-weight:400;
+    transition:background .4s,gap .4s cubic-bezier(.22,1,.36,1);
+  }
+  .btn-primary svg{transition:transform .4s cubic-bezier(.22,1,.36,1);}
+  .btn-primary:hover{background:var(--accent);gap:24px;}
+  .btn-ghost{
+    text-decoration:none;color:var(--ink);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    border-bottom:1px solid var(--line);padding-bottom:6px;transition:border-color .3s,color .3s;
+  }
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+
+  .hero-canvas-wrap{
+    position:absolute;top:0;right:0;bottom:0;width:48%;z-index:1;overflow:hidden;
+  }
+  #heroCanvas{width:100%;height:100%;display:block;}
+
+  .scroll-hint{
+    position:absolute;bottom:40px;left:64px;display:flex;align-items:center;gap:16px;z-index:2;
+  }
+  .scroll-hint .line-v{width:1px;height:52px;background:var(--line);position:relative;overflow:hidden;}
+  .scroll-hint .line-v::after{
+    content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:var(--ink);
+    animation:drip 2.6s cubic-bezier(.65,0,.35,1) infinite;
+  }
+  @keyframes drip{0%{top:-100%}55%{top:0}100%{top:100%}}
+  .scroll-hint span{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-faint);}
+
+  /* ---------- shared section chrome ---------- */
+  section{position:relative;}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 64px;}
+  .sec-head{display:flex;align-items:baseline;gap:32px;margin-bottom:80px;}
+  .sec-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--ink-faint);}
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity 1s cubic-bezier(.22,1,.36,1),transform 1s cubic-bezier(.22,1,.36,1);}
+  .reveal.in{opacity:1;transform:none;}
+
+  /* ---------- strip / marquee ---------- */
+  .strip{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:26px 0;overflow:hidden;white-space:nowrap;
+  }
+  .strip-track{display:inline-block;animation:slide 46s linear infinite;}
+  .strip span{
+    display:inline-flex;align-items:center;gap:22px;margin-right:56px;
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;color:var(--ink-soft);
+  }
+  .strip .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block;}
+  @keyframes slide{to{transform:translateX(-50%)}}
+
+  /* ---------- problem ---------- */
+  .problem{padding:180px 0 160px;}
+  .problem-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:120px;align-items:start;}
+  .sticky-note{position:sticky;top:140px;}
+  .sticky-note h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(36px,3.4vw,52px);line-height:1.15;margin-top:36px;max-width:11ch;}
+  .pain{display:flex;gap:32px;padding:36px 0;border-top:1px solid var(--line);}
+  .pain:last-child{border-bottom:1px solid var(--line);}
+  .pain-idx{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--ink-faint);font-size:16px;min-width:32px;padding-top:3px;}
+  .pain h3{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:24px;margin-bottom:12px;}
+  .pain p{font-size:14.5px;line-height:1.85;color:var(--ink-soft);max-width:52ch;}
+
+  /* ---------- how ---------- */
+  .how{background:var(--paper-deep);padding:160px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .how h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(38px,3.6vw,56px);line-height:1.12;max-width:16ch;margin-top:36px;}
+  .how-intro{display:flex;justify-content:space-between;align-items:flex-end;gap:80px;margin-bottom:110px;}
+  .how-intro p{max-width:38ch;font-size:15px;line-height:1.9;color:var(--ink-soft);}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);}
+  .step{padding:56px 48px 64px;border-right:1px solid var(--line);position:relative;}
+  .step:last-child{border-right:none;}
+  .step svg{margin-bottom:44px;}
+  .step-num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--accent);letter-spacing:.08em;}
+  .step h3{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:27px;margin:14px 0 16px;}
+  .step p{font-size:14px;line-height:1.85;color:var(--ink-soft);}
+  .step-arrow{
+    position:absolute;top:64px;right:-9px;z-index:2;color:var(--ink-faint);
+  }
+
+  /* ---------- specs ---------- */
+  .specs{padding:180px 0 160px;}
+  .specs-grid{display:grid;grid-template-columns:1fr 1fr;gap:110px;align-items:center;}
+  .spec-list h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(36px,3.4vw,52px);line-height:1.15;margin-top:36px;max-width:14ch;}
+  .spec-list>p{margin-top:32px;font-size:15px;line-height:1.9;color:var(--ink-soft);max-width:44ch;}
+  .spec-rows{margin-top:56px;}
+  .spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:18px 0;border-top:1px solid var(--line);}
+  .spec-row:last-child{border-bottom:1px solid var(--line);}
+  .spec-row dt{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);}
+  .spec-row dd{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;}
+  .spec-visual{display:flex;align-items:center;justify-content:center;}
+  .widget-fig{max-width:420px;width:100%;}
+
+  /* ---------- quote ---------- */
+  .quote{background:var(--ink);color:var(--paper);padding:170px 0;text-align:center;}
+  .quote blockquote{
+    font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;
+    font-size:clamp(30px,3vw,44px);line-height:1.35;max-width:24ch;margin:0 auto;
+  }
+  .quote blockquote strong{font-weight:400;color:var(--accent-soft);}
+  .quote cite{
+    display:block;margin-top:48px;font-style:normal;
+    font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:rgba(247,244,238,.55);
+  }
+  .quote .qmark{font-family:'Cormorant Garamond',serif;font-size:110px;line-height:.4;color:var(--accent);display:block;margin-bottom:28px;}
+
+  /* ---------- stats ---------- */
+  .stats{border-bottom:1px solid var(--line);}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);}
+  .stat{padding:88px 48px;text-align:center;border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat .num{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(52px,4.6vw,72px);line-height:1;}
+  .stat .num sup{font-size:.42em;color:var(--accent);}
+  .stat p{margin-top:20px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);}
+
+  /* ---------- CTA ---------- */
+  .cta{padding:190px 0 180px;text-align:center;position:relative;overflow:hidden;}
+  .cta h2{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(46px,4.6vw,72px);line-height:1.1;max-width:16ch;margin:0 auto;}
+  .cta p{margin:36px auto 0;max-width:44ch;font-size:15.5px;line-height:1.9;color:var(--ink-soft);}
+  .cta .btn-primary{margin-top:56px;}
+  .cta-fine{margin-top:28px;font-size:12px;color:var(--ink-faint);letter-spacing:.08em;}
+  .cta-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);padding:64px 0 48px;background:var(--paper-deep);}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:64px;}
+  .foot-brand p{margin-top:20px;font-size:13px;line-height:1.8;color:var(--ink-soft);max-width:32ch;}
+  .foot-links{display:flex;gap:80px;}
+  .foot-links h4{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:22px;font-weight:400;}
+  .foot-links ul{list-style:none;}
+  .foot-links li{margin-bottom:12px;}
+  .foot-links a{text-decoration:none;font-size:13.5px;color:var(--ink-soft);transition:color .3s;}
+  .foot-links a:hover{color:var(--accent);}
+  .foot-bottom{
+    margin-top:64px;padding-top:28px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-faint);letter-spacing:.06em;
+  }
+
+  @media (max-width:1100px){
+    .hero-canvas-wrap{opacity:.35;width:100%;}
+    .problem-grid,.specs-grid{grid-template-columns:1fr;gap:64px;}
+    .sticky-note{position:static;}
+    .steps{grid-template-columns:1fr;}
+    .step{border-right:none;border-bottom:1px solid var(--line);}
+    .stats-grid{grid-template-columns:1fr;}
+    .stat{border-right:none;border-bottom:1px solid var(--line);}
+    .nav-links li:not(:last-child){display:none;}
+  }
+</style>
+</head>
+<body>
+
+<svg class="grain" xmlns="http://www.w3.org/2000/svg" width="300" height="300">
+  <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.05"/></feComponentTransfer></filter>
+  <rect width="300" height="300" filter="url(#n)"/>
+</svg>
+
+<nav id="nav">
+  <a class="brand" href="#top">
+    <svg class="brand-mark" viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#2b2824" stroke-width="1"/>
+      <circle cx="13" cy="13" r="4.5" fill="#b35c33"/>
+    </svg>
+    <span class="brand-name">Acme</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#why">Why Acme</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#craft">The craft</a></li>
+    <li><a href="#demo" class="nav-cta">Book a demo</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <p class="label"><span class="rule"></span>Widget operations, quietly resolved</p>
+    <h1>The supply chain,<br>held to a <em>finer tolerance</em>.</h1>
+    <p class="hero-sub">Acme is the platform where operations teams at mid-sized manufacturers configure, order, and track custom widgets — from first drawing to final delivery — with the calm precision your floor deserves.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#demo">Book a demo
+        <svg width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="M0 5h16M12 1l4 4-4 4" stroke="currentColor" stroke-width="1.2"/></svg>
+      </a>
+      <a class="btn-ghost" href="#how">See how it works</a>
+    </div>
+  </div>
+  <div class="hero-canvas-wrap"><canvas id="heroCanvas"></canvas></div>
+  <div class="scroll-hint"><div class="line-v"></div><span>Scroll</span></div>
+</header>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-track" id="stripTrack">
+    <span><i class="dot"></i>Configured to drawing</span>
+    <span><i class="dot"></i>Quoted in hours</span>
+    <span><i class="dot"></i>Tracked to the dock</span>
+    <span><i class="dot"></i>Trusted by 240 plants</span>
+    <span><i class="dot"></i>ISO 9001 workflows</span>
+    <span><i class="dot"></i>One calm dashboard</span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem" id="why">
+  <div class="wrap">
+    <div class="problem-grid">
+      <div class="sticky-note reveal">
+        <p class="label"><span class="sec-num">01</span>&ensp;—&ensp;The quiet cost of friction</p>
+        <h2>Your line runs on widgets. Your week runs on email.</h2>
+      </div>
+      <div>
+        <div class="pain reveal">
+          <div class="pain-idx">i.</div>
+          <div>
+            <h3>Specifications scattered</h3>
+            <p>Drawings live in one inbox, revisions in another, and the version on the shop floor is nobody's guess you'd like to make. Each ambiguity costs a call, a day, sometimes a batch.</p>
+          </div>
+        </div>
+        <div class="pain reveal">
+          <div class="pain-idx">ii.</div>
+          <div>
+            <h3>Lead times you can't repeat</h3>
+            <p>A quote that took nine days last quarter takes three this one — or the other way around. Without a system, every order is a first order, and planning becomes weather-watching.</p>
+          </div>
+        </div>
+        <div class="pain reveal">
+          <div class="pain-idx">iii.</div>
+          <div>
+            <h3>Visibility that ends at the purchase order</h3>
+            <p>Once the PO is sent, the widget disappears into a fog of "we'll check with the supplier." Your line, meanwhile, waits on a date you cannot defend.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="how-intro reveal">
+      <div>
+        <p class="label"><span class="sec-num">02</span>&ensp;—&ensp;The method</p>
+        <h2>Three movements. No noise between them.</h2>
+      </div>
+      <p>Acme replaces the sprawl of inboxes and spreadsheets with a single, unhurried flow — from the part you imagine to the part in your hand.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#b35c33" stroke-width="1">
+          <rect x="6" y="6" width="32" height="32" rx="1"/>
+          <path d="M14 30V22M22 30V16M30 30V12" stroke-linecap="round"/>
+        </svg>
+        <p class="step-num">Step one</p>
+        <h3>Configure</h3>
+        <p>Build your widget from governed templates — material, tolerance, finish, quantity — with drawings and revisions versioned in one place. What you specify is what gets made.</p>
+        <svg class="step-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#a89f93" stroke-width="1"/><path d="M6 9h6M9.5 6.5L12 9l-2.5 2.5" stroke="#a89f93" stroke-width="1"/></svg>
+      </div>
+      <div class="step reveal" style="transition-delay:.12s">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#b35c33" stroke-width="1">
+          <circle cx="22" cy="22" r="16"/>
+          <path d="M22 12v10l7 5" stroke-linecap="round"/>
+        </svg>
+        <p class="step-num">Step two</p>
+        <h3>Order</h3>
+        <p>Quotes return in hours, priced against live capacity. Approvals route themselves. One purchase order, one source of truth, lead times you can promise to a line manager without crossing your fingers.</p>
+        <svg class="step-arrow" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#a89f93" stroke-width="1"/><path d="M6 9h6M9.5 6.5L12 9l-2.5 2.5" stroke="#a89f93" stroke-width="1"/></svg>
+      </div>
+      <div class="step reveal" style="transition-delay:.24s">
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#b35c33" stroke-width="1">
+          <path d="M6 34c6-2 6-14 12-16s8 10 14 8 4-14 6-16" stroke-linecap="round"/>
+          <circle cx="38" cy="10" r="2.5"/>
+        </svg>
+        <p class="step-num">Step three</p>
+        <h3>Track</h3>
+        <p>Every widget carries its story: machining status, inspection results, carrier, dock ETA. Exceptions surface before they become shortages. Your floor plans against fact, not hope.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECS / CRAFT -->
+<section class="specs" id="craft">
+  <div class="wrap">
+    <div class="specs-grid">
+      <div class="spec-visual reveal">
+        <svg class="widget-fig" viewBox="0 0 420 460" fill="none">
+          <circle cx="210" cy="210" r="150" stroke="#ddd5c7" stroke-width="1"/>
+          <circle cx="210" cy="210" r="150" stroke="#2b2824" stroke-width="1" stroke-dasharray="1 7"/>
+          <circle cx="210" cy="210" r="104" stroke="#2b2824" stroke-width="1.2"/>
+          <circle cx="210" cy="210" r="104" stroke="#b35c33" stroke-width="1.2" stroke-dasharray="140 513" stroke-linecap="round" id="ringArc"/>
+          <circle cx="210" cy="210" r="38" stroke="#2b2824" stroke-width="1.2"/>
+          <circle cx="210" cy="210" r="6" fill="#b35c33"/>
+          <g id="ticks"></g>
+          <line x1="210" y1="36" x2="210" y2="14" stroke="#a89f93" stroke-width="1"/>
+          <text x="222" y="22" font-family="Cormorant Garamond, serif" font-style="italic" font-size="15" fill="#6e675e">± 0.02 mm, everywhere</text>
+          <line x1="348" y1="290" x2="392" y2="322" stroke="#a89f93" stroke-width="1"/>
+          <text x="316" y="352" font-family="Cormorant Garamond, serif" font-style="italic" font-size="15" fill="#6e675e">lot-traceable finish</text>
+          <line x1="86" y1="290" x2="40" y2="326" stroke="#a89f93" stroke-width="1"/>
+          <text x="30" y="356" font-family="Cormorant Garamond, serif" font-style="italic" font-size="15" fill="#6e675e">rev-controlled bore</text>
+          <line x1="60" y1="410" x2="360" y2="410" stroke="#ddd5c7" stroke-width="1"/>
+          <text x="152" y="438" font-family="Inter, sans-serif" font-size="10" letter-spacing="3" fill="#a89f93">FIG. 1 — THE WIDGET, OBSERVED</text>
+        </svg>
+      </div>
+      <div class="spec-list reveal">
+        <p class="label"><span class="sec-num">03</span>&ensp;—&ensp;The craft</p>
+        <h2>Precision is a habit, not a feature.</h2>
+        <p>Acme was built with manufacturers, for manufacturers. Every number below is a default, not an upgrade.</p>
+        <dl class="spec-rows">
+          <div class="spec-row"><dt>Quote turnaround</dt><dd>Under 4 hours</dd></div>
+          <div class="spec-row"><dt>Spec revision control</dt><dd>Automatic, always on</dd></div>
+          <div class="spec-row"><dt>Tracking granularity</dt><dd>Operation level</dd></div>
+          <div class="spec-row"><dt>Supplier network</dt><dd>380 audited shops</dd></div>
+          <div class="spec-row"><dt>ERP integrations</dt><dd>SAP, NetSuite, Epicor</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote">
+  <div class="wrap reveal">
+    <span class="qmark serif">“</span>
+    <blockquote>We stopped chasing widgets through inboxes. Acme gave us back the thing a plant needs most — <strong>a date we can believe in</strong>.</blockquote>
+    <cite>Marisol Vega — Director of Operations, Hartwell Fabrication</cite>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat reveal"><div class="num"><span data-count="240">0</span><sup>+</sup></div><p>Manufacturing plants served</p></div>
+    <div class="stat reveal" style="transition-delay:.12s"><div class="num"><span data-count="38">0</span><sup>%</sup></div><p>Average reduction in lead-time variance</p></div>
+    <div class="stat reveal" style="transition-delay:.24s"><div class="num"><span data-count="99.6" data-decimal="1">0</span><sup>%</sup></div><p>Order lines delivered to promise date</p></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="demo">
+  <svg class="cta-ring" width="900" height="900" viewBox="0 0 900 900" fill="none">
+    <circle cx="450" cy="450" r="330" stroke="#ddd5c7" stroke-width="1" opacity=".7"/>
+    <circle cx="450" cy="450" r="410" stroke="#ddd5c7" stroke-width="1" opacity=".4" stroke-dasharray="1 8"/>
+  </svg>
+  <div class="wrap reveal" style="position:relative;">
+    <h2>An hour with us.<br>A calmer year for you.</h2>
+    <p>Book a working demo with an operations specialist. We'll configure one of your real parts, live, and show you the quote, the order, and the tracking — end to end.</p>
+    <a class="btn-primary" href="#" id="demoBtn">Book a demo
+      <svg width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="M0 5h16M12 1l4 4-4 4" stroke="currentColor" stroke-width="1.2"/></svg>
+    </a>
+    <p class="cta-fine" id="ctaFine">Forty-five minutes · your parts, your data · no obligation</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top">
+          <svg class="brand-mark" viewBox="0 0 26 26" fill="none">
+            <circle cx="13" cy="13" r="12" stroke="#2b2824" stroke-width="1"/>
+            <circle cx="13" cy="13" r="4.5" fill="#b35c33"/>
+          </svg>
+          <span class="brand-name">Acme</span>
+        </a>
+        <p>Widgets, made in order. Built for the operations teams who keep mid-sized manufacturing honest.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="#how">Configure</a></li>
+            <li><a href="#how">Order</a></li>
+            <li><a href="#how">Track</a></li>
+            <li><a href="#craft">Integrations</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#why">Why Acme</a></li>
+            <li><a href="#demo">Book a demo</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2025 Acme Widget Systems, Inc.</span>
+      <span>Made with care, to a fine tolerance.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ---- nav scroll state ---- */
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), {passive:true});
+
+  /* ---- duplicate marquee content for seamless loop ---- */
+  const strip = document.getElementById('stripTrack');
+  strip.innerHTML += strip.innerHTML;
+
+  /* ---- hero canvas: slowly rotating technical drawing ---- */
+  const cv = document.getElementById('heroCanvas');
+  const ctx = cv.getContext('2d');
+  let W, H, dpr;
+  function size(){
+    dpr = Math.min(devicePixelRatio, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  size(); addEventListener('resize', size);
+
+  let t = 0, mouseX = 0;
+  addEventListener('mousemove', e => { mouseX = (e.clientX / innerWidth - .5); });
+
+  function drawGear(cx, cy, r, rot, alpha){
+    ctx.save();
+    ctx.translate(cx, cy); ctx.rotate(rot);
+    ctx.strokeStyle = `rgba(43,40,36,${alpha})`;
+    ctx.lineWidth = 1;
+    const teeth = 24;
+    ctx.beginPath();
+    for (let i = 0; i < teeth * 2; i++){
+      const a = (i / (teeth * 2)) * Math.PI * 2;
+      const rad = i % 2 === 0 ? r : r * 0.88;
+      const x = Math.cos(a) * rad, y = Math.sin(a) * rad;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.62, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.2, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(179,92,51,${alpha + 0.1})`; ctx.stroke();
+    ctx.restore();
+  }
+
+  function loop(){
+    t += 0.0016;
+    ctx.clearRect(0, 0, W, H);
+    const cx = W * 0.55 + mouseX * 24, cy = H * 0.46;
+    // concentric guides
+    [0.34, 0.42, 0.5].forEach((f, i) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, Math.min(W, H) * f, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(221,213,199,${0.9 - i * 0.22})`;
+      ctx.lineWidth = 1; ctx.stroke();
+    });
+    drawGear(cx, cy, Math.min(W, H) * 0.30, t, 0.5);
+    drawGear(cx + Math.min(W,H) * 0.335, cy + 60, Math.min(W, H) * 0.10, -t * 3 + 0.4, 0.35);
+    // sweeping accent arc
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.min(W, H) * 0.38, t * 2, t * 2 + 1.1);
+    ctx.strokeStyle = 'rgba(179,92,51,.65)';
+    ctx.lineWidth = 1.4; ctx.lineCap = 'round'; ctx.stroke();
+    // crosshair ticks
+    ctx.strokeStyle = 'rgba(168,159,147,.8)';
+    [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy]) => {
+      const r1 = Math.min(W,H) * 0.5 + 8, r2 = r1 + 12;
+      ctx.beginPath();
+      ctx.moveTo(cx + dx * r1, cy + dy * r1);
+      ctx.lineTo(cx + dx * r2, cy + dy * r2);
+      ctx.stroke();
+    });
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  /* ---- scroll reveal ---- */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold: 0.15});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* ---- animated counters ---- */
+  const counterIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      counterIO.unobserve(e.target);
+      const el = e.target, target = parseFloat(el.dataset.count), dec = +(el.dataset.decimal || 0);
+      const start = performance.now(), dur = 1800;
+      (function tick(now){
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = (target * eased).toFixed(dec);
+        if (p < 1) requestAnimationFrame(tick);
+      })(start);
+    });
+  }, {threshold: 0.6});
+  document.querySelectorAll('[data-count]').forEach(el => counterIO.observe(el));
+
+  /* ---- widget figure: ticks + rotating accent arc ---- */
+  const ticks = document.getElementById('ticks');
+  for (let i = 0; i < 48; i++){
+    const a = (i / 48) * Math.PI * 2, long = i % 4 === 0;
+    const r1 = 116, r2 = long ? 128 : 123;
+    const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1', 210 + Math.cos(a) * r1); l.setAttribute('y1', 210 + Math.sin(a) * r1);
+    l.setAttribute('x2', 210 + Math.cos(a) * r2); l.setAttribute('y2', 210 + Math.sin(a) * r2);
+    l.setAttribute('stroke', long ? '#6e675e' : '#a89f93');
+    l.setAttribute('stroke-width', '1');
+    ticks.appendChild(l);
+  }
+  const arc = document.getElementById('ringArc');
+  let arcT = 0;
+  (function spinArc(){
+    arcT += 0.35;
+    arc.setAttribute('transform', `rotate(${arcT} 210 210)`);
+    requestAnimationFrame(spinArc);
+  })();
+
+  /* ---- gentle demo confirmation ---- */
+  const demoBtn = document.getElementById('demoBtn');
+  const fine = document.getElementById('ctaFine');
+  demoBtn.addEventListener('click', e => {
+    e.preventDefault();
+    demoBtn.style.pointerEvents = 'none';
+    demoBtn.style.background = '#b35c33';
+    demoBtn.firstChild.textContent = 'We\u2019ll be in touch \u2014 thank you ';
+    fine.textContent = 'A specialist will write within one business day to arrange your session.';
+  });
+</script>
+</body>
+</html>

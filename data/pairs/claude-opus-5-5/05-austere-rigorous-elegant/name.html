@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme — Every widget, exactly as specified</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f1efe9;
+    --ink:#0d0d0d;
+    --red:#e2231a;
+    --mute:#6d6b65;
+    --line:rgba(13,13,13,.9);
+    --faint:rgba(13,13,13,.12);
+    --m:48px;
+    --g:24px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:"Inter",Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1440px;margin:0 auto;padding:0 var(--m)}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);column-gap:var(--g)}
+  .display{font-family:"Inter Tight",Helvetica,Arial,sans-serif;letter-spacing:-.035em;font-weight:700}
+  .label{font-size:12px;font-weight:500;letter-spacing:.02em;text-transform:none;color:var(--ink)}
+  .mute{color:var(--mute)}
+  .rule{border-top:2px solid var(--ink)}
+  .hair{border-top:1px solid var(--line)}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--bg)}
+  header .grid{height:72px;align-items:center;border-bottom:1px solid var(--ink)}
+  .logo{grid-column:1/4;display:flex;align-items:center;gap:12px;font-family:"Inter Tight";font-weight:800;font-size:22px;letter-spacing:-.04em}
+  .logo i{width:18px;height:18px;border-radius:50%;background:var(--red);display:block}
+  nav{grid-column:4/10;display:flex;gap:40px;font-size:14px;font-weight:500}
+  nav a{position:relative}
+  nav a::after{content:"";position:absolute;left:0;bottom:-4px;height:2px;width:0;background:var(--red);transition:width .25s}
+  nav a:hover::after{width:100%}
+  .hcta{grid-column:10/13;justify-self:end}
+  .btn{display:inline-flex;align-items:center;gap:14px;font-weight:600;font-size:14px;padding:14px 20px;background:var(--ink);color:var(--bg);border:0;cursor:pointer;font-family:inherit;transition:background .2s}
+  .btn:hover{background:var(--red)}
+  .btn .arr{display:inline-block;transition:transform .2s}
+  .btn:hover .arr{transform:translateX(4px)}
+  .btn.red{background:var(--red)}
+  .btn.red:hover{background:var(--ink)}
+  .link{font-weight:600;font-size:14px;border-bottom:2px solid var(--ink);padding-bottom:3px}
+  .link:hover{color:var(--red);border-color:var(--red)}
+
+  /* ---------- Hero ---------- */
+  .hero{padding-top:40px}
+  .hero-meta{padding-bottom:40px}
+  .hero-meta div{font-size:12px;font-weight:500}
+  .hero-meta .c1{grid-column:1/4}
+  .hero-meta .c2{grid-column:4/7}
+  .hero-meta .c3{grid-column:7/10}
+  .hero-meta .c4{grid-column:10/13;text-align:right}
+  .hero-body{align-items:start;min-height:680px}
+  .hero h1{grid-column:1/7;font-size:118px;line-height:.9;padding-top:8px}
+  .hero h1 em{font-style:normal;color:var(--red)}
+  .hero-art{grid-column:7/13;position:relative;height:680px}
+  .hero-art svg{width:100%;height:100%;display:block;overflow:visible}
+  .hero-foot{padding:32px 0 96px;align-items:start}
+  .hero-foot p{grid-column:1/5;font-size:20px;line-height:1.4;font-weight:400}
+  .hero-foot .acts{grid-column:5/9;display:flex;gap:32px;align-items:center;padding-top:4px}
+  .hero-foot .note{grid-column:10/13;font-size:13px;color:var(--mute);text-align:right;padding-top:6px}
+
+  /* ---------- Stats ---------- */
+  .stats{padding-bottom:128px}
+  .stat{grid-column:span 3;padding-top:20px;border-top:2px solid var(--ink)}
+  .stat b{display:block;font-family:"Inter Tight";font-size:88px;line-height:1;letter-spacing:-.05em;font-weight:700}
+  .stat b sup{font-size:32px;vertical-align:top;position:relative;top:10px;margin-left:4px;letter-spacing:-.02em}
+  .stat span{display:block;font-size:14px;margin-top:14px;max-width:240px}
+  .stat:first-child b{color:var(--red)}
+  .stats .src{grid-column:1/13;margin-top:24px;font-size:12px;color:var(--mute)}
+
+  /* ---------- Sections ---------- */
+  section{padding:0 0 144px}
+  .shead{padding-top:20px;margin-bottom:72px}
+  .shead .num{grid-column:1/4;font-size:14px;font-weight:600}
+  .shead .num span{color:var(--red)}
+  .shead h2{grid-column:4/12;font-size:64px;line-height:1;}
+  .shead p{grid-column:4/10;margin-top:28px;font-size:20px;line-height:1.45;max-width:720px}
+
+  /* Problem */
+  .problem .cols{align-items:start}
+  .pcol{grid-column:span 3;padding-top:16px;border-top:1px solid var(--ink)}
+  .pcol:first-child{grid-column:4/7}
+  .pcol h3{font-family:"Inter Tight";font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:10px}
+  .pcol p{font-size:15px;color:#2b2a27}
+  .pcol .x{font-family:"Inter Tight";font-weight:700;font-size:13px;color:var(--red);margin-bottom:28px;display:block}
+
+  /* Method */
+  .step{grid-column:span 4}
+  .step .fig{aspect-ratio:1/1;background:transparent;border-top:2px solid var(--ink);position:relative;margin-bottom:28px}
+  .step .fig svg{width:100%;height:100%;display:block}
+  .step .n{font-family:"Inter Tight";font-size:14px;font-weight:700;color:var(--red)}
+  .step h3{font-family:"Inter Tight";font-size:36px;letter-spacing:-.03em;font-weight:700;margin:6px 0 14px}
+  .step p{font-size:16px;max-width:380px}
+  .step ul{list-style:none;margin-top:24px;font-size:14px}
+  .step li{padding:10px 0;border-top:1px solid var(--faint);display:flex;justify-content:space-between}
+  .step li:last-child{border-bottom:1px solid var(--faint)}
+  .step li span:last-child{color:var(--mute)}
+
+  /* Spec table */
+  .spec .row{padding:22px 0;border-top:1px solid var(--ink);align-items:baseline}
+  .spec .row:last-child{border-bottom:2px solid var(--ink)}
+  .spec .row .k{grid-column:1/4;font-size:13px;font-weight:600}
+  .spec .row .h{grid-column:4/8;font-family:"Inter Tight";font-size:26px;font-weight:600;letter-spacing:-.025em;line-height:1.15}
+  .spec .row .d{grid-column:8/12;font-size:15px;color:#2b2a27}
+  .spec .row .i{grid-column:12/13;text-align:right;font-size:12px;font-weight:600}
+  .spec .row{transition:background .2s}
+  .spec .row:hover .h{color:var(--red)}
+
+  /* Quote */
+  .quote{background:var(--red);color:#fff;padding:120px 0 112px;margin-bottom:144px;position:relative;overflow:hidden}
+  .quote .qmark{grid-column:1/3;font-family:"Inter Tight";font-size:200px;line-height:.7;font-weight:800}
+  .quote blockquote{grid-column:3/12;font-family:"Inter Tight";font-weight:600;font-size:58px;line-height:1.05;letter-spacing:-.035em}
+  .quote .who{grid-column:3/7;margin-top:56px;padding-top:16px;border-top:2px solid #fff;font-size:14px}
+  .quote .who b{display:block;font-size:16px}
+  .quote .res{grid-column:8/12;margin-top:56px;padding-top:16px;border-top:2px solid #fff;display:flex;gap:48px}
+  .quote .res div b{font-family:"Inter Tight";font-size:44px;letter-spacing:-.04em;display:block;line-height:1}
+  .quote .res div span{font-size:13px}
+  .quote svg.q-art{position:absolute;right:-120px;top:-120px;width:520px;height:520px;opacity:.18;pointer-events:none}
+
+  /* Integrations */
+  .integr .cell{grid-column:span 2;border-top:1px solid var(--ink);padding:18px 0 48px;font-family:"Inter Tight";font-weight:600;font-size:20px;letter-spacing:-.02em}
+  .integr .cell small{display:block;font-family:"Inter";font-weight:400;font-size:12px;color:var(--mute);letter-spacing:0;margin-top:4px}
+
+  /* Demo */
+  .demo{background:var(--ink);color:var(--bg);padding:120px 0 96px}
+  .demo .shead .num{color:var(--bg)}
+  .demo .left{grid-column:1/6}
+  .demo h2{font-size:112px;line-height:.9;margin-bottom:48px}
+  .demo h2 em{font-style:normal;color:var(--red)}
+  .demo ol{list-style:none;counter-reset:s}
+  .demo ol li{counter-increment:s;display:grid;grid-template-columns:56px 1fr;padding:18px 0;border-top:1px solid rgba(241,239,233,.35);font-size:15px}
+  .demo ol li:last-child{border-bottom:1px solid rgba(241,239,233,.35)}
+  .demo ol li::before{content:counter(s,decimal-leading-zero);font-weight:600;color:var(--red);font-size:13px;padding-top:2px}
+  .demo ol li b{display:block;font-weight:600}
+  .demo ol li span{color:rgba(241,239,233,.65)}
+  .demo form{grid-column:7/13;border-top:2px solid var(--bg);padding-top:24px}
+  .demo form .fr{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--g)}
+  .field{display:block;margin-bottom:28px;position:relative}
+  .field label{display:block;font-size:12px;font-weight:600;margin-bottom:8px}
+  .field input,.field select{
+    width:100%;background:transparent;border:0;border-bottom:1px solid rgba(241,239,233,.5);
+    color:var(--bg);font-family:"Inter Tight";font-size:22px;letter-spacing:-.02em;padding:6px 0 10px;outline:none;border-radius:0;appearance:none;-webkit-appearance:none;
+  }
+  .field select{cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--bg) 50%),linear-gradient(135deg,var(--bg) 50%,transparent 50%);background-position:calc(100% - 12px) 18px,calc(100% - 6px) 18px;background-size:6px 6px;background-repeat:no-repeat}
+  .field select option{color:var(--ink)}
+  .field input:focus,.field select:focus{border-bottom:2px solid var(--red)}
+  .field input::placeholder{color:rgba(241,239,233,.3)}
+  .field .err{position:absolute;right:0;top:0;font-size:12px;color:var(--red);font-weight:600;opacity:0;transition:opacity .2s}
+  .field.bad .err{opacity:1}
+  .field.bad input{border-bottom-color:var(--red)}
+  .seg{display:flex;border:1px solid rgba(241,239,233,.5);margin-bottom:32px}
+  .seg input{display:none}
+  .seg label{flex:1;text-align:center;padding:12px 0;font-size:14px;font-weight:500;cursor:pointer;border-right:1px solid rgba(241,239,233,.5);transition:background .15s}
+  .seg label:last-of-type{border-right:0}
+  .seg input:checked + label{background:var(--bg);color:var(--ink)}
+  .formfoot{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:8px}
+  .formfoot small{font-size:12px;color:rgba(241,239,233,.55);max-width:300px}
+  .done{display:none;grid-column:7/13;border-top:2px solid var(--red);padding-top:24px}
+  .done h3{font-family:"Inter Tight";font-size:48px;letter-spacing:-.035em;line-height:1;margin-bottom:24px}
+  .done p{font-size:18px;max-width:520px;color:rgba(241,239,233,.8)}
+  .done .disc{width:72px;height:72px;border-radius:50%;background:var(--red);margin-bottom:32px}
+
+  footer{background:var(--ink);color:rgba(241,239,233,.7);font-size:13px}
+  footer .grid{padding:28px 0 40px;border-top:1px solid rgba(241,239,233,.35)}
+  footer .f1{grid-column:1/4;color:var(--bg);font-family:"Inter Tight";font-weight:800;font-size:18px;letter-spacing:-.04em;display:flex;gap:10px;align-items:center}
+  footer .f1 i{width:12px;height:12px;border-radius:50%;background:var(--red);display:block}
+  footer .f2{grid-column:4/7}
+  footer .f3{grid-column:7/10}
+  footer .f4{grid-column:10/13;text-align:right}
+  footer a:hover{color:var(--bg)}
+
+  /* Grid overlay */
+  .overlay{position:fixed;inset:0;pointer-events:none;z-index:100;opacity:0;transition:opacity .3s}
+  .overlay.on{opacity:1}
+  .overlay .wrap{height:100%}
+  .overlay .grid{height:100%}
+  .overlay .grid div{background:rgba(226,35,26,.07);border-left:1px solid rgba(226,35,26,.35);border-right:1px solid rgba(226,35,26,.35)}
+  .gridtog{position:fixed;right:24px;bottom:24px;z-index:101;width:44px;height:44px;border-radius:50%;border:1px solid var(--ink);background:var(--bg);font-family:"Inter Tight";font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
+  .gridtog:hover,.gridtog.on{background:var(--red);border-color:var(--red);color:#fff}
+
+  /* Reveal */
+  .rv{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .rv.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="grid">
+      <a href="#" class="logo"><i></i>acme</a>
+      <nav>
+        <a href="#problem">Problem</a>
+        <a href="#method">Method</a>
+        <a href="#platform">Platform</a>
+        <a href="#integrations">Integrations</a>
+        <a href="#demo">Contact</a>
+      </nav>
+      <div class="hcta"><a href="#demo" class="btn">Book a demo <span class="arr">→</span></a></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <div class="hero wrap">
+    <div class="grid hero-meta">
+      <div class="c1">Widget operations platform</div>
+      <div class="c2 mute">For mid-sized manufacturers</div>
+      <div class="c3 mute">Configure / Order / Track</div>
+      <div class="c4">Nº 01 — 2025</div>
+    </div>
+    <div class="grid hero-body">
+      <h1 class="display">Every widget, exactly as <em>specified.</em></h1>
+      <div class="hero-art" aria-hidden="true">
+        <svg id="heroSvg" viewBox="0 0 640 680"></svg>
+      </div>
+    </div>
+    <div class="grid hero-foot rule">
+      <p>Acme gives operations teams one exact record of every custom widget in the supply chain — from first tolerance to final delivery.</p>
+      <div class="acts">
+        <a href="#demo" class="btn red">Book a 30-minute demo <span class="arr">→</span></a>
+        <a href="#method" class="link">How it works</a>
+      </div>
+      <div class="note">No commitment. You will speak with a product specialist, not a sales script.</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="wrap">
+    <div class="grid stats">
+      <div class="stat rv"><b>38<sup>%</sup></b><span>fewer specification errors reaching suppliers</span></div>
+      <div class="stat rv"><b>11<sup>days</sup></b><span>shorter average lead time on custom orders</span></div>
+      <div class="stat rv"><b>6.5<sup>h</sup></b><span>saved per planner, per week, on status chasing</span></div>
+      <div class="stat rv"><b>420<sup>+</sup></b><span>manufacturing sites running on Acme today</span></div>
+      <div class="src">Medians across Acme customers in their first twelve months, measured against their own pre-Acme baseline.</div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section id="problem" class="problem">
+    <div class="wrap">
+      <div class="grid shead rule">
+        <div class="num"><span>02</span> — Problem</div>
+        <h2 class="display rv">Custom widgets are still ordered by email, specified in spreadsheets and tracked by phone.</h2>
+        <p class="rv">Each handoff between engineering, purchasing and the supplier is a place where a dimension is retyped, a revision is missed, or a date quietly slips.</p>
+      </div>
+      <div class="grid cols">
+        <div class="pcol rv"><span class="x">A — Specification</span><h3>Drawings drift from reality</h3><p>Three versions of the same bracket live in three inboxes. The supplier builds the one attached last.</p></div>
+        <div class="pcol rv"><span class="x">B — Ordering</span><h3>Approvals stall in threads</h3><p>Pricing, capability and lead time are confirmed by hand for every order, every time.</p></div>
+        <div class="pcol rv"><span class="x">C — Tracking</span><h3>Delays surface too late</h3><p>The first sign that a lot is late is an empty bin on the line.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD -->
+  <section id="method">
+    <div class="wrap">
+      <div class="grid shead rule">
+        <div class="num"><span>03</span> — Method</div>
+        <h2 class="display rv">One system, three disciplines.</h2>
+      </div>
+      <div class="grid">
+        <div class="step rv">
+          <div class="fig">
+            <svg viewBox="0 0 400 400">
+              <rect x="100" y="110" width="200" height="200" fill="none" stroke="#0d0d0d" stroke-width="2"/>
+              <circle cx="200" cy="210" r="46" fill="#e2231a"/>
+              <line x1="100" y1="70" x2="300" y2="70" stroke="#0d0d0d" stroke-width="1"/>
+              <line x1="100" y1="60" x2="100" y2="80" stroke="#0d0d0d"/><line x1="300" y1="60" x2="300" y2="80" stroke="#0d0d0d"/>
+              <text x="200" y="58" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600">120.00 ±0.05</text>
+              <line x1="340" y1="110" x2="340" y2="310" stroke="#0d0d0d"/>
+              <line x1="330" y1="110" x2="350" y2="110" stroke="#0d0d0d"/><line x1="330" y1="310" x2="350" y2="310" stroke="#0d0d0d"/>
+              <text x="356" y="214" font-family="Inter" font-size="12" font-weight="600">120</text>
+              <line x1="200" y1="210" x2="262" y2="148" stroke="#0d0d0d"/>
+              <text x="266" y="144" font-family="Inter" font-size="12" font-weight="600">Ø 46</text>
+            </svg>
+          </div>
+          <div class="n">01</div>
+          <h3>Configure</h3>
+          <p>Define widgets as parameters, not drawings. Dimensions, materials, finishes and tolerances are checked against supplier capability as you enter them.</p>
+          <ul><li><span>Parametric templates</span><span>Unlimited</span></li><li><span>Revision control</span><span>Automatic</span></li><li><span>Capability checks</span><span>Real time</span></li></ul>
+        </div>
+        <div class="step rv">
+          <div class="fig">
+            <svg viewBox="0 0 400 400">
+              <g stroke="#0d0d0d" stroke-width="1.5">
+                <line x1="60" y1="100" x2="300" y2="200"/>
+                <line x1="60" y1="150" x2="300" y2="200"/>
+                <line x1="60" y1="200" x2="300" y2="200" stroke="#e2231a" stroke-width="4"/>
+                <line x1="60" y1="250" x2="300" y2="200"/>
+                <line x1="60" y1="300" x2="300" y2="200"/>
+              </g>
+              <g fill="#0d0d0d"><circle cx="60" cy="100" r="6"/><circle cx="60" cy="150" r="6"/><circle cx="60" cy="250" r="6"/><circle cx="60" cy="300" r="6"/></g>
+              <circle cx="60" cy="200" r="10" fill="#e2231a"/>
+              <rect x="300" y="170" width="60" height="60" fill="#0d0d0d"/>
+              <text x="60" y="340" font-family="Inter" font-size="12" font-weight="600">5 qualified suppliers</text>
+              <text x="300" y="250" font-family="Inter" font-size="12" font-weight="600">PO 20418</text>
+            </svg>
+          </div>
+          <div class="n">02</div>
+          <h3>Order</h3>
+          <p>Route each order to qualified suppliers with pricing, lead time and approvals attached. Nothing is retyped between request and purchase order.</p>
+          <ul><li><span>Approval routing</span><span>Rule-based</span></li><li><span>Supplier quotes</span><span>Side by side</span></li><li><span>ERP sync</span><span>Two-way</span></li></ul>
+        </div>
+        <div class="step rv">
+          <div class="fig">
+            <svg viewBox="0 0 400 400">
+              <line x1="40" y1="200" x2="360" y2="200" stroke="#0d0d0d" stroke-width="2"/>
+              <g fill="#0d0d0d"><circle cx="60" cy="200" r="10"/><circle cx="140" cy="200" r="10"/><circle cx="220" cy="200" r="10"/></g>
+              <circle cx="300" cy="200" r="10" fill="none" stroke="#0d0d0d" stroke-width="2"/>
+              <circle cx="220" cy="200" r="28" fill="none" stroke="#e2231a" stroke-width="2"/>
+              <circle cx="220" cy="200" r="46" fill="none" stroke="#e2231a" stroke-width="1"/>
+              <g font-family="Inter" font-size="11" font-weight="600">
+                <text x="60" y="240" text-anchor="middle">Made</text>
+                <text x="140" y="240" text-anchor="middle">Inspected</text>
+                <text x="220" y="270" text-anchor="middle" fill="#e2231a">In transit</text>
+                <text x="300" y="240" text-anchor="middle">Dock</text>
+              </g>
+              <text x="40" y="120" font-family="Inter Tight" font-size="44" font-weight="700" letter-spacing="-2">T–2d</text>
+            </svg>
+          </div>
+          <div class="n">03</div>
+          <h3>Track</h3>
+          <p>Follow every lot from production to receiving dock. Exceptions surface the moment a milestone slips — days before they reach the line.</p>
+          <ul><li><span>Lot-level visibility</span><span>Per unit</span></li><li><span>Exception alerts</span><span>Predictive</span></li><li><span>Supplier scorecards</span><span>Monthly</span></li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM SPEC -->
+  <section id="platform" class="spec">
+    <div class="wrap">
+      <div class="grid shead rule">
+        <div class="num"><span>04</span> — Platform</div>
+        <h2 class="display rv">Specification.</h2>
+        <p class="rv">Built for operations teams of five to five hundred, across one plant or thirty.</p>
+      </div>
+      <div class="grid row rv"><div class="k">4.1 Configurator</div><div class="h">Widgets defined by rule, not by memory</div><div class="d">Parametric templates with dependent fields, unit conversion and tolerance stacking. Engineering approves the template once; planners configure within it.</div><div class="i">Core</div></div>
+      <div class="grid row rv"><div class="k">4.2 Supplier network</div><div class="h">Capability on file, not on the phone</div><div class="d">Each supplier's machines, materials and minimums are recorded, so only feasible orders are ever sent.</div><div class="i">Core</div></div>
+      <div class="grid row rv"><div class="k">4.3 Approvals</div><div class="h">Controls that follow your policy</div><div class="d">Route by cost, category, plant or supplier. Every decision is timestamped and auditable.</div><div class="i">Core</div></div>
+      <div class="grid row rv"><div class="k">4.4 Tracking</div><div class="h">Milestones, lot by lot</div><div class="d">Supplier-reported and carrier-reported milestones reconciled into one timeline, with predicted arrival updated hourly.</div><div class="i">Core</div></div>
+      <div class="grid row rv"><div class="k">4.5 Analytics</div><div class="h">Spend, lead time, quality</div><div class="d">Standard reports for purchasing and operations, plus a governed data export to your warehouse.</div><div class="i">Plus</div></div>
+      <div class="grid row rv"><div class="k">4.6 Security</div><div class="h">Enterprise controls as standard</div><div class="d">SOC 2 Type II, ISO 27001, SAML single sign-on, role-based access and EU or US data residency.</div><div class="i">All plans</div></div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <div class="quote">
+    <svg class="q-art" viewBox="0 0 520 520" aria-hidden="true">
+      <g fill="none" stroke="#fff" stroke-width="2">
+        <circle cx="260" cy="260" r="60"/><circle cx="260" cy="260" r="110"/><circle cx="260" cy="260" r="160"/><circle cx="260" cy="260" r="210"/><circle cx="260" cy="260" r="258"/>
+      </g>
+    </svg>
+    <div class="wrap">
+      <div class="grid">
+        <div class="qmark">“</div>
+        <blockquote class="rv">We replaced four spreadsheets, two shared inboxes and a weekly supplier call with one screen. Our planners now spend their time planning.</blockquote>
+        <div class="who"><b>Marit Halvorsen</b>VP Operations, Halvorsen Precision Components — 3 plants, 640 employees</div>
+        <div class="res">
+          <div><b>−52%</b><span>expedite fees</span></div>
+          <div><b>97.8%</b><span>on-time receipt</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTEGRATIONS -->
+  <section id="integrations" class="integr">
+    <div class="wrap">
+      <div class="grid shead rule">
+        <div class="num"><span>05</span> — Integrations</div>
+        <h2 class="display rv">Fits the systems you already run.</h2>
+        <p class="rv">Acme reads and writes to your ERP, so the purchase order, the receipt and the invoice agree. Most customers are live within six weeks.</p>
+      </div>
+      <div class="grid">
+        <div class="cell rv">SAP S/4HANA<small>ERP · two-way</small></div>
+        <div class="cell rv">Oracle NetSuite<small>ERP · two-way</small></div>
+        <div class="cell rv">Microsoft Dynamics 365<small>ERP · two-way</small></div>
+        <div class="cell rv">Epicor Kinetic<small>ERP · two-way</small></div>
+        <div class="cell rv">SolidWorks PDM<small>CAD · revisions</small></div>
+        <div class="cell rv">REST API<small>Webhooks · SCIM</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <div id="demo" class="demo">
+    <div class="wrap">
+      <div class="grid">
+        <div class="left">
+          <h2 class="display">Book a <em>demo.</em></h2>
+          <ol>
+            <li><div><b>30 minutes, on your widgets</b><span>Send us one real part and we will configure it live.</span></div></li>
+            <li><div><b>A specialist from manufacturing</b><span>Every Acme demo is led by someone who has run a plant or a purchasing team.</span></div></li>
+            <li><div><b>A written rollout estimate</b><span>Timeline, integrations and cost, in your inbox within two days.</span></div></li>
+          </ol>
+        </div>
+        <form id="demoForm" novalidate>
+          <div class="fr">
+            <div class="field"><label for="name">Full name</label><input id="name" name="name" autocomplete="name" placeholder="Anna Keller"><span class="err">Required</span></div>
+            <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="anna@company.com"><span class="err">Use a work email</span></div>
+          </div>
+          <div class="fr">
+            <div class="field"><label for="company">Company</label><input id="company" name="company" autocomplete="organization" placeholder="Keller Metallbau"><span class="err">Required</span></div>
+            <div class="field"><label for="role">Role</label>
+              <select id="role" name="role">
+                <option>Operations</option><option>Purchasing / Procurement</option><option>Supply chain</option><option>Engineering</option><option>Executive</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:10px"><label>Manufacturing sites</label></div>
+          <div class="seg">
+            <input type="radio" name="sites" id="s1" value="1" checked><label for="s1">1</label>
+            <input type="radio" name="sites" id="s2" value="2–5"><label for="s2">2–5</label>
+            <input type="radio" name="sites" id="s3" value="6–15"><label for="s3">6–15</label>
+            <input type="radio" name="sites" id="s4" value="16+"><label for="s4">16+</label>
+          </div>
+          <div class="formfoot">
+            <small>We reply within one business day. Your details are used only to arrange this demo.</small>
+            <button type="submit" class="btn red">Request demo <span class="arr">→</span></button>
+          </div>
+        </form>
+        <div class="done" id="done">
+          <div class="disc"></div>
+          <h3 id="doneTitle">Thank you.</h3>
+          <p id="doneText"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="grid">
+      <div class="f1"><i></i>acme</div>
+      <div class="f2">Acme Widget Systems AG<br>Seefeldstrasse 88, 8008 Zürich</div>
+      <div class="f3"><a href="#platform">Security</a> · <a href="#integrations">API</a> · <a href="#demo">Careers</a></div>
+      <div class="f4">© 2025 Acme. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay" aria-hidden="true"><div class="wrap"><div class="grid">
+  <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+</div></div></div>
+<button class="gridtog" id="gridtog" title="Show grid (G)">G</button>
+
+<script>
+(function(){
+  /* ---------- Hero composition ---------- */
+  const NS="http://www.w3.org/2000/svg";
+  const svg=document.getElementById("heroSvg");
+  const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+  let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
+
+  const cx=380,cy=300;
+  const rings=[];
+  for(let i=0;i<13;i++){
+    const r=36+i*21;
+    const c=2*Math.PI*r;
+    const arc=c*(0.25+rnd()*0.5);
+    const g=el("g",{});
+    const red=(i===4||i===9);
+    const circ=el("circle",{cx,cy,r,fill:"none",stroke:red?"#e2231a":"#0d0d0d","stroke-width":red?10:(i%3===0?6:2),"stroke-dasharray":arc+" "+(c-arc),"stroke-linecap":"butt"});
+    g.appendChild(circ);
+    g.dataset.dir=i%2?1:-1;
+    g.dataset.speed=(0.03+rnd()*0.08).toFixed(3);
+    g.dataset.base=Math.floor(rnd()*360);
+    g.setAttribute("transform",`rotate(${g.dataset.base} ${cx} ${cy})`);
+    svg.appendChild(g);rings.push(g);
+  }
+  // solid red disc
+  const disc=el("circle",{cx:150,cy:560,r:92,fill:"#e2231a"});
+  svg.appendChild(disc);
+  svg.appendChild(el("circle",{cx,cy,r:12,fill:"#0d0d0d"}));
+  // axis lines
+  svg.appendChild(el("line",{x1:0,y1:cy,x2:640,y2:cy,stroke:"#0d0d0d","stroke-width":1}));
+  svg.appendChild(el("line",{x1:cx,y1:0,x2:cx,y2:680,stroke:"#0d0d0d","stroke-width":1}));
+  // annotations
+  const t1=el("text",{x:cx+8,y:18,"font-family":"Inter","font-size":12,"font-weight":600});t1.textContent="Ø 540.00 ±0.02";svg.appendChild(t1);
+  const t2=el("text",{x:8,y:cy-10,"font-family":"Inter","font-size":12,"font-weight":600});t2.textContent="Lot 20418 / Rev C";svg.appendChild(t2);
+  const t3=el("text",{x:262,y:660,"font-family":"Inter","font-size":12,"font-weight":600,fill:"#0d0d0d"});t3.textContent="Fig. 1 — Widget, parametric";svg.appendChild(t3);
+
+  let ticking=false;
+  function spin(){
+    const y=window.scrollY;
+    const t=performance.now()/1000;
+    rings.forEach(g=>{
+      const a=+g.dataset.base+g.dataset.dir*(y*g.dataset.speed*1.2+t*g.dataset.speed*20);
+      g.setAttribute("transform",`rotate(${a.toFixed(2)} ${cx} ${cy})`);
+    });
+    disc.setAttribute("cy",(560 - y*0.08).toFixed(1));
+    requestAnimationFrame(spin);
+  }
+  if(!matchMedia("(prefers-reduced-motion: reduce)").matches) requestAnimationFrame(spin);
+
+  /* ---------- Reveal ---------- */
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}}),{threshold:.15});
+  document.querySelectorAll(".rv").forEach((n,i)=>{n.style.transitionDelay=((i%4)*70)+"ms";io.observe(n);});
+
+  /* ---------- Grid overlay ---------- */
+  const ov=document.getElementById("overlay"),tg=document.getElementById("gridtog");
+  const toggle=()=>{ov.classList.toggle("on");tg.classList.toggle("on");};
+  tg.addEventListener("click",toggle);
+  document.addEventListener("keydown",e=>{if(e.key.toLowerCase()==="g"&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))toggle();});
+
+  /* ---------- Form ---------- */
+  const form=document.getElementById("demoForm");
+  const free=/@(gmail|yahoo|hotmail|outlook|icloud|aol|gmx|web|proton(mail)?)\./i;
+  form.addEventListener("submit",e=>{
+    e.preventDefault();
+    let ok=true;
+    const f=id=>document.getElementById(id);
+    const set=(id,bad)=>{f(id).parentElement.classList.toggle("bad",bad);if(bad)ok=false;};
+    set("name",!f("name").value.trim());
+    const em=f("email").value.trim();
+    const emBad=!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)||free.test(em);
+    f("email").nextElementSibling.textContent=!em?"Required":(free.test(em)?"Use a work email":"Check format");
+    set("email",emBad);
+    set("company",!f("company").value.trim());
+    if(!ok)return;
+    const first=f("name").value.trim().split(" ")[0];
+    const sites=form.querySelector("input[name=sites]:checked").value;
+    document.getElementById("doneTitle").textContent="Thank you, "+first+".";
+    document.getElementById("doneText").textContent="A product specialist will write to "+em+" within one business day to confirm a time. We will prepare the demo around "+f("company").value.trim()+" and "+(sites==="1"?"your single site":sites+" sites")+". If you have a part drawing to hand, reply with it — we will configure it live.";
+    form.style.display="none";
+    document.getElementById("done").style.display="block";
+  });
+  form.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>i.parentElement.classList.remove("bad")));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme: Somewhere, right now, a widget is on its way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Patrick+Hand&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f7f0e3;
+    --ink:#1f1b18;
+    --pink:#f2a7b8;
+    --red:#d9432f;
+    --ochre:#e8b33a;
+    --cobalt:#2f4fa8;
+    --green:#5f8f5a;
+    --lilac:#b9a2d6;
+    --sky:#bcd6e6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Libre Caslon Text",Georgia,serif;
+    font-size:19px;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  /* paper grain */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.35;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.38  0 0 0 0 0.3  0 0 0 .18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .hand{font-family:"Caveat Brush",cursive;font-weight:400}
+  .note{font-family:"Patrick Hand",cursive}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 40px}
+
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:34px 0 10px}
+  .logo{font-family:"Caveat Brush";font-size:46px;line-height:1;display:flex;gap:2px}
+  .logo span:nth-child(1){color:var(--red);transform:rotate(-6deg)}
+  .logo span:nth-child(2){color:var(--cobalt);transform:translateY(4px)}
+  .logo span:nth-child(3){color:var(--green);transform:rotate(5deg)}
+  .logo span:nth-child(4){color:var(--ochre);transform:translateY(-3px) rotate(-3deg)}
+  .logo span{display:inline-block}
+  nav ul{list-style:none;display:flex;gap:38px;font-family:"Patrick Hand";font-size:22px}
+  nav a{color:var(--ink);text-decoration:none;position:relative}
+  nav ul a:hover{color:var(--red)}
+  .btn{
+    display:inline-block;font-family:"Caveat Brush";font-size:28px;color:var(--paper);
+    background:var(--red);padding:10px 30px 12px;text-decoration:none;border:none;cursor:pointer;
+    border-radius:255px 18px 225px 20px/20px 225px 18px 255px;
+    transform:rotate(-1.5deg);transition:transform .25s ease, background .25s;
+    box-shadow:4px 5px 0 var(--ink);
+  }
+  .btn:hover{transform:rotate(1deg) scale(1.04);background:var(--cobalt)}
+  .btn.small{font-size:23px;padding:6px 22px 8px;box-shadow:3px 3px 0 var(--ink)}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:40px 0 60px}
+  .today{font-family:"Patrick Hand";font-size:23px;color:var(--cobalt);margin-bottom:14px;transform:rotate(-1deg);display:inline-block}
+  h1{font-family:"Caveat Brush";font-weight:400;font-size:104px;line-height:.92;letter-spacing:-.5px;margin-bottom:28px}
+  h1 span{display:inline-block}
+  .c1{color:var(--ink)} .c2{color:var(--red)} .c3{color:var(--cobalt)} .c4{color:var(--green)} .c5{color:var(--ochre)} .c6{color:#c96f8c}
+  .hero p.lede{font-size:22px;max-width:560px;margin-bottom:34px}
+  .hero .aside{font-family:"Patrick Hand";font-size:21px;color:#6a5f55;margin-top:22px;display:flex;align-items:center;gap:10px}
+  .hero-art{position:relative}
+  .hero-art svg{width:100%;height:auto;display:block}
+  .caption{font-family:"Patrick Hand";font-size:20px;text-align:center;color:#5a5048;margin-top:-6px}
+
+  /* section generic */
+  section{padding:80px 0}
+  h2{font-family:"Caveat Brush";font-weight:400;font-size:72px;line-height:1;margin-bottom:20px}
+  .divider{display:block;margin:0 auto;width:100%;max-width:1100px;height:40px}
+
+  /* list */
+  .truths{display:grid;grid-template-columns:.9fr 1.1fr;gap:70px;align-items:start}
+  .truths ol{list-style:none;counter-reset:t}
+  .truths li{counter-increment:t;position:relative;padding-left:70px;margin-bottom:26px;font-size:22px}
+  .truths li::before{
+    content:counter(t);position:absolute;left:0;top:-14px;font-family:"Caveat Brush";font-size:58px;line-height:1;
+  }
+  .truths li:nth-child(1)::before{color:var(--red)}
+  .truths li:nth-child(2)::before{color:var(--cobalt)}
+  .truths li:nth-child(3)::before{color:var(--green)}
+  .truths li:nth-child(4)::before{color:var(--ochre)}
+  .truths li:nth-child(5)::before{color:#c96f8c}
+  .truths em{font-family:"Patrick Hand";font-style:normal;font-size:24px;color:var(--red)}
+
+  /* how */
+  .how-intro{max-width:720px;margin-bottom:50px}
+  .how-intro p{font-size:21px}
+  .panels{display:grid;grid-template-columns:repeat(3,1fr);gap:44px}
+  .panel{position:relative}
+  .panel .frame{background:#fff9ee;padding:18px;box-shadow:0 2px 0 rgba(0,0,0,.05);transition:transform .35s ease}
+  .panel:nth-child(1) .frame{transform:rotate(-2deg)}
+  .panel:nth-child(2) .frame{transform:rotate(1.5deg) translateY(20px)}
+  .panel:nth-child(3) .frame{transform:rotate(-1deg)}
+  .panel:hover .frame{transform:rotate(0) scale(1.03)}
+  .panel svg{width:100%;height:auto;display:block}
+  .panel h3{font-family:"Caveat Brush";font-weight:400;font-size:52px;line-height:1;margin:36px 0 8px}
+  .panel:nth-child(1) h3{color:var(--red)}
+  .panel:nth-child(2) h3{color:var(--cobalt)}
+  .panel:nth-child(3) h3{color:var(--green)}
+  .panel p{font-size:18px}
+  .panel .paren{font-family:"Patrick Hand";font-size:20px;color:#7a6e63;display:block;margin-top:8px}
+
+  /* numbers */
+  .numbers{background:var(--pink);position:relative;padding:90px 0 100px}
+  .numbers::before,.numbers::after{content:"";position:absolute;left:0;right:0;height:30px;background:var(--pink)}
+  .numbers::before{top:-28px;clip-path:polygon(0 60%,6% 40%,13% 70%,21% 35%,30% 65%,38% 30%,47% 60%,55% 25%,63% 55%,72% 35%,80% 70%,88% 40%,95% 65%,100% 45%,100% 100%,0 100%)}
+  .numbers::after{bottom:-28px;clip-path:polygon(0 0,100% 0,100% 50%,93% 70%,85% 35%,76% 65%,67% 30%,58% 60%,49% 35%,40% 70%,31% 40%,22% 65%,13% 30%,5% 60%,0 40%)}
+  .numbers h2{text-align:center;color:var(--ink)}
+  .numbers .sub{text-align:center;font-family:"Patrick Hand";font-size:23px;margin-bottom:50px}
+  .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;text-align:center}
+  .num b{display:block;font-family:"Caveat Brush";font-weight:400;font-size:110px;line-height:1}
+  .num:nth-child(1) b{color:var(--cobalt)}
+  .num:nth-child(2) b{color:var(--red)}
+  .num:nth-child(3) b{color:var(--green)}
+  .num span{font-size:19px;display:block;max-width:300px;margin:6px auto 0}
+
+  /* quote */
+  .quote{display:grid;grid-template-columns:380px 1fr;gap:70px;align-items:center}
+  .quote blockquote{font-size:34px;line-height:1.35;font-style:italic;position:relative}
+  .quote blockquote::before{content:"“";font-family:"Caveat Brush";font-style:normal;font-size:180px;color:var(--ochre);position:absolute;left:-60px;top:-80px;line-height:1}
+  .quote cite{display:block;margin-top:26px;font-style:normal;font-family:"Patrick Hand";font-size:23px;color:var(--cobalt)}
+  .quote svg{width:100%;height:auto}
+
+  /* demo */
+  .demo{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
+  .demo h2 span{display:inline-block}
+  .demo .promise{list-style:none;margin-top:26px}
+  .demo .promise li{font-size:20px;margin-bottom:14px;padding-left:40px;position:relative}
+  .demo .promise li::before{content:"";position:absolute;left:0;top:6px;width:24px;height:22px;background:var(--ochre);border-radius:50% 40% 55% 45%/45% 55% 40% 50%}
+  .demo .promise li:nth-child(2)::before{background:var(--pink)}
+  .demo .promise li:nth-child(3)::before{background:var(--sky)}
+  .demo .promise li:nth-child(4)::before{background:var(--lilac)}
+  form{
+    background:#fffaf0;padding:44px 44px 40px;position:relative;transform:rotate(1deg);
+    border:2.5px solid var(--ink);
+    border-radius:4px 14px 6px 18px/16px 4px 14px 6px;
+  }
+  form .tape{position:absolute;width:130px;height:34px;background:rgba(232,179,58,.6);top:-16px;left:40%;transform:rotate(-4deg)}
+  label{display:block;font-family:"Patrick Hand";font-size:22px;margin-bottom:4px}
+  input,select{
+    width:100%;font-family:"Libre Caslon Text";font-size:18px;background:transparent;border:none;
+    border-bottom:2px solid var(--ink);padding:6px 2px 8px;margin-bottom:24px;color:var(--ink);outline:none;
+  }
+  input:focus,select:focus{border-bottom-color:var(--red)}
+  form .btn{width:100%;margin-top:8px;font-size:32px}
+  form .fine{font-family:"Patrick Hand";font-size:18px;color:#7a6e63;margin-top:18px;text-align:center}
+  .thanks{display:none;text-align:center;padding:30px 0}
+  .thanks h3{font-family:"Caveat Brush";font-weight:400;font-size:60px;color:var(--green);line-height:1;margin-bottom:14px}
+  .thanks p{font-size:20px}
+
+  footer{padding:60px 0 50px;text-align:center}
+  footer p{font-family:"Patrick Hand";font-size:21px;color:#6a5f55}
+  footer .tiny{font-family:"Libre Caslon Text";font-size:14px;margin-top:10px}
+
+  .wiggle{animation:wig 4s ease-in-out infinite;transform-origin:50% 90%}
+  @keyframes wig{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+  .float{animation:fl 5s ease-in-out infinite}
+  @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .drive{animation:drive 9s linear infinite}
+  @keyframes drive{0%{transform:translateX(-40px)}100%{transform:translateX(40px)}}
+</style>
+</head>
+<body>
+
+<!-- shared SVG filters -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="3" seed="4"/><feDisplacementMap in="SourceGraphic" scale="7"/></filter>
+    <filter id="wobble2"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="11"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+    <filter id="gouache">
+      <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" seed="2" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="8" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="5" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -.9 .95" result="gm"/>
+      <feComposite in="d" in2="gm" operator="in"/>
+    </filter>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <nav>
+    <a href="#" class="logo" aria-label="Acme home"><span>A</span><span>c</span><span>m</span><span>e</span></a>
+    <ul>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#truths">Who it's for</a></li>
+      <li><a href="#numbers">Proof</a></li>
+    </ul>
+    <a href="#demo" class="btn small">Book a demo</a>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <div class="today" id="today">Today is a Tuesday. A good day for widgets.</div>
+      <h1>
+        <span class="c1">Somewhere,</span>
+        <span class="c2">right</span> <span class="c3">now,</span><br>
+        <span class="c4">a widget</span> <span class="c1">is</span><br>
+        <span class="c5">on</span> <span class="c6">its way.</span>
+      </h1>
+      <p class="lede">Acme helps operations teams at mid-sized manufacturers configure, order, and track custom widgets across every plant and supplier. Calmly. In one place. So the thing you need shows up when you need it, and you can go home at a reasonable hour.</p>
+      <a href="#demo" class="btn">Book a 30-minute demo</a>
+      <div class="aside">
+        <svg width="46" height="30" viewBox="0 0 46 30" aria-hidden="true"><path d="M2 20 C12 4, 26 30, 42 10 M34 8 L43 9 L40 18" fill="none" stroke="#d9432f" stroke-width="2.5" stroke-linecap="round" filter="url(#wobble2)"/></svg>
+        A real person will show you. Not a video of a person.
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <svg viewBox="0 0 520 600" aria-label="A painting of a woman in a yellow coat holding a pink box, with a small dog at her feet">
+        <!-- background washes -->
+        <ellipse cx="260" cy="290" rx="235" ry="250" fill="#bcd6e6" filter="url(#gouache)" opacity=".9"/>
+        <circle cx="410" cy="110" r="46" fill="#e8b33a" filter="url(#gouache)"/>
+        <!-- floor -->
+        <path d="M30 520 Q260 500 500 522 L500 560 Q260 548 30 562Z" fill="#5f8f5a" filter="url(#gouache)" opacity=".85"/>
+        <!-- plant -->
+        <g filter="url(#wobble)">
+          <path d="M70 520 L60 450 L118 450 L108 520Z" fill="#d9432f"/>
+          <path d="M89 450 C80 390 60 360 44 340" stroke="#1f1b18" stroke-width="3" fill="none"/>
+          <path d="M89 450 C92 380 110 350 128 320" stroke="#1f1b18" stroke-width="3" fill="none"/>
+          <ellipse cx="50" cy="350" rx="22" ry="11" fill="#5f8f5a" transform="rotate(-30 50 350)"/>
+          <ellipse cx="72" cy="390" rx="20" ry="10" fill="#3f6f40" transform="rotate(20 72 390)"/>
+          <ellipse cx="122" cy="330" rx="22" ry="11" fill="#5f8f5a" transform="rotate(30 122 330)"/>
+          <ellipse cx="105" cy="385" rx="20" ry="10" fill="#3f6f40" transform="rotate(-25 105 385)"/>
+        </g>
+        <!-- woman -->
+        <g class="wiggle">
+          <g filter="url(#wobble)">
+            <!-- legs -->
+            <path d="M238 440 L232 512" stroke="#1f1b18" stroke-width="7" stroke-linecap="round"/>
+            <path d="M282 440 L290 512" stroke="#1f1b18" stroke-width="7" stroke-linecap="round"/>
+            <ellipse cx="226" cy="516" rx="18" ry="8" fill="#d9432f"/>
+            <ellipse cx="298" cy="516" rx="18" ry="8" fill="#d9432f"/>
+            <!-- coat -->
+            <path d="M216 230 Q260 212 304 230 L338 452 Q260 468 182 452Z" fill="#e8b33a"/>
+            <!-- coat stripes -->
+            <path d="M205 300 Q260 292 315 300 M198 350 Q260 342 322 350 M191 400 Q260 392 329 400" stroke="#d9432f" stroke-width="4" fill="none" opacity=".7"/>
+            <!-- buttons -->
+            <circle cx="260" cy="270" r="4" fill="#1f1b18"/><circle cx="260" cy="320" r="4" fill="#1f1b18"/>
+            <!-- neck + head -->
+            <rect x="250" y="190" width="20" height="30" fill="#f1c9a8"/>
+            <ellipse cx="260" cy="160" rx="42" ry="48" fill="#f1c9a8"/>
+            <!-- hair -->
+            <path d="M216 160 Q212 100 262 104 Q312 104 306 160 Q300 128 262 126 Q226 128 216 160Z" fill="#1f1b18"/>
+            <path d="M216 150 Q204 190 214 210" stroke="#1f1b18" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <path d="M306 150 Q318 190 306 210" stroke="#1f1b18" stroke-width="12" fill="none" stroke-linecap="round"/>
+            <!-- hat -->
+            <ellipse cx="262" cy="112" rx="80" ry="15" fill="#2f4fa8"/>
+            <path d="M224 110 Q226 62 262 60 Q300 62 300 110Z" fill="#2f4fa8"/>
+            <path d="M226 100 Q262 92 300 100" stroke="#f2a7b8" stroke-width="7" fill="none"/>
+            <!-- face -->
+            <circle cx="246" cy="160" r="3.5" fill="#1f1b18"/>
+            <circle cx="276" cy="160" r="3.5" fill="#1f1b18"/>
+            <path d="M250 182 Q262 190 274 182" stroke="#1f1b18" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <circle cx="236" cy="176" r="8" fill="#f2a7b8" opacity=".8"/>
+            <circle cx="286" cy="176" r="8" fill="#f2a7b8" opacity=".8"/>
+            <!-- arms -->
+            <path d="M222 244 Q196 300 224 336" stroke="#e8b33a" stroke-width="24" fill="none" stroke-linecap="round"/>
+            <path d="M298 244 Q326 300 296 336" stroke="#e8b33a" stroke-width="24" fill="none" stroke-linecap="round"/>
+            <!-- box (the widget) -->
+            <rect x="214" y="310" width="92" height="70" fill="#f2a7b8" transform="rotate(-3 260 345)"/>
+            <path d="M260 308 L262 382 M214 344 L306 340" stroke="#d9432f" stroke-width="4"/>
+            <path d="M262 310 Q244 290 250 284 Q262 286 262 310 Q278 288 284 292 Q282 304 262 310" fill="none" stroke="#d9432f" stroke-width="3.5"/>
+            <!-- hands -->
+            <circle cx="222" cy="344" r="10" fill="#f1c9a8"/>
+            <circle cx="300" cy="342" r="10" fill="#f1c9a8"/>
+          </g>
+        </g>
+        <!-- dog -->
+        <g filter="url(#wobble)">
+          <ellipse cx="400" cy="486" rx="58" ry="22" fill="#8a5a3c"/>
+          <ellipse cx="456" cy="468" rx="22" ry="18" fill="#8a5a3c"/>
+          <path d="M448 456 Q438 480 448 488" fill="#5a3a24" stroke="#5a3a24" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="464" cy="464" r="3" fill="#1f1b18"/>
+          <circle cx="477" cy="472" r="4" fill="#1f1b18"/>
+          <path d="M366 502 L362 518 M384 504 L384 520 M418 504 L420 520 M436 500 L440 516" stroke="#5a3a24" stroke-width="6" stroke-linecap="round"/>
+          <path d="M344 478 Q326 460 332 448" stroke="#8a5a3c" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <rect x="430" y="478" width="18" height="6" fill="#d9432f" transform="rotate(-20 439 481)"/>
+        </g>
+        <!-- little label -->
+        <g class="float">
+          <text x="92" y="118" font-family="Patrick Hand" font-size="22" fill="#1f1b18" transform="rotate(-8 92 118)">part no. W-2208,</text>
+          <text x="104" y="142" font-family="Patrick Hand" font-size="22" fill="#1f1b18" transform="rotate(-8 104 142)">brass, arriving Thurs.</text>
+          <path d="M190 160 Q210 200 224 300" stroke="#1f1b18" stroke-width="1.8" fill="none" stroke-dasharray="4 6"/>
+        </g>
+      </svg>
+      <p class="caption">Ruth, from receiving, with the gaskets. And Pickle.</p>
+    </div>
+  </header>
+</div>
+
+<svg class="divider" viewBox="0 0 1100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M10 22 Q140 6 280 22 T560 20 T840 24 T1090 18" fill="none" stroke="#2f4fa8" stroke-width="3" stroke-linecap="round" filter="url(#wobble2)"/></svg>
+
+<section id="truths">
+  <div class="wrap truths">
+    <div>
+      <h2><span class="c2">A short list</span><br><span class="c1">of things</span> <span class="c3">that are true.</span></h2>
+      <svg viewBox="0 0 380 300" width="380" aria-label="A painting of a wooden chair with a stack of papers on it">
+        <g filter="url(#wobble)">
+          <ellipse cx="190" cy="282" rx="150" ry="12" fill="#1f1b18" opacity=".1"/>
+          <path d="M120 60 L126 170 M250 60 L244 170" stroke="#8a5a3c" stroke-width="12" stroke-linecap="round"/>
+          <path d="M120 70 L250 70 M122 110 L248 110" stroke="#8a5a3c" stroke-width="10" stroke-linecap="round"/>
+          <path d="M100 170 L270 170 L262 190 L108 190Z" fill="#d9432f"/>
+          <path d="M112 190 L104 280 M258 190 L266 280 M140 190 L140 268 M230 190 L230 268" stroke="#8a5a3c" stroke-width="10" stroke-linecap="round"/>
+          <rect x="140" y="142" width="96" height="10" fill="#fff9ee" stroke="#1f1b18" stroke-width="1.5" transform="rotate(-4 188 147)"/>
+          <rect x="134" y="152" width="100" height="10" fill="#fff9ee" stroke="#1f1b18" stroke-width="1.5" transform="rotate(3 184 157)"/>
+          <rect x="138" y="160" width="98" height="10" fill="#bcd6e6" stroke="#1f1b18" stroke-width="1.5"/>
+          <circle cx="226" cy="132" r="12" fill="#fff9ee" stroke="#1f1b18" stroke-width="2"/>
+          <path d="M238 130 q8 0 8 6 q0 6 -8 6" fill="none" stroke="#1f1b18" stroke-width="2"/>
+        </g>
+        <text x="20" y="40" font-family="Patrick Hand" font-size="21" fill="#5a5048" transform="rotate(-4 20 40)">the chair where the purchase orders wait</text>
+      </svg>
+    </div>
+    <ol>
+      <li>Operations people are the reason anything arrives at all.</li>
+      <li>They currently have fourteen tabs open, three spreadsheets named <em>FINAL_v7</em>, and one supplier who only answers the phone.</li>
+      <li>When the right valve shows up at the right plant on the right Tuesday, nobody throws a party. Nobody even notices. That is the job.</li>
+      <li>A custom widget is a small, specific promise. Thread pitch, finish, tolerance, quantity. Somebody has to keep it.</li>
+      <li>We would like to help you keep it. And close eleven of those tabs.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="how-intro">
+      <h2><span class="c3">Here is</span> <span class="c4">how it goes.</span></h2>
+      <p>Three things happen to every widget. It is imagined, it is asked for, and it travels. Acme gives each of those moments a home, and lets the people on your team see the same picture at the same time.</p>
+    </div>
+    <div class="panels">
+      <div class="panel">
+        <div class="frame">
+          <svg viewBox="0 0 320 260" aria-label="A painted widget with its parts labelled by hand">
+            <rect width="320" height="260" fill="#f2a7b8" filter="url(#gouache)" opacity=".55"/>
+            <g filter="url(#wobble)">
+              <circle cx="160" cy="130" r="62" fill="#2f4fa8"/>
+              <circle cx="160" cy="130" r="26" fill="#f7f0e3"/>
+              <g fill="#2f4fa8">
+                <rect x="150" y="54" width="20" height="22"/><rect x="150" y="184" width="20" height="22"/>
+                <rect x="84" y="120" width="22" height="20"/><rect x="214" y="120" width="22" height="20"/>
+                <rect x="104" y="72" width="20" height="20" transform="rotate(45 114 82)"/>
+                <rect x="196" y="72" width="20" height="20" transform="rotate(45 206 82)"/>
+                <rect x="104" y="168" width="20" height="20" transform="rotate(45 114 178)"/>
+                <rect x="196" y="168" width="20" height="20" transform="rotate(45 206 178)"/>
+              </g>
+              <circle cx="160" cy="130" r="10" fill="#e8b33a"/>
+            </g>
+            <g font-family="Patrick Hand" font-size="17" fill="#1f1b18">
+              <text x="12" y="30">anodized, blue</text>
+              <path d="M62 36 Q90 60 108 80" stroke="#1f1b18" fill="none" stroke-width="1.5"/>
+              <text x="222" y="40">± 0.02 mm</text>
+              <path d="M240 46 Q226 80 214 108" stroke="#1f1b18" fill="none" stroke-width="1.5"/>
+              <text x="16" y="236">M8 thread (not M10!)</text>
+              <path d="M120 222 Q146 196 156 142" stroke="#1f1b18" fill="none" stroke-width="1.5"/>
+            </g>
+          </svg>
+        </div>
+        <h3>Configure</h3>
+        <p>Choose the size, the thread, the finish, the tolerance. Every option you've been emailing back and forth about lives in one patient place, with rules that catch the mistakes before they're machined. It remembers what you chose last spring.</p>
+      </div>
+
+      <div class="panel">
+        <div class="frame">
+          <svg viewBox="0 0 320 260" aria-label="A painted envelope with a stamp and a small heart">
+            <rect width="320" height="260" fill="#bcd6e6" filter="url(#gouache)" opacity=".7"/>
+            <g filter="url(#wobble)">
+              <rect x="52" y="62" width="216" height="140" fill="#fff9ee" stroke="#1f1b18" stroke-width="3"/>
+              <path d="M52 62 L160 142 L268 62" fill="none" stroke="#1f1b18" stroke-width="3"/>
+              <rect x="214" y="74" width="40" height="46" fill="#d9432f"/>
+              <path d="M234 88 c-6 -8 -16 0 0 14 c16 -14 6 -22 0 -14" fill="#f2a7b8"/>
+            </g>
+            <g font-family="Patrick Hand" font-size="18" fill="#1f1b18">
+              <text x="74" y="176">PO 44-1187</text>
+              <text x="74" y="194" font-size="15">to: Midland Precision</text>
+              <text x="170" y="236" fill="#2f4fa8">approved by Sam ✓</text>
+            </g>
+          </svg>
+        </div>
+        <h3>Order</h3>
+        <p>Send it to the right supplier for the right plant. Approvals happen where people already are, in the inbox or on the phone. Pricing and lead times sit right beside the part.</p>
+        <span class="paren">(No one retypes a part number ever again. Retyping is where the sorrow starts.)</span>
+      </div>
+
+      <div class="panel">
+        <div class="frame">
+          <svg viewBox="0 0 320 260" aria-label="A painted red truck driving along a winding road toward a factory">
+            <rect width="320" height="260" fill="#e8b33a" filter="url(#gouache)" opacity=".5"/>
+            <path d="M-10 210 Q80 170 160 200 T330 180" stroke="#1f1b18" stroke-width="22" fill="none" filter="url(#wobble)" opacity=".85"/>
+            <path d="M-10 210 Q80 170 160 200 T330 180" stroke="#f7f0e3" stroke-width="2" stroke-dasharray="10 12" fill="none"/>
+            <g filter="url(#wobble)">
+              <rect x="232" y="80" width="70" height="70" fill="#5f8f5a"/>
+              <path d="M232 80 L250 58 L268 80 L286 58 L302 80" fill="#5f8f5a"/>
+              <rect x="286" y="34" width="10" height="30" fill="#d9432f"/>
+              <rect x="252" y="112" width="26" height="38" fill="#fff9ee"/>
+            </g>
+            <text x="244" y="104" font-family="Patrick Hand" font-size="14" fill="#fff9ee">Dock 4</text>
+            <g class="drive">
+              <g filter="url(#wobble2)">
+                <rect x="60" y="140" width="76" height="40" fill="#d9432f"/>
+                <path d="M136 152 L160 152 L170 168 L170 180 L136 180Z" fill="#2f4fa8"/>
+                <circle cx="80" cy="184" r="10" fill="#1f1b18"/><circle cx="152" cy="184" r="10" fill="#1f1b18"/>
+                <text x="70" y="166" font-family="Patrick Hand" font-size="16" fill="#fff9ee">widgets</text>
+              </g>
+            </g>
+            <text x="16" y="36" font-family="Patrick Hand" font-size="18" fill="#1f1b18">left Toledo 6:12 am</text>
+            <text x="16" y="58" font-family="Patrick Hand" font-size="18" fill="#1f1b18">on time. (phew.)</text>
+          </svg>
+        </div>
+        <h3>Track</h3>
+        <p>Watch it leave the machine shop, cross three states, and arrive at Dock 4. If it is going to be late, you'll know first, and you'll know why, with a day or two to do something about it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="numbers" id="numbers">
+  <div class="wrap">
+    <h2>Some numbers we are proud of.</h2>
+    <p class="sub">Counted carefully, by people, from last year.</p>
+    <div class="nums">
+      <div class="num"><b>412</b><span>mid-sized manufacturers who run their custom parts through Acme.</span></div>
+      <div class="num"><b>38%</b><span>fewer expedite fees, on average, in the first six months. That is real money. That is a new forklift.</span></div>
+      <div class="num"><b>2.1M</b><span>widgets tracked from order to dock. Each one small. Each one somebody's problem, solved.</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap quote">
+    <svg viewBox="0 0 380 420" aria-label="A painted portrait of Dolores holding a yellow notebook">
+      <rect x="20" y="20" width="340" height="380" fill="#b9a2d6" filter="url(#gouache)" opacity=".8"/>
+      <g filter="url(#wobble)">
+        <path d="M90 400 Q100 270 190 262 Q280 270 290 400Z" fill="#2f4fa8"/>
+        <rect x="178" y="228" width="24" height="40" fill="#e0b08e"/>
+        <ellipse cx="190" cy="180" rx="60" ry="68" fill="#e0b08e"/>
+        <path d="M128 176 Q120 100 192 104 Q262 104 254 176 Q246 140 190 138 Q140 140 128 176Z" fill="#d8d2cc"/>
+        <circle cx="140" cy="146" r="22" fill="#d8d2cc"/><circle cx="240" cy="146" r="22" fill="#d8d2cc"/>
+        <circle cx="168" cy="182" r="16" fill="none" stroke="#d9432f" stroke-width="3.5"/>
+        <circle cx="212" cy="182" r="16" fill="none" stroke="#d9432f" stroke-width="3.5"/>
+        <path d="M184 182 L196 182" stroke="#d9432f" stroke-width="3.5"/>
+        <circle cx="168" cy="183" r="3" fill="#1f1b18"/><circle cx="212" cy="183" r="3" fill="#1f1b18"/>
+        <path d="M172 214 Q190 224 208 214" stroke="#1f1b18" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <rect x="150" y="300" width="80" height="96" fill="#e8b33a" transform="rotate(-6 190 348)"/>
+        <path d="M160 320 L218 314 M162 336 L214 331 M164 352 L220 346" stroke="#1f1b18" stroke-width="1.5" opacity=".5"/>
+      </g>
+      <text x="40" y="60" font-family="Patrick Hand" font-size="20" fill="#1f1b18" transform="rotate(-3 40 60)">Dolores, 23 years in operations</text>
+    </svg>
+    <div>
+      <blockquote>Before Acme, I kept our whole supply chain in a yellow notebook. I still have the notebook. I just don't need it anymore. Now it's for grocery lists and the names of my grandchildren's goldfish.
+        <cite>Dolores Whitcomb, Director of Operations, Hartwell Valve &amp; Fitting, Dayton, Ohio (three plants, 640 people)</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<svg class="divider" viewBox="0 0 1100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M10 18 Q160 34 300 18 T600 22 T880 16 T1090 22" fill="none" stroke="#d9432f" stroke-width="3" stroke-linecap="round" filter="url(#wobble2)"/></svg>
+
+<section id="demo">
+  <div class="wrap demo">
+    <div>
+      <h2><span class="c1">Let us</span> <span class="c2">show you.</span><br><span class="c4">It takes</span> <span class="c3">thirty minutes.</span></h2>
+      <p style="font-size:21px;margin-top:10px">Bring a real part you're struggling with, the one with the long email thread. We'll configure it, order it, and track it together, live, with your plants and suppliers in mind. You'll leave knowing whether Acme is right for you. If it isn't, we'll say so.</p>
+      <ul class="promise">
+        <li>A person who has worked a loading dock, not a script.</li>
+        <li>Your real parts, not a pretend widget.</li>
+        <li>Honest pricing, said out loud.</li>
+        <li>No follow-up avalanche. One kind email. Maybe two.</li>
+      </ul>
+    </div>
+    <form id="demoForm" novalidate>
+      <div class="tape"></div>
+      <div id="formFields">
+        <label for="name">Your name</label>
+        <input id="name" name="name" type="text" placeholder="Ruth Abernathy" required>
+        <label for="email">Work email</label>
+        <input id="email" name="email" type="email" placeholder="ruth@hartwellvalve.com" required>
+        <label for="company">Company</label>
+        <input id="company" name="company" type="text" placeholder="Hartwell Valve & Fitting" required>
+        <label for="plants">How many plants?</label>
+        <select id="plants" name="plants">
+          <option>Just one (a good one)</option>
+          <option>2 to 5</option>
+          <option>6 to 15</option>
+          <option>More than 15</option>
+        </select>
+        <button type="submit" class="btn">Book my demo</button>
+        <p class="fine" id="formMsg">We'll write back within one business day to find a time.</p>
+      </div>
+      <div class="thanks" id="thanks">
+        <h3>Thank you.</h3>
+        <p id="thanksText">We got your note. Someone from our team will write to you within one business day to find a time that works. Meanwhile, go get a coffee. You deserve it.</p>
+        <svg width="120" height="110" viewBox="0 0 120 110" style="margin-top:20px" aria-hidden="true">
+          <g filter="url(#wobble)">
+            <path d="M24 40 L90 40 L84 100 L30 100Z" fill="#f2a7b8"/>
+            <path d="M90 52 q20 0 18 18 q-2 16 -22 14" fill="none" stroke="#f2a7b8" stroke-width="8"/>
+            <path d="M44 30 q-6 -12 2 -22 M60 30 q-6 -12 2 -22 M76 30 q-6 -12 2 -22" stroke="#1f1b18" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Acme is made in a small office above a bakery, by people who love the unglamorous work of making things arrive.</p>
+    <p class="tiny">© <span id="yr">2025</span> Acme Widget Co. · hello@acme.example · Privacy · Terms</p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    var notes = {
+      0:"A quiet day. The widgets are resting.",
+      1:"The week is new and full of parts.",
+      2:"A good day for widgets.",
+      3:"Halfway there. The truck is too.",
+      4:"Almost Friday. Almost Dock 4.",
+      5:"Let's get it shipped before lunch.",
+      6:"Even the forklifts are napping."
+    };
+    var d = new Date();
+    document.getElementById('today').textContent = "Today is " + days[d.getDay()] + ". " + notes[d.getDay()];
+    document.getElementById('yr').textContent = d.getFullYear();
+
+    var form = document.getElementById('demoForm');
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = form.name.value.trim();
+      var email = form.email.value.trim();
+      var company = form.company.value.trim();
+      var msg = document.getElementById('formMsg');
+      if(!name || !company || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        msg.textContent = "Oh dear, something's missing. We need your name, a work email, and your company.";
+        msg.style.color = "#d9432f";
+        return;
+      }
+      document.getElementById('formFields').style.display = 'none';
+      var first = name.split(' ')[0];
+      document.getElementById('thanksText').textContent =
+        "Thank you, " + first + ". We'll write to " + email + " within one business day to find a time. Bring your trickiest part from " + company + ". Meanwhile, go get a coffee. You deserve it.";
+      document.getElementById('thanks').style.display = 'block';
+    });
+  })();
+</script>
+</body>
+</html>

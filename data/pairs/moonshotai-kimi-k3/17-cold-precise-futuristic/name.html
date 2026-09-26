@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Parametric Widget Operations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ice:#eef3f7;
+    --silver:#c9d4dd;
+    --steel:#8fa2b3;
+    --graphite:#1a2229;
+    --ink:#0b1015;
+    --accent:#6fd8e8;
+    --line:rgba(143,162,179,.35);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ice);
+    color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;
+    overflow-x:hidden;
+    cursor:default;
+  }
+  ::selection{background:var(--ink);color:var(--accent)}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:28px 56px;
+    mix-blend-mode:multiply;
+  }
+  .logo{font-weight:700;font-size:22px;letter-spacing:.35em;text-transform:uppercase}
+  .logo span{color:var(--steel)}
+  .nav-links{display:flex;gap:42px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase}
+  .nav-links a{color:var(--ink);text-decoration:none;position:relative;transition:color .3s}
+  .nav-links a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--ink);transition:width .4s cubic-bezier(.7,0,.2,1)}
+  .nav-links a:hover::after{width:100%}
+  .nav-cta{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase;
+    border:1px solid var(--ink);background:transparent;padding:12px 28px;cursor:pointer;
+    transition:background .3s,color .3s;
+    clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  }
+  .nav-cta:hover{background:var(--ink);color:var(--accent)}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;height:100vh;min-height:760px;
+    display:flex;align-items:center;
+  }
+  #flow{position:absolute;inset:0;width:100%;height:100%}
+  .hero-inner{position:relative;z-index:2;padding:0 56px;max-width:1000px}
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.4em;text-transform:uppercase;
+    color:var(--steel);display:flex;align-items:center;gap:16px;margin-bottom:36px;
+    opacity:0;animation:fadeUp 1s .3s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .kicker::before{content:'';width:64px;height:1px;background:var(--steel)}
+  h1{
+    font-size:clamp(64px,7.5vw,112px);line-height:.95;font-weight:700;letter-spacing:-.02em;
+    text-transform:uppercase;
+  }
+  h1 .row{display:block;overflow:hidden}
+  h1 .row span{display:block;transform:translateY(110%);animation:rise 1.1s cubic-bezier(.16,1,.3,1) forwards}
+  h1 .row:nth-child(2) span{animation-delay:.12s}
+  h1 .row:nth-child(3) span{animation-delay:.24s}
+  h1 .outline{
+    color:transparent;-webkit-text-stroke:1.5px var(--ink);
+  }
+  .hero-sub{
+    margin-top:40px;max-width:460px;font-size:17px;line-height:1.7;color:#3d4a55;font-weight:300;
+    opacity:0;animation:fadeUp 1s .7s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  .hero-ctas{margin-top:44px;display:flex;gap:20px;opacity:0;animation:fadeUp 1s .9s cubic-bezier(.2,.8,.2,1) forwards}
+  .btn-primary{
+    background:var(--ink);color:var(--ice);border:none;padding:20px 44px;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;
+    clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+    transition:letter-spacing .4s cubic-bezier(.7,0,.2,1), background .3s;
+  }
+  .btn-primary:hover{background:#22313c;letter-spacing:.3em}
+  .btn-ghost{
+    background:transparent;color:var(--ink);border:1px solid var(--ink);padding:20px 44px;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;
+    clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+    transition:background .3s,color .3s;
+  }
+  .btn-ghost:hover{background:var(--ink);color:var(--ice)}
+  .scroll-hint{
+    position:absolute;bottom:40px;left:56px;z-index:2;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--steel);
+    writing-mode:vertical-rl;
+  }
+  @keyframes rise{to{transform:translateY(0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ---------- MARQUEE ---------- */
+  .marquee{
+    background:var(--ink);color:var(--silver);overflow:hidden;white-space:nowrap;
+    padding:18px 0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.3em;text-transform:uppercase;
+  }
+  .marquee-track{display:inline-block;animation:scroll 30s linear infinite}
+  .marquee-track span{margin:0 48px}
+  .marquee-track b{color:var(--accent);font-weight:400}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* ---------- SECTIONS ---------- */
+  section{position:relative}
+  .section-pad{padding:140px 56px}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:80px;flex-wrap:wrap;gap:24px}
+  .section-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--steel)}
+  h2{font-size:clamp(40px,4.5vw,64px);font-weight:500;letter-spacing:-.02em;line-height:1.05;text-transform:uppercase}
+  h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1px var(--ink)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(48px);transition:opacity 1s cubic-bezier(.2,.8,.2,1),transform 1s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:translateY(0)}
+
+  /* ---------- FLOW DIAGRAM ---------- */
+  .flow-sec{background:linear-gradient(180deg,var(--ice),#e2eaf0)}
+  .flow-svg-wrap{position:relative}
+  .flow-svg{width:100%;height:auto;display:block}
+  .flow-label{
+    position:absolute;transform:translate(-50%,-50%);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.25em;text-transform:uppercase;
+    background:var(--ink);color:var(--ice);padding:10px 18px;
+    clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    transition:transform .3s;
+  }
+  .flow-label:hover{transform:translate(-50%,-50%) scale(1.08);z-index:5}
+
+  /* ---------- FEATURES ---------- */
+  .features{background:var(--ink);color:var(--ice)}
+  .features .section-tag{color:var(--steel)}
+  .features h2 em{-webkit-text-stroke:1px var(--silver)}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(201,212,221,.15)}
+  .feat{
+    background:var(--ink);padding:56px 40px 64px;position:relative;overflow:hidden;
+    transition:background .5s;
+  }
+  .feat::before{
+    content:'';position:absolute;top:-80px;right:-120px;width:280px;height:280px;
+    border:1px solid rgba(111,216,232,.0);border-radius:50%;
+    transition:border-color .5s,transform .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .feat:hover{background:#131b22}
+  .feat:hover::before{border-color:rgba(111,216,232,.25);transform:scale(1.4)}
+  .feat-num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:.3em;margin-bottom:60px}
+  .feat h3{font-size:24px;font-weight:500;text-transform:uppercase;letter-spacing:.02em;margin-bottom:18px}
+  .feat p{font-size:14.5px;line-height:1.75;color:var(--steel);font-weight:300}
+
+  /* ---------- METRICS ---------- */
+  .metrics{background:var(--ice)}
+  .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:48px}
+  .metric{border-left:1px solid var(--line);padding-left:28px}
+  .metric-val{font-size:64px;font-weight:700;letter-spacing:-.03em;line-height:1}
+  .metric-val sup{font-size:24px;color:var(--steel)}
+  .metric-label{margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--steel);line-height:1.8}
+
+  /* ---------- CTA ---------- */
+  .cta{background:var(--ink);color:var(--ice);overflow:hidden;position:relative}
+  .cta-curves{position:absolute;inset:0;pointer-events:none}
+  .cta-inner{position:relative;z-index:2;text-align:center;padding:180px 56px}
+  .cta h2{font-size:clamp(48px,6vw,88px)}
+  .cta p{margin:32px auto 52px;max-width:520px;color:var(--steel);font-weight:300;line-height:1.8;font-size:16px}
+  .demo-form{display:flex;justify-content:center;gap:0;max-width:560px;margin:0 auto}
+  .demo-form input{
+    flex:1;background:rgba(238,243,247,.06);border:1px solid rgba(201,212,221,.3);border-right:none;
+    color:var(--ice);padding:20px 24px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.05em;
+    outline:none;transition:border-color .3s;
+  }
+  .demo-form input::placeholder{color:var(--steel)}
+  .demo-form input:focus{border-color:var(--accent)}
+  .demo-form button{
+    background:var(--accent);border:none;color:var(--ink);padding:20px 40px;cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;
+    clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+    transition:background .3s;white-space:nowrap;
+  }
+  .demo-form button:hover{background:#9fe9f3}
+  .form-note{margin-top:20px;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--steel)}
+  .form-success{display:none;margin-top:20px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent)}
+
+  footer{
+    background:var(--ink);color:var(--steel);border-top:1px solid rgba(201,212,221,.12);
+    padding:40px 56px;display:flex;justify-content:space-between;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ACME<span>/SYS</span></div>
+  <div class="nav-links">
+    <a href="#flow">Platform</a>
+    <a href="#features">Capabilities</a>
+    <a href="#metrics">Results</a>
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Book a Demo</button>
+</nav>
+
+<header class="hero">
+  <canvas id="flow"></canvas>
+  <div class="hero-inner">
+    <div class="kicker">Widget Operations · Parametric Supply</div>
+    <h1>
+      <span class="row"><span>Configure.</span></span>
+      <span class="row"><span class="outline">Order.</span></span>
+      <span class="row"><span>Track.</span></span>
+    </h1>
+    <p class="hero-sub">
+      Acme gives operations teams at mid-sized manufacturers a single fluid system
+      for custom widgets — from specification to delivery, across every supplier,
+      every plant, every purchase order.
+    </p>
+    <div class="hero-ctas">
+      <button class="btn-primary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">Book a Demo</button>
+      <button class="btn-ghost" onclick="document.getElementById('flow').scrollIntoView({behavior:'smooth'})">See the Flow</button>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll — 001</div>
+</header>
+
+<div class="marquee">
+  <div class="marquee-track" id="marqueeTrack">
+    <span>Configure <b>//</b></span><span>Order <b>//</b></span><span>Track <b>//</b></span>
+    <span>4.2M widgets in motion <b>//</b></span><span>312 manufacturing partners <b>//</b></span>
+    <span>99.98% order accuracy <b>//</b></span>
+  </div>
+</div>
+
+<section class="flow-sec section-pad" id="flow">
+  <div class="section-head reveal">
+    <div>
+      <div class="section-tag">001 / The Platform</div>
+      <h2 style="margin-top:20px">One continuous<br><em>current</em> of work</h2>
+    </div>
+    <p style="max-width:380px;color:#3d4a55;font-weight:300;line-height:1.8;font-size:15px">
+      No handoffs lost in email. No specs buried in spreadsheets. Acme routes every
+      custom widget through a single parametric pipeline.
+    </p>
+  </div>
+  <div class="flow-svg-wrap reveal">
+    <svg class="flow-svg" viewBox="0 0 1280 420" fill="none">
+      <path id="fp1" d="M-20 210 C 240 60, 420 360, 660 210 S 1060 60, 1300 210" stroke="#8fa2b3" stroke-width="1"/>
+      <path d="M-20 240 C 240 90, 420 390, 660 240 S 1060 90, 1300 240" stroke="#c9d4dd" stroke-width="1"/>
+      <path d="M-20 180 C 240 30, 420 330, 660 180 S 1060 30, 1300 180" stroke="#c9d4dd" stroke-width="1"/>
+      <circle r="5" fill="#0b1015"><animateMotion dur="6s" repeatCount="indefinite"><mpath href="#fp1"/></animateMotion></circle>
+      <circle r="5" fill="#6fd8e8"><animateMotion dur="6s" begin="2s" repeatCount="indefinite"><mpath href="#fp1"/></animateMotion></circle>
+      <circle r="5" fill="#0b1015"><animateMotion dur="6s" begin="4s" repeatCount="indefinite"><mpath href="#fp1"/></animateMotion></circle>
+      <circle cx="180" cy="196" r="9" fill="#0b1015"/>
+      <circle cx="500" cy="272" r="9" fill="#0b1015"/>
+      <circle cx="820" cy="150" r="9" fill="#0b1015"/>
+      <circle cx="1130" cy="196" r="9" fill="#0b1015"/>
+    </svg>
+    <div class="flow-label" style="left:14%;top:42%">01 · Configure Spec</div>
+    <div class="flow-label" style="left:39%;top:62%">02 · Route to Suppliers</div>
+    <div class="flow-label" style="left:64%;top:30%">03 · Track Production</div>
+    <div class="flow-label" style="left:88%;top:44%">04 · Receive &amp; Reconcile</div>
+  </div>
+</section>
+
+<section class="features section-pad" id="features">
+  <div class="section-head reveal">
+    <div>
+      <div class="section-tag">002 / Capabilities</div>
+      <h2 style="margin-top:20px">Engineered for<br><em>operations</em> teams</h2>
+    </div>
+  </div>
+  <div class="feat-grid reveal">
+    <div class="feat">
+      <div class="feat-num">— 01</div>
+      <h3>Parametric Configurator</h3>
+      <p>Define widget geometry, tolerances, materials, and finishes once. Acme validates every configuration against live supplier capability data — no more ordering parts nobody can machine.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">— 02</div>
+      <h3>Multi-Supplier Ordering</h3>
+      <p>Split a single bill of widgets across qualified suppliers by capacity, lead time, and cost. One checkout, one contract, one source of truth for the whole order book.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">— 03</div>
+      <h3>Live Production Tracking</h3>
+      <p>Every widget carries a live status — queued, in production, quality hold, in transit. Drill from a plant-level view down to an individual serial number in two clicks.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">— 04</div>
+      <h3>Exception Forecasting</h3>
+      <p>Acme flags at-risk orders an average of eleven days before the missed date, using supplier throughput signals — early enough to re-route, expedite, or renegotiate.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">— 05</div>
+      <h3>Spec Version Control</h3>
+      <p>Revision B supersedes revision A everywhere, automatically. Suppliers always build to the current drawing; your ERP always receives the current price.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">— 06</div>
+      <h3>ERP &amp; MES Sync</h3>
+      <p>Native connectors for the systems you already run. Purchase orders, receipts, and inventory levels reconcile hourly — no swivel-chair data entry, no drift.</p>
+    </div>
+  </div>
+</section>
+
+<section class="metrics section-pad" id="metrics">
+  <div class="section-head reveal">
+    <div>
+      <div class="section-tag">003 / Results</div>
+      <h2 style="margin-top:20px">Measured in<br><em>tolerances</em></h2>
+    </div>
+  </div>
+  <div class="metric-grid reveal">
+    <div class="metric">
+      <div class="metric-val" data-count="38" data-suffix="%">0<sup>%</sup></div>
+      <div class="metric-label">Average reduction in widget lead time after two quarters</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" data-count="11" data-suffix="d">0<sup>d</sup></div>
+      <div class="metric-label">Median advance warning before a supplier slips a date</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" data-count="99.98" data-suffix="%" data-decimal="2">0<sup>%</sup></div>
+      <div class="metric-label">Order-to-spec accuracy across 4.2M widgets shipped in 2024</div>
+    </div>
+    <div class="metric">
+      <div class="metric-val" data-count="6" data-suffix="wks">0<sup>wks</sup></div>
+      <div class="metric-label">Typical time from signed contract to first live order</div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="demo">
+  <svg class="cta-curves" viewBox="0 0 1440 700" preserveAspectRatio="none">
+    <path d="M-100 600 C 300 400, 700 750, 1540 500" stroke="rgba(111,216,232,.15)" fill="none" stroke-width="1"/>
+    <path d="M-100 640 C 320 440, 720 790, 1540 540" stroke="rgba(201,212,221,.1)" fill="none" stroke-width="1"/>
+    <path d="M-100 560 C 280 360, 680 710, 1540 460" stroke="rgba(201,212,221,.08)" fill="none" stroke-width="1"/>
+  </svg>
+  <div class="cta-inner reveal">
+    <h2>Put your widgets<br><em style="-webkit-text-stroke:1px var(--silver)">in motion</em></h2>
+    <p>A thirty-minute working session with an Acme solutions engineer. We configure one of your real parts, live, against real supplier data.</p>
+    <form class="demo-form" id="demoForm">
+      <input type="email" placeholder="WORK EMAIL" required aria-label="Work email">
+      <button type="submit">Book Demo</button>
+    </form>
+    <div class="form-note" id="formNote">No credit card · No procurement paperwork · 30 minutes</div>
+    <div class="form-success" id="formSuccess">Request received — we'll reach out within one business day.</div>
+  </div>
+</section>
+
+<footer>
+  <div>ACME/SYS © 2025</div>
+  <div>Parametric Widget Operations</div>
+  <div>hello@acme.example</div>
+</footer>
+
+<script>
+/* ---------- Hero canvas: flowing parametric field lines ---------- */
+(function(){
+  const cv = document.getElementById('flow');
+  const ctx = cv.getContext('2d');
+  let W, H, t = 0;
+
+  function resize(){
+    W = cv.width = cv.offsetWidth * devicePixelRatio;
+    H = cv.height = cv.offsetHeight * devicePixelRatio;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const LINES = 26;
+  const PTS = 90;
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    t += 0.0035;
+    for(let i=0;i<LINES;i++){
+      const p = i/(LINES-1);
+      const accent = (i%9===0);
+      ctx.beginPath();
+      for(let j=0;j<=PTS;j++){
+        const u = j/PTS;
+        const x = u*W;
+        const baseY = H*(0.18 + p*0.72);
+        const amp = H*0.09*(0.5+Math.sin(p*Math.PI));
+        const y = baseY
+          + Math.sin(u*4.2 + t*2 + p*6.0)*amp*0.6
+          + Math.sin(u*9.0 - t*3 + p*2.5)*amp*0.25
+          + Math.cos(u*2.0 + t + p*9.0)*amp*0.35;
+        j===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = accent ? 'rgba(111,216,232,.55)' : 'rgba(143,162,179,'+(0.10+0.22*Math.sin(p*Math.PI))+')';
+      ctx.lineWidth = accent ? 1.4*devicePixelRatio : 0.8*devicePixelRatio;
+      ctx.stroke();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ---------- Scroll reveal ---------- */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- Animated counters ---------- */
+const cio = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    cio.unobserve(e.target);
+    const el = e.target;
+    const target = parseFloat(el.dataset.count);
+    const dec = parseInt(el.dataset.decimal||0);
+    const suffix = el.dataset.suffix;
+    const dur = 1800, start = performance.now();
+    function step(now){
+      const k = Math.min((now-start)/dur,1);
+      const ease = 1-Math.pow(1-k,4);
+      el.innerHTML = (target*ease).toFixed(dec) + '<sup>'+suffix+'</sup>';
+      if(k<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+},{threshold:0.5});
+document.querySelectorAll('.metric-val').forEach(el=>cio.observe(el));
+
+/* ---------- Marquee duplication for seamless loop ---------- */
+(function(){
+  const track = document.getElementById('marqueeTrack');
+  track.innerHTML += track.innerHTML;
+})();
+
+/* ---------- Demo form ---------- */
+document.getElementById('demoForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  this.querySelector('button').textContent = 'Requested';
+  this.querySelector('input').disabled = true;
+  this.querySelector('button').disabled = true;
+  document.getElementById('formNote').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+});
+</script>
+</body>
+</html>

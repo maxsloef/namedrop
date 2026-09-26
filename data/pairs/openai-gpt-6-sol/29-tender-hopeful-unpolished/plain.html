@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f5ee" />
+  <title>Acme — A calmer way to make widgets happen</title>
+  <meta name="description" content="Configure, order, and track custom widgets in one place. Acme helps manufacturing operations teams keep every handoff moving." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f7f5ee;
+      --ink: #28352e;
+      --muted: #68736a;
+      --line: #d9ddd2;
+      --sage: #e8ede4;
+      --sage-dark: #788c77;
+      --peach: #edaa91;
+      --rust: #b65d45;
+      --white: #fffefa;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, a { font: inherit; }
+    a { color: inherit; }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--rust); outline-offset: 4px; }
+    .wrap { max-width: 1320px; padding: 0 48px; margin: 0 auto; }
+
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner {
+      height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: -.075em;
+      line-height: 1;
+    }
+    .brand-mark { width: 32px; height: 32px; flex: none; }
+    .nav { display: flex; align-items: center; gap: 39px; }
+    .nav a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color .2s ease;
+    }
+    .nav a:hover { color: var(--rust); }
+    .nav .nav-cta {
+      border: 1px solid var(--ink);
+      padding: 13px 19px;
+      border-radius: 4px;
+      margin-left: 9px;
+    }
+    .nav .nav-cta:hover { color: var(--white); background: var(--ink); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 52% 48%;
+      min-height: 650px;
+      align-items: center;
+      gap: 0;
+      padding-top: 34px;
+      padding-bottom: 53px;
+    }
+    .hero-copy { padding: 20px 36px 20px 0; position: relative; z-index: 1; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: 10px;
+      font-weight: 700;
+      color: #69776a;
+    }
+    .eyebrow .dot { width: 7px; height: 7px; background: var(--rust); border-radius: 50%; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, .serif { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+    h1 {
+      font-size: clamp(68px, 6.15vw, 92px);
+      line-height: .99;
+      letter-spacing: -.046em;
+      margin: 27px 0 27px;
+    }
+    h1 em { color: var(--rust); font-weight: 400; white-space: nowrap; }
+    .hero-copy > p {
+      max-width: 470px;
+      color: #59665d;
+      line-height: 1.75;
+      font-size: 16px;
+      margin-bottom: 29px;
+    }
+    .hero-actions { display: flex; align-items: center; gap: 23px; flex-wrap: wrap; }
+    .button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 17px;
+      min-height: 53px;
+      padding: 0 20px;
+      background: var(--ink);
+      color: var(--white);
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: transform .2s ease, background .2s ease;
+    }
+    .button:hover { background: #425748; transform: translateY(-2px); }
+    .button svg { width: 17px; height: 17px; }
+    .quiet-link {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      text-underline-offset: 5px;
+      text-decoration-thickness: 1px;
+    }
+    .hero-aside {
+      margin: 27px 0 0;
+      font-size: 11px;
+      color: #838b80;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .hero-aside svg { width: 19px; }
+
+    .hero-art {
+      height: 543px;
+      background: #e9eee6;
+      border: 1px solid #dce4da;
+      border-radius: 154px 154px 9px 9px;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .hero-art:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: .38;
+      background-image: radial-gradient(#9eaa9d 0.7px, transparent 0.7px);
+      background-size: 15px 15px;
+      mask-image: linear-gradient(to bottom, transparent, black 45%);
+    }
+    .art-topline {
+      position: absolute;
+      top: 34px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 10px;
+      letter-spacing: .18em;
+      font-weight: 700;
+      color: #687c6a;
+      text-transform: uppercase;
+    }
+    .art-topline:before, .art-topline:after { content: "✳"; margin: 0 14px; font-size: 12px; }
+    .orbit {
+      position: absolute;
+      width: 368px;
+      height: 368px;
+      border: 1px dashed #b4c2b3;
+      border-radius: 50%;
+      top: 98px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-20deg);
+    }
+    .orbit:after {
+      content: "";
+      position: absolute;
+      inset: 28px;
+      border: 1px solid rgba(178,194,177,.45);
+      border-radius: 50%;
+    }
+    .widget {
+      position: absolute;
+      width: 270px;
+      height: 270px;
+      top: 126px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-9deg);
+      filter: drop-shadow(15px 22px 12px rgba(81,91,74,.13));
+    }
+    .art-card {
+      position: absolute;
+      z-index: 2;
+      background: #fffefa;
+      border: 1px solid #d7dfd2;
+      box-shadow: 4px 5px 0 rgba(127,151,126,.12);
+      border-radius: 5px;
+      padding: 13px 15px;
+    }
+    .art-card small {
+      display: block;
+      color: #839081;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: 9px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+    .art-card strong { display: block; font-size: 13px; letter-spacing: -.02em; }
+    .art-card span { display: block; font-size: 11px; color: #788579; margin-top: 5px; }
+    .spec-card { left: 27px; top: 183px; width: 171px; transform: rotate(-5deg); }
+    .status-card { right: 23px; bottom: 100px; width: 174px; transform: rotate(4deg); }
+    .status-card strong:before {
+      content: "";
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #83a77a;
+      margin-right: 7px;
+    }
+    .art-hand {
+      position: absolute;
+      bottom: 31px;
+      left: 49px;
+      font: italic 23px "Instrument Serif", Georgia, serif;
+      color: #627665;
+      transform: rotate(-5deg);
+    }
+    .art-hand svg { width: 46px; vertical-align: middle; margin-left: 6px; }
+    .art-number {
+      position: absolute;
+      right: 26px;
+      top: 118px;
+      color: #8b9d8c;
+      font-size: 10px;
+      writing-mode: vertical-rl;
+      letter-spacing: .16em;
+    }
+
+    .belief {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .belief-inner {
+      min-height: 116px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 34px;
+    }
+    .belief .serif { font-size: 26px; margin: 0; letter-spacing: -.015em; }
+    .belief-list { display: flex; align-items: center; gap: 38px; flex-wrap: wrap; }
+    .belief-list span { font-size: 12px; font-weight: 700; color: #68776b; white-space: nowrap; }
+    .belief-list span:before { content: "✳"; color: var(--rust); margin-right: 11px; font-size: 16px; vertical-align: -1px; }
+
+    .section { padding-top: 117px; padding-bottom: 120px; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 60px; margin-bottom: 40px; }
+    .section-head h2, .workflow h2, .closing h2 {
+      font-size: clamp(54px, 5vw, 76px);
+      line-height: 1.02;
+      letter-spacing: -.038em;
+      margin: 15px 0 0;
+    }
+    .section-head > p { max-width: 320px; font-size: 14px; line-height: 1.8; color: var(--muted); margin-bottom: 5px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .feature {
+      min-height: 365px;
+      border: 1px solid var(--line);
+      background: #faf9f4;
+      padding: 27px 29px 31px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature:nth-child(2) { background: #edf0e9; }
+    .feature:nth-child(3) { background: #f3ebe3; }
+    .feature-number { font-size: 11px; letter-spacing: .13em; font-weight: 700; color: #8c988c; }
+    .feature-visual { height: 137px; display: grid; place-items: center; margin: 8px 0 18px; }
+    .feature-visual svg { width: 190px; height: 130px; }
+    .feature h3 { font: 400 37px/1 "Instrument Serif", Georgia, serif; margin: auto 0 10px; letter-spacing: -.025em; }
+    .feature p { color: #677268; font-size: 13px; line-height: 1.7; max-width: 295px; margin-bottom: 0; }
+
+    .workflow { background: #e9ede5; padding-top: 112px; padding-bottom: 112px; border-top: 1px solid #dae1d7; border-bottom: 1px solid #dae1d7; }
+    .workflow-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 95px; align-items: center; }
+    .workflow h2 { margin-bottom: 19px; }
+    .workflow-intro { max-width: 400px; line-height: 1.75; color: #667369; font-size: 14px; }
+    .steps { margin-top: 37px; border-top: 1px solid #cbd5c9; }
+    .step {
+      display: flex;
+      align-items: baseline;
+      gap: 22px;
+      padding: 17px 0;
+      border-bottom: 1px solid #cbd5c9;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .step span { color: var(--rust); font-size: 11px; letter-spacing: .1em; }
+    .step small { margin-left: auto; color: #829081; font-size: 12px; font-weight: 400; }
+    .desk {
+      background: #f8f8f2;
+      border: 1px solid #cbd5c9;
+      border-radius: 9px;
+      box-shadow: 15px 18px 0 #d7dfd3;
+      min-height: 420px;
+      overflow: hidden;
+    }
+    .desk-bar { height: 47px; border-bottom: 1px solid #e0e4dc; display: flex; align-items: center; padding: 0 19px; gap: 6px; }
+    .desk-bar i { width: 7px; height: 7px; border-radius: 50%; background: #d6ddd2; }
+    .desk-bar span { margin: auto; transform: translateX(-13px); font-size: 10px; letter-spacing: .09em; font-weight: 700; color: #919d90; }
+    .desk-body { padding: 26px 28px; }
+    .desk-title { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
+    .desk-title small { color: #889587; text-transform: uppercase; letter-spacing: .12em; font-size: 9px; font-weight: 700; }
+    .desk-title h3 { font: 400 29px "Instrument Serif", Georgia, serif; margin: 5px 0 0; }
+    .desk-pill { border-radius: 20px; background: #e8eee3; padding: 7px 11px; color: #637b63; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .desk-content { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 23px; }
+    .desk-preview { background: #e9eee7; min-height: 237px; display: grid; place-items: center; border: 1px dashed #c7d5c5; position: relative; }
+    .desk-preview svg { width: 155px; transform: rotate(-12deg); filter: drop-shadow(6px 9px 5px #b9c6b4); }
+    .desk-preview small { position: absolute; bottom: 13px; left: 15px; color: #829280; font-size: 10px; }
+    .desk-fields { display: flex; flex-direction: column; gap: 10px; }
+    .desk-field { background: #fffefa; border: 1px solid #e1e5dc; padding: 10px 12px; }
+    .desk-field small { display: block; color: #929d90; font-size: 9px; margin-bottom: 5px; }
+    .desk-field strong { font-size: 11px; font-weight: 600; }
+    .desk-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; color: #849082; font-size: 10px; }
+    .desk-bottom b { background: var(--ink); color: white; padding: 10px 13px; border-radius: 3px; font-size: 10px; }
+
+    .closing { padding-top: 112px; padding-bottom: 106px; }
+    .closing-panel {
+      background: #bf735c;
+      color: #fffaf1;
+      min-height: 400px;
+      padding: 68px 77px;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 40px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 3px;
+    }
+    .closing-panel:after {
+      content: "";
+      width: 450px;
+      height: 450px;
+      border: 1px solid rgba(255,248,233,.3);
+      border-radius: 50%;
+      position: absolute;
+      right: -127px;
+      top: -204px;
+      box-shadow: 0 0 0 48px rgba(255,248,233,.06), 0 0 0 99px rgba(255,248,233,.06);
+      pointer-events: none;
+    }
+    .closing .eyebrow { color: #ffdfcd; }
+    .closing .eyebrow .dot { background: #ffe6ce; }
+    .closing h2 { max-width: 720px; margin-top: 25px; font-size: clamp(58px, 5.4vw, 78px); }
+    .closing h2 em { font-weight: 400; }
+    .closing-panel > div { position: relative; z-index: 1; }
+    .closing-action { max-width: 245px; flex: none; }
+    .closing-action p { font-size: 13px; line-height: 1.7; color: #ffeadc; }
+    .closing-action .button { background: #fff9f0; color: var(--ink); }
+    .closing-action .button:hover { background: #e8ede4; }
+    .site-footer { border-top: 1px solid var(--line); }
+    .footer-inner { padding-top: 28px; padding-bottom: 30px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .footer-inner .brand { font-size: 23px; }
+    .footer-inner .brand-mark { width: 26px; height: 26px; }
+    .footer-inner p, .footer-inner a { margin: 0; color: #7c877c; font-size: 11px; }
+    .footer-inner a { text-underline-offset: 4px; }
+
+    @media (max-width: 1000px) {
+      .wrap { padding-left: 30px; padding-right: 30px; }
+      .hero { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: clamp(55px, 6.5vw, 75px); }
+      .hero-art { height: 500px; }
+      .workflow-grid { gap: 35px; }
+      .closing-panel { padding: 55px; }
+    }
+    @media (max-width: 700px) {
+      .wrap { padding-left: 22px; padding-right: 22px; }
+      .header-inner { height: 72px; }
+      .nav { gap: 0; }
+      .nav a:not(.nav-cta) { display: none; }
+      .nav .nav-cta { padding: 11px 13px; }
+      .hero { display: flex; flex-direction: column; align-items: stretch; padding-top: 46px; padding-bottom: 42px; gap: 38px; }
+      .hero-copy { padding: 0; }
+      h1 { font-size: clamp(58px, 12vw, 82px); }
+      h1 em { white-space: normal; }
+      .hero-art { height: 440px; border-radius: 110px 110px 7px 7px; }
+      .widget { width: 225px; top: 115px; }
+      .orbit { width: 315px; height: 315px; }
+      .spec-card { left: 12px; top: 163px; }
+      .status-card { right: 11px; bottom: 73px; }
+      .art-hand { left: 22px; bottom: 20px; }
+      .belief-inner { padding-top: 30px; padding-bottom: 30px; align-items: start; flex-direction: column; gap: 16px; }
+      .belief-list { gap: 12px 22px; }
+      .section, .workflow { padding-top: 75px; padding-bottom: 78px; }
+      .section-head { display: block; }
+      .section-head h2, .workflow h2, .closing h2 { font-size: 59px; }
+      .section-head > p { margin-top: 18px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature { min-height: 305px; }
+      .feature-visual { height: 100px; margin: 0 0 10px; }
+      .feature-visual svg { height: 105px; }
+      .workflow-grid { grid-template-columns: 1fr; gap: 35px; }
+      .desk { min-height: auto; }
+      .desk-body { padding: 18px; }
+      .desk-content { gap: 9px; }
+      .closing { padding-top: 75px; padding-bottom: 75px; }
+      .closing-panel { padding: 40px 28px; display: block; }
+      .closing h2 { font-size: 58px; }
+      .closing-action { margin-top: 30px; }
+      .footer-inner { flex-wrap: wrap; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *:before, *:after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M20 3.5c2.4 6.8 3.3 8 5.2 9.2 1.7 1.1 3.4.8 10.6-.7-4.4 5.8-5.3 7.4-5.2 9.5.1 2 1.8 3.1 6.5 8.2-7.2-.1-9.1.2-10.7 1.5-1.5 1.3-2 3.1-4.5 9.8-2.5-6.5-3.2-8.1-4.9-9.2-1.7-1-3.5-.8-10.3-.2 4.3-5.4 5.6-7.1 5.6-9.1 0-2-1.1-3.7-5.8-9.3 7.1 1.8 8.8 2 10.5 1.2C16.6 11 17.3 9.4 20 3.5Z" fill="#BC7058"/>
+          <circle cx="20" cy="20" r="4" fill="#F7F5EE"/>
+        </svg>
+        acme
+      </a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#about">Why Acme</a>
+        <a class="nav-cta" href="mailto:hello@acme.com?subject=Let%27s%20book%20an%20Acme%20demo">Book a demo&nbsp; ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="dot"></span> For the people behind the process</div>
+        <h1 id="hero-title">Making things<br>is hard enough.<br><em>Widgets shouldn’t be.</em></h1>
+        <p>Custom widgets come with a lot of moving parts. Acme brings configuration, orders, and tracking into one thoughtful place—so your team can spend less time chasing answers and more time making things happen.</p>
+        <div class="hero-actions">
+          <a class="button" href="mailto:hello@acme.com?subject=Let%27s%20book%20an%20Acme%20demo">
+            Book a demo
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="quiet-link" href="#how-it-works">See how it works</a>
+        </div>
+        <div class="hero-aside">
+          <svg viewBox="0 0 23 18" fill="none" aria-hidden="true"><path d="M1 9.5c3-6 6 6 9 0s6-6 11-4M18 2l3 3.5-3 3" stroke="#9AAB99" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          A little more clarity, from first request to final delivery.
+        </div>
+      </div>
+
+      <div class="hero-art" role="img" aria-label="Illustrated custom widget surrounded by a specification card and an order tracking card">
+        <div class="art-topline">a better way through</div>
+        <div class="orbit"></div>
+        <svg class="widget" viewBox="0 0 300 300" fill="none" aria-hidden="true">
+          <path d="M150 25 250 83v116l-100 58L50 199V83L150 25Z" fill="#849984" stroke="#5F775F" stroke-width="3" stroke-linejoin="round"/>
+          <path d="m150 25 100 58-100 59L50 83l100-58Z" fill="#B5C6AC" stroke="#5F775F" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M150 142v115L50 199V83l100 59Z" fill="#A1B69B" stroke="#5F775F" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M150 142 250 83v116l-100 58V142Z" fill="#738D78" stroke="#5F775F" stroke-width="3" stroke-linejoin="round"/>
+          <path d="m150 51 77 44-77 45-77-45 77-44Z" fill="#DDE5D2" stroke="#647D65" stroke-width="2.4"/>
+          <path d="m150 73 57 33-57 33-57-33 57-33Z" fill="#AFC4A7" stroke="#647D65" stroke-width="2.4"/>
+          <path d="M150 73v66m-57-33 57 33 57-33" stroke="#647D65" stroke-width="2.4"/>
+          <path d="M72 112v73m15-64v72m121-69v66m17-76v65" stroke="#6E896E" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+          <path d="m159 174 67-39m-67 56 67-39" stroke="#ABC0A7" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+          <circle cx="150" cy="22" r="5" fill="#EDAA91"/>
+          <path d="M124 251c17 12 34 12 51 1" stroke="#526D58" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="art-card spec-card">
+          <small>Made to fit</small>
+          <strong>Widget 04-B</strong>
+          <span>Configured together ✓</span>
+        </div>
+        <div class="art-card status-card">
+          <small>Order update</small>
+          <strong>On its way</strong>
+          <span>Every step, in view</span>
+        </div>
+        <div class="art-hand">
+          all the little details
+          <svg viewBox="0 0 54 29" fill="none" aria-hidden="true"><path d="M2 4c11 1 8 17 24 18 7 .5 14-3 21-8m-9-5 10 5-4 10" stroke="#627665" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="art-number">ACME / 001</div>
+      </div>
+    </section>
+
+    <section class="belief" id="about" aria-label="Who Acme is for">
+      <div class="wrap belief-inner">
+        <p class="serif">Built for real work, and the people doing it.</p>
+        <div class="belief-list">
+          <span>Operations teams</span>
+          <span>Complex specifications</span>
+          <span>Many moving parts</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap" id="platform" aria-labelledby="platform-title">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> One place for the whole picture</div>
+          <h2 id="platform-title">Every handoff,<br><em>held together.</em></h2>
+        </div>
+        <p>From “could we make this?” to “it’s here,” everyone works from the same, up-to-date details.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature">
+          <span class="feature-number">01 / GET IT RIGHT</span>
+          <div class="feature-visual" aria-hidden="true">
+            <svg viewBox="0 0 190 130" fill="none">
+              <rect x="39" y="15" width="98" height="100" rx="3" fill="#F1F2E9" stroke="#8FA28B" stroke-width="1.5" transform="rotate(-8 39 15)"/>
+              <rect x="55" y="12" width="98" height="100" rx="3" fill="#FFFDF8" stroke="#8FA28B" stroke-width="1.5"/>
+              <path d="M68 32h36M68 40h58" stroke="#AAB8A4" stroke-width="2" stroke-linecap="round"/>
+              <path d="m99 56 22 13v26L99 107 77 95V69l22-13Z" fill="#D3DFCB" stroke="#819881" stroke-width="1.5"/>
+              <path d="m77 69 22 13 22-13M99 82v25" stroke="#819881" stroke-width="1.5"/>
+              <path d="m136 23 5 5 9-11" stroke="#BE7359" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Configure with confidence.</h3>
+          <p>Capture the exact specs your team needs, without another version of the spreadsheet.</p>
+        </article>
+        <article class="feature">
+          <span class="feature-number">02 / KEEP IT MOVING</span>
+          <div class="feature-visual" aria-hidden="true">
+            <svg viewBox="0 0 190 130" fill="none">
+              <path d="M24 83c22-51 54-2 78-36 18-26 38-20 61-3" stroke="#98AB96" stroke-width="1.5" stroke-dasharray="4 5" stroke-linecap="round"/>
+              <rect x="26" y="72" width="52" height="42" rx="2" fill="#FFFEFA" stroke="#849A83" stroke-width="1.5" transform="rotate(-8 26 72)"/>
+              <path d="m29 82 26 10 20-14M56 92l-2 20" stroke="#849A83" stroke-width="1.5"/>
+              <rect x="107" y="26" width="53" height="48" rx="2" fill="#FFFDF8" stroke="#849A83" stroke-width="1.5" transform="rotate(7 107 26)"/>
+              <path d="m109 37 25 10 26-14m-26 14-6 28" stroke="#849A83" stroke-width="1.5"/>
+              <circle cx="96" cy="47" r="5" fill="#C37C62"/>
+              <path d="m153 88 6 6 12-15" stroke="#799878" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Order without the back-and-forth.</h3>
+          <p>Turn approved configurations into orders, with the right information already in place.</p>
+        </article>
+        <article class="feature">
+          <span class="feature-number">03 / KNOW WHAT’S NEXT</span>
+          <div class="feature-visual" aria-hidden="true">
+            <svg viewBox="0 0 190 130" fill="none">
+              <path d="M31 72h128" stroke="#A7A995" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="39" cy="72" r="8" fill="#C8D5BE" stroke="#829780" stroke-width="1.5"/>
+              <circle cx="96" cy="72" r="8" fill="#C8D5BE" stroke="#829780" stroke-width="1.5"/>
+              <circle cx="153" cy="72" r="10" fill="#BD735C" stroke="#A75F49" stroke-width="1.5"/>
+              <path d="m149 72 3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M32 49h23m-16-7h16m33 63h25m-25 7h16" stroke="#B6AE9E" stroke-width="2" stroke-linecap="round"/>
+              <path d="M31 87c17 13 31 11 42 4m42-37c13-12 30-10 43-2" stroke="#C7B6A4" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>See where everything stands.</h3>
+          <p>Follow orders across your supply chain, so updates are easy to find and share.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="workflow" id="how-it-works" aria-labelledby="workflow-title">
+      <div class="wrap workflow-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Less chasing. More making.</div>
+          <h2 id="workflow-title">A clearer path<br>from here <em>to there.</em></h2>
+          <p class="workflow-intro">Your work doesn’t happen in neat little boxes. Acme connects the details, decisions, and deliveries that make a custom widget possible.</p>
+          <div class="steps" aria-label="Acme workflow">
+            <div class="step"><span>01</span> Set the right specifications <small>Configure</small></div>
+            <div class="step"><span>02</span> Get the order underway <small>Order</small></div>
+            <div class="step"><span>03</span> Stay in the know <small>Track</small></div>
+          </div>
+        </div>
+        <div class="desk" aria-label="Example of a widget configuration in Acme">
+          <div class="desk-bar"><i></i><i></i><i></i><span>YOUR WORKSPACE / ACME</span></div>
+          <div class="desk-body">
+            <div class="desk-title">
+              <div><small>Configuration / W-1042</small><h3>A widget that fits the job.</h3></div>
+              <span class="desk-pill">● Ready to review</span>
+            </div>
+            <div class="desk-content">
+              <div class="desk-preview">
+                <svg viewBox="0 0 160 170" fill="none" aria-hidden="true">
+                  <path d="m80 12 61 35v72l-61 35-61-35V47L80 12Z" fill="#829A82" stroke="#5E795E" stroke-width="2"/>
+                  <path d="m80 12 61 35-61 36-61-36 61-35Z" fill="#C0D0B5" stroke="#5E795E" stroke-width="2"/>
+                  <path d="M80 83v71l-61-35V47l61 36Z" fill="#A9BFA3" stroke="#5E795E" stroke-width="2"/>
+                  <path d="m80 34 39 23-39 23-39-23 39-23Z" fill="#E8EBDA" stroke="#718A70" stroke-width="2"/>
+                  <path d="m80 48 27 16-27 16-27-16 27-16Z" fill="#B7CAB0" stroke="#718A70" stroke-width="2"/>
+                  <path d="m80 48 27 16-27 16-27-16 27-16Z" stroke="#718A70" stroke-width="2"/>
+                  <path d="M80 80v74M31 67v44m99-46v45" stroke="#718A70" stroke-width="2"/>
+                </svg>
+                <small>Preview / Widget 04-B</small>
+              </div>
+              <div class="desk-fields">
+                <div class="desk-field"><small>Material</small><strong>Recycled composite ↗</strong></div>
+                <div class="desk-field"><small>Finish</small><strong>Soft matte / sage ↗</strong></div>
+                <div class="desk-field"><small>Quantity</small><strong>1,200 units ↗</strong></div>
+                <div class="desk-field"><small>Needed by</small><strong>October 28 ↗</strong></div>
+              </div>
+            </div>
+            <div class="desk-bottom"><span>All the important details, in one place.</span><b>Review configuration →</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing wrap" aria-labelledby="closing-title">
+      <div class="closing-panel">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Let’s make this easier</div>
+          <h2 id="closing-title">Good things take work.<br><em>They don’t have to take guesswork.</em></h2>
+        </div>
+        <div class="closing-action">
+          <p>Tell us what your team is making. We’d love to show you a simpler way through.</p>
+          <a class="button" href="mailto:hello@acme.com?subject=Let%27s%20book%20an%20Acme%20demo">
+            Book a demo
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M20 3.5c2.4 6.8 3.3 8 5.2 9.2 1.7 1.1 3.4.8 10.6-.7-4.4 5.8-5.3 7.4-5.2 9.5.1 2 1.8 3.1 6.5 8.2-7.2-.1-9.1.2-10.7 1.5-1.5 1.3-2 3.1-4.5 9.8-2.5-6.5-3.2-8.1-4.9-9.2-1.7-1-3.5-.8-10.3-.2 4.3-5.4 5.6-7.1 5.6-9.1 0-2-1.1-3.7-5.8-9.3 7.1 1.8 8.8 2 10.5 1.2C16.6 11 17.3 9.4 20 3.5Z" fill="#BC7058"/>
+          <circle cx="20" cy="20" r="4" fill="#F7F5EE"/>
+        </svg>
+        acme
+      </a>
+      <p>Made for the people who keep things moving.</p>
+      <a href="mailto:hello@acme.com">Say hello ↗</a>
+    </div>
+  </footer>
+
+  <script>
+    // Keep in-page links predictable when the page is opened as a local HTML file.
+    document.querySelectorAll('a[href="#"]').forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>

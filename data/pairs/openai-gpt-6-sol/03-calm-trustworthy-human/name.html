@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f7f2" />
+  <title>Acme — Custom widgets, clearly managed</title>
+  <meta name="description" content="Configure, order, and track custom widgets across your supply chain. Acme gives manufacturing operations teams one clear place to keep work moving." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f7f7f2;
+      --white: #ffffff;
+      --ink: #25342e;
+      --muted: #66736b;
+      --green: #344d3f;
+      --sage: #e6ebe3;
+      --sage-dark: #a9b9a7;
+      --line: #dfe4dc;
+      --orange: #bf7254;
+      --orange-light: #f6e8df;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "DM Sans", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; }
+    svg { display: block; }
+    ::selection { background: #c9d7c6; color: var(--ink); }
+
+    .container { width: min(1240px, calc(100% - 80px)); margin-inline: auto; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #52705a;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #81a484;
+    }
+    .button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      min-height: 52px;
+      padding: 0 21px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: var(--green);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: transform .2s, background .2s, box-shadow .2s;
+    }
+    .button:hover { background: #243a2e; transform: translateY(-2px); box-shadow: 0 8px 20px #25342e20; }
+    .button:focus-visible, a:focus-visible, input:focus-visible, .menu-toggle:focus-visible {
+      outline: 3px solid #a2bb9c;
+      outline-offset: 3px;
+    }
+    .button svg { width: 17px; height: 17px; }
+    .text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      border-bottom: 1px solid #a1b1a1;
+      padding-bottom: 5px;
+    }
+    .text-link svg { width: 15px; height: 15px; transition: transform .2s; }
+    .text-link:hover svg { transform: translateX(4px); }
+
+    /* Navigation */
+    .site-header { position: relative; z-index: 20; border-bottom: 1px solid #e8eae3; }
+    .header-inner { height: 82px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 23px; font-weight: 700; letter-spacing: -.065em; }
+    .brand-mark { width: 30px; height: 30px; color: var(--green); }
+    .nav-links { display: flex; align-items: center; gap: 38px; margin-left: 80px; }
+    .nav-links a { font-size: 13px; font-weight: 600; color: #56635b; transition: color .2s; }
+    .nav-links a:hover { color: var(--ink); }
+    .header-cta { min-height: 40px; padding-inline: 17px; font-size: 12px; gap: 12px; }
+    .menu-toggle { display: none; border: 0; background: transparent; color: var(--ink); padding: 8px; }
+
+    /* Hero */
+    .hero { overflow: hidden; }
+    .hero-grid {
+      min-height: 640px;
+      display: grid;
+      grid-template-columns: 48% 52%;
+      align-items: center;
+      gap: 8px;
+      padding: 55px 0 71px;
+    }
+    .hero-copy { position: relative; z-index: 2; padding-bottom: 8px; }
+    .hero h1 {
+      max-width: 590px;
+      margin: 25px 0 22px;
+      font-size: clamp(51px, 4.65vw, 68px);
+      font-weight: 500;
+      letter-spacing: -.071em;
+      line-height: 1.075;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: #849f86;
+    }
+    .hero-description {
+      max-width: 455px;
+      margin: 0;
+      color: #627068;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+    .hero-actions { display: flex; align-items: center; gap: 28px; margin-top: 34px; }
+    .hero-note {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 46px;
+      color: #7a887e;
+      font-size: 12px;
+    }
+    .hero-note svg { color: #809e83; width: 19px; height: 19px; }
+    .hero-visual {
+      position: relative;
+      height: 505px;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .hero-visual::before {
+      content: "";
+      position: absolute;
+      width: 610px;
+      height: 610px;
+      right: -137px;
+      top: -53px;
+      border-radius: 50%;
+      background: #e9eee7;
+    }
+    .hero-visual::after {
+      content: "";
+      position: absolute;
+      right: -57px;
+      bottom: -55px;
+      width: 183px;
+      height: 183px;
+      border: 1px solid #cddace;
+      border-radius: 50%;
+    }
+
+    /* Illustrated product interface */
+    .app-window {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 142px 1fr;
+      width: 618px;
+      height: 433px;
+      margin-right: -18px;
+      border: 1px solid #e1e5dc;
+      border-radius: 13px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 27px 55px #263c3019, 0 4px 10px #263c300d;
+      transform: rotate(-1.1deg);
+    }
+    .app-sidebar { background: #354c3f; color: #ecf2e9; padding: 20px 12px; }
+    .app-logo { display: flex; align-items: center; gap: 7px; margin: 0 0 41px 7px; font-size: 15px; font-weight: 700; letter-spacing: -.05em; }
+    .app-logo svg { width: 16px; height: 16px; }
+    .app-nav-item {
+      display: flex; align-items: center; gap: 9px;
+      height: 34px; padding: 0 9px; margin-bottom: 5px;
+      border-radius: 5px; color: #c2d0c2; font-size: 10px; font-weight: 500;
+    }
+    .app-nav-item.active { background: #536a59; color: #fff; }
+    .app-nav-item svg { width: 13px; height: 13px; opacity: .9; }
+    .app-sidebar-bottom { margin: 132px 8px 0; border-top: 1px solid #617667; padding-top: 14px; font-size: 9px; color: #c5d2c6; }
+    .app-user { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .user-avatar { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: #e4c7ad; color: #684939; font-size: 9px; font-weight: 700; }
+    .app-main { min-width: 0; background: #fbfcfa; padding: 22px 23px; }
+    .app-top { display: flex; justify-content: space-between; align-items: center; color: #8a958c; font-size: 10px; }
+    .app-top-right { display: flex; align-items: center; gap: 13px; }
+    .app-top-right svg { width: 14px; height: 14px; color: #748478; }
+    .tiny-avatar { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: #dfebe1; color: #526b56; font-size: 9px; font-weight: 700; }
+    .app-heading { display: flex; align-items: end; justify-content: space-between; margin: 25px 0 20px; }
+    .app-heading small { display: block; margin-bottom: 4px; color: #89958a; font-size: 9px; }
+    .app-heading strong { font-size: 20px; letter-spacing: -.06em; font-weight: 600; }
+    .app-heading .period { color: #68796b; font-size: 9px; padding: 7px 9px; background: white; border: 1px solid #e9ede6; border-radius: 4px; }
+    .app-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .app-stat { height: 78px; border: 1px solid #ebeee8; border-radius: 6px; background: white; padding: 12px; }
+    .app-stat span { color: #849087; font-size: 9px; }
+    .app-stat strong { display: block; margin-top: 7px; font-size: 21px; line-height: 1; font-weight: 600; letter-spacing: -.06em; }
+    .app-stat i { font-style: normal; color: #7a997b; font-size: 8px; margin-left: 4px; letter-spacing: 0; }
+    .app-section-head { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 11px; }
+    .app-section-head strong { font-size: 11px; font-weight: 700; }
+    .app-section-head span { color: #6f8972; font-size: 9px; }
+    .orders-card { border: 1px solid #e9ede6; border-radius: 6px; background: white; overflow: hidden; }
+    .orders-row { display: grid; grid-template-columns: 1.45fr .9fr .85fr; align-items: center; min-height: 49px; padding: 0 12px; border-bottom: 1px solid #eef0ea; }
+    .orders-row:last-child { border-bottom: 0; }
+    .order-name { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .part-icon { display: grid; place-items: center; flex: none; width: 27px; height: 27px; border-radius: 5px; background: #ecf0e9; color: #68836b; }
+    .part-icon svg { width: 17px; height: 17px; }
+    .order-name b { display: block; font-size: 9px; font-weight: 700; }
+    .order-name small { display: block; color: #9ba69c; font-size: 8px; margin-top: 3px; }
+    .order-date { color: #758178; font-size: 9px; }
+    .status { justify-self: end; border-radius: 20px; padding: 5px 7px; background: #e8f2e8; color: #608065; font-size: 8px; white-space: nowrap; }
+    .status.processing { background: #f8efe5; color: #af835b; }
+    .floating-card {
+      position: absolute;
+      z-index: 3;
+      right: -41px;
+      bottom: 15px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      width: 208px;
+      padding: 13px;
+      background: white;
+      border: 1px solid #e5ebe3;
+      border-radius: 9px;
+      box-shadow: 0 13px 33px #263c301b;
+      transform: rotate(2deg);
+    }
+    .float-icon { width: 35px; height: 35px; display: grid; place-items: center; border-radius: 7px; background: var(--orange-light); color: var(--orange); }
+    .float-icon svg { width: 18px; height: 18px; }
+    .floating-card strong { display: block; font-size: 10px; }
+    .floating-card small { display: block; margin-top: 4px; color: #88958a; font-size: 9px; }
+    .visual-caption { position: absolute; left: 41px; bottom: -12px; z-index: 2; color: #89978b; font-size: 10px; letter-spacing: .02em; }
+
+    /* Role strip */
+    .role-strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .role-inner { min-height: 104px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+    .role-inner > p { max-width: 230px; color: #707f73; font-size: 12px; line-height: 1.5; }
+    .role-list { display: flex; align-items: center; justify-content: space-between; flex: 1; max-width: 790px; }
+    .role-list span { color: #52675a; font-size: 14px; font-weight: 600; letter-spacing: -.035em; }
+    .role-list .divider { width: 4px; height: 4px; border-radius: 50%; background: #bdcbbd; }
+
+    /* Benefits */
+    .section { padding: 116px 0; }
+    .section-heading { max-width: 690px; }
+    .section-heading h2, .feature-copy h2, .process-intro h2, .demo-copy h2 {
+      margin: 17px 0 0;
+      font-size: clamp(39px, 3.25vw, 48px);
+      font-weight: 500;
+      letter-spacing: -.065em;
+      line-height: 1.16;
+    }
+    .section-heading p { max-width: 570px; color: var(--muted); font-size: 15px; line-height: 1.7; margin: 19px 0 0; }
+    .benefit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; margin-top: 49px; }
+    .benefit-card { min-height: 290px; padding: 28px 29px 30px; border: 1px solid #e4e8e0; border-radius: 10px; background: #fff; }
+    .benefit-art { position: relative; display: flex; align-items: center; justify-content: center; width: 77px; height: 77px; margin-bottom: 31px; border-radius: 18px; background: #edf2eb; }
+    .benefit-art svg { width: 41px; height: 41px; color: #608169; }
+    .benefit-card:nth-child(2) .benefit-art { background: #f6eee6; }
+    .benefit-card:nth-child(2) .benefit-art svg { color: #b17d5a; }
+    .benefit-card:nth-child(3) .benefit-art { background: #e9efed; }
+    .benefit-card h3 { margin: 0 0 10px; font-size: 19px; font-weight: 600; letter-spacing: -.045em; }
+    .benefit-card p { max-width: 285px; margin: 0; color: #728076; font-size: 13px; line-height: 1.7; }
+
+    /* Feature */
+    .feature-section { background: #e9eee7; padding: 103px 0; overflow: hidden; }
+    .feature-grid { display: grid; grid-template-columns: 1.12fr .88fr; align-items: center; gap: 105px; }
+    .flow-art {
+      position: relative;
+      min-height: 378px;
+      padding: 26px;
+      background: #f8faf6;
+      border: 1px solid #dbe4d9;
+      border-radius: 12px;
+      box-shadow: 0 16px 34px #38503b0b;
+    }
+    .flow-top { display: flex; justify-content: space-between; align-items: center; padding: 1px 2px 22px; border-bottom: 1px solid #e5ebe3; }
+    .flow-top strong { font-size: 13px; font-weight: 700; }
+    .flow-top span { color: #88968b; font-size: 10px; }
+    .flow-line { position: absolute; top: 121px; left: 79px; right: 79px; height: 1px; border-top: 1px dashed #adbfac; }
+    .flow-steps { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 29px; }
+    .flow-step { text-align: center; }
+    .flow-circle {
+      width: 54px; height: 54px; display: grid; place-items: center;
+      margin: auto; border: 1px solid #d8e5d8; border-radius: 50%; background: #e9f2e7; color: #54725b;
+    }
+    .flow-circle svg { width: 23px; height: 23px; }
+    .flow-step:nth-child(2) .flow-circle { background: #f6ece2; border-color: #f0dfcd; color: #b7825c; }
+    .flow-step strong { display: block; margin-top: 13px; font-size: 11px; }
+    .flow-step small { display: block; margin-top: 5px; color: #91a092; font-size: 9px; }
+    .flow-bottom {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 29px; padding: 16px; border: 1px solid #e5ebe3; border-radius: 7px; background: white;
+    }
+    .flow-bottom-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 6px; background: #e9f1e8; color: #638469; }
+    .flow-bottom-icon svg { width: 18px; height: 18px; }
+    .flow-bottom strong { display: block; font-size: 10px; }
+    .flow-bottom small { display: block; margin-top: 4px; color: #8c998e; font-size: 9px; }
+    .flow-check { margin-left: auto; color: #73977a; width: 18px; height: 18px; }
+    .feature-copy h2 { max-width: 440px; }
+    .feature-copy > p { max-width: 440px; margin: 21px 0 27px; color: #65756a; font-size: 15px; line-height: 1.75; }
+    .feature-points { list-style: none; padding: 0; margin: 0 0 30px; }
+    .feature-points li { display: flex; align-items: center; gap: 11px; margin: 12px 0; color: #3d5644; font-size: 13px; font-weight: 600; }
+    .feature-points svg { width: 17px; height: 17px; color: #6f9474; }
+
+    /* Process */
+    .process-section { padding: 112px 0 120px; }
+    .process-top { display: flex; align-items: end; justify-content: space-between; gap: 40px; }
+    .process-intro h2 { max-width: 580px; }
+    .process-top > p { max-width: 330px; margin: 0 0 5px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .process-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 56px; }
+    .process-item { padding-top: 22px; border-top: 1px solid #cdd9cb; }
+    .process-number { color: #80a084; font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+    .process-item h3 { margin: 28px 0 10px; font-size: 20px; font-weight: 600; letter-spacing: -.045em; }
+    .process-item p { max-width: 315px; margin: 0; color: #718075; font-size: 13px; line-height: 1.75; }
+
+    /* Closing CTA */
+    .demo-section { background: #344d3f; color: white; overflow: hidden; }
+    .demo-inner { position: relative; min-height: 391px; display: flex; align-items: center; justify-content: space-between; gap: 50px; padding-block: 80px; }
+    .demo-inner::after {
+      content: ""; position: absolute; width: 390px; height: 390px; right: 290px; bottom: -298px;
+      border: 1px solid #78947c; border-radius: 50%; opacity: .45; pointer-events: none;
+    }
+    .demo-copy { position: relative; z-index: 1; max-width: 580px; }
+    .demo-copy .eyebrow { color: #b6cdb6; }
+    .demo-copy .eyebrow::before { background: #b8d0b6; }
+    .demo-copy h2 { max-width: 580px; margin-top: 22px; font-size: 47px; }
+    .demo-copy p { max-width: 440px; margin: 19px 0 0; color: #c6d5c8; font-size: 14px; line-height: 1.75; }
+    .demo-form-wrap { position: relative; z-index: 1; width: 390px; flex: none; padding: 27px; background: #f8f9f5; color: var(--ink); border-radius: 10px; }
+    .demo-form-wrap h3 { margin: 0 0 5px; font-size: 19px; font-weight: 600; letter-spacing: -.04em; }
+    .demo-form-wrap > p { margin: 0 0 22px; color: #78877b; font-size: 12px; line-height: 1.5; }
+    .demo-form-wrap label { display: block; margin-bottom: 8px; color: #536557; font-size: 11px; font-weight: 700; }
+    .demo-form-wrap input {
+      width: 100%; height: 48px; padding: 0 14px; border: 1px solid #d7e0d6;
+      border-radius: 5px; background: white; color: var(--ink); outline: none; font-size: 13px;
+    }
+    .demo-form-wrap input:focus { border-color: #74947b; }
+    .demo-form-wrap input::placeholder { color: #a3aea4; }
+    .demo-form-wrap .button { width: 100%; margin-top: 11px; justify-content: space-between; }
+    .form-message { min-height: 17px; margin: 12px 0 0; color: #718073; font-size: 10px; line-height: 1.5; }
+    .form-message a { text-decoration: underline; }
+
+    /* Footer */
+    .site-footer { background: #f7f7f2; }
+    .footer-main { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 38px 0 25px; }
+    .footer-main .brand { font-size: 21px; }
+    .footer-main .brand-mark { width: 27px; height: 27px; }
+    .footer-main p { margin: 8px 0 0; color: #7d8a7f; font-size: 12px; }
+    .footer-links { display: flex; align-items: center; gap: 30px; color: #596c5e; font-size: 12px; font-weight: 600; }
+    .footer-links a:hover { text-decoration: underline; }
+    .footer-bottom { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding: 19px 0 25px; color: #8a988b; font-size: 11px; }
+
+    @media (max-width: 1100px) {
+      .hero-grid { grid-template-columns: 47% 53%; }
+      .hero h1 { font-size: 54px; }
+      .app-window { transform: scale(.85) rotate(-1.1deg); transform-origin: right center; margin-right: -12px; flex: none; }
+      .floating-card { right: -15px; }
+      .feature-grid { gap: 55px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 40px, 560px); }
+      .header-inner { height: 70px; }
+      .header-cta { display: none; }
+      .menu-toggle { display: block; }
+      .nav-links {
+        display: none; position: absolute; top: 69px; left: 0; right: 0;
+        margin: 0; padding: 22px 20px; background: var(--paper);
+        border-bottom: 1px solid var(--line); box-shadow: 0 12px 18px #25342e0c;
+      }
+      .nav-links.open { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+      .hero-grid { display: block; min-height: unset; padding: 67px 0 55px; }
+      .hero h1 { max-width: 590px; font-size: clamp(45px, 10vw, 64px); }
+      .hero-description { font-size: 15px; }
+      .hero-actions { flex-wrap: wrap; gap: 20px; }
+      .hero-note { margin-top: 27px; }
+      .hero-visual { margin-top: 35px; height: 410px; justify-content: center; }
+      .hero-visual::before { width: 450px; height: 450px; top: -8px; right: -130px; }
+      .app-window { transform: scale(.76) rotate(-1.1deg); transform-origin: center center; margin: 0; flex: none; }
+      .floating-card { bottom: 9px; right: 0; }
+      .visual-caption { left: 0; bottom: -10px; }
+      .role-inner { align-items: flex-start; flex-direction: column; padding: 26px 0; gap: 19px; }
+      .role-inner > p { margin: 0; max-width: none; }
+      .role-list { width: 100%; flex-wrap: wrap; justify-content: flex-start; gap: 13px 18px; }
+      .role-list span { font-size: 12px; }
+      .section, .process-section { padding: 78px 0; }
+      .section-heading h2, .feature-copy h2, .process-intro h2, .demo-copy h2 { font-size: 39px; }
+      .benefit-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 32px; }
+      .benefit-card { min-height: 0; padding: 24px; }
+      .benefit-art { width: 64px; height: 64px; margin-bottom: 21px; }
+      .feature-section { padding: 76px 0; }
+      .feature-grid { grid-template-columns: 1fr; gap: 43px; }
+      .flow-art { min-height: 350px; }
+      .feature-copy { grid-row: 1; }
+      .process-top { display: block; }
+      .process-top > p { margin-top: 17px; }
+      .process-grid { grid-template-columns: 1fr; gap: 27px; margin-top: 38px; }
+      .process-item h3 { margin-top: 15px; }
+      .demo-inner { flex-direction: column; align-items: stretch; padding-block: 73px; gap: 35px; }
+      .demo-form-wrap { width: 100%; }
+      .footer-main { align-items: flex-start; flex-direction: column; }
+      .footer-links { flex-wrap: wrap; gap: 18px; }
+    }
+    @media (max-width: 440px) {
+      .hero-visual { height: 310px; margin-top: 20px; }
+      .app-window { transform: scale(.55) rotate(-1.1deg); }
+      .floating-card { transform: scale(.83) rotate(2deg); transform-origin: bottom right; right: -7px; bottom: 4px; }
+      .hero-visual::before { width: 330px; height: 330px; right: -100px; }
+      .visual-caption { bottom: -6px; }
+      .flow-art { padding: 18px; min-height: 330px; }
+      .flow-line { left: 51px; right: 51px; top: 108px; }
+      .flow-steps { gap: 4px; }
+      .flow-step strong { font-size: 10px; }
+      .flow-step small { font-size: 8px; }
+      .role-list .divider { display: none; }
+      .footer-bottom { gap: 12px; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="icon-mark" viewBox="0 0 32 32">
+      <path d="M16 2.5 19.4 12.6 29.5 16 19.4 19.4 16 29.5 12.6 19.4 2.5 16 12.6 12.6Z" fill="currentColor"/>
+      <circle cx="16" cy="16" r="3.1" fill="#f7f7f2"/>
+    </symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24"><path d="m12 2.8 8.2 4.5v9.4L12 21.2l-8.2-4.5V7.3L12 2.8Zm-8.2 4.5L12 12l8.2-4.7M12 12v9.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="icon-lines" viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="icon-truck" viewBox="0 0 24 24"><path d="M2.5 6h11v10h-11V6Zm11 3h4.1l3.9 4v3h-8V9ZM6 18.5a1.7 1.7 0 1 0 3.4 0 1.7 1.7 0 0 0-3.4 0Zm10 0a1.7 1.7 0 1 0 3.4 0 1.7 1.7 0 0 0-3.4 0Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M5 17h14l-2-2.5V10a5 5 0 0 0-10 0v4.5L5 17Zm5 3h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#" aria-label="Acme home"><svg class="brand-mark"><use href="#icon-mark"/></svg>acme</a>
+      <nav class="nav-links" id="main-nav" aria-label="Main navigation">
+        <a href="#benefits">Why Acme</a>
+        <a href="#platform">The platform</a>
+        <a href="#how-it-works">How it works</a>
+      </nav>
+      <a href="#demo" class="button header-cta">Book a demo <svg><use href="#icon-arrow"/></svg></a>
+      <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">A better way to keep things moving</span>
+          <h1 id="hero-title">Custom widgets.<br><em>Complete clarity.</em></h1>
+          <p class="hero-description">From the first specification to the final delivery, Acme gives your operations team one calm, connected place to configure, order, and track every widget.</p>
+          <div class="hero-actions">
+            <a class="button" href="#demo">Book a demo <svg><use href="#icon-arrow"/></svg></a>
+            <a class="text-link" href="#platform">Explore the platform <svg><use href="#icon-arrow"/></svg></a>
+          </div>
+          <div class="hero-note"><svg><use href="#icon-check"/></svg> Made for the realities of manufacturing operations.</div>
+        </div>
+
+        <div class="hero-visual" aria-label="Illustration of the Acme order dashboard">
+          <div class="app-window" aria-hidden="true">
+            <aside class="app-sidebar">
+              <div class="app-logo"><svg><use href="#icon-mark"/></svg>acme</div>
+              <div class="app-nav-item active"><svg><use href="#icon-grid"/></svg> Overview</div>
+              <div class="app-nav-item"><svg><use href="#icon-box"/></svg> Widgets</div>
+              <div class="app-nav-item"><svg><use href="#icon-lines"/></svg> Orders</div>
+              <div class="app-nav-item"><svg><use href="#icon-truck"/></svg> Deliveries</div>
+              <div class="app-sidebar-bottom">
+                YOUR WORKSPACE
+                <div class="app-user"><span class="user-avatar">ML</span><span>Maya Larsen</span></div>
+              </div>
+            </aside>
+            <div class="app-main">
+              <div class="app-top">
+                <span>Workspace / Overview</span>
+                <div class="app-top-right"><svg><use href="#icon-bell"/></svg><span class="tiny-avatar">ML</span></div>
+              </div>
+              <div class="app-heading">
+                <div><small>Good morning, Maya</small><strong>Orders overview</strong></div>
+                <span class="period">This month&nbsp; ⌄</span>
+              </div>
+              <div class="app-stats">
+                <div class="app-stat"><span>Active orders</span><strong>24 <i>↗</i></strong></div>
+                <div class="app-stat"><span>In production</span><strong>16</strong></div>
+                <div class="app-stat"><span>On the way</span><strong>08</strong></div>
+              </div>
+              <div class="app-section-head"><strong>Recent orders</strong><span>View all →</span></div>
+              <div class="orders-card">
+                <div class="orders-row">
+                  <div class="order-name"><span class="part-icon"><svg><use href="#icon-box"/></svg></span><span><b>Precision housing</b><small>Order #AC-2048</small></span></div>
+                  <span class="order-date">Oct 12</span><span class="status">In transit</span>
+                </div>
+                <div class="orders-row">
+                  <div class="order-name"><span class="part-icon"><svg><use href="#icon-box"/></svg></span><span><b>Mounting bracket</b><small>Order #AC-2047</small></span></div>
+                  <span class="order-date">Oct 18</span><span class="status processing">Production</span>
+                </div>
+                <div class="orders-row">
+                  <div class="order-name"><span class="part-icon"><svg><use href="#icon-box"/></svg></span><span><b>Valve connector</b><small>Order #AC-2046</small></span></div>
+                  <span class="order-date">Oct 21</span><span class="status processing">Production</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="floating-card" aria-hidden="true">
+            <span class="float-icon"><svg><use href="#icon-truck"/></svg></span>
+            <span><strong>Delivery on track</strong><small>Precision housing · Oct 12</small></span>
+          </div>
+          <span class="visual-caption">Illustrative platform view</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="role-strip">
+      <div class="container role-inner">
+        <p>One shared view for everyone keeping production on course.</p>
+        <div class="role-list" aria-label="Teams Acme supports">
+          <span>Operations</span><i class="divider"></i>
+          <span>Procurement</span><i class="divider"></i>
+          <span>Supply chain</span><i class="divider"></i>
+          <span>Production</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="section" id="benefits" aria-labelledby="benefits-title">
+      <div class="container">
+        <div class="section-heading">
+          <span class="eyebrow">Less friction, more flow</span>
+          <h2 id="benefits-title">The details are complex.<br>The workday doesn’t have to be.</h2>
+          <p>Custom orders come with moving parts. Acme brings the important ones together, so your team can spend less time looking for answers and more time moving forward.</p>
+        </div>
+        <div class="benefit-grid">
+          <article class="benefit-card">
+            <div class="benefit-art"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11h28v27H10zM10 18h28M17 7v8M31 7v8M17 25h7M17 31h13"/></svg></div>
+            <h3>Configure with confidence</h3>
+            <p>Keep widget specifications organized and easy to review before an order moves ahead.</p>
+          </article>
+          <article class="benefit-card">
+            <div class="benefit-art"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m24 6 17 9v18l-17 9-17-9V15L24 6ZM7 15l17 9 17-9M24 24v18M16 10l17 9"/><path d="M13 23v7"/></svg></div>
+            <h3>Order without the back-and-forth</h3>
+            <p>Move from approved configuration to order in one place, with the context your team needs close at hand.</p>
+          </article>
+          <article class="benefit-card">
+            <div class="benefit-art"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 35h32M11 35V19l9-6 8 6 9-11v27M8 12l6 6M34 8h5v5"/><circle cx="11" cy="35" r="2.5" fill="#e9efed"/><circle cx="37" cy="35" r="2.5" fill="#e9efed"/></svg></div>
+            <h3>See what’s happening</h3>
+            <p>Follow orders across the supply chain with clear status updates instead of another round of check-ins.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-section" id="platform" aria-labelledby="platform-title">
+      <div class="container feature-grid">
+        <div class="flow-art" aria-label="Illustration of a widget progressing from configuration to delivery">
+          <div class="flow-top"><strong>One connected journey</strong><span>Widget #W-1084</span></div>
+          <div class="flow-line"></div>
+          <div class="flow-steps">
+            <div class="flow-step">
+              <div class="flow-circle"><svg><use href="#icon-lines"/></svg></div>
+              <strong>Configured</strong><small>Specs confirmed</small>
+            </div>
+            <div class="flow-step">
+              <div class="flow-circle"><svg><use href="#icon-box"/></svg></div>
+              <strong>Ordered</strong><small>In production</small>
+            </div>
+            <div class="flow-step">
+              <div class="flow-circle"><svg><use href="#icon-truck"/></svg></div>
+              <strong>Delivered</strong><small>On its way</small>
+            </div>
+          </div>
+          <div class="flow-bottom">
+            <span class="flow-bottom-icon"><svg><use href="#icon-check"/></svg></span>
+            <div><strong>Everything in its place</strong><small>Specifications, orders, and status together.</small></div>
+            <svg class="flow-check"><use href="#icon-check"/></svg>
+          </div>
+        </div>
+        <div class="feature-copy">
+          <span class="eyebrow">The Acme platform</span>
+          <h2 id="platform-title">A single source of calm for custom widgets.</h2>
+          <p>When information is scattered, small questions can slow down big plans. Acme gives your team a clear path from what you need to where it is now.</p>
+          <ul class="feature-points">
+            <li><svg><use href="#icon-check"/></svg> Keep configurations and orders connected</li>
+            <li><svg><use href="#icon-check"/></svg> Give every stakeholder a clearer picture</li>
+            <li><svg><use href="#icon-check"/></svg> Know what needs your attention next</li>
+          </ul>
+          <a href="#demo" class="text-link">See Acme in action <svg><use href="#icon-arrow"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="process-section" id="how-it-works" aria-labelledby="process-title">
+      <div class="container">
+        <div class="process-top">
+          <div class="process-intro">
+            <span class="eyebrow">Simple by design</span>
+            <h2 id="process-title">From “we need it” to<br>“we know where it is.”</h2>
+          </div>
+          <p>A straightforward workflow that follows the way your operations team actually works.</p>
+        </div>
+        <div class="process-grid">
+          <article class="process-item">
+            <span class="process-number">01 / CONFIGURE</span>
+            <h3>Get the details right</h3>
+            <p>Define the widget you need and bring its specifications into one clear view.</p>
+          </article>
+          <article class="process-item">
+            <span class="process-number">02 / ORDER</span>
+            <h3>Keep work moving</h3>
+            <p>Place custom orders with the right information already attached.</p>
+          </article>
+          <article class="process-item">
+            <span class="process-number">03 / TRACK</span>
+            <h3>Stay in the know</h3>
+            <p>Follow progress from production through delivery, without losing the thread.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-section" id="demo" aria-labelledby="demo-title">
+      <div class="container demo-inner">
+        <div class="demo-copy">
+          <span class="eyebrow">Let’s talk</span>
+          <h2 id="demo-title">Make room for a clearer way to work.</h2>
+          <p>Tell us where your widget workflow gets complicated. We’ll show you how Acme can help bring it into focus.</p>
+        </div>
+        <div class="demo-form-wrap">
+          <h3>See Acme for yourself</h3>
+          <p>Start with your work email. We’ll help you take it from there.</p>
+          <form id="demo-form">
+            <label for="work-email">Work email</label>
+            <input id="work-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required />
+            <button class="button" type="submit">Request a demo <svg><use href="#icon-arrow"/></svg></button>
+          </form>
+          <p class="form-message" id="form-message" role="status">This opens an email draft to our team. No forms to chase.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-main">
+        <div>
+          <a class="brand" href="#" aria-label="Acme home"><svg class="brand-mark"><use href="#icon-mark"/></svg>acme</a>
+          <p>Custom widgets, clearly managed.</p>
+        </div>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="#benefits">Why Acme</a>
+          <a href="#platform">The platform</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="mailto:hello@acme.com">Contact</a>
+        </nav>
+      </div>
+      <div class="footer-bottom"><span>© <span id="year">2026</span> Acme. All rights reserved.</span><span>Made for the people who keep things moving.</span></div>
+    </div>
+  </footer>
+
+  <script>
+    const menuButton = document.querySelector(".menu-toggle");
+    const nav = document.querySelector("#main-nav");
+    menuButton.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+    });
+    nav.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    document.querySelector("#year").textContent = new Date().getFullYear();
+
+    document.querySelector("#demo-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const email = document.querySelector("#work-email").value.trim();
+      if (!email) return;
+      const subject = encodeURIComponent("I'd like to see an Acme demo");
+      const body = encodeURIComponent(
+        "Hi Acme team,\n\nI'd like to book a demo and learn how Acme could help our operations team manage custom widgets.\n\nMy work email: " + email + "\n\nThanks!"
+      );
+      document.querySelector("#form-message").textContent = "Your email draft is ready to send. If it didn’t open, write to hello@acme.com.";
+      window.location.href = `mailto:hello@acme.com?subject=${subject}&body=${body}`;
+    });
+  </script>
+</body>
+</html>

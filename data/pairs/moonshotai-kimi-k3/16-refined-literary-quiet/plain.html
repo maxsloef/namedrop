@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, made to order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#23211d;
+    --ink-soft:#5c574e;
+    --ink-faint:#8d877c;
+    --paper:#f7f5f0;
+    --paper-deep:#efede6;
+    --line:#ddd8cd;
+    --accent:#7a5c3e;
+    --accent-soft:#a08a6d;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-weight:300;
+    font-size:16px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent);color:var(--paper);}
+
+  .serif{font-family:'Cormorant Garamond',serif;}
+
+  /* ---------- navigation ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:26px 56px;
+    transition:background .5s ease, box-shadow .5s ease, padding .5s ease;
+  }
+  nav.scrolled{
+    background:rgba(247,245,240,.92);
+    backdrop-filter:blur(12px);
+    box-shadow:0 1px 0 var(--line);
+    padding:16px 56px;
+  }
+  .wordmark{
+    font-family:'Cormorant Garamond',serif;
+    font-size:26px;font-weight:600;letter-spacing:.06em;
+    color:var(--ink);text-decoration:none;
+  }
+  .wordmark em{font-style:italic;font-weight:400;color:var(--accent);}
+  .nav-links{display:flex;align-items:center;gap:38px;}
+  .nav-links a{
+    font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);text-decoration:none;
+    transition:color .3s;
+  }
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{
+    border:1px solid var(--ink);padding:10px 22px !important;
+    color:var(--ink) !important;
+    transition:background .35s,color .35s !important;
+  }
+  .nav-cta:hover{background:var(--ink);color:var(--paper) !important;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;
+    display:grid;grid-template-columns:1fr 1fr;
+    align-items:center;
+    padding:140px 56px 80px;
+    gap:40px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-copy{max-width:560px;}
+  .eyebrow{
+    font-size:12px;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:34px;
+    display:flex;align-items:center;gap:16px;
+  }
+  .eyebrow::before{content:'';width:44px;height:1px;background:var(--accent);}
+  h1{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:500;
+    font-size:clamp(52px,4.6vw,72px);
+    line-height:1.08;
+    letter-spacing:-.01em;
+    margin-bottom:32px;
+  }
+  h1 em{font-style:italic;color:var(--accent);}
+  .hero-sub{
+    font-size:17px;color:var(--ink-soft);max-width:440px;
+    margin-bottom:46px;
+  }
+  .hero-actions{display:flex;align-items:center;gap:30px;}
+  .btn-primary{
+    display:inline-block;
+    background:var(--ink);color:var(--paper);
+    font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    text-decoration:none;padding:17px 36px;
+    position:relative;overflow:hidden;
+    transition:color .4s;
+  }
+  .btn-primary::after{
+    content:'';position:absolute;inset:0;background:var(--accent);
+    transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.6,0,.2,1);
+    z-index:0;
+  }
+  .btn-primary span{position:relative;z-index:1;}
+  .btn-primary:hover::after{transform:scaleX(1);}
+  .btn-text{
+    font-size:13px;letter-spacing:.1em;color:var(--ink-soft);
+    text-decoration:none;border-bottom:1px solid var(--line);
+    padding-bottom:3px;transition:color .3s,border-color .3s;
+  }
+  .btn-text:hover{color:var(--ink);border-color:var(--ink);}
+
+  .hero-figure{display:flex;justify-content:center;align-items:center;}
+  .hero-figure svg{width:100%;max-width:520px;height:auto;}
+
+  .scroll-hint{
+    position:absolute;bottom:34px;left:56px;
+    display:flex;align-items:center;gap:14px;
+    font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);
+  }
+  .scroll-hint .tick{width:1px;height:44px;background:var(--ink-faint);overflow:hidden;position:relative;}
+  .scroll-hint .tick::after{
+    content:'';position:absolute;left:0;top:-100%;width:100%;height:100%;
+    background:var(--accent);animation:drip 2.4s ease-in-out infinite;
+  }
+  @keyframes drip{0%{top:-100%}55%{top:0}100%{top:100%}}
+
+  /* ---------- shared section ---------- */
+  section{padding:130px 56px;}
+  .wrap{max-width:1180px;margin:0 auto;}
+  .section-head{margin-bottom:80px;max-width:640px;}
+  .section-num{
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:15px;color:var(--accent);letter-spacing:.1em;margin-bottom:18px;
+  }
+  h2{
+    font-family:'Cormorant Garamond',serif;font-weight:500;
+    font-size:clamp(36px,3vw,48px);line-height:1.15;letter-spacing:-.01em;
+  }
+  h2 em{font-style:italic;color:var(--accent);}
+  .section-head p{margin-top:22px;color:var(--ink-soft);font-size:16px;}
+
+  /* ---------- reveal ---------- */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.6,.2,1);}
+  .reveal.in{opacity:1;transform:none;}
+  .reveal.d1{transition-delay:.12s;}
+  .reveal.d2{transition-delay:.24s;}
+  .reveal.d3{transition-delay:.36s;}
+
+  /* ---------- principles ---------- */
+  .principles{background:var(--paper);}
+  .principle-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+    border-top:1px solid var(--line);
+  }
+  .principle{
+    padding:52px 44px 60px;
+    border-bottom:1px solid var(--line);
+    border-right:1px solid var(--line);
+    transition:background .5s;
+  }
+  .principle:nth-child(3n){border-right:none;}
+  .principle:hover{background:var(--paper-deep);}
+  .principle .glyph{margin-bottom:30px;height:44px;}
+  .principle h3{
+    font-family:'Cormorant Garamond',serif;font-weight:600;
+    font-size:24px;margin-bottom:14px;letter-spacing:.01em;
+  }
+  .principle p{font-size:14.5px;color:var(--ink-soft);}
+
+  /* ---------- process ---------- */
+  .process{background:var(--paper-deep);}
+  .steps{border-top:1px solid var(--line);}
+  .step{
+    display:grid;grid-template-columns:120px 1fr 1.2fr;gap:48px;
+    align-items:baseline;
+    padding:52px 0;border-bottom:1px solid var(--line);
+  }
+  .step .roman{
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    font-size:30px;color:var(--accent-soft);
+  }
+  .step h3{
+    font-family:'Cormorant Garamond',serif;font-weight:600;font-size:28px;
+  }
+  .step p{color:var(--ink-soft);font-size:15px;max-width:520px;}
+
+  /* ---------- quote ---------- */
+  .quotation{background:var(--ink);color:var(--paper);text-align:center;}
+  .quotation blockquote{
+    font-family:'Cormorant Garamond',serif;font-weight:400;
+    font-size:clamp(30px,2.8vw,42px);line-height:1.35;
+    max-width:840px;margin:0 auto 40px;
+  }
+  .quotation blockquote em{font-style:italic;color:var(--accent-soft);}
+  .quotation cite{
+    font-style:normal;font-size:12px;letter-spacing:.22em;
+    text-transform:uppercase;color:#a8a196;
+  }
+  .quotation .mark{
+    font-family:'Cormorant Garamond',serif;font-size:90px;line-height:.4;
+    color:var(--accent);display:block;margin-bottom:34px;
+  }
+
+  /* ---------- numbers ---------- */
+  .numbers{border-bottom:1px solid var(--line);}
+  .num-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:60px;text-align:center;}
+  .num-item .value{
+    font-family:'Cormorant Garamond',serif;font-weight:500;
+    font-size:64px;line-height:1;color:var(--ink);
+  }
+  .num-item .value sup{font-size:30px;color:var(--accent);}
+  .num-item .label{
+    margin-top:16px;font-size:12px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--ink-faint);
+  }
+
+  /* ---------- demo / cta ---------- */
+  .demo{background:var(--paper);}
+  .demo-inner{
+    display:grid;grid-template-columns:1.1fr 1fr;gap:90px;align-items:center;
+  }
+  .demo-form{
+    background:#fff;border:1px solid var(--line);
+    padding:52px 48px;
+  }
+  .demo-form h3{
+    font-family:'Cormorant Garamond',serif;font-weight:600;
+    font-size:26px;margin-bottom:8px;
+  }
+  .demo-form .form-note{font-size:13.5px;color:var(--ink-faint);margin-bottom:34px;}
+  .field{margin-bottom:24px;}
+  .field label{
+    display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:9px;
+  }
+  .field input,.field select{
+    width:100%;border:none;border-bottom:1px solid var(--line);
+    background:transparent;padding:9px 2px;
+    font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);
+    outline:none;transition:border-color .3s;
+    border-radius:0;appearance:none;
+  }
+  .field input:focus,.field select:focus{border-color:var(--accent);}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  .demo-form .btn-primary{width:100%;text-align:center;border:none;cursor:pointer;font-family:'Inter',sans-serif;margin-top:10px;}
+  .form-success{
+    display:none;text-align:center;padding:40px 0;
+  }
+  .form-success .serif{font-size:28px;font-weight:500;margin-bottom:12px;}
+  .form-success p{color:var(--ink-soft);font-size:14.5px;}
+
+  .demo-list{list-style:none;margin-top:44px;}
+  .demo-list li{
+    display:flex;gap:20px;align-items:baseline;
+    padding:20px 0;border-bottom:1px solid var(--line);
+    font-size:15px;color:var(--ink-soft);
+  }
+  .demo-list li:last-child{border-bottom:none;}
+  .demo-list .n{
+    font-family:'Cormorant Garamond',serif;font-style:italic;
+    color:var(--accent);font-size:17px;min-width:26px;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:60px 56px 44px;
+  }
+  .foot-inner{
+    max-width:1180px;margin:0 auto;
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:30px;
+  }
+  .foot-links{display:flex;gap:32px;}
+  .foot-links a{
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-faint);text-decoration:none;transition:color .3s;
+  }
+  .foot-links a:hover{color:var(--ink);}
+  .foot-fine{font-size:12px;color:var(--ink-faint);margin-top:6px;}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;padding-top:120px;}
+    .hero-figure{display:none;}
+    .principle-grid{grid-template-columns:1fr;}
+    .principle{border-right:none;}
+    .step{grid-template-columns:1fr;gap:12px;}
+    .demo-inner{grid-template-columns:1fr;}
+    .num-grid{grid-template-columns:1fr;}
+    nav{padding:20px 28px;}
+    section{padding:90px 28px;}
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a class="wordmark" href="#">Acme<em>.</em></a>
+  <div class="nav-links">
+    <a href="#principles">The Platform</a>
+    <a href="#process">How It Works</a>
+    <a href="#customers">Customers</a>
+    <a href="#demo" class="nav-cta">Book a Demo</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow reveal">For operations teams</div>
+    <h1 class="reveal d1">The quiet craft of <em>custom widgets</em>, at scale.</h1>
+    <p class="hero-sub reveal d2">
+      Acme gives mid-sized manufacturers one considered place to configure,
+      order, and follow every widget through the supply chain — from first
+      specification to final delivery.
+    </p>
+    <div class="hero-actions reveal d3">
+      <a href="#demo" class="btn-primary"><span>Book a Demo</span></a>
+      <a href="#process" class="btn-text">See how it works</a>
+    </div>
+  </div>
+
+  <div class="hero-figure reveal d2" aria-hidden="true">
+    <svg viewBox="0 0 520 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="260" cy="260" r="218" stroke="#ddd8cd" stroke-width="1"/>
+      <circle cx="260" cy="260" r="160" stroke="#ddd8cd" stroke-width="1" stroke-dasharray="2 6"/>
+      <g id="orbit">
+        <circle cx="260" cy="42" r="5" fill="#7a5c3e"/>
+      </g>
+      <g stroke="#23211d" stroke-width="1.4">
+        <rect x="196" y="196" width="128" height="128" fill="#f7f5f0"/>
+        <rect x="216" y="216" width="88" height="88" fill="none" stroke="#a08a6d"/>
+        <line x1="196" y1="196" x2="168" y2="168" stroke="#ddd8cd"/>
+        <line x1="324" y1="196" x2="352" y2="168" stroke="#ddd8cd"/>
+        <line x1="196" y1="324" x2="168" y2="352" stroke="#ddd8cd"/>
+        <line x1="324" y1="324" x2="352" y2="352" stroke="#ddd8cd"/>
+        <rect x="168" y="160" width="14" height="14" fill="#efede6" stroke="#a08a6d" stroke-width="1"/>
+        <rect x="345" y="160" width="14" height="14" fill="#efede6" stroke="#a08a6d" stroke-width="1"/>
+        <rect x="168" y="345" width="14" height="14" fill="#efede6" stroke="#a08a6d" stroke-width="1"/>
+        <rect x="345" y="345" width="14" height="14" fill="#efede6" stroke="#a08a6d" stroke-width="1"/>
+      </g>
+      <circle cx="260" cy="260" r="10" fill="#7a5c3e"/>
+      <line x1="260" y1="120" x2="260" y2="188" stroke="#ddd8cd" stroke-width="1"/>
+      <line x1="260" y1="332" x2="260" y2="400" stroke="#ddd8cd" stroke-width="1"/>
+      <line x1="120" y1="260" x2="188" y2="260" stroke="#ddd8cd" stroke-width="1"/>
+      <line x1="332" y1="260" x2="400" y2="260" stroke="#ddd8cd" stroke-width="1"/>
+      <text x="260" y="112" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="15" fill="#8d877c">configure</text>
+      <text x="260" y="428" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="15" fill="#8d877c">track</text>
+      <text x="94" y="255" text-anchor="end" font-family="Cormorant Garamond, serif" font-style="italic" font-size="15" fill="#8d877c">order</text>
+      <text x="426" y="255" font-family="Cormorant Garamond, serif" font-style="italic" font-size="15" fill="#8d877c">deliver</text>
+    </svg>
+  </div>
+
+  <div class="scroll-hint"><span class="tick"></span>Scroll</div>
+</header>
+
+<!-- ============ PRINCIPLES ============ -->
+<section class="principles" id="principles">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-num">No. 1 — The Platform</div>
+      <h2>Built for those who <em>make things</em> properly.</h2>
+      <p>Three convictions shape every screen of Acme. They are simple, and we hold them firmly.</p>
+    </div>
+    <div class="principle-grid">
+      <div class="principle reveal">
+        <div class="glyph">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="6" y="6" width="32" height="32" stroke="#7a5c3e" stroke-width="1.3"/>
+            <rect x="15" y="15" width="14" height="14" stroke="#23211d" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <h3>Precise configuration</h3>
+        <p>Specify dimensions, tolerances, materials, and finishes in plain language. Acme translates your intent into manufacturing-ready specifications — no engineering drawings required.</p>
+      </div>
+      <div class="principle reveal d1">
+        <div class="glyph">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="22" r="16" stroke="#7a5c3e" stroke-width="1.3"/>
+            <path d="M22 12v10l7 5" stroke="#23211d" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Honest lead times</h3>
+        <p>Every quote carries a delivery window drawn from live capacity across our supplier network. When something slips, you hear it from us first — with a revised date, not an apology.</p>
+      </div>
+      <div class="principle reveal d2">
+        <div class="glyph">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M6 30c6-12 10-16 16-16s10 4 16 16" stroke="#7a5c3e" stroke-width="1.3"/>
+            <circle cx="22" cy="14" r="3.5" stroke="#23211d" stroke-width="1.3"/>
+            <line x1="6" y1="36" x2="38" y2="36" stroke="#23211d" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <h3>End-to-end visibility</h3>
+        <p>Follow each order from foundry to loading dock. One ledger of record for every widget, every revision, every shipment — shared with your whole team.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section class="process" id="process">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-num">No. 2 — The Method</div>
+      <h2>From specification to shelf, in <em>four movements</em>.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="roman">I.</div>
+        <h3>Describe</h3>
+        <p>Tell Acme what the widget must do. Our guided specification captures geometry, material, compliance requirements, and volume — in about the time it takes to write a memo.</p>
+      </div>
+      <div class="step reveal">
+        <div class="roman">II.</div>
+        <h3>Compare</h3>
+        <p>Receive firm quotes from vetted suppliers within one business day. Price, lead time, and quality history side by side, so the trade-offs are yours to weigh.</p>
+      </div>
+      <div class="step reveal">
+        <div class="roman">III.</div>
+        <h3>Confirm</h3>
+        <p>Place the order with a single approval. Acme locks the specification, issues the purchase documents, and opens a shared record your whole team can follow.</p>
+      </div>
+      <div class="step reveal">
+        <div class="roman">IV.</div>
+        <h3>Follow</h3>
+        <p>Watch production milestones, inspection results, and freight status as they happen. When the shipment arrives, the paperwork is already filed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUOTE ============ -->
+<section class="quotation" id="customers">
+  <div class="wrap reveal">
+    <span class="mark">&ldquo;</span>
+    <blockquote>
+      We used to chase widget orders through a thicket of spreadsheets and
+      unanswered emails. With Acme, the whole chain reads like a
+      <em>well-kept diary</em> — every entry dated, every promise kept.
+    </blockquote>
+    <cite>Margaret Ellison — VP of Operations, Hartwell Fabrication Co.</cite>
+  </div>
+</section>
+
+<!-- ============ NUMBERS ============ -->
+<section class="numbers">
+  <div class="wrap">
+    <div class="num-grid">
+      <div class="num-item reveal">
+        <div class="value" data-count="420"><span class="n">0</span><sup>+</sup></div>
+        <div class="label">Manufacturers served</div>
+      </div>
+      <div class="num-item reveal d1">
+        <div class="value" data-count="98"><span class="n">0</span><sup>%</sup></div>
+        <div class="label">Orders delivered on time</div>
+      </div>
+      <div class="num-item reveal d2">
+        <div class="value" data-count="11"><span class="n">0</span><sup>days</sup></div>
+        <div class="label">Median quote-to-order time saved</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEMO ============ -->
+<section class="demo" id="demo">
+  <div class="wrap demo-inner">
+    <div class="reveal">
+      <div class="section-num">No. 3 — The Invitation</div>
+      <h2>See it for yourself, <em>unhurried</em>.</h2>
+      <ul class="demo-list">
+        <li><span class="n">i.</span>A forty-five minute walkthrough, tailored to your product lines and volumes.</li>
+        <li><span class="n">ii.</span>Your own specification, quoted live against our supplier network.</li>
+        <li><span class="n">iii.</span>A candid conversation about fit — including, if need be, a recommendation to look elsewhere.</li>
+      </ul>
+    </div>
+    <div class="demo-form reveal d1">
+      <form id="demoForm" novalidate>
+        <h3>Book a demonstration</h3>
+        <p class="form-note">We reply within one business day, usually sooner.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="fname">Full name</label>
+            <input id="fname" type="text" autocomplete="name" required placeholder="Margaret Ellison">
+          </div>
+          <div class="field">
+            <label for="fcompany">Company</label>
+            <input id="fcompany" type="text" autocomplete="organization" required placeholder="Hartwell Fabrication">
+          </div>
+        </div>
+        <div class="field">
+          <label for="femail">Work email</label>
+          <input id="femail" type="email" autocomplete="email" required placeholder="m.ellison@hartwell.com">
+        </div>
+        <div class="field">
+          <label for="fvolume">Approximate monthly widget volume</label>
+          <select id="fvolume" required>
+            <option value="" disabled selected>Select a range</option>
+            <option>Under 500 units</option>
+            <option>500 – 5,000 units</option>
+            <option>5,000 – 50,000 units</option>
+            <option>Over 50,000 units</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary"><span>Request My Demo</span></button>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <div class="serif">Thank you — consider it noted.</div>
+        <p>A member of our team will write to you within one business day to arrange a time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="foot-inner">
+    <div>
+      <a class="wordmark" href="#">Acme<em>.</em></a>
+      <div class="foot-fine">© 2025 Acme Widget Systems, Inc. Made with care.</div>
+    </div>
+    <div class="foot-links">
+      <a href="#principles">Platform</a>
+      <a href="#process">Method</a>
+      <a href="#demo">Book a Demo</a>
+      <a href="mailto:hello@acme.example">hello@acme.example</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll state
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', scrollY > 40);
+  }, {passive:true});
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Animated counters
+  const counterIO = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const span = entry.target.querySelector('.n');
+      const target = +entry.target.dataset.count;
+      const dur = 1600, t0 = performance.now();
+      (function tick(now){
+        const p = Math.min((now - t0) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        span.textContent = Math.round(target * eased);
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+      counterIO.unobserve(entry.target);
+    });
+  }, {threshold:.5});
+  document.querySelectorAll('.num-item .value').forEach(el => counterIO.observe(el));
+
+  // Slow orbit on hero SVG
+  const orbit = document.getElementById('orbit');
+  let angle = 0;
+  (function spin(){
+    angle = (angle + 0.15) % 360;
+    orbit.setAttribute('transform', `rotate(${angle} 260 260)`);
+    requestAnimationFrame(spin);
+  })();
+
+  // Demo form
+  document.getElementById('demoForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const form = e.target;
+    let valid = true;
+    form.querySelectorAll('input, select').forEach(f => {
+      const bad = !f.value || (f.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value));
+      f.style.borderColor = bad ? '#b0552f' : '';
+      if (bad) valid = false;
+    });
+    if (!valid) return;
+    form.style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  });
+</script>
+</body>
+</html>

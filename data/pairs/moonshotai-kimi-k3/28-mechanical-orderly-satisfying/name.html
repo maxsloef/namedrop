@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, in order.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f5f3;
+    --paper:#ffffff;
+    --ink:#111111;
+    --grey:#6b6b68;
+    --line:#d8d8d4;
+    --accent:#ff5a00;
+    --radius:2px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent);color:#fff;}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:var(--bg);
+    border-bottom:1px solid var(--line);
+    transition:box-shadow .3s;
+  }
+  header.scrolled{box-shadow:0 1px 12px rgba(0,0,0,.06);}
+  .header-inner{
+    max-width:1280px;margin:0 auto;padding:0 48px;
+    height:72px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);}
+  .logo-mark{
+    width:32px;height:32px;background:var(--ink);border-radius:var(--radius);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:15px;letter-spacing:0;
+  }
+  .logo-name{font-weight:600;font-size:15px;letter-spacing:.14em;text-transform:uppercase;}
+  nav{display:flex;gap:36px;align-items:center;}
+  nav a{
+    text-decoration:none;color:var(--ink);font-size:14px;font-weight:500;
+    position:relative;padding:4px 0;
+  }
+  nav a:not(.btn)::after{
+    content:'';position:absolute;left:0;bottom:0;height:2px;width:0;
+    background:var(--accent);transition:width .25s cubic-bezier(.65,0,.35,1);
+  }
+  nav a:not(.btn):hover::after{width:100%;}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--ink);color:#fff;text-decoration:none;
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:500;
+    padding:12px 22px;border-radius:var(--radius);border:1px solid var(--ink);
+    cursor:pointer;transition:background .2s,color .2s;
+  }
+  .btn:hover{background:transparent;color:var(--ink);}
+  .btn .arrow{transition:transform .25s cubic-bezier(.65,0,.35,1);}
+  .btn:hover .arrow{transform:translateX(4px);}
+  .btn-accent{background:var(--accent);border-color:var(--accent);}
+  .btn-accent:hover{background:transparent;color:var(--accent);}
+  .btn-outline{background:transparent;color:var(--ink);}
+  .btn-outline:hover{background:var(--ink);color:#fff;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:200px 0 96px;
+    border-bottom:1px solid var(--line);
+    position:relative;overflow:hidden;
+  }
+  .hero-grid{
+    position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size:80px 80px;
+    mask-image:linear-gradient(to bottom, black, transparent 85%);
+    -webkit-mask-image:linear-gradient(to bottom, black, transparent 85%);
+  }
+  .hero-inner{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;position:relative;}
+  .eyebrow{color:var(--grey);margin-bottom:28px;display:flex;align-items:center;gap:12px;}
+  .eyebrow::before{content:'';width:24px;height:1px;background:var(--accent);display:inline-block;}
+  h1{
+    font-size:72px;line-height:1.02;letter-spacing:-.03em;font-weight:600;
+    margin-bottom:28px;
+  }
+  h1 em{font-style:normal;color:var(--accent);}
+  .hero-sub{font-size:19px;color:var(--grey);max-width:520px;margin-bottom:40px;}
+  .hero-actions{display:flex;gap:16px;align-items:center;}
+  .hero-note{margin-top:24px;color:var(--grey);}
+
+  /* Widget technical drawing */
+  .drawing{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:32px;position:relative;
+  }
+  .drawing-tag{
+    position:absolute;top:16px;left:16px;color:var(--grey);
+  }
+  .drawing svg{display:block;width:100%;height:auto;}
+  .dim-line{stroke:var(--grey);stroke-width:1;}
+  .dim-tick{stroke:var(--grey);stroke-width:1;}
+  .dim-text{font-family:'IBM Plex Mono',monospace;font-size:11px;fill:var(--grey);letter-spacing:.05em;}
+  .widget-body{fill:var(--ink);transition:fill .4s;}
+  .widget-accent{fill:var(--accent);}
+
+  /* ---------- Stats strip ---------- */
+  .stats{border-bottom:1px solid var(--line);background:var(--paper);}
+  .stats-inner{display:grid;grid-template-columns:repeat(4,1fr);}
+  .stat{padding:40px 32px;border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat .num{font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1;margin-bottom:8px;font-variant-numeric:tabular-nums;}
+  .stat .lbl{color:var(--grey);}
+
+  /* ---------- Section scaffold ---------- */
+  section{padding:112px 0;border-bottom:1px solid var(--line);}
+  .section-head{display:grid;grid-template-columns:200px 1fr;gap:48px;margin-bottom:72px;}
+  .section-index{color:var(--accent);}
+  h2{font-size:44px;font-weight:600;letter-spacing:-.02em;line-height:1.1;max-width:640px;}
+  .section-desc{margin-top:16px;color:var(--grey);font-size:17px;max-width:520px;}
+
+  /* ---------- Process ---------- */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);background:var(--paper);}
+  .step{padding:48px 40px;border-right:1px solid var(--line);position:relative;transition:background .3s;}
+  .step:last-child{border-right:none;}
+  .step:hover{background:#fafaf8;}
+  .step-num{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);
+    letter-spacing:.08em;margin-bottom:56px;display:block;
+  }
+  .step h3{font-size:22px;font-weight:600;margin-bottom:12px;letter-spacing:-.01em;}
+  .step p{color:var(--grey);font-size:15px;}
+  .step-icon{width:44px;height:44px;margin-bottom:24px;}
+
+  /* ---------- Configurator ---------- */
+  .config{
+    display:grid;grid-template-columns:1fr 1fr;gap:0;
+    border:1px solid var(--line);background:var(--paper);
+  }
+  .config-controls{padding:56px;border-right:1px solid var(--line);}
+  .config-preview{padding:56px;display:flex;flex-direction:column;justify-content:center;background:#fafaf8;position:relative;}
+  .opt-group{margin-bottom:40px;}
+  .opt-group:last-child{margin-bottom:0;}
+  .opt-label{color:var(--grey);margin-bottom:16px;display:flex;justify-content:space-between;}
+  .opt-label .val{color:var(--ink);}
+  .opt-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .opt{
+    font-family:'Inter',sans-serif;font-size:14px;font-weight:500;
+    padding:10px 18px;border:1px solid var(--line);background:var(--paper);
+    border-radius:var(--radius);cursor:pointer;transition:all .15s;color:var(--ink);
+  }
+  .opt:hover{border-color:var(--ink);}
+  .opt.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .preview-dims{margin-top:32px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);padding-top:24px;}
+  .pd{font-family:'IBM Plex Mono',monospace;}
+  .pd .k{font-size:11px;color:var(--grey);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px;}
+  .pd .v{font-size:15px;font-weight:500;}
+  .cfg-cta{margin-top:40px;}
+
+  /* ---------- Features ---------- */
+  .features{display:grid;grid-template-columns:repeat(2,1fr);border:1px solid var(--line);background:var(--paper);}
+  .feature{padding:48px 40px;border-bottom:1px solid var(--line);position:relative;}
+  .feature:nth-child(odd){border-right:1px solid var(--line);}
+  .feature:nth-last-child(-n+2){border-bottom:none;}
+  .feature .f-idx{color:var(--grey);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;margin-bottom:32px;display:block;}
+  .feature h3{font-size:20px;font-weight:600;margin-bottom:10px;}
+  .feature p{color:var(--grey);font-size:15px;max-width:400px;}
+
+  /* ---------- Quote ---------- */
+  .quote{background:var(--ink);color:#f5f5f3;border-bottom:1px solid var(--line);}
+  .quote-inner{max-width:840px;margin:0 auto;text-align:center;}
+  .quote blockquote{font-size:32px;line-height:1.35;font-weight:500;letter-spacing:-.01em;margin-bottom:40px;}
+  .quote blockquote em{font-style:normal;color:var(--accent);}
+  .quote-attrib{display:flex;align-items:center;justify-content:center;gap:16px;}
+  .quote-attrib .avatar{
+    width:48px;height:48px;border-radius:50%;background:#2c2c2c;border:1px solid #444;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--accent);
+  }
+  .quote-attrib .who{text-align:left;}
+  .quote-attrib .who b{display:block;font-size:15px;}
+  .quote-attrib .who span{font-size:13px;color:#9a9a95;}
+
+  /* ---------- Demo / Form ---------- */
+  .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start;}
+  .demo-list{list-style:none;margin-top:40px;}
+  .demo-list li{
+    display:flex;gap:20px;padding:20px 0;border-bottom:1px solid var(--line);align-items:baseline;
+  }
+  .demo-list li:last-child{border-bottom:none;}
+  .demo-list .n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);flex-shrink:0;}
+  .demo-list .t{font-size:16px;}
+  .demo-list .t b{font-weight:600;display:block;}
+  .demo-list .t span{color:var(--grey);font-size:14px;}
+  .form-card{background:var(--paper);border:1px solid var(--line);padding:48px;}
+  .form-card h3{font-size:22px;font-weight:600;margin-bottom:8px;}
+  .form-card .sub{color:var(--grey);font-size:14px;margin-bottom:36px;}
+  .field{margin-bottom:24px;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:8px;}
+  .field input,.field select{
+    width:100%;padding:13px 16px;font-family:'Inter',sans-serif;font-size:15px;
+    border:1px solid var(--line);border-radius:var(--radius);background:#fff;color:var(--ink);
+    transition:border-color .15s, box-shadow .15s;appearance:none;
+  }
+  .field input:focus,.field select:focus{
+    outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(17,17,17,.08);
+  }
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-card .btn{width:100%;justify-content:center;padding:15px;font-size:15px;}
+  .form-fine{margin-top:16px;font-size:12px;color:var(--grey);text-align:center;}
+  .success{display:none;text-align:center;padding:64px 0;}
+  .success .check{
+    width:56px;height:56px;border-radius:50%;background:var(--accent);margin:0 auto 24px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .success h4{font-size:22px;font-weight:600;margin-bottom:8px;}
+  .success p{color:var(--grey);font-size:15px;}
+
+  /* ---------- Footer ---------- */
+  footer{padding:64px 0 48px;background:var(--bg);}
+  .footer-inner{display:flex;justify-content:space-between;align-items:flex-start;}
+  .footer-cols{display:flex;gap:96px;}
+  .footer-col h5{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);margin-bottom:16px;font-weight:500;}
+  .footer-col a{display:block;text-decoration:none;color:var(--ink);font-size:14px;margin-bottom:10px;}
+  .footer-col a:hover{color:var(--accent);}
+  .footer-bottom{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--grey);}
+
+  /* ---------- Reveal ---------- */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1);}
+  .reveal.visible{opacity:1;transform:none;}
+  .reveal-d1{transition-delay:.08s;}.reveal-d2{transition-delay:.16s;}.reveal-d3{transition-delay:.24s;}
+
+  /* Drawing animation */
+  .draw-anim{stroke-dasharray:600;stroke-dashoffset:600;animation:draw 2.4s cubic-bezier(.65,0,.35,1) .4s forwards;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  .fade-in{opacity:0;animation:fadein .8s ease 1.6s forwards;}
+  @keyframes fadein{to{opacity:1;}}
+</style>
+</head>
+<body>
+
+<header id="header">
+  <div class="header-inner">
+    <a href="#top" class="logo">
+      <span class="logo-mark">A</span>
+      <span class="logo-name">Acme</span>
+    </a>
+    <nav>
+      <a href="#how">Process</a>
+      <a href="#configurator">Configure</a>
+      <a href="#platform">Platform</a>
+      <a href="#demo" class="btn btn-accent">Book a demo <span class="arrow">→</span></a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="wrap hero-inner">
+    <div>
+      <p class="eyebrow mono">Widget systems for operations teams</p>
+      <h1>Every widget.<br>Exactly <em>in order.</em></h1>
+      <p class="hero-sub">Acme is the platform mid-sized manufacturers use to configure, order, and track custom widgets across the supply chain — with tolerances you can set your watch by.</p>
+      <div class="hero-actions">
+        <a href="#demo" class="btn btn-accent">Book a demo <span class="arrow">→</span></a>
+        <a href="#how" class="btn btn-outline">See how it works</a>
+      </div>
+      <p class="hero-note mono">Avg. demo length — 22 min · No card required</p>
+    </div>
+    <div class="drawing">
+      <span class="drawing-tag mono">Fig. 01 — Widget, standard</span>
+      <svg viewBox="0 0 440 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Technical drawing of a standard Acme widget">
+        <!-- dimension lines -->
+        <g class="fade-in">
+          <line class="dim-line" x1="90" y1="310" x2="350" y2="310"/>
+          <line class="dim-tick" x1="90" y1="302" x2="90" y2="318"/>
+          <line class="dim-tick" x1="350" y1="302" x2="350" y2="318"/>
+          <text class="dim-text" x="220" y="330" text-anchor="middle">120 mm</text>
+          <line class="dim-line" x1="390" y1="90" x2="390" y2="250"/>
+          <line class="dim-tick" x1="382" y1="90" x2="398" y2="90"/>
+          <line class="dim-tick" x1="382" y1="250" x2="398" y2="250"/>
+          <text class="dim-text" x="404" y="174" transform="rotate(90 404 174)" text-anchor="middle">80 mm</text>
+        </g>
+        <!-- widget body -->
+        <rect class="widget-body draw-anim" x="90" y="90" width="260" height="160" rx="4" fill="none" stroke="#111" stroke-width="2"/>
+        <circle class="draw-anim" cx="220" cy="170" r="46" fill="none" stroke="#111" stroke-width="2"/>
+        <circle class="widget-accent fade-in" cx="220" cy="170" r="10"/>
+        <line class="draw-anim" x1="90" y1="130" x2="350" y2="130" stroke="#111" stroke-width="1"/>
+        <line class="draw-anim" x1="90" y1="210" x2="350" y2="210" stroke="#111" stroke-width="1"/>
+        <circle class="fade-in" cx="118" cy="110" r="5" fill="none" stroke="#111" stroke-width="1.5"/>
+        <circle class="fade-in" cx="322" cy="110" r="5" fill="none" stroke="#111" stroke-width="1.5"/>
+        <circle class="fade-in" cx="118" cy="230" r="5" fill="none" stroke="#111" stroke-width="1.5"/>
+        <circle class="fade-in" cx="322" cy="230" r="5" fill="none" stroke="#111" stroke-width="1.5"/>
+        <g class="fade-in">
+          <text class="dim-text" x="90" y="72">ACME W-120 · REV C</text>
+          <text class="dim-text" x="350" y="72" text-anchor="end">TOL ±0.05</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ================= STATS ================= -->
+<div class="stats">
+  <div class="wrap stats-inner">
+    <div class="stat reveal"><div class="num" data-count="98.4" data-decimals="1">0</div><div class="lbl mono">On-time delivery, %</div></div>
+    <div class="stat reveal reveal-d1"><div class="num" data-count="12" data-suffix=" days">0</div><div class="lbl mono">Median spec-to-ship</div></div>
+    <div class="stat reveal reveal-d2"><div class="num" data-count="460" data-suffix="+">0</div><div class="lbl mono">Manufacturers on Acme</div></div>
+    <div class="stat reveal reveal-d3"><div class="num" data-count="0" data-static="0">0</div><div class="lbl mono">Spreadsheets required</div></div>
+  </div>
+</div>
+
+<!-- ================= PROCESS ================= -->
+<section id="how">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-index mono">01 — Process</span>
+      <div>
+        <h2>Three steps. No steps between steps.</h2>
+        <p class="section-desc">A widget order should read like a well-made machine: few parts, each doing exactly one thing.</p>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <span class="step-num">Step / 01</span>
+        <svg class="step-icon" viewBox="0 0 44 44" fill="none" stroke="#111" stroke-width="1.5">
+          <rect x="6" y="6" width="32" height="32" rx="2"/><line x1="6" y1="17" x2="38" y2="17"/><circle cx="22" cy="27" r="6" stroke="#ff5a00"/>
+        </svg>
+        <h3>Configure</h3>
+        <p>Specify dimensions, material, and finish in a guided spec sheet. Every option is validated against live machine capacity before you commit.</p>
+      </div>
+      <div class="step reveal reveal-d1">
+        <span class="step-num">Step / 02</span>
+        <svg class="step-icon" viewBox="0 0 44 44" fill="none" stroke="#111" stroke-width="1.5">
+          <path d="M6 34 L22 10 L38 34 Z"/><circle cx="22" cy="27" r="4" stroke="#ff5a00"/><line x1="6" y1="38" x2="38" y2="38"/>
+        </svg>
+        <h3>Order</h3>
+        <p>One purchase order, one price, one delivery date. Acme routes your spec to the right line in our certified plant network — automatically.</p>
+      </div>
+      <div class="step reveal reveal-d2">
+        <span class="step-num">Step / 03</span>
+        <svg class="step-icon" viewBox="0 0 44 44" fill="none" stroke="#111" stroke-width="1.5">
+          <circle cx="22" cy="22" r="16"/><polyline points="22 13 22 22 30 26" stroke="#ff5a00"/>
+        </svg>
+        <h3>Track</h3>
+        <p>Follow each lot from first cut to final inspection with scan-level precision. Exceptions surface in hours, not at the loading dock.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONFIGURATOR ================= -->
+<section id="configurator">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-index mono">02 — Configure</span>
+      <div>
+        <h2>Try it. This is the actual spec sheet.</h2>
+        <p class="section-desc">A working sample of the Acme configurator. Choose a size, material, and finish — the drawing and dimensions update as they would in production.</p>
+      </div>
+    </div>
+    <div class="config reveal">
+      <div class="config-controls">
+        <div class="opt-group">
+          <div class="opt-label mono"><span>Size class</span><span class="val" id="sizeVal">W-120</span></div>
+          <div class="opt-row" data-group="size">
+            <button class="opt" data-value="W-80">W-80 · Compact</button>
+            <button class="opt active" data-value="W-120">W-120 · Standard</button>
+            <button class="opt" data-value="W-200">W-200 · Heavy</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label mono"><span>Material</span><span class="val" id="matVal">Steel 304</span></div>
+          <div class="opt-row" data-group="material">
+            <button class="opt active" data-value="Steel 304">Steel 304</button>
+            <button class="opt" data-value="Aluminum 6061">Aluminum 6061</button>
+            <button class="opt" data-value="Brass C360">Brass C360</button>
+          </div>
+        </div>
+        <div class="opt-group">
+          <div class="opt-label mono"><span>Finish</span><span class="val" id="finVal">Bead-blasted</span></div>
+          <div class="opt-row" data-group="finish">
+            <button class="opt active" data-value="Bead-blasted">Bead-blasted</button>
+            <button class="opt" data-value="Anodized black">Anodized black</button>
+            <button class="opt" data-value="Powder orange">Powder orange</button>
+          </div>
+        </div>
+        <div class="cfg-cta">
+          <a href="#demo" class="btn">Configure the real thing <span class="arrow">→</span></a>
+        </div>
+      </div>
+      <div class="config-preview">
+        <svg viewBox="0 0 440 300" xmlns="http://www.w3.org/2000/svg" id="cfgSvg" role="img" aria-label="Live widget preview">
+          <line class="dim-line" x1="70" y1="270" x2="370" y2="270"/>
+          <line class="dim-tick" x1="70" y1="263" x2="70" y2="277"/>
+          <line class="dim-tick" x1="370" y1="263" x2="370" y2="277"/>
+          <text class="dim-text" x="220" y="290" text-anchor="middle" id="dimW">120 mm</text>
+          <rect id="cfgBody" x="70" y="70" width="300" height="180" rx="4" fill="#111" style="transition:fill .35s, x .35s, width .35s, height .35s, y .35s;"/>
+          <circle cx="220" cy="160" r="52" fill="none" stroke="#f5f5f3" stroke-width="2" id="cfgBore"/>
+          <circle cx="220" cy="160" r="12" fill="#ff5a00"/>
+          <circle cx="98" cy="94" r="6" fill="none" stroke="#f5f5f3" stroke-width="1.5" class="cfg-hole"/>
+          <circle cx="342" cy="94" r="6" fill="none" stroke="#f5f5f3" stroke-width="1.5" class="cfg-hole"/>
+          <circle cx="98" cy="226" r="6" fill="none" stroke="#f5f5f3" stroke-width="1.5" class="cfg-hole"/>
+          <circle cx="342" cy="226" r="6" fill="none" stroke="#f5f5f3" stroke-width="1.5" class="cfg-hole"/>
+          <text class="dim-text" x="70" y="50" id="cfgTitle">ACME W-120 · STEEL 304</text>
+        </svg>
+        <div class="preview-dims">
+          <div class="pd"><span class="k">Width</span><span class="v" id="pdW">120 mm</span></div>
+          <div class="pd"><span class="k">Height</span><span class="v" id="pdH">80 mm</span></div>
+          <div class="pd"><span class="k">Unit weight</span><span class="v" id="pdWt">2.1 kg</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PLATFORM ================= -->
+<section id="platform">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="section-index mono">03 — Platform</span>
+      <div>
+        <h2>Less, but better software.</h2>
+        <p class="section-desc">Four capabilities. Each one finished. Nothing decorative, nothing you will have to relearn next quarter.</p>
+      </div>
+    </div>
+    <div class="features">
+      <div class="feature reveal">
+        <span class="f-idx">A.1</span>
+        <h3>Spec library</h3>
+        <p>Every widget your company has ever ordered, versioned like an engineering drawing. Reorder a Rev C with one click — or branch it into a Rev D.</p>
+      </div>
+      <div class="feature reveal reveal-d1">
+        <span class="f-idx">A.2</span>
+        <h3>Live capacity pricing</h3>
+        <p>Quotes are computed from real machine availability across the plant network, so the price and the date you see are the ones you get.</p>
+      </div>
+      <div class="feature reveal">
+        <span class="f-idx">A.3</span>
+        <h3>Lot-level tracking</h3>
+        <p>Each production lot carries a scan history: cutting, machining, finishing, inspection. Share a read-only tracking link with anyone downstream.</p>
+      </div>
+      <div class="feature reveal reveal-d1">
+        <span class="f-idx">A.4</span>
+        <h3>ERP handshake</h3>
+        <p>Native connectors for SAP, NetSuite, and Plex push confirmations, ASN data, and invoices back to your system of record. No swivel chair.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= QUOTE ================= -->
+<section class="quote">
+  <div class="wrap quote-inner reveal">
+    <blockquote>“We stopped chasing widgets through email threads. Now the order board just <em>reads like a timetable</em> — and it keeps time.”</blockquote>
+    <div class="quote-attrib">
+      <div class="avatar">MK</div>
+      <div class="who">
+        <b>Marta Keller</b>
+        <span>Director of Operations, Hartmann Fabrication</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DEMO ================= -->
+<section id="demo">
+  <div class="wrap demo-grid">
+    <div class="reveal">
+      <div class="section-head" style="grid-template-columns:1fr;margin-bottom:0;">
+        <span class="section-index mono">04 — Demo</span>
+        <div>
+          <h2>See your first widget in order.</h2>
+          <p class="section-desc">A 22-minute working session with an Acme engineer. Bring a real part number — we will configure it live.</p>
+        </div>
+      </div>
+      <ul class="demo-list">
+        <li><span class="n">01</span><div class="t"><b>Your spec, live</b><span>We configure one of your actual widgets in the platform.</span></div></li>
+        <li><span class="n">02</span><div class="t"><b>Honest pricing</b><span>A real quote with a real delivery date, on the call.</span></div></li>
+        <li><span class="n">03</span><div class="t"><b>Fit check</b><span>We map Acme to your ERP and approval flow before you decide anything.</span></div></li>
+      </ul>
+    </div>
+    <div class="form-card reveal reveal-d1">
+      <form id="demoForm" novalidate>
+        <h3>Book a demo</h3>
+        <p class="sub">We reply within one business day, usually sooner.</p>
+        <div class="field-row">
+          <div class="field">
+            <label for="fname">Full name</label>
+            <input type="text" id="fname" name="name" placeholder="Dieter Weiss" required>
+          </div>
+          <div class="field">
+            <label for="fcompany">Company</label>
+            <input type="text" id="fcompany" name="company" placeholder="Hartmann Fabrication" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="femail">Work email</label>
+          <input type="email" id="femail" name="email" placeholder="d.weiss@hartmann.com" required>
+        </div>
+        <div class="field">
+          <label for="fvolume">Monthly widget volume</label>
+          <select id="fvolume" name="volume">
+            <option>Under 500 units</option>
+            <option selected>500 – 5,000 units</option>
+            <option>5,000 – 25,000 units</option>
+            <option>Over 25,000 units</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-accent">Request my demo <span class="arrow">→</span></button>
+        <p class="form-fine">No commitment. No 40-slide deck. Just the product.</p>
+      </form>
+      <div class="success" id="formSuccess">
+        <div class="check">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h4>Request received.</h4>
+        <p>An Acme engineer will reach out within one business day<br>to schedule your working session.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div>
+        <a href="#top" class="logo" style="margin-bottom:16px;">
+          <span class="logo-mark">A</span>
+          <span class="logo-name">Acme</span>
+        </a>
+        <p class="mono" style="color:var(--grey);max-width:260px;line-height:1.8;">Orderly widget systems<br>for orderly operations.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Product</h5>
+          <a href="#how">Process</a>
+          <a href="#configurator">Configurator</a>
+          <a href="#platform">Platform</a>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <a href="#demo">Book a demo</a>
+          <a href="#top">About</a>
+          <a href="#top">Careers</a>
+        </div>
+        <div class="footer-col">
+          <h5>Contact</h5>
+          <a href="mailto:hello@acme.example">hello@acme.example</a>
+          <a href="tel:+18005550199">+1 800 555 0199</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom mono">
+      <span>© 2025 Acme Widget Systems, Inc.</span>
+      <span>Weniger, aber besser.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* Header shadow on scroll */
+  var header = document.getElementById('header');
+  window.addEventListener('scroll', function(){
+    header.classList.toggle('scrolled', window.scrollY > 8);
+  }, {passive:true});
+
+  /* Reveal on scroll */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+  /* Animated counters */
+  var counterIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target;
+      counterIO.unobserve(el);
+      if(el.dataset.static !== undefined){ el.textContent = el.dataset.static; return; }
+      var target = parseFloat(el.dataset.count);
+      var decimals = parseInt(el.dataset.decimals || '0', 10);
+      var suffix = el.dataset.suffix || '';
+      var start = null, dur = 1400;
+      function tick(ts){
+        if(!start) start = ts;
+        var p = Math.min((ts - start)/dur, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = (target * eased).toFixed(decimals) + suffix;
+        if(p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  }, {threshold:.5});
+  document.querySelectorAll('.num').forEach(function(el){ counterIO.observe(el); });
+
+  /* Configurator */
+  var SIZES = {
+    'W-80':  {w:80,  h:60,  svgW:220, svgH:165, wt:{steel:1.1, alu:0.4, brass:1.2}},
+    'W-120': {w:120, h:80,  svgW:300, svgH:180, wt:{steel:2.1, alu:0.7, brass:2.3}},
+    'W-200': {w:200, h:120, svgW:340, svgH:205, wt:{steel:5.6, alu:1.9, brass:6.0}}
+  };
+  var FINISHES = {
+    'Bead-blasted':   '#111111',
+    'Anodized black': '#3a3a38',
+    'Powder orange':  '#ff5a00'
+  };
+  var MATKEY = {'Steel 304':'steel','Aluminum 6061':'alu','Brass C360':'brass'};
+  var state = {size:'W-120', material:'Steel 304', finish:'Bead-blasted'};
+
+  var body = document.getElementById('cfgBody');
+  var title = document.getElementById('cfgTitle');
+  var dimW = document.getElementById('dimW');
+  var pdW = document.getElementById('pdW');
+  var pdH = document.getElementById('pdH');
+  var pdWt = document.getElementById('pdWt');
+
+  function render(){
+    var s = SIZES[state.size];
+    /* center the rect around x=220, vertically around 160 */
+    var x = 220 - s.svgW/2;
+    var y = 160 - s.svgH/2;
+    body.setAttribute('x', x);
+    body.setAttribute('y', y);
+    body.setAttribute('width', s.svgW);
+    body.setAttribute('height', s.svgH);
+    body.setAttribute('fill', FINISHES[state.finish]);
+    /* bore/hole stroke readable on orange */
+    var inner = state.finish === 'Powder orange' ? '#111111' : '#f5f5f3';
+    document.getElementById('cfgBore').setAttribute('stroke', inner);
+    document.querySelectorAll('.cfg-hole').forEach(function(h){ h.setAttribute('stroke', inner); });
+    title.textContent = 'ACME ' + state.size + ' · ' + state.material.toUpperCase();
+    dimW.textContent = s.w + ' mm';
+    pdW.textContent = s.w + ' mm';
+    pdH.textContent = s.h + ' mm';
+    pdWt.textContent = s.wt[MATKEY[state.material]].toFixed(1) + ' kg';
+    document.getElementById('sizeVal').textContent = state.size;
+    document.getElementById('matVal').textContent = state.material;
+    document.getElementById('finVal').textContent = state.finish;
+  }
+
+  document.querySelectorAll('.opt-row').forEach(function(row){
+    row.addEventListener('click', function(e){
+      var btn = e.target.closest('.opt');
+      if(!btn) return;
+      row.querySelectorAll('.opt').forEach(function(o){ o.classList.remove('active'); });
+      btn.classList.add('active');
+      var group = row.dataset.group;
+      if(group === 'size') state.size = btn.dataset.value;
+      if(group === 'material') state.material = btn.dataset.value;
+      if(group === 'finish') state.finish = btn.dataset.value;
+      render();
+    });
+  });
+  render();
+
+  /* Demo form */
+  var form = document.getElementById('demoForm');
+  var success = document.getElementById('formSuccess');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var valid = true;
+    form.querySelectorAll('input[required]').forEach(function(inp){
+      var ok = inp.value.trim().length > 0;
+      if(inp.type === 'email') ok = ok && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value.trim());
+      inp.style.borderColor = ok ? '' : '#ff5a00';
+      if(!ok) valid = false;
+    });
+    if(!valid) return;
+    form.style.display = 'none';
+    success.style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets Without the Runaround</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111111;
+    --paper:#f2efe9;
+    --red:#e8281e;
+    --grey:#6b6b66;
+    --line:#111111;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;
+    font-size:18px;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--red);color:var(--paper);}
+
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .container{max-width:1440px;margin:0 auto;padding:0 48px;}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:var(--paper);
+    border-bottom:2px solid var(--line);
+  }
+  nav .container{
+    display:flex;align-items:center;justify-content:space-between;
+    height:72px;
+  }
+  .logo{
+    font-family:'Archivo Black',sans-serif;
+    font-size:24px;letter-spacing:-0.5px;text-decoration:none;color:var(--ink);
+    display:flex;align-items:center;gap:10px;
+  }
+  .logo .dot{width:14px;height:14px;background:var(--red);display:inline-block;}
+  .nav-links{display:flex;gap:36px;list-style:none;}
+  .nav-links a{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;text-transform:uppercase;
+    letter-spacing:1px;color:var(--ink);text-decoration:none;
+    border-bottom:2px solid transparent;
+  }
+  .nav-links a:hover{border-bottom:2px solid var(--red);}
+  .btn{
+    display:inline-block;
+    font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;
+    text-transform:uppercase;letter-spacing:1px;
+    padding:16px 32px;
+    background:var(--ink);color:var(--paper);
+    text-decoration:none;border:2px solid var(--ink);
+    cursor:pointer;
+    box-shadow:6px 6px 0 var(--red);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{transform:translate(3px,3px);box-shadow:3px 3px 0 var(--red);}
+  .btn:active{transform:translate(6px,6px);box-shadow:0 0 0 var(--red);}
+  .btn.sm{padding:12px 24px;font-size:12px;box-shadow:4px 4px 0 var(--red);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    border-bottom:2px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    min-height:calc(100vh - 72px);
+  }
+  .hero-left{
+    padding:72px 48px 64px 0;
+    border-right:2px solid var(--line);
+    display:flex;flex-direction:column;justify-content:space-between;gap:48px;
+  }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--red);font-weight:700;
+    display:flex;align-items:center;gap:12px;margin-bottom:28px;
+  }
+  .kicker::before{content:"";width:40px;height:2px;background:var(--red);display:inline-block;}
+  h1{
+    font-family:'Archivo Black',sans-serif;
+    font-size:clamp(56px,5.2vw,86px);
+    line-height:.95;
+    letter-spacing:-2px;
+    text-transform:uppercase;
+  }
+  h1 .strike{position:relative;white-space:nowrap;}
+  h1 .strike::after{
+    content:"";position:absolute;left:-2%;top:52%;width:104%;height:10px;
+    background:var(--red);transform:rotate(-2deg);
+  }
+  .hero-sub{
+    margin-top:32px;max-width:520px;font-size:20px;color:#333;
+  }
+  .hero-sub strong{background:var(--ink);color:var(--paper);padding:0 6px;}
+  .hero-cta{margin-top:40px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+  .btn-ghost{
+    font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;
+    text-transform:uppercase;letter-spacing:1px;
+    color:var(--ink);text-decoration:none;
+    border-bottom:2px solid var(--ink);padding-bottom:2px;
+  }
+  .btn-ghost:hover{color:var(--red);border-color:var(--red);}
+  .hero-meta{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--grey);
+    display:flex;gap:40px;flex-wrap:wrap;
+  }
+  .hero-meta span b{color:var(--ink);}
+
+  .hero-right{
+    padding:48px 0 48px 48px;
+    display:flex;flex-direction:column;gap:0;
+    background:
+      repeating-linear-gradient(45deg, transparent 0 22px, rgba(17,17,17,.045) 22px 24px);
+  }
+  .terminal{
+    border:2px solid var(--ink);background:#fff;
+    box-shadow:8px 8px 0 var(--ink);
+    flex:1;display:flex;flex-direction:column;min-height:0;
+  }
+  .terminal-bar{
+    background:var(--ink);color:var(--paper);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+    padding:10px 16px;display:flex;justify-content:space-between;letter-spacing:1px;
+  }
+  .terminal-body{
+    padding:20px;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.9;
+    overflow:hidden;flex:1;
+  }
+  .terminal-body .ln{white-space:pre;display:block;}
+  .ln .ok{color:#0a7a2f;}
+  .ln .warn{color:var(--red);font-weight:700;}
+  .ln .dim{color:#999;}
+  .cursor{display:inline-block;width:9px;height:16px;background:var(--red);vertical-align:-3px;animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+
+  /* ---------- TICKER ---------- */
+  .ticker{
+    background:var(--ink);color:var(--paper);
+    overflow:hidden;white-space:nowrap;
+    border-bottom:2px solid var(--line);
+    padding:14px 0;
+  }
+  .ticker-track{display:inline-block;animation:scroll 28s linear infinite;}
+  .ticker span{
+    font-family:'IBM Plex Mono',monospace;font-size:14px;text-transform:uppercase;
+    letter-spacing:2px;margin-right:64px;
+  }
+  .ticker span b{color:var(--red);}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- SECTIONS ---------- */
+  section{border-bottom:2px solid var(--line);}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:64px 0 40px;gap:24px;flex-wrap:wrap;
+  }
+  .section-num{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--red);
+    letter-spacing:2px;font-weight:700;
+  }
+  h2{
+    font-family:'Archivo Black',sans-serif;
+    font-size:clamp(36px,3.4vw,52px);
+    text-transform:uppercase;letter-spacing:-1px;line-height:1;
+  }
+
+  /* problem */
+  .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid var(--line);border-left:2px solid var(--line);margin-bottom:80px;}
+  .problem-cell{
+    border-right:2px solid var(--line);border-bottom:2px solid var(--line);
+    padding:40px 32px;background:#fff;
+    transition:background .15s ease;
+  }
+  .problem-cell:hover{background:var(--ink);color:var(--paper);}
+  .problem-cell:hover .p-num{color:var(--red);}
+  .problem-cell:hover .p-body{color:#bbb;}
+  .p-num{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--red);font-weight:700;letter-spacing:2px;}
+  .p-title{font-family:'Archivo Black',sans-serif;font-size:22px;text-transform:uppercase;margin:16px 0 12px;letter-spacing:-.5px;}
+  .p-body{font-size:16px;color:var(--grey);}
+
+  /* how it works */
+  .how{background:var(--ink);color:var(--paper);}
+  .how .section-head{border:none;}
+  .how h2 em{font-style:normal;color:var(--red);}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:#333;border:2px solid #333;margin-bottom:80px;}
+  .step{background:var(--ink);padding:48px 36px;position:relative;}
+  .step-num{
+    font-family:'Archivo Black',sans-serif;font-size:96px;line-height:1;
+    color:transparent;-webkit-text-stroke:2px var(--red);
+  }
+  .step h3{font-family:'Archivo Black',sans-serif;font-size:24px;text-transform:uppercase;margin:24px 0 12px;}
+  .step p{color:#999;font-size:16px;}
+  .step .time{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-top:20px;display:block;}
+
+  /* proof / numbers */
+  .numbers{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--line);border-left:2px solid var(--line);margin-bottom:80px;}
+  .num-cell{border-right:2px solid var(--line);border-bottom:2px solid var(--line);padding:48px 36px;background:#fff;}
+  .num-big{font-family:'Archivo Black',sans-serif;font-size:64px;letter-spacing:-2px;line-height:1;}
+  .num-big sup{font-size:32px;color:var(--red);}
+  .num-label{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--grey);margin-top:16px;text-transform:uppercase;letter-spacing:1px;}
+
+  /* testimonial */
+  .quote-block{padding:96px 0;border-top:2px solid var(--line);margin-top:0;}
+  blockquote{
+    font-family:'Archivo Black',sans-serif;
+    font-size:clamp(28px,2.6vw,42px);
+    line-height:1.15;letter-spacing:-1px;max-width:1100px;text-transform:uppercase;
+  }
+  blockquote mark{background:var(--red);color:var(--paper);padding:0 8px;}
+  .quote-attr{margin-top:32px;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--grey);}
+  .quote-attr b{color:var(--ink);}
+
+  /* demo form */
+  .demo{background:var(--red);color:var(--paper);}
+  .demo .container{display:grid;grid-template-columns:1fr 1fr;gap:80px;padding-top:96px;padding-bottom:96px;}
+  .demo h2{color:var(--paper);font-size:clamp(44px,4vw,64px);}
+  .demo p{margin-top:24px;font-size:20px;max-width:440px;}
+  .demo ul{list-style:none;margin-top:36px;font-family:'IBM Plex Mono',monospace;font-size:14px;text-transform:uppercase;letter-spacing:1px;}
+  .demo ul li{padding:12px 0;border-bottom:1px solid rgba(242,239,233,.3);}
+  .demo ul li::before{content:"→ ";font-weight:700;}
+  .form-card{background:var(--paper);color:var(--ink);padding:48px;border:2px solid var(--ink);box-shadow:10px 10px 0 var(--ink);}
+  .form-card h3{font-family:'Archivo Black',sans-serif;font-size:24px;text-transform:uppercase;margin-bottom:8px;}
+  .form-card .form-note{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--grey);margin-bottom:28px;}
+  label{display:block;font-family:'IBM Plex Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:20px 0 8px;}
+  input,select{
+    width:100%;padding:14px 16px;font-family:'Space Grotesk',sans-serif;font-size:16px;
+    border:2px solid var(--ink);background:#fff;color:var(--ink);border-radius:0;
+    -webkit-appearance:none;appearance:none;
+  }
+  input:focus,select:focus{outline:none;box-shadow:4px 4px 0 var(--red);}
+  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9'%3E%3Cpath d='M0 0l7 9 7-9z' fill='%23111'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
+  .form-card .btn{width:100%;margin-top:32px;text-align:center;font-size:16px;padding:20px;}
+  .form-success{display:none;text-align:center;padding:40px 0;}
+  .form-success .big{font-family:'Archivo Black',sans-serif;font-size:32px;text-transform:uppercase;}
+  .form-success p{margin-top:16px;color:var(--grey);font-family:'IBM Plex Mono',monospace;font-size:14px;}
+
+  /* footer */
+  footer{padding:48px 0;}
+  footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;}
+  footer .mono{font-size:12px;color:var(--grey);text-transform:uppercase;letter-spacing:1px;}
+
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+  .reveal.in{opacity:1;transform:none;}
+
+  @media (max-width:1100px){
+    .hero-grid{grid-template-columns:1fr;}
+    .hero-left{border-right:none;padding-right:0;}
+    .hero-right{padding:0 0 48px;}
+    .problem-grid,.steps,.numbers{grid-template-columns:1fr 1fr;}
+    .demo .container{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a class="logo" href="#"><span class="dot"></span>ACME</a>
+    <ul class="nav-links">
+      <li><a href="#problem">The Problem</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#proof">Proof</a></li>
+    </ul>
+    <a class="btn sm" href="#demo">Book a Demo</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <div>
+          <div class="kicker">Widget procurement for operations teams</div>
+          <h1>Your widgets are late. <span class="strike">Again.</span> Fix it.</h1>
+          <p class="hero-sub">Acme is the platform mid-sized manufacturers use to <strong>configure, order, and track</strong> custom widgets across every supplier — without the spreadsheets, the fax-machine energy, or the 47-email thread that ends in a shrug.</p>
+          <div class="hero-cta">
+            <a class="btn" href="#demo">Book a 20-Minute Demo</a>
+            <a class="btn-ghost" href="#how">See how it works ↓</a>
+          </div>
+        </div>
+        <div class="hero-meta mono">
+          <span><b>No sales gauntlet.</b> One call. Real answers.</span>
+          <span><b>Live in days,</b> not quarters.</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="terminal">
+          <div class="terminal-bar"><span>ACME / ORDER #4471</span><span>LIVE</span></div>
+          <div class="terminal-body" id="terminal"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack">
+    <span>12,400 widgets shipped this week</span>
+    <span><b>98.2%</b> on-time rate across all tracked orders</span>
+    <span>avg. reorder time: <b>4 minutes</b></span>
+    <span>zero spreadsheets required</span>
+    <span>214 manufacturers already switched</span>
+  </div>
+</div>
+
+<section id="problem">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="reveal">Sound familiar?</h2>
+      <span class="section-num reveal">01 / THE PROBLEM</span>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-cell reveal">
+        <div class="p-num">P-01</div>
+        <div class="p-title">The spreadsheet of doom</div>
+        <div class="p-body">Fourteen tabs, three owners, one version called FINAL_v7_ACTUAL.xlsx. Nobody knows which numbers are real. Including you.</div>
+      </div>
+      <div class="problem-cell reveal">
+        <div class="p-num">P-02</div>
+        <div class="p-title">"It shipped." Did it?</div>
+        <div class="p-body">Your supplier says the order left Tuesday. Tuesday of which month remains unclear. Your line can't run on vibes.</div>
+      </div>
+      <div class="problem-cell reveal">
+        <div class="p-num">P-03</div>
+        <div class="p-title">Spec drift</div>
+        <div class="p-body">The widget that arrived is 2mm off from the widget you ordered. Somewhere between email #12 and email #31, the drawing changed. Nobody flagged it.</div>
+      </div>
+      <div class="problem-cell reveal">
+        <div class="p-num">P-04</div>
+        <div class="p-title">Reorder roulette</div>
+        <div class="p-body">Every reorder starts from zero: new quote, new lead time estimate, new round of phone tag. Three days of work to buy the same part twice.</div>
+      </div>
+      <div class="problem-cell reveal">
+        <div class="p-num">P-05</div>
+        <div class="p-title">Tribal knowledge</div>
+        <div class="p-body">Diane knows how the ordering actually works. Diane is on vacation. The ordering no longer works.</div>
+      </div>
+      <div class="problem-cell reveal">
+        <div class="p-num">P-06</div>
+        <div class="p-title">Firefighting as a strategy</div>
+        <div class="p-body">You find out about a shortage when the line stops. By then it's not procurement — it's triage. And triage is expensive.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="reveal">Three steps. <em>No ceremony.</em></h2>
+      <span class="section-num reveal">02 / HOW IT WORKS</span>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <h3>Configure</h3>
+        <p>Pick your widget specs — dimensions, tolerances, materials, finish — from a structured configurator. Every choice is validated against what suppliers can actually build. No more impossible orders.</p>
+        <span class="time">≈ 6 minutes per spec</span>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">02</div>
+        <h3>Order</h3>
+        <p>Get real quotes with real lead times from vetted suppliers. Compare side by side. Place the order in one click. Reorders pull your saved spec — done in under five minutes.</p>
+        <span class="time">≈ 4 minutes per reorder</span>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">03</div>
+        <h3>Track</h3>
+        <p>Every order, every supplier, one timeline. Status updates come from the source, not from a rep's inbox. If something slips, you know the day it slips — not the day the line stops.</p>
+        <span class="time">≈ 0 minutes of chasing</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="reveal">Numbers, not adjectives.</h2>
+      <span class="section-num reveal">03 / THE PROOF</span>
+    </div>
+    <div class="numbers">
+      <div class="num-cell reveal"><div class="num-big" data-count="214">0</div><div class="num-label">Manufacturers on Acme</div></div>
+      <div class="num-cell reveal"><div class="num-big"><span data-count="98">0</span><sup>.2%</sup></div><div class="num-label">On-time delivery rate</div></div>
+      <div class="num-cell reveal"><div class="num-big"><span data-count="11">0</span><sup>hrs</sup></div><div class="num-label">Saved per buyer, per week</div></div>
+      <div class="num-cell reveal"><div class="num-big"><span data-count="63">0</span><sup>%</sup></div><div class="num-label">Fewer shortage-driven line stops</div></div>
+    </div>
+    <div class="quote-block">
+      <blockquote class="reveal">"We stopped losing widgets in the void between 'ordered' and 'received.' That void was costing us <mark>$40k a quarter</mark> in expedited freight alone."</blockquote>
+      <div class="quote-attr reveal"><b>Marta Kowalski</b> — Director of Operations, Halcyon Fabrication (420 employees, 3 plants)</div>
+    </div>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <div class="container">
+    <div class="reveal">
+      <h2>Twenty minutes. That's the ask.</h2>
+      <p>We'll show you the configurator, a live order timeline, and what your first week looks like. No deck. No "circling back." If it's not a fit, we'll say so.</p>
+      <ul>
+        <li>Live walkthrough, not a recording</li>
+        <li>Your specs, your use case</li>
+        <li>Pricing on the call, not after</li>
+      </ul>
+    </div>
+    <div class="form-card reveal">
+      <form id="demoForm" novalidate>
+        <h3>Book your demo</h3>
+        <div class="form-note">// we reply within one business day, usually faster</div>
+        <label for="name">Your name</label>
+        <input type="text" id="name" name="name" placeholder="Diane (welcome back)" required>
+        <label for="email">Work email</label>
+        <input type="email" id="email" name="email" placeholder="diane@yourcompany.com" required>
+        <label for="company">Company</label>
+        <input type="text" id="company" name="company" placeholder="Halcyon Fabrication" required>
+        <label for="volume">Monthly widget volume</label>
+        <select id="volume" name="volume" required>
+          <option value="" disabled selected>Select a range</option>
+          <option>Under 500 units</option>
+          <option>500 – 5,000 units</option>
+          <option>5,000 – 25,000 units</option>
+          <option>25,000+ units</option>
+          <option>Honestly, no idea — that's the problem</option>
+        </select>
+        <button class="btn" type="submit">Book the Demo →</button>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <div class="big">Done. Check your inbox.</div>
+        <p>// confirmation sent — we'll lock in a time within one business day</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <a class="logo" href="#"><span class="dot"></span>ACME</a>
+    <span class="mono">© 2025 Acme Widget Systems · Built for people who make things</span>
+  </div>
+</footer>
+
+<script>
+// ---- Terminal typing animation ----
+(function(){
+  const lines = [
+    { t: "$ acme track --order 4471", cls: "dim" },
+    { t: "SPEC ...... WDG-220x / 316L / ±0.05mm  [LOCKED]", cls: "" },
+    { t: "QTY ....... 2,400 units", cls: "" },
+    { t: "SUPPLIER .. FerroWorks (Tier A · 99.1% OT)", cls: "" },
+    { t: "STATUS .... IN PRODUCTION — batch 3/5", cls: "warn" },
+    { t: "ETA ....... Thu 14:00 · ON SCHEDULE", cls: "ok" },
+    { t: "✓ spec verified  ✓ freight booked  ✓ no emails sent", cls: "ok" },
+  ];
+  const el = document.getElementById("terminal");
+  let li = 0, ci = 0, cur;
+  function newLine(){
+    cur = document.createElement("span");
+    cur.className = "ln " + lines[li].cls;
+    el.appendChild(cur);
+    const c = document.createElement("span");
+    c.className = "cursor";
+    cur.appendChild(c);
+  }
+  function type(){
+    if(li >= lines.length){ return; }
+    if(!cur) newLine();
+    const text = lines[li].t;
+    if(ci < text.length){
+      cur.firstChild ? cur.insertBefore(document.createTextNode(text[ci]), cur.lastChild) : cur.textContent = text[ci];
+      ci++;
+      setTimeout(type, 18 + Math.random()*30);
+    } else {
+      cur.querySelector(".cursor").remove();
+      li++; ci = 0; cur = null;
+      setTimeout(type, 260);
+    }
+  }
+  setTimeout(type, 600);
+  // persistent cursor at end
+  setInterval(()=>{
+    if(li >= lines.length && !el.querySelector(".cursor")){
+      const c = document.createElement("span");
+      c.className = "cursor";
+      el.appendChild(c);
+    }
+  }, 500);
+})();
+
+// ---- Ticker duplicate for seamless loop ----
+(function(){
+  const t = document.getElementById("tickerTrack");
+  t.innerHTML += t.innerHTML;
+})();
+
+// ---- Scroll reveal ----
+(function(){
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+  },{threshold:0.15});
+  document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+})();
+
+// ---- Count-up numbers ----
+(function(){
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting) return;
+      const el = e.target, target = +el.dataset.count, dur = 1400, t0 = performance.now();
+      (function tick(now){
+        const p = Math.min((now - t0)/dur, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1-p, 3)));
+        if(p < 1) requestAnimationFrame(tick);
+      })(t0);
+      io.unobserve(el);
+    });
+  },{threshold:0.5});
+  document.querySelectorAll("[data-count]").forEach(el=>io.observe(el));
+})();
+
+// ---- Demo form ----
+(function(){
+  const form = document.getElementById("demoForm");
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    let valid = true;
+    form.querySelectorAll("input, select").forEach(f=>{
+      if(!f.value || (f.type==="email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value))){
+        valid = false;
+        f.style.boxShadow = "4px 4px 0 #e8281e";
+        f.style.borderColor = "#e8281e";
+      } else {
+        f.style.boxShadow = "";
+        f.style.borderColor = "";
+      }
+    });
+    if(!valid) return;
+    form.style.display = "none";
+    document.getElementById("formSuccess").style.display = "block";
+  });
+})();
+</script>
+</body>
+</html>

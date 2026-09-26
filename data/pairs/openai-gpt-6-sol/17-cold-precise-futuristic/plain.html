@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08121b">
+  <meta name="description" content="Configure, order, and track custom widgets across your supply chain with Acme. Book a demo to see how it works.">
+  <title>Acme — Custom widgets, under control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #08121b;
+      --ink-2: #0d1b26;
+      --panel: #10212e;
+      --line: rgba(172, 213, 229, .15);
+      --muted: #94aab5;
+      --white: #f0f7f8;
+      --cyan: #85e8ed;
+      --cyan-dark: #205a64;
+      --ice: #e9f2f2;
+      --mono: "IBM Plex Mono", monospace;
+      --display: "Space Grotesk", sans-serif;
+      --body: "DM Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--ink); color: var(--white); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    ::selection { background: var(--cyan); color: var(--ink); }
+
+    .container { width: min(1280px, calc(100% - 80px)); margin: 0 auto; }
+    .mono { font-family: var(--mono); text-transform: uppercase; letter-spacing: .11em; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 11px; color: var(--cyan); font-size: 11px; font-weight: 500; }
+    .eyebrow::before { content: ""; width: 6px; height: 6px; background: var(--cyan); box-shadow: 0 0 14px rgba(133,232,237,.65); }
+
+    .topbar { border-bottom: 1px solid var(--line); height: 34px; }
+    .topbar .container { display: flex; align-items: center; justify-content: space-between; height: 100%; color: #8199a5; font: 10px var(--mono); letter-spacing: .1em; }
+    .topbar strong { color: var(--cyan); font-weight: 500; }
+    .topbar-right { display: flex; align-items: center; gap: 9px; }
+    .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 9px var(--cyan); }
+
+    header { height: 82px; border-bottom: 1px solid var(--line); position: relative; z-index: 10; }
+    header .container { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+    .logo { display: inline-flex; align-items: center; gap: 10px; font: 700 26px var(--display); letter-spacing: -.075em; }
+    .logo-mark { width: 29px; height: 29px; color: var(--cyan); }
+    nav { display: flex; align-items: center; gap: 40px; margin-left: 105px; }
+    nav a { font-size: 13px; color: #a9bac2; transition: color .2s; }
+    nav a:hover, .footer-links a:hover { color: var(--cyan); }
+    .nav-cta { display: inline-flex; align-items: center; justify-content: center; gap: 20px; height: 42px; padding: 0 16px; border: 1px solid #6aaeb8; color: var(--white); font-size: 12px; font-weight: 700; transition: background .2s, color .2s; }
+    .nav-cta:hover { background: var(--cyan); color: var(--ink); }
+    .arrow { font-size: 18px; font-weight: 400; line-height: 1; }
+
+    .hero { position: relative; overflow: hidden; min-height: 670px; border-bottom: 1px solid var(--line); }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(139,200,215,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(139,200,215,.045) 1px, transparent 1px);
+      background-size: 56px 56px; mask-image: linear-gradient(90deg, transparent 5%, #000 70%);
+      pointer-events: none;
+    }
+    .hero::after { content: ""; position: absolute; width: 650px; height: 650px; right: -170px; top: -120px; border-radius: 50%; background: #3b9aa2; filter: blur(170px); opacity: .14; pointer-events: none; }
+    .hero-inner { display: grid; grid-template-columns: 48% 52%; align-items: center; min-height: 670px; position: relative; z-index: 1; }
+    .hero-copy { padding: 20px 22px 40px 0; }
+    .hero h1 { font: 500 clamp(54px, 5.15vw, 76px)/1.065 var(--display); letter-spacing: -.074em; margin: 27px 0 25px; max-width: 630px; }
+    .hero h1 span { color: var(--cyan); }
+    .hero-description { max-width: 475px; color: #a8bac3; font-size: 16px; line-height: 1.75; margin: 0; }
+    .hero-actions { display: flex; align-items: center; gap: 26px; margin-top: 36px; }
+    .button-primary { border: 1px solid var(--cyan); background: var(--cyan); color: #06151b; min-height: 52px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 40px; font-size: 13px; font-weight: 700; transition: background .2s, transform .2s; }
+    .button-primary:hover { background: #b4f5f5; transform: translateY(-2px); }
+    .text-link { color: #d3e4e8; font-size: 13px; border-bottom: 1px solid #718e99; padding-bottom: 5px; transition: color .2s; }
+    .text-link:hover { color: var(--cyan); }
+    .hero-note { margin-top: 70px; display: flex; align-items: center; gap: 12px; color: #76919d; font: 10px var(--mono); letter-spacing: .06em; }
+    .hero-note .line { height: 1px; width: 35px; background: #53727b; }
+
+    /* Product interface illustration */
+    .visual-wrap { position: relative; padding-left: 5px; transform: translate(19px, 4px); }
+    .visual-wrap::before { content: ""; position: absolute; inset: -18px -15px 18px 20px; border: 1px solid rgba(133,232,237,.15); pointer-events: none; }
+    .visual-label { position: absolute; top: -34px; right: 0; font: 10px var(--mono); letter-spacing: .08em; color: #76929b; }
+    .app { height: 467px; display: grid; grid-template-columns: 57px 1fr; background: #101e29; border: 1px solid #42606b; box-shadow: 0 35px 90px rgba(0,0,0,.38), 0 0 50px rgba(60,178,190,.07); overflow: hidden; }
+    .app-rail { background: #0b1720; border-right: 1px solid #304852; display: flex; flex-direction: column; align-items: center; gap: 23px; padding: 19px 0; }
+    .rail-logo { width: 24px; height: 24px; margin-bottom: 24px; }
+    .rail-icon { width: 17px; height: 17px; color: #55727d; }
+    .rail-icon.active { color: var(--cyan); }
+    .rail-spacer { flex: 1; }
+    .rail-avatar { width: 23px; height: 23px; display: grid; place-items: center; background: #244550; color: #bce9eb; font: 9px var(--mono); }
+    .app-main { min-width: 0; }
+    .app-top { height: 52px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid #2d4550; }
+    .app-breadcrumb { color: #8aa4ae; font: 10px var(--mono); }
+    .app-breadcrumb b { color: #e4f3f3; font-weight: 500; }
+    .app-top-right { display: flex; align-items: center; gap: 15px; color: #a8bfc6; font: 9px var(--mono); }
+    .tiny-circle { width: 20px; height: 20px; border: 1px solid #53737e; display: grid; place-items: center; font-size: 12px; }
+    .app-content { padding: 20px 20px 16px; }
+    .app-heading { display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; }
+    .app-heading h3 { font: 500 22px var(--display); letter-spacing: -.045em; margin: 4px 0 0; }
+    .app-kicker { font: 9px var(--mono); letter-spacing: .1em; color: #7e9ba5; }
+    .app-button { padding: 8px 10px; background: #b0eff0; color: #0b2730; font: 9px var(--mono); font-weight: 600; }
+    .app-grid { display: grid; grid-template-columns: 1.18fr .82fr; gap: 12px; }
+    .app-card { border: 1px solid #304a55; background: #11232f; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; padding: 13px 13px 11px; border-bottom: 1px solid #2b4550; font: 10px var(--mono); color: #d8e8e9; }
+    .card-header span:last-child { color: #6f929d; }
+    .spec-graphic { height: 130px; position: relative; overflow: hidden; display: grid; place-items: center; background-image: linear-gradient(rgba(132,209,220,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(132,209,220,.06) 1px, transparent 1px); background-size: 18px 18px; }
+    .spec-graphic svg { width: 184px; height: 109px; }
+    .spec-graphic .measure { position: absolute; bottom: 9px; right: 10px; color: #81a4ac; font: 8px var(--mono); }
+    .spec-name { padding: 10px 13px 11px; border-top: 1px solid #2b4550; }
+    .spec-name strong { display: block; font: 500 11px var(--display); color: #e6f1f1; }
+    .spec-name small { display: block; color: #829ba5; font: 9px var(--mono); margin-top: 5px; }
+    .track-body { padding: 17px 13px 8px; }
+    .track-item { position: relative; padding: 0 0 17px 20px; border-left: 1px solid #486a74; margin-left: 5px; }
+    .track-item:last-child { border-left-color: transparent; padding-bottom: 2px; }
+    .track-item::before { content: ""; position: absolute; left: -4px; top: 1px; width: 7px; height: 7px; background: #82e4e8; box-shadow: 0 0 8px rgba(130,228,232,.4); }
+    .track-item.pending::before { background: #345461; box-shadow: none; border: 1px solid #7796a0; }
+    .track-item strong { display: block; font: 10px var(--display); color: #e5efef; line-height: 1; }
+    .track-item small { display: block; font: 8px var(--mono); color: #7e9aa5; margin-top: 5px; }
+    .app-bottom { border: 1px solid #304a55; margin-top: 12px; }
+    .table-head, .table-row { display: grid; grid-template-columns: 1.1fr 1.25fr .9fr .8fr; align-items: center; padding: 0 12px; gap: 6px; }
+    .table-head { height: 28px; background: #172d39; color: #86a2ac; font: 8px var(--mono); }
+    .table-row { height: 38px; border-top: 1px solid #2b4550; color: #d6e7e9; font: 9px var(--mono); }
+    .status-pill { width: fit-content; padding: 4px 6px; background: #183f44; color: #91e5e4; white-space: nowrap; font-size: 8px; }
+    .status-pill.dim { color: #b6c9cf; background: #293e48; }
+
+    .strip { border-bottom: 1px solid var(--line); }
+    .strip-inner { display: grid; grid-template-columns: 1.3fr repeat(3, 1fr); min-height: 102px; align-items: center; }
+    .strip-intro { font: 10px var(--mono); letter-spacing: .1em; color: #718e99; }
+    .strip-item { height: 42px; display: flex; align-items: center; gap: 17px; padding-left: 35px; border-left: 1px solid var(--line); font: 500 15px var(--display); }
+    .strip-item span { color: var(--cyan); font: 10px var(--mono); }
+
+    .section { padding: 120px 0; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-bottom: 48px; }
+    .section-heading h2 { max-width: 660px; margin: 20px 0 0; font: 500 clamp(38px, 4vw, 57px)/1.12 var(--display); letter-spacing: -.065em; }
+    .section-heading p { max-width: 330px; margin: 0 0 5px; color: #9fb3bc; font-size: 15px; line-height: 1.7; }
+
+    .features { background: #0a1721; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .feature-card { min-height: 328px; padding: 29px; border: 1px solid #29414c; background: #10212c; position: relative; overflow: hidden; transition: border-color .2s, transform .2s; }
+    .feature-card:hover { border-color: #6ebec5; transform: translateY(-3px); }
+    .feature-card::after { content: ""; position: absolute; width: 70px; height: 70px; top: -1px; right: -1px; border-top: 1px solid #538b96; border-right: 1px solid #538b96; opacity: .65; }
+    .feature-number { color: var(--cyan); font: 10px var(--mono); }
+    .feature-icon { height: 88px; display: flex; align-items: center; margin-top: 27px; }
+    .feature-icon svg { width: 78px; height: 78px; }
+    .feature-card h3 { margin: 15px 0 12px; font: 500 24px var(--display); letter-spacing: -.04em; }
+    .feature-card p { max-width: 310px; margin: 0; color: #9bb1bb; line-height: 1.65; font-size: 14px; }
+
+    .workflow { border-top: 1px solid var(--line); }
+    .workflow-layout { display: grid; grid-template-columns: 38% 62%; gap: 25px; }
+    .workflow h2 { max-width: 400px; margin: 20px 0 18px; font: 500 51px/1.12 var(--display); letter-spacing: -.065em; }
+    .workflow-copy { max-width: 360px; color: #a3b7bf; line-height: 1.7; font-size: 15px; }
+    .workflow-list { border-top: 1px solid #38535e; }
+    .workflow-step { display: grid; grid-template-columns: 85px 1fr 32px; align-items: start; padding: 23px 0 26px; border-bottom: 1px solid #38535e; }
+    .step-no { font: 11px var(--mono); color: var(--cyan); padding-top: 5px; }
+    .workflow-step h3 { margin: 0 0 7px; font: 500 21px var(--display); letter-spacing: -.035em; }
+    .workflow-step p { color: #93aab5; margin: 0; font-size: 13px; line-height: 1.55; }
+    .step-arrow { color: #81b5bd; font: 22px var(--display); text-align: right; }
+
+    .demo { background: var(--ice); color: #0b2029; padding: 100px 0 105px; position: relative; overflow: hidden; }
+    .demo::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(20,83,96,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(20,83,96,.055) 1px, transparent 1px); background-size: 44px 44px; pointer-events: none; }
+    .demo-inner { display: grid; grid-template-columns: 1fr 490px; gap: 80px; position: relative; }
+    .demo .eyebrow { color: #176773; }
+    .demo .eyebrow::before { background: #176773; box-shadow: none; }
+    .demo h2 { max-width: 610px; margin: 22px 0 20px; font: 500 clamp(45px, 4.5vw, 64px)/1.07 var(--display); letter-spacing: -.07em; }
+    .demo-copy > p { max-width: 460px; color: #48626a; font-size: 16px; line-height: 1.7; }
+    .demo-meta { display: flex; align-items: center; gap: 13px; margin-top: 66px; color: #52717a; font: 10px var(--mono); letter-spacing: .06em; }
+    .demo-meta span { width: 26px; height: 1px; background: #56838c; }
+    .form-card { background: #0e202a; color: var(--white); padding: 35px; border: 1px solid #385e68; box-shadow: 15px 15px 0 rgba(22,83,95,.11); }
+    .form-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #31505b; padding-bottom: 21px; margin-bottom: 24px; }
+    .form-head h3 { margin: 0; font: 500 21px var(--display); letter-spacing: -.035em; }
+    .form-head span { color: var(--cyan); font: 10px var(--mono); }
+    .field { margin-bottom: 17px; }
+    .field label { display: block; margin-bottom: 8px; font: 10px var(--mono); letter-spacing: .07em; color: #a7c1c9; text-transform: uppercase; }
+    .field input, .field select { width: 100%; height: 43px; padding: 0 12px; border: 1px solid #3b5964; border-radius: 0; outline: none; color: #edf8f8; background: #142b36; font: 13px var(--body); }
+    .field input::placeholder { color: #77949f; }
+    .field input:focus, .field select:focus { border-color: var(--cyan); }
+    .field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%2385e8ed' stroke-width='1.5' d='m1 1 5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 13px center; }
+    .field select:invalid { color: #77949f; }
+    .field select option { color: #edf8f8; background: #142b36; }
+    .form-card .button-primary { width: 100%; justify-content: space-between; margin-top: 4px; }
+    .form-note { color: #819ca6; font-size: 11px; line-height: 1.5; margin: 14px 0 0; }
+    #form-status { color: var(--cyan); font-size: 12px; margin: 12px 0 0; min-height: 0; }
+
+    footer { padding: 40px 0 26px; }
+    .footer-main { display: flex; align-items: center; justify-content: space-between; padding-bottom: 40px; border-bottom: 1px solid var(--line); }
+    .footer-main .logo { font-size: 24px; }
+    .footer-main p { margin: 8px 0 0; color: #819aa5; font-size: 12px; }
+    .footer-links { display: flex; gap: 31px; }
+    .footer-links a { font-size: 12px; color: #9aafb8; transition: color .2s; }
+    .footer-bottom { display: flex; justify-content: space-between; padding-top: 22px; color: #6e8995; font: 10px var(--mono); letter-spacing: .05em; }
+
+    @media (max-width: 1100px) {
+      .container { width: min(100% - 48px, 1280px); }
+      nav { margin-left: 0; gap: 22px; }
+      .hero-inner { grid-template-columns: 49% 51%; }
+      .hero h1 { font-size: clamp(47px, 5vw, 66px); }
+      .visual-wrap { transform: translateX(0); }
+      .app { height: 450px; }
+      .app-content { padding: 15px; }
+      .demo-inner { grid-template-columns: 1fr 440px; gap: 40px; }
+    }
+    @media (max-width: 800px) {
+      .container { width: calc(100% - 40px); }
+      .topbar-right, nav { display: none; }
+      header { height: 70px; }
+      .hero { padding: 72px 0 80px; }
+      .hero-inner { display: block; min-height: 0; }
+      .hero-copy { padding: 0; }
+      .hero h1 { max-width: 650px; font-size: clamp(48px, 9vw, 72px); }
+      .hero-note { margin-top: 40px; }
+      .visual-wrap { margin-top: 88px; padding-left: 0; max-width: 650px; }
+      .visual-label { right: 4px; }
+      .strip-inner { grid-template-columns: repeat(3, 1fr); padding: 23px 0; gap: 12px; }
+      .strip-intro { grid-column: 1 / -1; }
+      .strip-item { padding-left: 15px; font-size: 13px; }
+      .section { padding: 85px 0; }
+      .section-heading { display: block; }
+      .section-heading p { margin-top: 20px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 255px; }
+      .feature-icon { margin-top: 12px; height: 70px; }
+      .workflow-layout { grid-template-columns: 1fr; gap: 35px; }
+      .demo-inner { grid-template-columns: 1fr; }
+      .demo-meta { margin-top: 28px; }
+      .form-card { max-width: 560px; }
+    }
+    @media (max-width: 520px) {
+      .topbar .container { font-size: 8px; }
+      .nav-cta { height: 38px; padding: 0 10px; gap: 9px; font-size: 11px; }
+      .logo { font-size: 23px; }
+      .hero { padding-top: 57px; }
+      .hero h1 { font-size: 47px; }
+      .hero-description { font-size: 15px; }
+      .hero-actions { gap: 16px; flex-wrap: wrap; }
+      .button-primary { gap: 20px; }
+      .visual-wrap { margin-top: 75px; }
+      .app { height: auto; min-height: 410px; grid-template-columns: 37px 1fr; }
+      .app-rail { gap: 18px; }
+      .app-top { padding: 0 10px; }
+      .app-top-right { display: none; }
+      .app-content { padding: 12px 9px; }
+      .app-heading h3 { font-size: 18px; }
+      .app-grid { gap: 6px; }
+      .card-header { padding: 10px 6px; font-size: 8px; }
+      .spec-graphic { height: 118px; }
+      .spec-graphic svg { width: 100%; }
+      .track-body { padding: 15px 7px 3px; }
+      .track-item { padding-left: 11px; }
+      .track-item strong { font-size: 8px; }
+      .track-item small { font-size: 7px; }
+      .table-head, .table-row { grid-template-columns: .9fr 1fr .8fr; padding: 0 6px; font-size: 7px; }
+      .table-head span:nth-child(3), .table-row span:nth-child(3) { display: none; }
+      .strip-inner { grid-template-columns: 1fr; }
+      .strip-intro { grid-column: auto; margin-bottom: 4px; }
+      .strip-item { height: 35px; }
+      .section-heading h2, .workflow h2 { font-size: 40px; }
+      .workflow-step { grid-template-columns: 42px 1fr 20px; }
+      .demo { padding: 75px 0; }
+      .demo h2 { font-size: 46px; }
+      .form-card { padding: 24px; }
+      .footer-main { align-items: start; gap: 30px; flex-direction: column; }
+      .footer-links { flex-wrap: wrap; gap: 16px 25px; }
+      .footer-bottom { gap: 15px; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container">
+      <span>ACME / SUPPLY CHAIN OPERATIONS PLATFORM</span>
+      <span class="topbar-right"><span class="live-dot"></span> BUILT FOR WHAT'S NEXT</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="container">
+      <a href="#" class="logo" aria-label="Acme home">
+        <svg class="logo-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 2 30 27H2L16 2Z" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 11 23 24H9l7-13Z" fill="currentColor"/>
+        </svg>
+        acme
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#demo">Contact</a>
+      </nav>
+      <a class="nav-cta" href="#demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow mono">A clearer way to make things happen</div>
+          <h1 id="hero-title">Custom widgets.<br><span>Under control.</span></h1>
+          <p class="hero-description">From the first configuration to the final delivery, Acme gives operations teams one precise view of every custom widget order across their supply chain.</p>
+          <div class="hero-actions">
+            <a href="#demo" class="button-primary">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+            <a href="#platform" class="text-link">Explore the platform</a>
+          </div>
+          <div class="hero-note"><span class="line"></span> SPECIFY. ORDER. TRACK. REPEAT.</div>
+        </div>
+
+        <div class="visual-wrap" aria-label="Illustration of the Acme order workspace showing a widget specification and order progress">
+          <div class="visual-label">FIG 01 / SAMPLE WORKSPACE</div>
+          <div class="app">
+            <div class="app-rail" aria-hidden="true">
+              <svg class="rail-logo" viewBox="0 0 32 32" fill="none"><path d="M16 2 30 27H2L16 2Z" stroke="#85e8ed" stroke-width="2"/><path d="M16 11 23 24H9l7-13Z" fill="#85e8ed"/></svg>
+              <svg class="rail-icon active" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" stroke="currentColor"/><rect x="11" y="2" width="7" height="7" stroke="currentColor"/><rect x="2" y="11" width="7" height="7" stroke="currentColor"/><rect x="11" y="11" width="7" height="7" stroke="currentColor"/></svg>
+              <svg class="rail-icon" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h9" stroke="currentColor" stroke-width="1.5"/></svg>
+              <svg class="rail-icon" viewBox="0 0 20 20" fill="none"><path d="M3 15V6l7-3 7 3v9l-7 3-7-3Z" stroke="currentColor" stroke-width="1.3"/><path d="m3 6 7 3 7-3M10 9v9" stroke="currentColor" stroke-width="1.3"/></svg>
+              <div class="rail-spacer"></div>
+              <div class="rail-avatar">OP</div>
+            </div>
+            <div class="app-main">
+              <div class="app-top">
+                <div class="app-breadcrumb">WORKSPACE <span style="color:#52717d">/</span> <b>OVERVIEW</b></div>
+                <div class="app-top-right"><span>OPERATIONS</span><span class="tiny-circle">⌕</span></div>
+              </div>
+              <div class="app-content">
+                <div class="app-heading">
+                  <div>
+                    <div class="app-kicker">THURSDAY / ORDER VISIBILITY</div>
+                    <h3>Order workspace</h3>
+                  </div>
+                  <div class="app-button">+ NEW CONFIGURATION</div>
+                </div>
+                <div class="app-grid">
+                  <div class="app-card">
+                    <div class="card-header"><span>ACTIVE SPECIFICATION</span><span>01 / 04</span></div>
+                    <div class="spec-graphic">
+                      <svg viewBox="0 0 190 112" fill="none" aria-hidden="true">
+                        <path d="M41 32 104 17l48 27-63 16-48-28Z" fill="#244651" stroke="#8edfe2" stroke-width="1.2"/>
+                        <path d="M41 32v40l48 27V60L41 32Z" fill="#1b3541" stroke="#8edfe2" stroke-width="1.2"/>
+                        <path d="M89 60v39l63-18V44L89 60Z" fill="#2b5560" stroke="#8edfe2" stroke-width="1.2"/>
+                        <path d="m58 42 63-17M73 51l63-17M103 61v28M118 57v28M133 53v28" stroke="#8edfe2" stroke-opacity=".35"/>
+                        <path d="M41 82v17m48 9v-5M41 93l48 15M157 44h14m-14 37h14m9-37v37" stroke="#87cbd1" stroke-width=".8"/>
+                        <circle cx="180" cy="44" r="2" fill="#85e8ed"/><circle cx="180" cy="81" r="2" fill="#85e8ed"/>
+                      </svg>
+                      <span class="measure">DWG / W-204</span>
+                    </div>
+                    <div class="spec-name"><strong>Precision mounting widget</strong><small>ALLOY 6061 · REV 03 · QTY 240</small></div>
+                  </div>
+                  <div class="app-card">
+                    <div class="card-header"><span>ORDER PROGRESS</span><span>LIVE</span></div>
+                    <div class="track-body">
+                      <div class="track-item"><strong>Configured</strong><small>SPEC APPROVED</small></div>
+                      <div class="track-item"><strong>Order placed</strong><small>PO CONFIRMED</small></div>
+                      <div class="track-item"><strong>In production</strong><small>IN PROGRESS</small></div>
+                      <div class="track-item pending"><strong>In transit</strong><small>UP NEXT</small></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="app-bottom">
+                  <div class="table-head"><span>ORDER ID</span><span>ITEM</span><span>QUANTITY</span><span>STATUS</span></div>
+                  <div class="table-row"><span>AC-2048</span><span>Mounting widget</span><span>240 UNITS</span><span class="status-pill">PRODUCTION</span></div>
+                  <div class="table-row"><span>AC-2047</span><span>Spacer assembly</span><span>120 UNITS</span><span class="status-pill dim">IN TRANSIT</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="strip">
+      <div class="container strip-inner">
+        <div class="strip-intro">ONE CONNECTED WORKFLOW</div>
+        <div class="strip-item"><span>01 /</span> Configure with clarity</div>
+        <div class="strip-item"><span>02 /</span> Order with confidence</div>
+        <div class="strip-item"><span>03 /</span> Track without chasing</div>
+      </div>
+    </div>
+
+    <section class="section features" id="platform" aria-labelledby="platform-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow mono">The platform</div>
+            <h2 id="platform-title">Less back-and-forth.<br>More forward motion.</h2>
+          </div>
+          <p>Custom parts create complexity. Acme puts the details, decisions, and updates in one place so your team can keep production moving.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-number">MODULE / 01</div>
+            <div class="feature-icon">
+              <svg viewBox="0 0 80 80" fill="none" aria-hidden="true">
+                <rect x="10" y="13" width="50" height="50" stroke="#6096a1"/>
+                <path d="m27 29 23-6 17 10-23 6-17-10Z" stroke="#85e8ed" stroke-width="1.5"/>
+                <path d="M27 29v20l17 10V39M44 39v20l23-7V33" stroke="#85e8ed" stroke-width="1.5"/>
+                <path d="M10 69h60M70 13v50" stroke="#456a75" stroke-dasharray="3 4"/>
+              </svg>
+            </div>
+            <h3>Configure precisely.</h3>
+            <p>Capture specifications and requirements in a structured workflow before an order reaches the floor.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-number">MODULE / 02</div>
+            <div class="feature-icon">
+              <svg viewBox="0 0 80 80" fill="none" aria-hidden="true">
+                <path d="M16 13h37l11 11v43H16V13Z" stroke="#85e8ed" stroke-width="1.5"/>
+                <path d="M53 13v12h11M26 36h28M26 45h28M26 54h17" stroke="#6096a1" stroke-width="1.5"/>
+                <path d="m51 55 5 5 11-12" stroke="#85e8ed" stroke-width="2"/>
+              </svg>
+            </div>
+            <h3>Order decisively.</h3>
+            <p>Move from approved configuration to placed order with the right details attached and visible to your team.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-number">MODULE / 03</div>
+            <div class="feature-icon">
+              <svg viewBox="0 0 80 80" fill="none" aria-hidden="true">
+                <path d="M12 58h56M17 58V29l15-9 15 9v29M47 36h16v22" stroke="#6096a1" stroke-width="1.5"/>
+                <path d="M13 67h54M16 42h29" stroke="#456a75" stroke-dasharray="3 4"/>
+                <circle cx="20" cy="58" r="5" fill="#10212c" stroke="#85e8ed" stroke-width="1.5"/>
+                <circle cx="47" cy="58" r="5" fill="#10212c" stroke="#85e8ed" stroke-width="1.5"/>
+                <circle cx="64" cy="58" r="5" fill="#85e8ed"/>
+              </svg>
+            </div>
+            <h3>Track continuously.</h3>
+            <p>See where each order stands, from production through delivery, without piecing together email threads.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section workflow" id="how-it-works" aria-labelledby="workflow-title">
+      <div class="container workflow-layout">
+        <div>
+          <div class="eyebrow mono">How it works</div>
+          <h2 id="workflow-title">A direct line from need to delivery.</h2>
+          <p class="workflow-copy">Your supply chain has enough moving parts. The path for ordering them should be straightforward.</p>
+        </div>
+        <div class="workflow-list">
+          <div class="workflow-step">
+            <span class="step-no">01 —</span>
+            <div><h3>Define what you need</h3><p>Build a clear custom-widget configuration with the specifications that matter.</p></div>
+            <span class="step-arrow" aria-hidden="true">↗</span>
+          </div>
+          <div class="workflow-step">
+            <span class="step-no">02 —</span>
+            <div><h3>Put the order in motion</h3><p>Place the order from the same workspace where the requirements were set.</p></div>
+            <span class="step-arrow" aria-hidden="true">↗</span>
+          </div>
+          <div class="workflow-step">
+            <span class="step-no">03 —</span>
+            <div><h3>Stay ahead of the handoffs</h3><p>Follow progress across the supply chain and give your team a shared view of what comes next.</p></div>
+            <span class="step-arrow" aria-hidden="true">↗</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo" id="demo" aria-labelledby="demo-title">
+      <div class="container demo-inner">
+        <div class="demo-copy">
+          <div class="eyebrow mono">Let's talk operations</div>
+          <h2 id="demo-title">See the whole picture. Book a demo.</h2>
+          <p>Show us how your team handles custom widgets today. We’ll walk you through how Acme can make configuration, ordering, and tracking feel like one connected process.</p>
+          <div class="demo-meta"><span></span> A CONVERSATION BUILT AROUND YOUR WORKFLOW</div>
+        </div>
+        <div class="form-card">
+          <div class="form-head"><h3>Request a walkthrough</h3><span>01 / 01</span></div>
+          <form id="demo-form">
+            <div class="field">
+              <label for="name">Your name</label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="Alex Morgan" required>
+            </div>
+            <div class="field">
+              <label for="email">Work email</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="alex@company.com" required>
+            </div>
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" autocomplete="organization" placeholder="Your company" required>
+            </div>
+            <div class="field">
+              <label for="focus">What would you like to improve?</label>
+              <select id="focus" name="focus" required>
+                <option value="" disabled selected>Select a focus area</option>
+                <option>Configuring custom widgets</option>
+                <option>Placing and managing orders</option>
+                <option>Tracking supply chain progress</option>
+                <option>All of the above</option>
+              </select>
+            </div>
+            <button class="button-primary" type="submit">Request a demo <span class="arrow" aria-hidden="true">↗</span></button>
+            <p class="form-note">Submitting opens your email app with a pre-filled request.</p>
+            <p id="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-main">
+        <div>
+          <a href="#" class="logo" aria-label="Acme home">
+            <svg class="logo-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 2 30 27H2L16 2Z" stroke="currentColor" stroke-width="2"/><path d="M16 11 23 24H9l7-13Z" fill="currentColor"/></svg>
+            acme
+          </a>
+          <p>Custom widgets, under control.</p>
+        </div>
+        <div class="footer-links">
+          <a href="#platform">Platform</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#demo">Book a demo</a>
+        </div>
+      </div>
+      <div class="footer-bottom"><span>© <span id="year">2026</span> ACME. ALL RIGHTS RESERVED.</span><span>PRECISION IN EVERY STEP.</span></div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    document.getElementById("demo-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      if (!form.reportValidity()) return;
+
+      const data = new FormData(form);
+      const subject = "Acme demo request — " + data.get("company");
+      const body = [
+        "Hello Acme,",
+        "",
+        "I'd like to book a demo.",
+        "",
+        "Name: " + data.get("name"),
+        "Work email: " + data.get("email"),
+        "Company: " + data.get("company"),
+        "Focus area: " + data.get("focus"),
+        "",
+        "Please get in touch to arrange a time."
+      ].join("\n");
+
+      document.getElementById("form-status").textContent = "Your email app should open with the request ready to send.";
+      window.location.href = "mailto:hello@acme.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+    });
+  </script>
+</body>
+</html>

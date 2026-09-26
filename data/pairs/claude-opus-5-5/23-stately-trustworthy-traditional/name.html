@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — The Orderly Conduct of Custom Widgets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f5efe2;
+    --paper-deep:#ece4d2;
+    --ink:#15120f;
+    --ink-soft:#4a433b;
+    --rule:#15120f;
+    --crimson:#8c1d18;
+    --measure:1200px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Bodoni Moda",Didot,"Times New Roman",serif;
+    font-optical-sizing:auto;
+    font-size:19px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.55), transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(120,90,50,.06), transparent 60%);
+  }
+  a{color:inherit}
+  .wrap{max-width:var(--measure);margin:0 auto;padding:0 48px}
+  .caps{text-transform:uppercase;letter-spacing:.28em;font-size:12px;font-weight:500}
+  .ital{font-style:italic}
+  .crimson{color:var(--crimson)}
+  .center{text-align:center}
+
+  /* Rules */
+  .rule-double{border:0;height:5px;border-top:2px solid var(--rule);border-bottom:.5px solid var(--rule)}
+  .rule-thin{border:0;border-top:.5px solid var(--rule)}
+
+  /* Ornament */
+  .ornament{display:flex;align-items:center;justify-content:center;gap:0;margin:0 auto}
+  .ornament svg{display:block}
+
+  /* Navigation */
+  header.top{padding:28px 0 0}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding-bottom:22px}
+  .wordmark{font-size:30px;font-weight:500;letter-spacing:.32em;text-decoration:none;font-variation-settings:"opsz" 96}
+  .wordmark span{color:var(--crimson)}
+  .nav ul{list-style:none;display:flex;gap:44px}
+  .nav a{text-decoration:none;position:relative}
+  .nav ul a::after{content:"";position:absolute;left:0;right:100%;bottom:-6px;border-bottom:.5px solid var(--ink);transition:right .4s ease}
+  .nav ul a:hover::after{right:.28em}
+  .btn{
+    display:inline-block;text-decoration:none;cursor:pointer;
+    font-family:inherit;text-transform:uppercase;letter-spacing:.26em;font-size:12px;font-weight:600;
+    padding:17px 34px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
+    transition:background .3s,color .3s;
+  }
+  .btn:hover{background:var(--crimson);border-color:var(--crimson)}
+  .btn.ghost{background:transparent;color:var(--ink)}
+  .btn.ghost:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .btn.small{padding:12px 22px;font-size:11px}
+
+  /* Hero: title page */
+  .hero{padding:64px 0 90px}
+  .titlepage{
+    position:relative;border:2px solid var(--ink);padding:10px;
+  }
+  .titlepage-inner{border:.5px solid var(--ink);padding:84px 80px 76px;text-align:center}
+  .corner{position:absolute;width:26px;height:26px;background:var(--paper)}
+  .corner svg{display:block}
+  .c-tl{top:-6px;left:-6px}.c-tr{top:-6px;right:-6px;transform:scaleX(-1)}
+  .c-bl{bottom:-6px;left:-6px;transform:scaleY(-1)}.c-br{bottom:-6px;right:-6px;transform:scale(-1)}
+  .hero .kicker{margin-bottom:38px}
+  .hero h1{
+    font-weight:400;font-size:108px;line-height:.98;letter-spacing:-.015em;
+    font-variation-settings:"opsz" 96;margin:0 auto;max-width:1000px;
+  }
+  .hero h1 em{font-style:italic;color:var(--crimson);font-weight:400}
+  .hero .lede{max-width:640px;margin:40px auto 0;font-size:22px;line-height:1.55;color:var(--ink-soft);font-variation-settings:"opsz" 14}
+  .hero .actions{margin-top:48px;display:flex;justify-content:center;gap:18px}
+  .imprint{margin-top:64px;display:flex;justify-content:center;align-items:center;gap:28px;color:var(--ink-soft)}
+  .imprint .dot{width:5px;height:5px;background:var(--ink);transform:rotate(45deg)}
+
+  /* Patrons */
+  .patrons{padding:0 0 100px}
+  .patrons .caps{display:block;text-align:center;margin-bottom:30px;color:var(--ink-soft)}
+  .patron-row{display:flex;justify-content:space-between;align-items:center;border-top:.5px solid var(--ink);border-bottom:.5px solid var(--ink);padding:26px 10px}
+  .patron{font-size:21px;letter-spacing:.08em;font-variation-settings:"opsz" 40}
+  .patron.i{font-style:italic;letter-spacing:.02em}
+  .patron.b{font-weight:700;letter-spacing:.2em;font-size:16px;text-transform:uppercase}
+  .patron-sep{width:1px;height:26px;background:var(--ink);opacity:.4}
+
+  /* Section heads */
+  .section{padding:110px 0}
+  .section-head{text-align:center;margin-bottom:80px}
+  .section-head .caps{color:var(--crimson);display:block;margin-bottom:22px}
+  .section-head h2{font-size:64px;font-weight:400;line-height:1.05;font-variation-settings:"opsz" 96;letter-spacing:-.01em}
+  .section-head h2 em{font-style:italic}
+  .section-head p{max-width:620px;margin:26px auto 0;color:var(--ink-soft);font-size:20px}
+
+  /* Method */
+  .method{display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid var(--ink)}
+  .part{padding:52px 44px 56px;border-right:.5px solid var(--ink);text-align:center}
+  .part:last-child{border-right:0}
+  .numeral{font-size:120px;line-height:1;font-weight:400;font-variation-settings:"opsz" 96;display:block}
+  .part .caps{display:block;margin:18px 0 26px;color:var(--ink-soft)}
+  .part h3{font-size:30px;font-weight:400;font-style:italic;line-height:1.2;margin-bottom:18px;font-variation-settings:"opsz" 48}
+  .part p{font-size:17.5px;color:var(--ink-soft);line-height:1.65;text-align:left;hyphens:auto}
+  .part p::first-letter{font-size:3.2em;float:left;line-height:.82;padding:6px 8px 0 0;color:var(--crimson);font-variation-settings:"opsz" 96}
+  .part .fig{margin:34px auto 0;height:120px;display:flex;align-items:center;justify-content:center}
+
+  /* Figures (numbers) */
+  .figures{background:var(--ink);color:var(--paper);padding:110px 0}
+  .figures .section-head h2{color:var(--paper)}
+  .figures .section-head .caps{color:#d9a79f}
+  .figures .section-head p{color:#bdb4a6}
+  .fig-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:.5px solid rgba(245,239,226,.5);border-bottom:.5px solid rgba(245,239,226,.5)}
+  .fig-cell{padding:56px 30px;text-align:center;border-right:.5px solid rgba(245,239,226,.5)}
+  .fig-cell:last-child{border-right:0}
+  .big{font-size:150px;line-height:.9;font-weight:400;font-variation-settings:"opsz" 96;letter-spacing:-.03em;display:block}
+  .big sup{font-size:.4em;vertical-align:.95em;font-style:italic;margin-left:4px}
+  .fig-cell .caps{display:block;margin-top:26px;color:#d9d0c0}
+  .fig-cell p{margin-top:12px;font-style:italic;color:#bdb4a6;font-size:17px}
+  .fig-note{margin-top:30px;text-align:center;font-size:14px;color:#8f877b;font-style:italic}
+
+  /* Plate */
+  .plate-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:80px;align-items:center}
+  .plate{border:2px solid var(--ink);padding:8px;background:var(--paper)}
+  .plate-inner{border:.5px solid var(--ink);padding:30px 30px 22px}
+  .plate-caption{display:flex;justify-content:space-between;margin-top:14px;border-top:.5px solid var(--ink);padding-top:12px;font-size:15px}
+  .legend{list-style:none;margin-top:36px}
+  .legend li{display:grid;grid-template-columns:48px 1fr;padding:18px 0;border-top:.5px solid var(--ink)}
+  .legend li:last-child{border-bottom:.5px solid var(--ink)}
+  .legend b{font-weight:400;font-style:italic;font-size:26px;color:var(--crimson);line-height:1.2}
+  .legend strong{display:block;font-weight:600;font-size:18px}
+  .legend span{color:var(--ink-soft);font-size:16.5px}
+  .plate-text h2{font-size:54px;font-weight:400;line-height:1.08;font-variation-settings:"opsz" 96}
+  .plate-text h2 em{font-style:italic}
+  .plate-text > .caps{color:var(--crimson);display:block;margin-bottom:20px}
+  .plate-text > p{margin-top:22px;color:var(--ink-soft);font-size:19px}
+
+  /* Ledger */
+  .ledger-wrap{background:var(--paper-deep);padding:110px 0;border-top:.5px solid var(--ink);border-bottom:.5px solid var(--ink)}
+  .ledger{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);width:100%;border-collapse:collapse;font-variant-numeric:lining-nums tabular-nums}
+  .ledger th{text-align:left;padding:18px 16px;border-bottom:.5px solid var(--ink);font-weight:500;text-transform:uppercase;letter-spacing:.24em;font-size:11px;color:var(--ink-soft)}
+  .ledger td{padding:20px 16px;border-bottom:.5px solid rgba(21,18,15,.35);font-size:18px;vertical-align:middle}
+  .ledger tr:last-child td{border-bottom:0}
+  .ledger td.no{font-style:italic;color:var(--crimson)}
+  .ledger td.qty{text-align:right}
+  .ledger th.qty{text-align:right}
+  .stages{display:flex;gap:6px;align-items:center}
+  .stages i{display:block;width:30px;height:6px;border:.5px solid var(--ink);transition:background .6s}
+  .stages i.on{background:var(--ink)}
+  .stages i.now{background:var(--crimson);border-color:var(--crimson)}
+  .status{font-style:italic;min-width:150px;display:inline-block;transition:color .6s}
+  .status.flash{color:var(--crimson)}
+  .ledger-foot{display:flex;justify-content:space-between;margin-top:18px;font-size:15px;color:var(--ink-soft);font-style:italic}
+  .live{display:inline-flex;align-items:center;gap:10px}
+  .live::before{content:"";width:7px;height:7px;background:var(--crimson);transform:rotate(45deg);animation:pulse 2s infinite}
+  @keyframes pulse{50%{opacity:.25}}
+
+  /* Testimony */
+  .testimony{padding:130px 0;text-align:center}
+  .quote-mark{font-size:200px;line-height:.6;color:var(--crimson);font-style:italic;display:block;height:80px;font-variation-settings:"opsz" 96}
+  blockquote{max-width:960px;margin:0 auto;font-size:44px;line-height:1.28;font-style:italic;font-weight:400;font-variation-settings:"opsz" 72}
+  .attrib{margin-top:44px}
+  .attrib strong{display:block;font-weight:600;font-size:19px;letter-spacing:.04em}
+  .attrib .caps{color:var(--ink-soft);display:block;margin-top:8px}
+
+  /* Articles (security etc) */
+  .articles{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:.5px solid var(--ink);border-bottom:.5px solid var(--ink)}
+  .article{padding:40px 30px;border-right:.5px solid var(--ink)}
+  .article:last-child{border-right:0}
+  .article .caps{color:var(--crimson);display:block;margin-bottom:14px;font-size:11px}
+  .article h4{font-size:24px;font-weight:400;font-style:italic;line-height:1.2;margin-bottom:12px}
+  .article p{font-size:16px;color:var(--ink-soft);line-height:1.6}
+
+  /* Demo */
+  .demo{padding:120px 0 130px}
+  .demo-frame{border:2px solid var(--ink);padding:10px}
+  .demo-inner{border:.5px solid var(--ink);display:grid;grid-template-columns:1fr 1.1fr}
+  .demo-left{padding:70px 60px;border-right:.5px solid var(--ink);background:var(--ink);color:var(--paper)}
+  .demo-left .caps{color:#d9a79f;display:block;margin-bottom:22px}
+  .demo-left h2{font-size:58px;line-height:1.02;font-weight:400;font-variation-settings:"opsz" 96}
+  .demo-left h2 em{font-style:italic}
+  .demo-left p{margin-top:24px;color:#cfc6b6;font-size:18px}
+  .agenda{list-style:none;margin-top:40px;counter-reset:ag}
+  .agenda li{counter-increment:ag;display:grid;grid-template-columns:64px 1fr;padding:16px 0;border-top:.5px solid rgba(245,239,226,.35);font-size:17px}
+  .agenda li:last-child{border-bottom:.5px solid rgba(245,239,226,.35)}
+  .agenda li::before{content:counter(ag,upper-roman) ".";font-style:italic;color:#d9a79f;font-size:20px}
+  .agenda small{display:block;color:#a79f92;font-style:italic;font-size:15px}
+  .demo-right{padding:70px 60px}
+  .field{margin-bottom:28px}
+  .field label{display:block;text-transform:uppercase;letter-spacing:.24em;font-size:11px;font-weight:600;margin-bottom:6px}
+  .field input,.field select,.field textarea{
+    width:100%;background:transparent;border:0;border-bottom:1px solid var(--ink);
+    font-family:inherit;font-size:21px;padding:10px 0 10px;color:var(--ink);outline:none;border-radius:0;
+    -webkit-appearance:none;appearance:none;
+  }
+  .field select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 14px) 22px,calc(100% - 8px) 22px;background-size:6px 6px;background-repeat:no-repeat}
+  .field input:focus,.field select:focus,.field textarea:focus{border-bottom:2px solid var(--crimson)}
+  .field input::placeholder,.field textarea::placeholder{color:#a39a8c;font-style:italic}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+  .field.err label{color:var(--crimson)}
+  .field.err input{border-bottom-color:var(--crimson)}
+  .form-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+  .form-foot small{font-style:italic;color:var(--ink-soft);font-size:14.5px;max-width:280px;line-height:1.5}
+  .thanks{display:none;text-align:center;padding:60px 10px}
+  .thanks h3{font-size:48px;font-weight:400;font-style:italic;margin:24px 0 16px}
+  .thanks p{color:var(--ink-soft)}
+
+  /* Colophon */
+  footer{padding:0 0 60px}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding:56px 0 50px}
+  .foot-grid h5{text-transform:uppercase;letter-spacing:.26em;font-size:11px;font-weight:600;margin-bottom:18px}
+  .foot-grid ul{list-style:none}
+  .foot-grid li{margin-bottom:8px;font-size:16px}
+  .foot-grid a{text-decoration:none;color:var(--ink-soft)}
+  .foot-grid a:hover{color:var(--crimson)}
+  .colophon{font-style:italic;color:var(--ink-soft);font-size:15.5px;max-width:360px;margin-top:18px}
+  .foot-base{display:flex;justify-content:space-between;padding-top:22px;border-top:.5px solid var(--ink);font-size:14px;color:var(--ink-soft)}
+
+  /* Reveal */
+  .js .reveal{opacity:0;transform:translateY(18px);transition:opacity 1s ease,transform 1s ease}
+  .js .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+
+<header class="top">
+  <div class="wrap">
+    <nav class="nav">
+      <a href="#" class="wordmark">ACM<span>E</span></a>
+      <ul class="caps">
+        <li><a href="#method">The Method</a></li>
+        <li><a href="#plate">The Platform</a></li>
+        <li><a href="#ledger">The Register</a></li>
+        <li><a href="#testimony">Testimony</a></li>
+      </ul>
+      <a href="#demo" class="btn small">Book a Demonstration</a>
+    </nav>
+    <hr class="rule-double">
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="titlepage">
+        <div class="corner c-tl"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M2 24V2h22" fill="none" stroke="#15120f" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" transform="rotate(45 8.5 8.5)" fill="#8c1d18"/></svg></div>
+        <div class="corner c-tr"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M2 24V2h22" fill="none" stroke="#15120f" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" transform="rotate(45 8.5 8.5)" fill="#8c1d18"/></svg></div>
+        <div class="corner c-bl"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M2 24V2h22" fill="none" stroke="#15120f" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" transform="rotate(45 8.5 8.5)" fill="#8c1d18"/></svg></div>
+        <div class="corner c-br"><svg width="26" height="26" viewBox="0 0 26 26"><path d="M2 24V2h22" fill="none" stroke="#15120f" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" transform="rotate(45 8.5 8.5)" fill="#8c1d18"/></svg></div>
+        <div class="titlepage-inner">
+          <p class="caps kicker">For the Operations Teams of Mid-Sized Manufacturers</p>
+          <h1>Custom widgets, made to&nbsp;order <em>&amp;</em> kept in&nbsp;order.</h1>
+          <div class="ornament" style="margin-top:44px">
+            <svg width="260" height="20" viewBox="0 0 260 20" aria-hidden="true">
+              <line x1="0" y1="10" x2="104" y2="10" stroke="#15120f" stroke-width=".6"/>
+              <line x1="156" y1="10" x2="260" y2="10" stroke="#15120f" stroke-width=".6"/>
+              <circle cx="112" cy="10" r="2" fill="#15120f"/>
+              <circle cx="148" cy="10" r="2" fill="#15120f"/>
+              <rect x="124" y="4" width="12" height="12" transform="rotate(45 130 10)" fill="none" stroke="#15120f" stroke-width="1"/>
+              <rect x="127.5" y="7.5" width="5" height="5" transform="rotate(45 130 10)" fill="#8c1d18"/>
+            </svg>
+          </div>
+          <p class="lede">Acme is the single, dependable record for configuring, ordering, and tracking custom widgets across every plant and supplier you work with — so nothing is lost between the drawing and the dock.</p>
+          <div class="actions">
+            <a href="#demo" class="btn">Book a Demonstration</a>
+            <a href="#method" class="btn ghost">Read the Method</a>
+          </div>
+          <div class="imprint caps">
+            <span>Configure</span><span class="dot"></span><span>Order</span><span class="dot"></span><span>Track</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATRONS -->
+  <section class="patrons">
+    <div class="wrap">
+      <span class="caps">Entrusted with the widgets of</span>
+      <div class="patron-row reveal">
+        <span class="patron">Harrowgate Tooling</span>
+        <span class="patron-sep"></span>
+        <span class="patron b">Vesper Hydraulics</span>
+        <span class="patron-sep"></span>
+        <span class="patron i">Calder &amp; Moss</span>
+        <span class="patron-sep"></span>
+        <span class="patron">Northfield Castings</span>
+        <span class="patron-sep"></span>
+        <span class="patron b">Orrin Precision</span>
+        <span class="patron-sep"></span>
+        <span class="patron i">Tamsin Works</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD -->
+  <section class="section" id="method" style="padding-top:20px">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="caps">The Method</span>
+        <h2>One discipline, <em>in three parts.</em></h2>
+        <p>Spreadsheets, email threads and supplier portals each hold a fragment of the truth. Acme gathers them into one orderly practice.</p>
+      </div>
+      <div class="method">
+        <article class="part reveal">
+          <span class="numeral">I</span>
+          <span class="caps">Configure</span>
+          <h3>Specify once, correctly.</h3>
+          <p>Build each widget from approved dimensions, materials and tolerances. Acme validates every combination against your engineering rules before it reaches a supplier, so impossible parts are never quoted, never cut, never returned.</p>
+          <div class="fig">
+            <svg width="120" height="110" viewBox="0 0 120 110" aria-hidden="true">
+              <rect x="20" y="20" width="80" height="70" fill="none" stroke="#15120f" stroke-width="1"/>
+              <circle cx="60" cy="55" r="20" fill="none" stroke="#15120f" stroke-width="2.4"/>
+              <circle cx="60" cy="55" r="7" fill="none" stroke="#15120f" stroke-width=".6"/>
+              <line x1="20" y1="10" x2="100" y2="10" stroke="#8c1d18" stroke-width=".6"/>
+              <line x1="20" y1="6" x2="20" y2="14" stroke="#8c1d18" stroke-width=".6"/>
+              <line x1="100" y1="6" x2="100" y2="14" stroke="#8c1d18" stroke-width=".6"/>
+              <line x1="110" y1="20" x2="110" y2="90" stroke="#8c1d18" stroke-width=".6"/>
+              <line x1="106" y1="20" x2="114" y2="20" stroke="#8c1d18" stroke-width=".6"/>
+              <line x1="106" y1="90" x2="114" y2="90" stroke="#8c1d18" stroke-width=".6"/>
+              <line x1="40" y1="55" x2="80" y2="55" stroke="#15120f" stroke-width=".4" stroke-dasharray="3 2"/>
+              <line x1="60" y1="35" x2="60" y2="75" stroke="#15120f" stroke-width=".4" stroke-dasharray="3 2"/>
+            </svg>
+          </div>
+        </article>
+        <article class="part reveal">
+          <span class="numeral">II</span>
+          <span class="caps">Order</span>
+          <h3>Place it with confidence.</h3>
+          <p>Route configured widgets to the right supplier with pricing, lead times and approvals in plain view. Purchase orders flow into your ERP without re-keying, and every revision is signed, dated and kept on the record.</p>
+          <div class="fig">
+            <svg width="120" height="110" viewBox="0 0 120 110" aria-hidden="true">
+              <rect x="28" y="14" width="64" height="84" fill="none" stroke="#15120f" stroke-width="1"/>
+              <rect x="32" y="18" width="56" height="76" fill="none" stroke="#15120f" stroke-width=".4"/>
+              <line x1="40" y1="32" x2="80" y2="32" stroke="#15120f" stroke-width="2.2"/>
+              <line x1="40" y1="44" x2="80" y2="44" stroke="#15120f" stroke-width=".5"/>
+              <line x1="40" y1="52" x2="74" y2="52" stroke="#15120f" stroke-width=".5"/>
+              <line x1="40" y1="60" x2="78" y2="60" stroke="#15120f" stroke-width=".5"/>
+              <line x1="40" y1="68" x2="66" y2="68" stroke="#15120f" stroke-width=".5"/>
+              <circle cx="72" cy="82" r="8" fill="none" stroke="#8c1d18" stroke-width="1.2"/>
+              <path d="M68 82l3 3 5-6" fill="none" stroke="#8c1d18" stroke-width="1.2"/>
+            </svg>
+          </div>
+        </article>
+        <article class="part reveal">
+          <span class="numeral">III</span>
+          <span class="caps">Track</span>
+          <h3>Know where it stands.</h3>
+          <p>Follow each widget from the supplier’s floor to your receiving dock. Acme reports production milestones, shipment status and exceptions as they happen, and tells the right person before a delay becomes a stoppage.</p>
+          <div class="fig">
+            <svg width="130" height="110" viewBox="0 0 130 110" aria-hidden="true">
+              <line x1="10" y1="55" x2="120" y2="55" stroke="#15120f" stroke-width=".6"/>
+              <circle cx="14" cy="55" r="5" fill="#15120f"/>
+              <circle cx="42" cy="55" r="5" fill="#15120f"/>
+              <circle cx="70" cy="55" r="5" fill="#15120f"/>
+              <circle cx="98" cy="55" r="7" fill="none" stroke="#8c1d18" stroke-width="1.4"/>
+              <circle cx="98" cy="55" r="2.5" fill="#8c1d18"/>
+              <circle cx="122" cy="55" r="4" fill="none" stroke="#15120f" stroke-width=".8"/>
+              <line x1="98" y1="30" x2="98" y2="45" stroke="#8c1d18" stroke-width=".6"/>
+              <rect x="88" y="18" width="20" height="12" fill="none" stroke="#8c1d18" stroke-width=".6"/>
+              <line x1="14" y1="70" x2="14" y2="80" stroke="#15120f" stroke-width=".4"/>
+              <line x1="42" y1="70" x2="42" y2="80" stroke="#15120f" stroke-width=".4"/>
+              <line x1="70" y1="70" x2="70" y2="80" stroke="#15120f" stroke-width=".4"/>
+            </svg>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIGURES -->
+  <section class="figures">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="caps">The Figures</span>
+        <h2>Measured <em>in the ledger,</em> not the brochure.</h2>
+        <p>Median results reported by Acme customers in their first year, across forty-one manufacturers and two hundred and six plants.</p>
+      </div>
+      <div class="fig-grid">
+        <div class="fig-cell reveal">
+          <span class="big"><span class="count" data-to="38">38</span><sup>%</sup></span>
+          <span class="caps">Fewer Order Errors</span>
+          <p>Specifications validated before a single purchase order is sent.</p>
+        </div>
+        <div class="fig-cell reveal">
+          <span class="big"><span class="count" data-to="11">11</span><sup>days</sup></span>
+          <span class="caps">Shorter Lead Time</span>
+          <p>From approved configuration to widget received at the dock.</p>
+        </div>
+        <div class="fig-cell reveal">
+          <span class="big"><span class="count" data-to="6">6</span><sup>hrs</sup></span>
+          <span class="caps">Returned Each Week</span>
+          <p>Per planner, once status chasing by email comes to an end.</p>
+        </div>
+      </div>
+      <p class="fig-note">Figures drawn from Acme’s 2024 customer outcomes review; individual results vary with supplier mix and order volume.</p>
+    </div>
+  </section>
+
+  <!-- PLATE -->
+  <section class="section" id="plate">
+    <div class="wrap plate-grid">
+      <div class="plate reveal">
+        <div class="plate-inner">
+          <svg viewBox="0 0 560 440" width="100%" aria-label="Engraved diagram of a configured widget with labelled parts">
+            <defs>
+              <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="5" stroke="#15120f" stroke-width=".7"/>
+              </pattern>
+              <pattern id="hatch2" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+                <line x1="0" y1="0" x2="0" y2="4" stroke="#15120f" stroke-width=".5"/>
+              </pattern>
+            </defs>
+            <!-- shadow -->
+            <ellipse cx="250" cy="380" rx="150" ry="16" fill="url(#hatch2)" opacity=".5"/>
+            <!-- teeth -->
+            <circle cx="250" cy="215" r="150" fill="none" stroke="#15120f" stroke-width="22" stroke-dasharray="19.6 19.6"/>
+            <circle cx="250" cy="215" r="139" fill="#f5efe2" stroke="#15120f" stroke-width="1.2"/>
+            <circle cx="250" cy="215" r="161" fill="none" stroke="#15120f" stroke-width=".5"/>
+            <!-- body hatch ring -->
+            <circle cx="250" cy="215" r="120" fill="url(#hatch)" stroke="#15120f" stroke-width="1"/>
+            <circle cx="250" cy="215" r="92" fill="#f5efe2" stroke="#15120f" stroke-width="2.5"/>
+            <!-- spokes -->
+            <g stroke="#15120f" stroke-width="1">
+              <rect x="244" y="123" width="12" height="46" fill="#f5efe2"/>
+              <rect x="244" y="261" width="12" height="46" fill="#f5efe2"/>
+              <rect x="158" y="209" width="46" height="12" fill="#f5efe2"/>
+              <rect x="296" y="209" width="46" height="12" fill="#f5efe2"/>
+            </g>
+            <!-- hub -->
+            <circle cx="250" cy="215" r="46" fill="#f5efe2" stroke="#15120f" stroke-width="1.4"/>
+            <circle cx="250" cy="215" r="38" fill="none" stroke="#15120f" stroke-width=".5"/>
+            <circle cx="250" cy="215" r="18" fill="#15120f"/>
+            <rect x="245" y="191" width="10" height="8" fill="#f5efe2"/>
+            <!-- bolt holes -->
+            <g fill="#f5efe2" stroke="#15120f" stroke-width="1">
+              <circle cx="315" cy="150" r="7"/><circle cx="185" cy="150" r="7"/>
+              <circle cx="315" cy="280" r="7"/><circle cx="185" cy="280" r="7"/>
+            </g>
+            <!-- centre lines -->
+            <line x1="70" y1="215" x2="430" y2="215" stroke="#8c1d18" stroke-width=".5" stroke-dasharray="10 3 2 3"/>
+            <line x1="250" y1="35" x2="250" y2="395" stroke="#8c1d18" stroke-width=".5" stroke-dasharray="10 3 2 3"/>
+            <!-- callouts -->
+            <g stroke="#15120f" stroke-width=".6" fill="none">
+              <path d="M358 96 L420 50 H490"/>
+              <path d="M290 222 L420 190 H490"/>
+              <path d="M315 280 L420 330 H490"/>
+              <path d="M140 110 L80 70 H30"/>
+            </g>
+            <g font-family="Bodoni Moda, serif" font-style="italic" font-size="22" fill="#8c1d18">
+              <text x="496" y="57">A</text>
+              <text x="496" y="197">B</text>
+              <text x="496" y="337">C</text>
+              <text x="12" y="77">D</text>
+            </g>
+            <circle cx="358" cy="96" r="2.5" fill="#15120f"/>
+            <circle cx="290" cy="222" r="2.5" fill="#15120f"/>
+            <circle cx="315" cy="280" r="2.5" fill="#15120f"/>
+            <circle cx="140" cy="110" r="2.5" fill="#15120f"/>
+          </svg>
+          <div class="plate-caption">
+            <span class="caps" style="font-size:10.5px">Plate I</span>
+            <span class="ital">The widget, as Acme sees it.</span>
+            <span class="caps" style="font-size:10.5px">Fig. 1</span>
+          </div>
+        </div>
+      </div>
+      <div class="plate-text reveal">
+        <span class="caps">The Platform</span>
+        <h2>Every widget, <em>anatomised</em> and accounted for.</h2>
+        <p>Acme holds the whole life of a part in one record — what it is, who makes it, what it costs and where it is today.</p>
+        <ul class="legend">
+          <li><b>A</b><div><strong>Configuration Rules</strong><span>Tolerances, materials and finishes checked against your engineering standards.</span></div></li>
+          <li><b>B</b><div><strong>Supplier Routing</strong><span>Qualified vendors ranked by capability, capacity, price and lead time.</span></div></li>
+          <li><b>C</b><div><strong>Milestone Tracking</strong><span>Production, inspection and shipment events recorded as they occur.</span></div></li>
+          <li><b>D</b><div><strong>ERP Integration</strong><span>Native connectors for SAP S/4HANA, Oracle NetSuite, Microsoft Dynamics and Epicor.</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEDGER -->
+  <section class="ledger-wrap" id="ledger">
+    <div class="wrap">
+      <div class="section-head reveal" style="margin-bottom:56px">
+        <span class="caps">The Register</span>
+        <h2>A register that <em>keeps itself.</em></h2>
+        <p>What your operations team sees each morning: every open order, every stage, updated without a single chasing email.</p>
+      </div>
+      <table class="ledger reveal" aria-label="Sample order register">
+        <thead>
+          <tr><th>Order</th><th>Widget</th><th>Supplier</th><th>Destination</th><th class="qty">Qty</th><th>Progress</th><th>Status</th></tr>
+        </thead>
+        <tbody id="ledger-body"></tbody>
+      </table>
+      <div class="ledger-foot">
+        <span class="live">Illustrative register — updating live</span>
+        <span>Stages: Configured · Approved · In Production · Inspected · Dispatched · Received</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONY -->
+  <section class="testimony" id="testimony">
+    <div class="wrap reveal">
+      <span class="quote-mark">“</span>
+      <blockquote>We used to learn a widget was late when the line stopped. Now we learn it from Acme, a fortnight early, with two alternative suppliers already listed.</blockquote>
+      <div class="attrib">
+        <strong>Margaret Ellison</strong>
+        <span class="caps">Director of Operations, Northfield Castings</span>
+      </div>
+      <div class="ornament" style="margin-top:50px">
+        <svg width="120" height="14" viewBox="0 0 120 14" aria-hidden="true">
+          <line x1="0" y1="7" x2="50" y2="7" stroke="#15120f" stroke-width=".6"/>
+          <line x1="70" y1="7" x2="120" y2="7" stroke="#15120f" stroke-width=".6"/>
+          <rect x="56" y="3" width="8" height="8" transform="rotate(45 60 7)" fill="#8c1d18"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARTICLES -->
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="articles reveal">
+        <div class="article"><span class="caps">Article I</span><h4>Secure by constitution.</h4><p>SOC 2 Type II audited, encrypted at rest and in transit, with single sign-on and role-based permissions throughout.</p></div>
+        <div class="article"><span class="caps">Article II</span><h4>Integrated, not bolted on.</h4><p>Purchase orders, receipts and invoices reconcile with your ERP automatically. Your system of record remains yours.</p></div>
+        <div class="article"><span class="caps">Article III</span><h4>Open to your suppliers.</h4><p>Vendors update milestones through a simple portal at no cost to them — no training, no licences, no friction.</p></div>
+        <div class="article"><span class="caps">Article IV</span><h4>Live in six weeks.</h4><p>A named implementation lead migrates your catalogue and suppliers, and stays with you through the first quarter.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="demo" id="demo">
+    <div class="wrap">
+      <div class="demo-frame reveal">
+        <div class="demo-inner">
+          <div class="demo-left">
+            <span class="caps">Request an Audience</span>
+            <h2>Thirty minutes, <em>your widgets,</em> no slides.</h2>
+            <p>A product specialist will walk through Acme using parts and suppliers drawn from your own operation.</p>
+            <ol class="agenda">
+              <li><div>Your current process<small>Where orders stall, and why.</small></div></li>
+              <li><div>A live configuration<small>One of your widgets, built and validated.</small></div></li>
+              <li><div>Tracking across suppliers<small>How exceptions surface before they cost you.</small></div></li>
+              <li><div>A plain proposal<small>Timeline, integration plan and pricing in writing.</small></div></li>
+            </ol>
+          </div>
+          <div class="demo-right">
+            <form id="demo-form" novalidate>
+              <div class="field-row">
+                <div class="field"><label for="name">Full Name</label><input id="name" name="name" placeholder="Margaret Ellison" required></div>
+                <div class="field"><label for="title">Title</label><input id="title" name="title" placeholder="Director of Operations"></div>
+              </div>
+              <div class="field"><label for="email">Work Email</label><input id="email" name="email" type="email" placeholder="m.ellison@northfield.com" required></div>
+              <div class="field-row">
+                <div class="field"><label for="company">Company</label><input id="company" name="company" placeholder="Northfield Castings" required></div>
+                <div class="field"><label for="plants">Number of Plants</label>
+                  <select id="plants" name="plants">
+                    <option>One</option><option selected>Two to five</option><option>Six to fifteen</option><option>More than fifteen</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field"><label for="note">What should we prepare?</label><input id="note" name="note" placeholder="e.g. We order 300 custom bracket variants from eight suppliers"></div>
+              <div class="form-foot">
+                <small>We reply within one business day to arrange a time that suits you.</small>
+                <button type="submit" class="btn">Book the Demonstration</button>
+              </div>
+            </form>
+            <div class="thanks" id="thanks" role="status">
+              <svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="28" fill="none" stroke="#15120f" stroke-width="1"/><circle cx="30" cy="30" r="24" fill="none" stroke="#15120f" stroke-width=".4"/><path d="M19 31l7 7 15-16" fill="none" stroke="#8c1d18" stroke-width="2"/></svg>
+              <h3>Your request is received.</h3>
+              <p id="thanks-msg">A specialist will write to you within one business day.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <hr class="rule-double">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="wordmark">ACM<span>E</span></a>
+        <p class="colophon">Configuration, ordering and tracking for custom widgets, kept with the care of a well-bound ledger.</p>
+      </div>
+      <div><h5>Platform</h5><ul><li><a href="#method">Configure</a></li><li><a href="#method">Order</a></li><li><a href="#ledger">Track</a></li><li><a href="#plate">Integrations</a></li></ul></div>
+      <div><h5>Company</h5><ul><li><a href="#testimony">Customers</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li><li><a href="#demo">Contact</a></li></ul></div>
+      <div><h5>Assurance</h5><ul><li><a href="#">Security</a></li><li><a href="#">Privacy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Status</a></li></ul></div>
+    </div>
+    <div class="foot-base">
+      <span>© MMXXV Acme, Inc. All rights reserved.</span>
+      <span class="ital">Colophon: set in Bodoni Moda, after the types of Giambattista Bodoni, Parma, 1818.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Reveal on scroll
+  var els=document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+    },{threshold:.12});
+    els.forEach(function(el){io.observe(el)});
+  } else els.forEach(function(el){el.classList.add('in')});
+
+  // Count up figures
+  var counted=false;
+  var counts=document.querySelectorAll('.count');
+  function runCounts(){
+    if(counted)return;counted=true;
+    counts.forEach(function(c){
+      var to=+c.dataset.to,start=null;
+      function step(t){if(!start)start=t;var p=Math.min((t-start)/1400,1);c.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step);}
+      c.textContent='0';requestAnimationFrame(step);
+    });
+  }
+  if('IntersectionObserver' in window){
+    var fio=new IntersectionObserver(function(e){if(e[0].isIntersecting){runCounts();fio.disconnect();}},{threshold:.4});
+    fio.observe(document.querySelector('.fig-grid'));
+  }
+
+  // Ledger
+  var stages=['Configured','Approved','In Production','Inspected','Dispatched','Received'];
+  var orders=[
+    {no:'AC-20417',w:'Flanged Bracket, 316 Stainless',s:'Calder & Moss',d:'Plant 2, Dayton',q:1200,st:2},
+    {no:'AC-20422',w:'Hub Widget, 48-Tooth',s:'Orrin Precision',d:'Plant 1, Toledo',q:340,st:4},
+    {no:'AC-20431',w:'Sealed Coupling, Nitrile',s:'Vesper Hydraulics',d:'Plant 3, Erie',q:2600,st:1},
+    {no:'AC-20438',w:'Mounting Plate, Anodised',s:'Harrowgate Tooling',d:'Plant 2, Dayton',q:880,st:3},
+    {no:'AC-20446',w:'Tension Spring Widget',s:'Tamsin Works',d:'Plant 1, Toledo',q:5000,st:0}
+  ];
+  var body=document.getElementById('ledger-body');
+  function bars(st){var h='';for(var i=0;i<stages.length;i++){h+='<i class="'+(i<st?'on':i===st?'now':'')+'"></i>';}return h;}
+  orders.forEach(function(o,i){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td class="no">'+o.no+'</td><td>'+o.w+'</td><td>'+o.s.replace('&','&amp;')+'</td><td>'+o.d+'</td><td class="qty">'+o.q.toLocaleString('en-US')+'</td><td><div class="stages">'+bars(o.st)+'</div></td><td><span class="status">'+stages[o.st]+'</span></td>';
+    body.appendChild(tr);o.el=tr;
+  });
+  var counter=20446;
+  setInterval(function(){
+    var o=orders[Math.floor(Math.random()*orders.length)];
+    if(o.st>=stages.length-1){
+      counter+=Math.floor(Math.random()*6)+3;
+      o.no='AC-'+counter;o.st=0;o.el.querySelector('.no').textContent=o.no;
+    } else o.st++;
+    o.el.querySelector('.stages').innerHTML=bars(o.st);
+    var s=o.el.querySelector('.status');s.textContent=stages[o.st];
+    s.classList.add('flash');setTimeout(function(){s.classList.remove('flash')},1400);
+  },2600);
+
+  // Form
+  var form=document.getElementById('demo-form');
+  form.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var ok=true;
+    ['name','email','company'].forEach(function(id){
+      var inp=document.getElementById(id),f=inp.parentNode;
+      var valid=inp.value.trim().length>0 && (id!=='email'||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value.trim()));
+      f.classList.toggle('err',!valid);if(!valid)ok=false;
+    });
+    if(!ok){form.querySelector('.err input').focus();return;}
+    var first=document.getElementById('name').value.trim().split(' ')[0];
+    var company=document.getElementById('company').value.trim();
+    document.getElementById('thanks-msg').textContent='Thank you, '+first+'. A specialist will write to you within one business day to arrange a demonstration for '+company+'.';
+    form.style.display='none';
+    document.getElementById('thanks').style.display='block';
+  });
+  form.querySelectorAll('input').forEach(function(i){i.addEventListener('input',function(){i.parentNode.classList.remove('err')})});
+})();
+</script>
+</body>
+</html>

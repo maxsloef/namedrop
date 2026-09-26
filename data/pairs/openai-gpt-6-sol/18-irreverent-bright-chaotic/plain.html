@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f5ec">
+  <meta name="description" content="Acme helps manufacturing operations teams configure, order, and track custom widgets in one place.">
+  <title>Acme — Make widgets. Not workarounds.</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+    :root {
+      --ink: #181819;
+      --paper: #f8f5ec;
+      --white: #fffefa;
+      --blue: #4449e9;
+      --lime: #d5f447;
+      --pink: #ff91ba;
+      --orange: #ff805c;
+      --line: 2px solid var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "DM Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+    button { font: inherit; }
+    :focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+    ::selection { background: var(--lime); color: var(--ink); }
+
+    .container { width: min(100% - 112px, 1328px); margin-inline: auto; }
+    .mono { font-family: "Space Mono", monospace; font-size: 11px; font-weight: 700; letter-spacing: .065em; text-transform: uppercase; }
+    .arrow { display: inline-block; transition: transform .2s ease; }
+    a:hover .arrow, button:hover .arrow { transform: translate(3px, -3px); }
+
+    .announcement {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      padding: 7px 18px;
+      background: var(--lime);
+      border-bottom: var(--line);
+      text-align: center;
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+    .announcement a { text-underline-offset: 3px; }
+
+    .nav {
+      height: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 35px;
+      border-bottom: 1px solid rgba(24,24,25,.16);
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -.085em;
+      white-space: nowrap;
+    }
+    .logo svg { width: 34px; height: 34px; flex: none; }
+    .nav-links { display: flex; align-items: center; gap: 39px; margin-left: auto; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-cta, .button-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 25px;
+      min-height: 48px;
+      padding: 0 19px;
+      border: var(--line);
+      background: var(--ink);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      white-space: nowrap;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .nav-cta:hover, .button-primary:hover { transform: translate(-3px, -3px); box-shadow: 5px 5px 0 var(--blue); }
+    .nav-cta { min-height: 43px; }
+    .menu-toggle { display: none; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 79px 0 93px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+      align-items: center;
+      gap: 20px;
+      min-height: 565px;
+    }
+    .eyebrow { display: flex; align-items: center; gap: 12px; }
+    .eyebrow-dot { width: 11px; height: 11px; border: 2px solid var(--ink); border-radius: 50%; background: var(--orange); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: "Space Grotesk", sans-serif; }
+    .hero h1 {
+      max-width: 700px;
+      margin: 24px 0 26px;
+      font-size: clamp(64px, 5.85vw, 85px);
+      font-weight: 700;
+      line-height: .99;
+      letter-spacing: -.079em;
+    }
+    .hero h1 .highlight {
+      white-space: nowrap;
+      background: linear-gradient(transparent 75%, var(--lime) 75%, var(--lime) 95%, transparent 95%);
+    }
+    .hero-copy > p {
+      max-width: 520px;
+      margin-bottom: 31px;
+      color: #42413f;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 26px; }
+    .hero-actions .button-primary { min-height: 59px; padding: 0 24px; font-size: 16px; box-shadow: 5px 5px 0 var(--lime); }
+    .hero-actions .button-primary:hover { box-shadow: 8px 8px 0 var(--lime); }
+    .text-link { font-size: 14px; font-weight: 700; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+    .hero-foot {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 54px;
+      color: #67645f;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .hero-foot svg { width: 38px; height: 38px; flex: none; }
+    .hero-foot span { max-width: 235px; line-height: 1.35; }
+
+    /* The hero art is entirely HTML, CSS, and inline SVG. */
+    .scene { position: relative; height: 575px; isolation: isolate; }
+    .scene-back {
+      position: absolute;
+      inset: 55px 22px 42px 77px;
+      background: var(--blue);
+      border: var(--line);
+      border-radius: 30px;
+      transform: rotate(8deg);
+    }
+    .scene-back::after {
+      content: "";
+      position: absolute;
+      inset: 25px;
+      border: 2px dashed rgba(255,255,255,.45);
+      border-radius: 16px;
+    }
+    .scene-orb {
+      position: absolute;
+      top: 9px;
+      right: 4px;
+      width: 169px;
+      height: 169px;
+      border: var(--line);
+      border-radius: 50%;
+      background: var(--lime);
+      z-index: 0;
+    }
+    .dashboard {
+      position: absolute;
+      top: 127px;
+      left: 24px;
+      width: min(540px, 85%);
+      padding: 0 21px 23px;
+      border: var(--line);
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 12px 13px 0 var(--ink);
+      transform: rotate(-4deg);
+      z-index: 2;
+    }
+    .dash-top {
+      height: 59px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--ink);
+    }
+    .dash-brand { font-family: "Space Grotesk", sans-serif; font-size: 17px; font-weight: 700; letter-spacing: -.06em; }
+    .dash-brand b { color: var(--blue); }
+    .dash-top-right { display: flex; align-items: center; gap: 8px; color: #77746d; }
+    .dash-top-right i { width: 9px; height: 9px; border-radius: 50%; background: var(--lime); border: 1px solid var(--ink); }
+    .dash-title { display: flex; align-items: flex-end; justify-content: space-between; margin: 22px 0 20px; gap: 10px; }
+    .dash-title strong { display: block; margin-top: 4px; font-family: "Space Grotesk", sans-serif; font-size: 27px; letter-spacing: -.055em; }
+    .dash-title .count { padding: 8px 10px; border: 1.5px solid var(--ink); border-radius: 50px; background: var(--lime); white-space: nowrap; }
+    .dash-columns { display: grid; grid-template-columns: 1.45fr .8fr .7fr; gap: 10px; padding: 0 11px 9px; color: #77746d; }
+    .dash-row {
+      display: grid;
+      grid-template-columns: 1.45fr .8fr .7fr;
+      align-items: center;
+      gap: 10px;
+      min-height: 59px;
+      padding: 7px 11px;
+      border-top: 1px solid #d9d6ce;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .dash-row:last-child { border-bottom: 1px solid #d9d6ce; }
+    .order-name { display: flex; align-items: center; gap: 10px; }
+    .order-icon { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border: 1.5px solid var(--ink); border-radius: 5px; background: #e6e8ff; font-size: 18px; line-height: 1; }
+    .dash-row:nth-of-type(3) .order-icon { background: #ffe2d8; }
+    .dash-row:nth-of-type(4) .order-icon { background: #f8e0ef; }
+    .status { width: fit-content; padding: 5px 7px; border-radius: 4px; background: #dff3ae; font-size: 10px; white-space: nowrap; }
+    .status.orange { background: #ffdec8; }
+    .status.blue { background: #dcddff; }
+    .widget-illustration {
+      position: absolute;
+      top: 0;
+      right: -4px;
+      width: 272px;
+      height: 267px;
+      z-index: 4;
+      filter: drop-shadow(5px 9px 0 rgba(24,24,25,.19));
+      transform: rotate(10deg);
+    }
+    .sticker {
+      position: absolute;
+      z-index: 5;
+      left: -15px;
+      bottom: 39px;
+      width: 155px;
+      height: 155px;
+      display: grid;
+      place-items: center;
+      border: var(--line);
+      border-radius: 50%;
+      background: var(--orange);
+      text-align: center;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.04;
+      letter-spacing: -.06em;
+      transform: rotate(-16deg);
+    }
+    .float-note {
+      position: absolute;
+      right: -8px;
+      bottom: 26px;
+      z-index: 5;
+      padding: 15px 19px;
+      border: var(--line);
+      background: var(--pink);
+      box-shadow: 5px 5px 0 var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      transform: rotate(7deg);
+    }
+    .scene-spark { position: absolute; top: 69px; left: 14px; z-index: 4; color: var(--orange); font-size: 65px; line-height: 1; transform: rotate(-15deg); }
+
+    .ticker { overflow: hidden; border-block: var(--line); background: var(--ink); color: var(--white); }
+    .ticker-inner {
+      display: flex;
+      justify-content: space-around;
+      gap: 40px;
+      width: max-content;
+      min-width: 100%;
+      padding: 18px 25px;
+      white-space: nowrap;
+      font-family: "Space Mono", monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .045em;
+    }
+    .ticker-inner span { color: var(--lime); font-size: 19px; line-height: .7; }
+
+    .section { padding: 108px 0; }
+    .section-label { display: flex; align-items: center; gap: 11px; margin-bottom: 24px; }
+    .section-label::before { content: ""; width: 25px; height: 2px; background: currentColor; }
+    .section-heading { font-size: clamp(42px, 4.1vw, 61px); line-height: 1.07; letter-spacing: -.065em; }
+    .intro-grid { display: grid; grid-template-columns: 1.15fr .85fr; align-items: end; gap: 100px; }
+    .intro-grid h2 { max-width: 790px; margin-bottom: 0; }
+    .intro-grid > p { max-width: 400px; margin-bottom: 4px; color: #595751; font-size: 17px; line-height: 1.6; }
+
+    .problem-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 58px; }
+    .problem-card {
+      position: relative;
+      min-height: 299px;
+      padding: 28px;
+      border: var(--line);
+      box-shadow: 6px 6px 0 var(--ink);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .problem-card:hover { transform: translate(-3px, -5px); box-shadow: 9px 11px 0 var(--ink); }
+    .problem-card:nth-child(1) { background: var(--pink); }
+    .problem-card:nth-child(2) { background: var(--lime); }
+    .problem-card:nth-child(3) { background: #a5a8ff; }
+    .card-number { display: inline-block; padding: 5px 8px; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--white); }
+    .card-doodle { position: absolute; top: 30px; right: 28px; width: 75px; height: 75px; }
+    .problem-card h3 { max-width: 290px; margin: 68px 0 12px; font-size: 29px; line-height: 1.08; letter-spacing: -.06em; }
+    .problem-card p { max-width: 320px; margin: 0; font-size: 15px; line-height: 1.5; }
+
+    .how { position: relative; overflow: hidden; background: var(--blue); color: white; }
+    .how::after {
+      content: "✳";
+      position: absolute;
+      right: -80px;
+      top: -135px;
+      color: rgba(255,255,255,.075);
+      font-size: 530px;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .how .container { position: relative; z-index: 1; }
+    .how-head { display: flex; justify-content: space-between; align-items: end; gap: 50px; }
+    .how h2 { max-width: 760px; margin-bottom: 0; }
+    .how-head p { max-width: 295px; margin-bottom: 5px; line-height: 1.55; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 19px; margin-top: 66px; }
+    .step { min-height: 259px; padding: 25px 27px; border: 2px solid white; background: var(--white); color: var(--ink); }
+    .step:nth-child(2) { background: var(--lime); }
+    .step:nth-child(3) { background: var(--pink); }
+    .step-top { display: flex; justify-content: space-between; align-items: start; }
+    .step-number { font-family: "Space Mono", monospace; font-size: 13px; font-weight: 700; }
+    .step-icon { width: 48px; height: 48px; }
+    .step h3 { margin: 44px 0 11px; font-size: 32px; letter-spacing: -.065em; }
+    .step p { max-width: 330px; margin: 0; font-size: 15px; line-height: 1.5; }
+    .how-note { display: flex; align-items: center; gap: 14px; margin: 33px 0 0; font-size: 13px; font-weight: 700; }
+    .how-note span { color: var(--lime); font-size: 24px; line-height: 1; }
+
+    .product { overflow: hidden; }
+    .product-layout { display: grid; grid-template-columns: .88fr 1.12fr; align-items: center; gap: 95px; }
+    .product-copy h2 { margin-bottom: 24px; }
+    .product-copy > p { max-width: 440px; color: #595751; font-size: 17px; line-height: 1.6; }
+    .feature-list { margin: 34px 0 36px; padding: 0; list-style: none; }
+    .feature-list li { display: flex; gap: 13px; align-items: start; padding: 14px 0; border-top: 1px solid #c8c5bc; font-size: 15px; font-weight: 700; }
+    .feature-list li:last-child { border-bottom: 1px solid #c8c5bc; }
+    .feature-list b { display: grid; place-items: center; width: 23px; height: 23px; flex: none; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--lime); font-size: 13px; }
+    .product-stage { position: relative; min-height: 517px; padding: 51px 26px 29px; border: var(--line); background: var(--lime); }
+    .product-stage::before {
+      content: "";
+      position: absolute;
+      top: 17px;
+      right: 17px;
+      width: 75px;
+      height: 75px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: var(--pink);
+    }
+    .product-stage::after { content: "✳"; position: absolute; top: 14px; right: 30px; font-size: 54px; line-height: 1.3; }
+    .app-window { position: relative; z-index: 1; overflow: hidden; border: var(--line); background: var(--white); box-shadow: 9px 9px 0 var(--ink); }
+    .window-bar { display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 14px; border-bottom: var(--line); background: #f5f2ea; }
+    .window-bar i { width: 9px; height: 9px; border: 1.5px solid var(--ink); border-radius: 50%; }
+    .window-bar i:first-child { background: var(--orange); }
+    .window-bar i:nth-child(2) { background: var(--lime); }
+    .window-bar i:nth-child(3) { background: #a5a8ff; }
+    .window-bar span { margin-left: auto; color: #77746d; }
+    .app-content { display: grid; grid-template-columns: 127px 1fr; min-height: 348px; }
+    .app-sidebar { padding: 23px 12px; border-right: 1.5px solid var(--ink); background: #f5f2ea; }
+    .app-sidebar strong { display: block; margin-bottom: 23px; font-family: "Space Grotesk", sans-serif; font-size: 21px; letter-spacing: -.07em; }
+    .app-sidebar div { margin: 0 -5px 8px; padding: 8px 7px; border-radius: 3px; color: #65635e; font-size: 11px; font-weight: 700; }
+    .app-sidebar .active { background: var(--blue); color: white; }
+    .app-main { padding: 22px 22px 24px; min-width: 0; }
+    .app-main-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .app-main-header h3 { margin: 4px 0 0; font-size: 25px; letter-spacing: -.06em; }
+    .app-main-header span { padding: 7px 9px; border: 1.5px solid var(--ink); background: var(--orange); white-space: nowrap; }
+    .timeline { display: flex; margin: 35px 0 14px; }
+    .timeline-node { position: relative; flex: 1; height: 8px; background: var(--blue); }
+    .timeline-node:last-child { flex: 0 0 15px; background: transparent; }
+    .timeline-node::before { content: "✓"; position: absolute; top: -9px; left: 0; display: grid; place-items: center; width: 25px; height: 25px; border: 2px solid var(--ink); border-radius: 50%; background: var(--lime); font-size: 12px; font-weight: 700; }
+    .timeline-node.current, .timeline-node.current ~ .timeline-node { background: #dedbd3; }
+    .timeline-node.current::before { content: ""; background: var(--orange); }
+    .timeline-node:last-child::before { content: ""; background: white; }
+    .timeline-labels { display: flex; justify-content: space-between; gap: 5px; font-size: 10px; font-weight: 700; }
+    .app-details { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 35px; }
+    .app-detail { min-height: 87px; padding: 13px; border: 1.5px solid var(--ink); background: #f5f2ea; }
+    .app-detail span { display: block; margin-bottom: 9px; color: #77746d; }
+    .app-detail strong { font-family: "Space Grotesk", sans-serif; font-size: 16px; letter-spacing: -.04em; }
+    .product-stamp { position: absolute; z-index: 2; bottom: 2px; left: -26px; padding: 13px 17px; border: var(--line); background: var(--pink); box-shadow: 4px 4px 0 var(--ink); transform: rotate(-7deg); }
+
+    .statement { padding: 83px 0; border-block: var(--line); background: var(--orange); }
+    .statement-inner { display: flex; align-items: center; justify-content: space-between; gap: 55px; }
+    .statement h2 { max-width: 940px; margin: 0; font-size: clamp(38px, 4.2vw, 62px); line-height: 1.09; letter-spacing: -.068em; }
+    .statement svg { width: 112px; height: 112px; flex: none; transform: rotate(-13deg); }
+
+    .faq { padding: 100px 0 110px; }
+    .faq-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 110px; }
+    .faq h2 { margin-bottom: 15px; }
+    .faq-intro { color: #595751; line-height: 1.55; }
+    .faq-item { border-top: var(--line); }
+    .faq-item:last-child { border-bottom: var(--line); }
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      padding: 23px 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -.035em;
+      cursor: pointer;
+    }
+    .faq-plus { display: grid; place-items: center; width: 30px; height: 30px; flex: none; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--lime); font: 23px/1 "DM Sans", sans-serif; transition: transform .2s; }
+    .faq-question[aria-expanded="true"] .faq-plus { transform: rotate(45deg); }
+    .faq-answer { display: none; max-width: 585px; padding: 0 35px 24px 0; color: #595751; font-size: 15px; line-height: 1.6; }
+    .faq-question[aria-expanded="true"] + .faq-answer { display: block; }
+
+    .final-cta { position: relative; overflow: hidden; padding: 89px 0 93px; background: var(--lime); border-top: var(--line); }
+    .final-cta::before, .final-cta::after { content: "✳"; position: absolute; font-size: 260px; line-height: 1; pointer-events: none; }
+    .final-cta::before { left: -97px; top: -62px; color: var(--orange); }
+    .final-cta::after { right: -70px; bottom: -136px; color: var(--blue); }
+    .final-content { position: relative; z-index: 1; text-align: center; }
+    .final-content h2 { max-width: 820px; margin: 13px auto 19px; font-size: clamp(48px, 5.3vw, 77px); line-height: 1.02; letter-spacing: -.075em; }
+    .final-content p { margin-bottom: 29px; font-size: 17px; }
+    .final-content .button-primary { min-height: 58px; padding: 0 26px; background: var(--blue); font-size: 16px; }
+    .final-content .button-primary:hover { box-shadow: 5px 5px 0 var(--ink); }
+
+    footer { padding: 31px 0; background: var(--ink); color: white; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 25px; }
+    footer .logo { font-size: 26px; }
+    footer .logo svg { width: 28px; height: 28px; }
+    .footer-links { display: flex; gap: 27px; }
+    .footer-links a { font-size: 13px; font-weight: 700; text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; }
+    footer small { color: #c4c1b9; font-size: 12px; }
+
+    @media (max-width: 1100px) {
+      .container { width: min(100% - 64px, 1328px); }
+      .hero { padding-top: 55px; }
+      .hero h1 { font-size: clamp(59px, 6.2vw, 76px); }
+      .scene { transform: scale(.87); transform-origin: center left; width: 115%; }
+      .product-layout { gap: 45px; }
+      .intro-grid { gap: 45px; }
+      .faq-grid { gap: 55px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 36px, 560px); }
+      .announcement { font-size: 9px; }
+      .nav { height: 69px; }
+      .logo { font-size: 27px; }
+      .nav-cta { display: none; }
+      .menu-toggle { display: grid; place-items: center; width: 39px; height: 39px; margin-left: auto; border: var(--line); background: var(--lime); cursor: pointer; font-size: 23px; line-height: 1; }
+      .nav-links { display: none; position: absolute; top: 105px; left: 0; right: 0; z-index: 20; margin: 0; padding: 23px 18px; border-bottom: var(--line); background: var(--paper); box-shadow: 0 8px 0 rgba(24,24,25,.1); }
+      .nav-links.open { display: flex; flex-direction: column; align-items: stretch; gap: 22px; }
+      .hero { padding: 56px 0 65px; }
+      .hero-grid { display: flex; flex-direction: column; align-items: stretch; gap: 14px; min-height: 0; }
+      .hero h1 { font-size: clamp(52px, 11vw, 76px); }
+      .hero h1 .highlight { white-space: normal; }
+      .hero-copy > p { font-size: 16px; }
+      .hero-foot { margin-top: 35px; }
+      .scene { width: 100%; height: 420px; margin-top: 15px; transform: none; }
+      .scene-back { inset: 54px 20px 20px 44px; }
+      .dashboard { top: 101px; left: 7px; width: 87%; padding: 0 13px 14px; box-shadow: 7px 8px 0 var(--ink); }
+      .dash-top { height: 43px; }
+      .dash-title { margin: 14px 0; }
+      .dash-title strong { font-size: 19px; }
+      .dash-title .count { font-size: 8px; }
+      .dash-columns, .dash-row { grid-template-columns: 1.3fr .75fr .65fr; gap: 4px; }
+      .dash-columns { font-size: 8px; }
+      .dash-row { min-height: 48px; font-size: 9px; }
+      .order-icon { width: 25px; height: 25px; font-size: 13px; }
+      .status { font-size: 8px; padding: 4px; }
+      .widget-illustration { width: 180px; height: 180px; right: -10px; top: 2px; }
+      .sticker { width: 100px; height: 100px; bottom: 5px; left: -7px; font-size: 16px; }
+      .float-note { bottom: 0; right: 0; padding: 10px; font-size: 9px; }
+      .scene-spark { font-size: 44px; left: 2px; }
+      .scene-orb { width: 105px; height: 105px; }
+      .ticker-inner { gap: 22px; font-size: 10px; }
+      .section { padding: 74px 0; }
+      .section-heading { font-size: clamp(40px, 9vw, 55px); }
+      .intro-grid, .how-head, .product-layout, .faq-grid { display: block; }
+      .intro-grid > p { margin-top: 22px; }
+      .problem-cards, .steps { grid-template-columns: 1fr; gap: 16px; margin-top: 40px; }
+      .problem-card { min-height: 230px; }
+      .problem-card h3 { margin-top: 42px; }
+      .how-head p { margin-top: 22px; }
+      .steps { margin-top: 40px; }
+      .step { min-height: 210px; }
+      .step h3 { margin-top: 25px; }
+      .product-stage { margin-top: 45px; min-height: auto; padding: 48px 15px 25px; }
+      .product-stamp { left: -8px; bottom: -12px; }
+      .statement { padding: 65px 0; }
+      .statement-inner { gap: 15px; }
+      .statement svg { width: 55px; height: 55px; }
+      .faq { padding: 75px 0; }
+      .faq-list { margin-top: 35px; }
+      .final-cta { padding: 75px 0; }
+      .final-cta::before, .final-cta::after { font-size: 165px; }
+      .final-cta::before { left: -80px; }
+      .final-cta::after { right: -85px; bottom: -80px; }
+      .footer-inner { flex-wrap: wrap; }
+      .footer-links { order: 3; width: 100%; flex-wrap: wrap; }
+    }
+    @media (max-width: 390px) {
+      .hero h1 { font-size: 48px; }
+      .scene { height: 365px; }
+      .dash-row:nth-of-type(4) { display: none; }
+      .float-note { display: none; }
+      .app-content { grid-template-columns: 92px 1fr; }
+      .app-sidebar { padding-inline: 7px; }
+      .app-main { padding-inline: 12px; }
+      .app-main-header h3 { font-size: 19px; }
+      .app-main-header span { font-size: 8px; }
+      .timeline-labels { font-size: 8px; }
+      .app-detail { padding: 8px; }
+      .app-detail strong { font-size: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement">
+    <span>GOOD NEWS: YOUR WIDGETS CAN FINALLY GET THEIR ACT TOGETHER.</span>
+    <a href="#how">See how <span aria-hidden="true">↗</span></a>
+  </div>
+
+  <header class="container">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="logo" href="#" aria-label="Acme home">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M20 2v36M2 20h36M7.3 7.3l25.4 25.4M32.7 7.3 7.3 32.7" stroke="#4449e9" stroke-width="6"/>
+          <circle cx="20" cy="20" r="4" fill="#181819"/>
+        </svg>
+        acme
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">☰</button>
+      <div class="nav-links" id="nav-links">
+        <a href="#why">Why Acme</a>
+        <a href="#how">How it works</a>
+        <a href="#platform">The platform</a>
+        <a href="#faq">FAQs</a>
+      </div>
+      <a class="nav-cta" href="mailto:demo@acme.com?subject=I'd%20like%20an%20Acme%20demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow mono"><span class="eyebrow-dot" aria-hidden="true"></span> CUSTOM WIDGETS, MINUS THE MAYHEM</div>
+          <h1 id="hero-title">Make widgets.<br><span class="highlight">Not workarounds.</span></h1>
+          <p>Configure, order, and track custom widgets across your supply chain—in one place. Fewer “any updates?” emails. More getting stuff made.</p>
+          <div class="hero-actions">
+            <a class="button-primary" href="mailto:demo@acme.com?subject=I'd%20like%20an%20Acme%20demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#how">See how it works <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="hero-foot">
+            <svg viewBox="0 0 42 42" fill="none" aria-hidden="true">
+              <path d="M21 2v38M2 21h38M7.5 7.5l27 27M34.5 7.5l-27 27" stroke="#4449e9" stroke-width="3"/>
+              <circle cx="21" cy="21" r="5" fill="#ff805c" stroke="#181819" stroke-width="2"/>
+            </svg>
+            <span>Built for the operations people keeping production moving.</span>
+          </div>
+        </div>
+
+        <div class="scene" aria-label="Illustration of the Acme order dashboard and a custom widget" role="img">
+          <div class="scene-orb"></div>
+          <div class="scene-back"></div>
+          <div class="scene-spark" aria-hidden="true">✳</div>
+          <div class="dashboard" aria-hidden="true">
+            <div class="dash-top">
+              <div class="dash-brand"><b>✳</b> acme <span style="font-weight:400;color:#77746d;font-size:12px;letter-spacing:0">/ control room</span></div>
+              <div class="dash-top-right mono"><i></i> ALL SYSTEMS GO</div>
+            </div>
+            <div class="dash-title">
+              <div><span class="mono" style="color:#77746d">YOUR WORKSPACE</span><strong>Widget orders</strong></div>
+              <span class="count mono">+ NEW ORDER</span>
+            </div>
+            <div class="dash-columns mono"><span>WIDGET</span><span>STATUS</span><span>ETA</span></div>
+            <div class="dash-row"><span class="order-name"><span class="order-icon">⬡</span> Bracket W-204</span><span class="status">In production</span><span>Oct 14</span></div>
+            <div class="dash-row"><span class="order-name"><span class="order-icon">✳</span> Coupler C-18</span><span class="status orange">In transit</span><span>Oct 08</span></div>
+            <div class="dash-row"><span class="order-name"><span class="order-icon">◇</span> Fitting F-72</span><span class="status blue">Approved</span><span>Oct 22</span></div>
+          </div>
+          <svg class="widget-illustration" viewBox="0 0 280 280" fill="none" aria-hidden="true">
+            <path d="M49 85 137 31l101 52 1 110-93 55-96-53L49 85Z" fill="#181819" stroke="#181819" stroke-width="5"/>
+            <path d="M49 85 137 31l101 52-91 55L49 85Z" fill="#a4a7ff" stroke="#181819" stroke-width="5" stroke-linejoin="round"/>
+            <path d="m147 138 91-55 1 110-93 55 1-110Z" fill="#4449e9" stroke="#181819" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M49 85 147 138l-1 110-96-53L49 85Z" fill="#777cf2" stroke="#181819" stroke-width="5" stroke-linejoin="round"/>
+            <path d="m77 98 65-39 68 34-67 40-66-35Z" fill="#d5f447" stroke="#181819" stroke-width="4"/>
+            <path d="m102 98 40-24 42 20-41 25-41-21Z" fill="#181819"/>
+            <path d="m112 98 30-18 31 15-31 18-30-15Z" fill="#ff805c"/>
+            <path d="m81 132 37 20v44l-37-20v-44Z" fill="#ff805c" stroke="#181819" stroke-width="4"/>
+            <path d="m171 159 41-25v47l-41 25v-47Z" fill="#d5f447" stroke="#181819" stroke-width="4"/>
+            <circle cx="67" cy="83" r="6" fill="#fffefa" stroke="#181819" stroke-width="3"/>
+            <circle cx="138" cy="42" r="6" fill="#fffefa" stroke="#181819" stroke-width="3"/>
+            <circle cx="218" cy="84" r="6" fill="#fffefa" stroke="#181819" stroke-width="3"/>
+            <path d="m9 43 14-5m-2-16 8 13M258 31l-12 12m18 4-16 2" stroke="#181819" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <div class="sticker" aria-hidden="true">GOODBYE,<br>GUESSWORK<br>↗</div>
+          <div class="float-note" aria-hidden="true">YES, IT'S ALL IN ONE PLACE. ✓</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-inner">LESS SPREADSHEET ARCHAEOLOGY <span>✳</span> MORE ACTUAL PROGRESS <span>✳</span> CONFIGURE IT <span>✳</span> ORDER IT <span>✳</span> TRACK IT <span>✳</span> LESS SPREADSHEET ARCHAEOLOGY <span>✳</span> MORE ACTUAL PROGRESS <span>✳</span></div>
+    </div>
+
+    <section class="section" id="why" aria-labelledby="why-title">
+      <div class="container">
+        <div class="section-label mono">SOUND FAMILIAR?</div>
+        <div class="intro-grid">
+          <h2 class="section-heading" id="why-title">Your widgets are custom.<br>Your chaos shouldn’t be.</h2>
+          <p>When specs, orders, and updates live in different places, even a simple widget becomes a whole production. Acme brings the moving parts together.</p>
+        </div>
+        <div class="problem-cards">
+          <article class="problem-card">
+            <span class="card-number mono">01 / SPECS</span>
+            <svg class="card-doodle" viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M13 9h40l14 14v48H13V9Z" fill="#fffefa" stroke="#181819" stroke-width="3"/><path d="M53 9v15h14M23 34h33M23 43h25M23 52h29" stroke="#181819" stroke-width="3"/><path d="m47 59 8 8 17-19" stroke="#4449e9" stroke-width="5"/></svg>
+            <h3>One spec. One source of truth.</h3>
+            <p>Configure what you need without hunting down the latest version of “final_FINAL_v3.”</p>
+          </article>
+          <article class="problem-card">
+            <span class="card-number mono">02 / ORDERS</span>
+            <svg class="card-doodle" viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="m10 24 30-15 30 15v34L40 73 10 58V24Z" fill="#fffefa" stroke="#181819" stroke-width="3"/><path d="m10 24 30 16 30-16M40 40v33M26 16l30 17" stroke="#181819" stroke-width="3"/><path d="m52 48 6 6 12-15" stroke="#4449e9" stroke-width="4"/></svg>
+            <h3>Orders without the ordeal.</h3>
+            <p>Move from approved configuration to placed order with the details already attached.</p>
+          </article>
+          <article class="problem-card">
+            <span class="card-number mono">03 / UPDATES</span>
+            <svg class="card-doodle" viewBox="0 0 80 80" fill="none" aria-hidden="true"><rect x="8" y="13" width="64" height="54" rx="3" fill="#fffefa" stroke="#181819" stroke-width="3"/><path d="M8 27h64M20 44h40M20 54h24" stroke="#181819" stroke-width="3"/><circle cx="56" cy="52" r="14" fill="#d5f447" stroke="#181819" stroke-width="3"/><path d="m51 52 4 4 7-9" stroke="#181819" stroke-width="3"/></svg>
+            <h3>Visibility, not detective work.</h3>
+            <p>Know where every order stands, so “let me check” stops being your catchphrase.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section how" id="how" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section-label mono">THE BEAUTIFULLY SIMPLE BIT</div>
+        <div class="how-head">
+          <h2 class="section-heading" id="how-title">From “we need a widget”<br>to “it’s on its way.”</h2>
+          <p>One connected workflow for the custom parts that keep your operation running.</p>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <div class="step-top"><span class="step-number">STEP 01 —</span><svg class="step-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M8 9h32v30H8V9Z" stroke="#181819" stroke-width="2.5"/><path d="M15 18h18M15 25h11M15 32h15" stroke="#181819" stroke-width="2.5"/><circle cx="35" cy="32" r="7" fill="#4449e9" stroke="#181819" stroke-width="2"/></svg></div>
+            <h3>Configure</h3>
+            <p>Set the specs your team actually needs and keep the details together from the start.</p>
+          </article>
+          <article class="step">
+            <div class="step-top"><span class="step-number">STEP 02 —</span><svg class="step-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M7 16 24 7l17 9v19l-17 9-17-9V16Z" stroke="#181819" stroke-width="2.5"/><path d="m7 16 17 9 17-9M24 25v19" stroke="#181819" stroke-width="2.5"/><path d="m17 12 17 9" stroke="#181819" stroke-width="2.5"/></svg></div>
+            <h3>Order</h3>
+            <p>Place custom widget orders without re-entering everything or losing the important bits.</p>
+          </article>
+          <article class="step">
+            <div class="step-top"><span class="step-number">STEP 03 —</span><svg class="step-icon" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M7 35h34M10 35V20l10-7 10 7v15M30 24h8l4 5v6" stroke="#181819" stroke-width="2.5"/><circle cx="17" cy="36" r="4" fill="#fffefa" stroke="#181819" stroke-width="2.5"/><circle cx="35" cy="36" r="4" fill="#fffefa" stroke="#181819" stroke-width="2.5"/><path d="M17 6v6m-6-3h12" stroke="#181819" stroke-width="2.5"/></svg></div>
+            <h3>Track</h3>
+            <p>Follow progress across your supply chain without chasing another status email.</p>
+          </article>
+        </div>
+        <p class="how-note"><span aria-hidden="true">✳</span> Less back-and-forth. More forward motion.</p>
+      </div>
+    </section>
+
+    <section class="section product" id="platform" aria-labelledby="platform-title">
+      <div class="container product-layout">
+        <div class="product-copy">
+          <div class="section-label mono">MEET YOUR NEW CONTROL ROOM</div>
+          <h2 class="section-heading" id="platform-title">Every widget.<br>Every detail.<br>One very good place.</h2>
+          <p>Acme gives operations teams a clear view from first configuration to final delivery. No mystery handoffs. No tab safari.</p>
+          <ul class="feature-list">
+            <li><b aria-hidden="true">✓</b> Keep configurations and order details connected</li>
+            <li><b aria-hidden="true">✓</b> See what’s approved, in progress, and on its way</li>
+            <li><b aria-hidden="true">✓</b> Give your team a shared view of what happens next</li>
+          </ul>
+          <a class="text-link" href="mailto:demo@acme.com?subject=Show%20me%20the%20Acme%20platform">Take a closer look <span class="arrow" aria-hidden="true">↗</span></a>
+        </div>
+        <div class="product-stage">
+          <div class="app-window" aria-label="Example Acme order detail view">
+            <div class="window-bar"><i></i><i></i><i></i><span class="mono">ORDER VIEW / ACME</span></div>
+            <div class="app-content">
+              <div class="app-sidebar">
+                <strong>✳ acme</strong>
+                <div>Overview</div>
+                <div class="active">Orders ↗</div>
+                <div>Widgets</div>
+                <div>Team</div>
+              </div>
+              <div class="app-main">
+                <div class="app-main-header">
+                  <div><span class="mono" style="color:#77746d">ORDER #AC-2048</span><h3>Bracket W-204</h3></div>
+                  <span class="mono">ON TRACK</span>
+                </div>
+                <div class="timeline" aria-hidden="true"><div class="timeline-node"></div><div class="timeline-node"></div><div class="timeline-node current"></div><div class="timeline-node"></div></div>
+                <div class="timeline-labels"><span>Configured</span><span>Approved</span><span>Production</span><span>Delivered</span></div>
+                <div class="app-details">
+                  <div class="app-detail"><span class="mono">QUANTITY</span><strong>240 units</strong></div>
+                  <div class="app-detail"><span class="mono">EST. DELIVERY</span><strong>October 14</strong></div>
+                  <div class="app-detail"><span class="mono">MATERIAL</span><strong>Aluminum 6061</strong></div>
+                  <div class="app-detail"><span class="mono">LATEST UPDATE</span><strong>In production ✓</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="product-stamp mono">CLARITY LOOKS GOOD ON YOU ↗</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="statement" aria-label="The Acme promise">
+      <div class="container statement-inner">
+        <h2>Because your team should run the supply chain. Not chase it around.</h2>
+        <svg viewBox="0 0 120 120" fill="none" aria-hidden="true"><path d="M60 5v110M5 60h110M21 21l78 78M99 21 21 99" stroke="#181819" stroke-width="13"/><circle cx="60" cy="60" r="15" fill="#d5f447" stroke="#181819" stroke-width="5"/></svg>
+      </div>
+    </section>
+
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="container faq-grid">
+        <div>
+          <div class="section-label mono">THE FAIR QUESTIONS</div>
+          <h2 class="section-heading" id="faq-title">A few things you might be wondering.</h2>
+          <p class="faq-intro">Still have questions? We’re real people. <a href="mailto:hello@acme.com">Say hello ↗</a></p>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" type="button" aria-expanded="false">Is Acme for off-the-shelf widgets?<span class="faq-plus" aria-hidden="true">+</span></button>
+            <div class="faq-answer">Acme is designed around custom widgets: the ones with specific requirements, approvals, and supply-chain steps that don’t fit neatly into a standard catalog.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" type="button" aria-expanded="false">Who on my team would use it?<span class="faq-plus" aria-hidden="true">+</span></button>
+            <div class="faq-answer">Operations and purchasing teams use Acme to manage the process, while anyone who needs to check a widget’s specs or order status gets a clearer shared picture.</div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" type="button" aria-expanded="false">Can I see the actual platform?<span class="faq-plus" aria-hidden="true">+</span></button>
+            <div class="faq-answer">Absolutely. Book a demo and we’ll walk through how configuration, ordering, and tracking work together—and talk through your team’s specific workflow.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" aria-labelledby="cta-title">
+      <div class="container final-content">
+        <div class="mono">ENOUGH WIDGET WHACK-A-MOLE</div>
+        <h2 id="cta-title">Let’s make this a whole lot easier.</h2>
+        <p>See what your widget workflow looks like when everything clicks.</p>
+        <a class="button-primary" href="mailto:demo@acme.com?subject=I'd%20like%20an%20Acme%20demo">Book your demo <span class="arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <a class="logo" href="#" aria-label="Acme home">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 2v36M2 20h36M7.3 7.3l25.4 25.4M32.7 7.3 7.3 32.7" stroke="#d5f447" stroke-width="6"/><circle cx="20" cy="20" r="4" fill="#fffefa"/></svg>
+        acme
+      </a>
+      <div class="footer-links">
+        <a href="#why">Why Acme</a>
+        <a href="#how">How it works</a>
+        <a href="#platform">Platform</a>
+        <a href="mailto:hello@acme.com">Contact ↗</a>
+      </div>
+      <small>© 2026 Acme. Widgets with a plan.</small>
+    </div>
+  </footer>
+
+  <script>
+    const menuButton = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    menuButton.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      menuButton.setAttribute('aria-expanded', String(isOpen));
+      menuButton.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+      menuButton.textContent = isOpen ? '×' : '☰';
+    });
+
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.setAttribute('aria-label', 'Open menu');
+        menuButton.textContent = '☰';
+      });
+    });
+
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const wasOpen = button.getAttribute('aria-expanded') === 'true';
+        document.querySelectorAll('.faq-question').forEach(item => item.setAttribute('aria-expanded', 'false'));
+        button.setAttribute('aria-expanded', String(!wasOpen));
+      });
+    });
+  </script>
+</body>
+</html>

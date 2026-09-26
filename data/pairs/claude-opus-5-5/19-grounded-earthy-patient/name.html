@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom widget operations for mid-sized manufacturers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ebe5da;
+    --wall:#e3dccf;
+    --bone:#d9d0c1;
+    --table:#d2c7b5;
+    --clay:#c6b39a;
+    --ochre:#bb9f76;
+    --rose:#c3a397;
+    --sage:#a3a89c;
+    --slate:#8f9796;
+    --umber:#6e604f;
+    --deep:#3f382f;
+    --ink:#4a4238;
+    --muted:#7a6f62;
+    --line:rgba(63,56,47,.16);
+    --serif:"Cormorant Garamond", Georgia, serif;
+    --sans:"Karla", "Helvetica Neue", Arial, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.35;mix-blend-mode:multiply;
+  }
+  a{color:inherit}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 56px}
+
+  /* nav */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(235,229,218,.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{display:flex;align-items:center;justify-content:space-between;height:76px}
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:var(--serif);font-size:28px;font-weight:600;color:var(--deep);letter-spacing:.02em}
+  .nav-links{display:flex;gap:40px;list-style:none;font-size:15px}
+  .nav-links a{text-decoration:none;color:var(--muted);transition:color .4s}
+  .nav-links a:hover{color:var(--deep)}
+
+  .btn{
+    display:inline-block;font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.03em;
+    padding:15px 28px;border-radius:2px;text-decoration:none;cursor:pointer;border:1px solid transparent;
+    transition:background .5s ease, color .5s ease, border-color .5s ease, transform .5s ease;
+  }
+  .btn-primary{background:var(--umber);color:var(--paper)}
+  .btn-primary:hover{background:var(--deep)}
+  .btn-ghost{background:transparent;color:var(--deep);border-color:rgba(63,56,47,.35)}
+  .btn-ghost:hover{border-color:var(--deep);background:rgba(63,56,47,.04)}
+  .btn-sm{padding:11px 22px;font-size:14px}
+  .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible{outline:2px solid var(--umber);outline-offset:3px}
+
+  .eyebrow{
+    font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:500;
+    display:flex;align-items:center;gap:14px;margin-bottom:28px;
+  }
+  .eyebrow::before{content:"";width:36px;height:1px;background:var(--muted)}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;color:var(--deep);line-height:1.08;letter-spacing:-.005em}
+  h1{font-size:76px}
+  h2{font-size:54px}
+  h3{font-size:28px;line-height:1.2}
+  em{font-style:italic;color:var(--umber)}
+
+  /* hero */
+  .hero{padding:88px 0 0;position:relative}
+  .hero-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:40px;align-items:end}
+  .hero-copy{padding-bottom:110px}
+  .hero p.lede{font-size:20px;color:var(--ink);max-width:520px;margin:30px 0 42px}
+  .cta-row{display:flex;gap:16px;align-items:center}
+  .cta-note{margin-top:22px;font-size:14px;color:var(--muted)}
+  .hero-art{position:relative}
+  .hero-art svg{display:block;width:100%;height:auto}
+
+  .table-band{height:64px;background:var(--table);border-top:1px solid rgba(63,56,47,.08)}
+
+  /* trust */
+  .trust{background:var(--table);padding:0 0 60px}
+  .trust .wrap{display:flex;align-items:center;justify-content:space-between;gap:40px;border-top:1px solid rgba(63,56,47,.12);padding-top:36px}
+  .trust p{font-size:14px;color:var(--umber);max-width:240px;line-height:1.5}
+  .trust ul{display:flex;gap:56px;list-style:none;font-family:var(--serif);font-size:23px;color:#6f6456;letter-spacing:.04em}
+
+  section{padding:140px 0}
+
+  /* problem */
+  .problem-grid{display:grid;grid-template-columns:5fr 7fr;gap:100px}
+  .problem-grid h2{max-width:460px}
+  .observations{display:grid;gap:0}
+  .obs{display:grid;grid-template-columns:70px 1fr;padding:34px 0;border-top:1px solid var(--line)}
+  .obs:last-child{border-bottom:1px solid var(--line)}
+  .obs span{font-family:var(--serif);font-size:22px;color:var(--ochre);font-style:italic}
+  .obs h3{font-size:25px;margin-bottom:8px}
+  .obs p{color:var(--muted);max-width:560px}
+
+  /* how */
+  .how{background:var(--wall);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:80px;gap:60px}
+  .section-head p{max-width:420px;color:var(--muted)}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+  .step{background:var(--paper);border:1px solid var(--line);padding:0 0 38px}
+  .step-art{height:210px;background:linear-gradient(to bottom,var(--bone) 0 68%, var(--table) 68% 100%);border-bottom:1px solid var(--line);margin-bottom:34px}
+  .step-art svg{width:100%;height:100%;display:block}
+  .step .num{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:0 36px;margin-bottom:12px}
+  .step h3{padding:0 36px;margin-bottom:14px}
+  .step p{padding:0 36px;color:var(--muted);font-size:16px}
+
+  /* shelf mock */
+  .shelf-grid{display:grid;grid-template-columns:4fr 7fr;gap:80px;align-items:center}
+  .shelf-copy p{color:var(--muted);margin:26px 0 30px}
+  .shelf-copy ul{list-style:none;display:grid;gap:14px}
+  .shelf-copy li{display:flex;gap:14px;align-items:baseline}
+  .shelf-copy li::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ochre);flex:none;transform:translateY(-2px)}
+  .mock{
+    background:#f1ece3;border:1px solid var(--line);border-radius:3px;
+    box-shadow:0 30px 60px -30px rgba(63,56,47,.35), 0 2px 0 rgba(63,56,47,.04);
+    overflow:hidden;
+  }
+  .mock-top{display:flex;justify-content:space-between;align-items:center;padding:18px 26px;border-bottom:1px solid var(--line);background:var(--bone)}
+  .mock-top strong{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--deep)}
+  .mock-tabs{display:flex;gap:6px}
+  .mock-tabs button{font-family:var(--sans);font-size:13px;border:1px solid transparent;background:transparent;color:var(--muted);padding:6px 12px;border-radius:2px;cursor:pointer;transition:all .4s}
+  .mock-tabs button.active{background:var(--paper);border-color:var(--line);color:var(--deep)}
+  .mock-summary{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+  .mock-summary div{padding:18px 26px;border-right:1px solid var(--line)}
+  .mock-summary div:last-child{border-right:0}
+  .mock-summary b{display:block;font-family:var(--serif);font-size:32px;font-weight:500;color:var(--deep);line-height:1.1}
+  .mock-summary span{font-size:12px;color:var(--muted);letter-spacing:.05em}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:14px 26px;border-bottom:1px solid var(--line)}
+  td{padding:15px 26px;border-bottom:1px solid rgba(63,56,47,.08);color:var(--ink)}
+  tr:last-child td{border-bottom:0}
+  tbody tr{transition:background .4s}
+  tbody tr:hover{background:rgba(187,159,118,.08)}
+  td.po{font-variant-numeric:tabular-nums;color:var(--umber)}
+  .status{display:inline-flex;align-items:center;gap:8px;font-size:13px}
+  .status::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.85}
+  .s-transit{color:#7c8886}
+  .s-prod{color:#a4845a}
+  .s-hold{color:#a77b6e}
+  .s-deliv{color:#7f8a6f}
+  .progress{height:4px;width:110px;background:rgba(63,56,47,.1);border-radius:2px;overflow:hidden}
+  .progress i{display:block;height:100%;background:var(--clay)}
+
+  /* features */
+  .features{background:var(--wall);border-top:1px solid var(--line)}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  .feat{padding:44px 40px 48px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .feat svg{margin-bottom:26px}
+  .feat h3{font-size:25px;margin-bottom:10px}
+  .feat p{color:var(--muted);font-size:16px}
+
+  /* numbers + quote */
+  .proof{padding:150px 0}
+  .numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:60px;margin-bottom:130px}
+  .numbers div{border-top:1px solid var(--deep);padding-top:24px}
+  .numbers b{font-family:var(--serif);font-weight:400;font-size:84px;line-height:1;color:var(--deep);display:block;margin-bottom:14px}
+  .numbers p{color:var(--muted);max-width:300px}
+  .quote{display:grid;grid-template-columns:260px 1fr;gap:90px;align-items:center}
+  .quote blockquote{font-family:var(--serif);font-size:40px;line-height:1.28;color:var(--deep);font-weight:400}
+  .quote cite{display:block;margin-top:30px;font-family:var(--sans);font-style:normal;font-size:15px;color:var(--muted)}
+  .quote cite strong{color:var(--ink);font-weight:600}
+
+  /* demo */
+  .demo{background:var(--umber);color:var(--paper);padding:130px 0}
+  .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start}
+  .demo h2{color:#f1ebe0}
+  .demo em{color:#dcc6a2}
+  .demo .eyebrow{color:#cfc2ae}
+  .demo .eyebrow::before{background:#cfc2ae}
+  .demo-copy p{color:#e1d7c7;margin:26px 0 40px;font-size:18px;max-width:480px}
+  .agenda{list-style:none;border-top:1px solid rgba(241,235,224,.2)}
+  .agenda li{display:grid;grid-template-columns:80px 1fr;padding:18px 0;border-bottom:1px solid rgba(241,235,224,.2);color:#e8dfd1}
+  .agenda li span{font-family:var(--serif);font-style:italic;color:#cdb896;font-size:19px}
+  form{background:var(--paper);color:var(--ink);padding:48px;border-radius:2px;box-shadow:0 40px 80px -40px rgba(20,16,12,.6)}
+  form h3{margin-bottom:6px}
+  form .sub{font-size:15px;color:var(--muted);margin-bottom:30px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .field{margin-bottom:18px}
+  label{display:block;font-size:13px;font-weight:500;color:var(--umber);margin-bottom:7px;letter-spacing:.02em}
+  input,select,textarea{
+    width:100%;font-family:var(--sans);font-size:16px;color:var(--deep);
+    background:#f4f0e8;border:1px solid rgba(63,56,47,.22);border-radius:2px;padding:13px 14px;
+    transition:border-color .4s, background .4s;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--umber);background:#fbf8f2;outline:none}
+  textarea{resize:vertical;min-height:96px}
+  .field.error input,.field.error select{border-color:#a4675a}
+  .err{font-size:12.5px;color:#9a5f52;margin-top:6px;display:none}
+  .field.error .err{display:block}
+  form .btn{width:100%;margin-top:10px;font-size:16px;padding:17px}
+  .fine{font-size:13px;color:var(--muted);margin-top:16px;text-align:center}
+  .thanks{display:none;text-align:center;padding:40px 10px}
+  .thanks h3{margin:24px 0 12px}
+  .thanks p{color:var(--muted)}
+
+  footer{padding:70px 0 50px;background:var(--table)}
+  .foot{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid var(--line)}
+  .foot p{color:var(--umber);font-size:15px;max-width:320px;margin-top:16px}
+  .foot h4{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:16px}
+  .foot ul{list-style:none;display:grid;gap:9px;font-size:15px}
+  .foot a{text-decoration:none;color:var(--ink);transition:color .4s}
+  .foot a:hover{color:var(--deep);text-decoration:underline;text-underline-offset:3px}
+  .legal{display:flex;justify-content:space-between;padding-top:26px;font-size:13px;color:var(--muted)}
+
+  /* slow reveal */
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity 1.4s ease, transform 1.4s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<svg class="grain" width="100%" height="100%" aria-hidden="true">
+  <filter id="grainF"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .25  0 0 0 .22 0"/></filter>
+  <rect width="100%" height="100%" filter="url(#grainF)"/>
+</svg>
+
+<!-- shared SVG defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="hand" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/>
+    </filter>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="softS" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3"/></filter>
+    <linearGradient id="gSlate" x1="0" x2="1"><stop offset="0" stop-color="#b9bdb6"/><stop offset=".55" stop-color="#a2a8a2"/><stop offset="1" stop-color="#858c88"/></linearGradient>
+    <linearGradient id="gOchre" x1="0" x2="1"><stop offset="0" stop-color="#d3bb93"/><stop offset=".6" stop-color="#c0a37a"/><stop offset="1" stop-color="#a78c66"/></linearGradient>
+    <linearGradient id="gRose" x1="0" x2="1"><stop offset="0" stop-color="#d5b8ab"/><stop offset=".55" stop-color="#c2a295"/><stop offset="1" stop-color="#a88a7e"/></linearGradient>
+    <linearGradient id="gBone" x1="0" x2="1"><stop offset="0" stop-color="#f3eee4"/><stop offset=".6" stop-color="#e3dbcd"/><stop offset="1" stop-color="#c9bfae"/></linearGradient>
+    <linearGradient id="gUmber" x1="0" x2="1"><stop offset="0" stop-color="#9a8a74"/><stop offset=".6" stop-color="#806f5b"/><stop offset="1" stop-color="#65574a"/></linearGradient>
+    <linearGradient id="gSage" x1="0" x2="1"><stop offset="0" stop-color="#b6b9a8"/><stop offset=".6" stop-color="#9ea292"/><stop offset="1" stop-color="#848877"/></linearGradient>
+  </defs>
+</svg>
+
+<header>
+  <div class="wrap">
+    <nav aria-label="Primary">
+      <a href="#top" class="logo" aria-label="Acme home">
+        <svg width="34" height="28" viewBox="0 0 34 28" aria-hidden="true">
+          <rect x="2" y="8" width="8" height="18" rx="1.5" fill="#8f9796"/>
+          <rect x="4.5" y="3" width="3" height="6" fill="#8f9796"/>
+          <rect x="12" y="13" width="10" height="13" fill="#bb9f76"/>
+          <rect x="24" y="10" width="8" height="16" rx="3" fill="#c3a397"/>
+        </svg>
+        Acme
+      </a>
+      <ul class="nav-links">
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#shelf">Tracking</a></li>
+        <li><a href="#features">Platform</a></li>
+        <li><a href="#proof">Customers</a></li>
+      </ul>
+      <a href="#demo" class="btn btn-primary btn-sm">Book a demo</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero" style="padding-bottom:0">
+    <div class="wrap hero-grid">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Widget operations for mid-sized manufacturers</p>
+        <h1>Custom widgets, ordered <em>calmly</em> and arriving on time.</h1>
+        <p class="lede">Acme gives operations teams one steady place to configure, order, and track custom widgets across every plant, supplier, and shipment. Fewer spreadsheets. Fewer surprises. More weeks that go as planned.</p>
+        <div class="cta-row">
+          <a href="#demo" class="btn btn-primary">Book a 30-minute demo</a>
+          <a href="#how" class="btn btn-ghost">See how it works</a>
+        </div>
+        <p class="cta-note">With an operations specialist, not a sales script. Bring a real order and we'll walk it through.</p>
+      </div>
+
+      <div class="hero-art reveal" aria-hidden="true">
+        <svg viewBox="0 0 620 560">
+          <!-- wall & table -->
+          <rect width="620" height="440" fill="#ddd5c7"/>
+          <rect y="440" width="620" height="120" fill="#d2c7b5"/>
+          <rect y="438" width="620" height="3" fill="#c7bba8"/>
+          <!-- shadows (light from upper left, cast right) -->
+          <g filter="url(#soft)" fill="#5a4c3e" opacity=".18">
+            <path d="M205 450 L300 450 L330 470 L215 470 Z"/>
+            <path d="M320 455 L420 455 L470 478 L330 478 Z"/>
+            <path d="M435 462 L520 462 L560 480 L440 480 Z"/>
+            <path d="M270 492 L360 492 L380 506 L275 506 Z"/>
+            <rect x="120" y="140" width="10" height="300" opacity=".15"/>
+          </g>
+          <g filter="url(#hand)">
+            <!-- back tall bottle (slate) -->
+            <path d="M140 452 L140 240 Q140 214 166 202 L166 118 L161 108 L197 108 L192 118 L192 202 Q218 214 218 240 L218 452 Z" fill="url(#gSlate)"/>
+            <ellipse cx="179" cy="108" rx="18" ry="4" fill="#c4c7c0"/>
+            <!-- ochre box -->
+            <rect x="232" y="300" width="128" height="152" fill="url(#gOchre)"/>
+            <rect x="232" y="300" width="128" height="14" fill="#dac6a2"/>
+            <!-- tall pale vase behind right -->
+            <path d="M398 458 L398 228 Q398 206 414 196 L414 168 Q414 160 422 160 L446 160 Q454 160 454 168 L454 196 Q470 206 470 228 L470 458 Z" fill="url(#gBone)"/>
+            <ellipse cx="434" cy="161" rx="20" ry="4.5" fill="#f4efe6"/>
+            <!-- rose cylinder in front of box -->
+            <rect x="318" y="262" width="84" height="196" fill="url(#gRose)"/>
+            <ellipse cx="360" cy="262" rx="42" ry="8" fill="#dcc3b7"/>
+            <ellipse cx="360" cy="262" rx="30" ry="5" fill="#b3958a"/>
+            <!-- sage small bottle far right -->
+            <path d="M470 466 L470 330 Q470 312 490 306 L490 272 L486 266 L512 266 L508 272 L508 306 Q528 312 528 330 L528 466 Z" fill="url(#gSage)"/>
+            <!-- front umber bowl -->
+            <path d="M232 498 Q232 452 296 452 Q360 452 360 498 Z" fill="url(#gUmber)"/>
+            <ellipse cx="296" cy="455" rx="64" ry="7" fill="#a89783"/>
+            <ellipse cx="296" cy="455" rx="54" ry="4.5" fill="#6d5e4e"/>
+            <!-- small white cube front left -->
+            <rect x="100" y="452" width="72" height="54" fill="url(#gBone)"/>
+            <rect x="100" y="452" width="72" height="8" fill="#f5f1e9"/>
+          </g>
+          <g filter="url(#softS)" fill="#4a3f33" opacity=".22">
+            <rect x="170" y="504" width="40" height="6"/>
+            <rect x="96" y="504" width="80" height="4"/>
+          </g>
+          <!-- faint horizon line on wall -->
+          <rect x="0" y="210" width="620" height="1" fill="#cfc6b6" opacity=".6"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <div class="trust">
+    <div class="wrap">
+      <p>Trusted by operations teams at 240+ manufacturers across North America and Europe</p>
+      <ul>
+        <li>Hollis Fabrication</li>
+        <li>Northgate Pump</li>
+        <li>Vireo Components</li>
+        <li>Carden &amp; Price</li>
+        <li>Ostrander Mills</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="wrap problem-grid">
+      <div class="reveal">
+        <p class="eyebrow">The way it usually goes</p>
+        <h2>Most widget orders are held together by <em>email threads</em> and good memory.</h2>
+      </div>
+      <div class="observations reveal">
+        <div class="obs">
+          <span>i.</span>
+          <div>
+            <h3>Specs drift between drawing and delivery</h3>
+            <p>A tolerance changes in one spreadsheet but not another. The supplier builds what they were sent, and the plant receives something close, but not quite right.</p>
+          </div>
+        </div>
+        <div class="obs">
+          <span>ii.</span>
+          <div>
+            <h3>Nobody can say where an order actually is</h3>
+            <p>Status lives in inboxes and phone calls. Planners chase updates on Friday afternoons instead of planning next month.</p>
+          </div>
+        </div>
+        <div class="obs">
+          <span>iii.</span>
+          <div>
+            <h3>Expediting becomes the operating model</h3>
+            <p>When delays are discovered late, the only fix is freight you didn't budget for. Over a year, it quietly becomes one of your larger line items.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="how" id="how">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">How Acme works</p>
+          <h2>Three steps, done <em>properly</em>.</h2>
+        </div>
+        <p>Acme doesn't ask you to change how your plants run. It gives each part of the process a proper place, so nothing important sits in someone's head.</p>
+      </div>
+      <div class="steps">
+        <article class="step reveal">
+          <div class="step-art" aria-hidden="true">
+            <svg viewBox="0 0 380 210" preserveAspectRatio="xMidYMax meet">
+              <g filter="url(#soft)" fill="#5a4c3e" opacity=".18"><path d="M150 146 L250 146 L280 162 L160 162Z"/></g>
+              <g filter="url(#hand)">
+                <rect x="140" y="62" width="110" height="86" fill="url(#gOchre)"/>
+                <rect x="140" y="62" width="110" height="10" fill="#dac6a2"/>
+              </g>
+              <g stroke="#6e604f" stroke-width="1.2" opacity=".7" fill="none">
+                <path d="M140 46 L250 46 M140 41 L140 51 M250 41 L250 51"/>
+                <path d="M266 62 L266 148 M261 62 L271 62 M261 148 L271 148"/>
+              </g>
+              <text x="195" y="38" text-anchor="middle" font-family="Karla" font-size="11" fill="#6e604f">110.00 mm</text>
+              <text x="276" y="109" font-family="Karla" font-size="11" fill="#6e604f">86.0</text>
+            </svg>
+          </div>
+          <p class="num">Step one</p>
+          <h3>Configure</h3>
+          <p>Build each widget from your approved materials, finishes, and tolerances. Acme checks every configuration against supplier capabilities before it's ever sent, and keeps a versioned record of every change.</p>
+        </article>
+        <article class="step reveal">
+          <div class="step-art" aria-hidden="true">
+            <svg viewBox="0 0 380 210" preserveAspectRatio="xMidYMax meet">
+              <g filter="url(#soft)" fill="#5a4c3e" opacity=".18"><path d="M100 146 L290 146 L320 162 L110 162Z"/></g>
+              <g filter="url(#hand)">
+                <path d="M104 148 L104 84 Q104 72 116 68 L116 44 L136 44 L136 68 Q148 72 148 84 L148 148Z" fill="url(#gSlate)"/>
+                <path d="M164 148 L164 84 Q164 72 176 68 L176 44 L196 44 L196 68 Q208 72 208 84 L208 148Z" fill="url(#gSlate)"/>
+                <path d="M224 148 L224 84 Q224 72 236 68 L236 44 L256 44 L256 68 Q268 72 268 84 L268 148Z" fill="url(#gRose)"/>
+              </g>
+            </svg>
+          </div>
+          <p class="num">Step two</p>
+          <h3>Order</h3>
+          <p>Send purchase orders to one supplier or split them across several. Approvals route to the right people automatically, and quantities, prices, and lead times are confirmed in one place, not five.</p>
+        </article>
+        <article class="step reveal">
+          <div class="step-art" aria-hidden="true">
+            <svg viewBox="0 0 380 210" preserveAspectRatio="xMidYMax meet">
+              <g filter="url(#soft)" fill="#5a4c3e" opacity=".16"><path d="M70 146 L320 146 L340 160 L80 160Z"/></g>
+              <g filter="url(#hand)">
+                <rect x="72" y="112" width="40" height="36" fill="url(#gBone)"/>
+                <rect x="138" y="96" width="40" height="52" fill="url(#gSage)"/>
+                <rect x="204" y="80" width="40" height="68" fill="url(#gOchre)"/>
+                <rect x="270" y="62" width="40" height="86" fill="url(#gUmber)"/>
+              </g>
+              <path d="M92 104 L158 88 L224 72 L290 54" stroke="#6e604f" stroke-width="1" stroke-dasharray="3 4" fill="none" opacity=".6"/>
+              <circle cx="290" cy="54" r="3.5" fill="#6e604f"/>
+            </svg>
+          </div>
+          <p class="num">Step three</p>
+          <h3>Track</h3>
+          <p>Follow every order from production through freight to the receiving dock. Acme notices slippage early, when there's still time to adjust calmly, and tells the people who need to know.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHELF MOCK -->
+  <section id="shelf">
+    <div class="wrap shelf-grid">
+      <div class="shelf-copy reveal">
+        <p class="eyebrow">The Shelf</p>
+        <h2>Your whole supply chain, <em>at a glance</em>.</h2>
+        <p>The Shelf is Acme's live view of every open widget order. It's the screen your team opens each morning, and the one they stop needing to explain to anyone else.</p>
+        <ul>
+          <li>Status updates pulled directly from supplier systems and carriers</li>
+          <li>Early warnings when an ETA drifts past its planned window</li>
+          <li>Filter by plant, supplier, program, or widget family</li>
+        </ul>
+      </div>
+      <div class="mock reveal" role="img" aria-label="Example of the Acme Shelf view listing open widget orders and their status">
+        <div class="mock-top">
+          <strong>The Shelf</strong>
+          <div class="mock-tabs" id="tabs">
+            <button class="active" data-f="all">All plants</button>
+            <button data-f="Dayton">Dayton</button>
+            <button data-f="Tilburg">Tilburg</button>
+            <button data-f="Monterrey">Monterrey</button>
+          </div>
+        </div>
+        <div class="mock-summary">
+          <div><b id="sOpen">42</b><span>Open orders</span></div>
+          <div><b id="sTrack">38</b><span>On schedule</span></div>
+          <div><b id="sWatch">3</b><span>Watching</span></div>
+          <div><b id="sHold">1</b><span>On hold</span></div>
+        </div>
+        <table>
+          <thead><tr><th>PO</th><th>Widget</th><th>Plant</th><th>Status</th><th>Progress</th><th>ETA</th></tr></thead>
+          <tbody id="rows">
+            <tr data-p="Dayton"><td class="po">PO-20418</td><td>Flanged W-40, zinc</td><td>Dayton</td><td><span class="status s-transit">In transit</span></td><td><div class="progress"><i style="width:78%"></i></div></td><td>Mar 14</td></tr>
+            <tr data-p="Tilburg"><td class="po">PO-20422</td><td>Threaded W-12, brass</td><td>Tilburg</td><td><span class="status s-prod">In production</span></td><td><div class="progress"><i style="width:46%"></i></div></td><td>Mar 21</td></tr>
+            <tr data-p="Monterrey"><td class="po">PO-20427</td><td>Sealed W-88, nylon</td><td>Monterrey</td><td><span class="status s-hold">Awaiting spec sign-off</span></td><td><div class="progress"><i style="width:12%"></i></div></td><td>Apr 02</td></tr>
+            <tr data-p="Dayton"><td class="po">PO-20431</td><td>Hex W-25, stainless</td><td>Dayton</td><td><span class="status s-deliv">Received</span></td><td><div class="progress"><i style="width:100%"></i></div></td><td>Mar 08</td></tr>
+            <tr data-p="Tilburg"><td class="po">PO-20436</td><td>Flanged W-40, zinc</td><td>Tilburg</td><td><span class="status s-transit">In transit</span></td><td><div class="progress"><i style="width:64%"></i></div></td><td>Mar 17</td></tr>
+            <tr data-p="Monterrey"><td class="po">PO-20440</td><td>Keyed W-60, aluminum</td><td>Monterrey</td><td><span class="status s-prod">In production</span></td><td><div class="progress"><i style="width:30%"></i></div></td><td>Mar 29</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">The platform</p>
+          <h2>Built for the long, <em>ordinary</em> middle of manufacturing.</h2>
+        </div>
+        <p>Not the launch or the crisis, but the thousands of routine orders in between. That's where Acme earns its keep.</p>
+      </div>
+      <div class="feat-grid reveal">
+        <div class="feat">
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="8" y="14" width="28" height="26" fill="#bb9f76"/><rect x="8" y="14" width="28" height="4" fill="#d6c2a0"/><path d="M6 8 H38" stroke="#6e604f"/></svg>
+          <h3>Spec library</h3>
+          <p>One approved source of truth for every widget your company buys, with version history and who changed what, and when.</p>
+        </div>
+        <div class="feat">
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="6" y="18" width="10" height="22" fill="#8f9796"/><rect x="18" y="12" width="10" height="28" fill="#a3a89c"/><rect x="30" y="22" width="10" height="18" fill="#c3a397"/></svg>
+          <h3>Supplier network</h3>
+          <p>Invite your existing suppliers at no cost to them. They confirm orders and post updates without changing their own systems.</p>
+        </div>
+        <div class="feat">
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="24" r="15" fill="#d9d0c1"/><path d="M22 24 V14 M22 24 L29 28" stroke="#6e604f" stroke-width="1.6"/></svg>
+          <h3>Early drift alerts</h3>
+          <p>Acme compares every order against its plan and flags changes days earlier than a phone call would, with enough time to act.</p>
+        </div>
+        <div class="feat">
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><path d="M8 40 V20 Q8 14 14 12 V6 H20 V12 Q26 14 26 20 V40Z" fill="#8f9796"/><rect x="28" y="26" width="10" height="14" fill="#bb9f76"/></svg>
+          <h3>Multi-plant ordering</h3>
+          <p>Consolidate demand across sites to earn better pricing, or keep plants independent. Either way, everyone sees the same picture.</p>
+        </div>
+        <div class="feat">
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><rect x="6" y="10" width="32" height="28" fill="#e6dfd2" stroke="#b7ab99"/><path d="M11 18 H33 M11 24 H28 M11 30 H24" stroke="#6e604f"/></svg>
+          <h3>ERP connections</h3>
+          <p>Two-way sync with SAP, Oracle NetSuite, Epicor, and Microsoft Dynamics. Purchase orders and receipts stay in step without re-keying.</p>
+        </div>
+        <div class="feat">
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true"><path d="M22 6 L36 12 V22 Q36 34 22 40 Q8 34 8 22 V12Z" fill="#a3a89c"/><path d="M16 22 L21 27 L29 17" stroke="#f1ebe0" stroke-width="2" fill="none"/></svg>
+          <h3>Quality &amp; compliance</h3>
+          <p>Attach certificates, inspection reports, and material traceability to each lot. SOC 2 Type II and ISO 27001 certified.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF -->
+  <section class="proof" id="proof">
+    <div class="wrap">
+      <div class="numbers reveal">
+        <div><b>41%</b><p>fewer expedited shipments in the first year, averaged across customers with three or more plants.</p></div>
+        <div><b>9 days</b><p>shorter average order-to-dock time once specs and approvals live in one place.</p></div>
+        <div><b>6 weeks</b><p>typical time from signed agreement to the first order placed through Acme.</p></div>
+      </div>
+      <div class="quote reveal">
+        <svg viewBox="0 0 260 300" width="260" height="300" aria-hidden="true">
+          <rect width="260" height="210" fill="#ddd5c7"/>
+          <rect y="210" width="260" height="90" fill="#d2c7b5"/>
+          <g filter="url(#soft)" fill="#5a4c3e" opacity=".18"><path d="M80 214 L200 214 L230 232 L90 232Z"/></g>
+          <g filter="url(#hand)">
+            <path d="M70 222 L70 110 Q70 92 88 86 L88 50 L112 50 L112 86 Q130 92 130 110 L130 222Z" fill="url(#gBone)"/>
+            <rect x="126" y="140" width="74" height="84" fill="url(#gRose)"/>
+            <ellipse cx="163" cy="140" rx="37" ry="7" fill="#dcc3b7"/>
+          </g>
+        </svg>
+        <blockquote>
+          “We used to spend Monday mornings figuring out what went wrong last week. Now we spend them deciding what to do next. Acme didn't make us faster so much as it made us <em>steadier</em>.”
+          <cite><strong>Renata Solberg</strong>, Director of Operations, Northgate Pump · 4 plants, 1,100 employees</cite>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="demo" id="demo">
+    <div class="wrap demo-grid">
+      <div class="demo-copy reveal">
+        <p class="eyebrow">Book a demo</p>
+        <h2>Bring one real order. We'll show you how it <em>settles</em>.</h2>
+        <p>In thirty minutes, an Acme operations specialist will walk through your current process and show you, with your own widgets, what configuring, ordering, and tracking looks like on Acme.</p>
+        <ul class="agenda">
+          <li><span>5 min</span>How your team orders custom widgets today</li>
+          <li><span>15 min</span>A live walkthrough using one of your recent orders</li>
+          <li><span>10 min</span>Integration, rollout timeline, and pricing for your plant count</li>
+        </ul>
+      </div>
+
+      <form id="demoForm" novalidate class="reveal">
+        <div id="formBody">
+          <h3>Request your demo</h3>
+          <p class="sub">We'll reply within one business day with times that suit you.</p>
+          <div class="row">
+            <div class="field">
+              <label for="name">Full name</label>
+              <input id="name" name="name" autocomplete="name" required>
+              <p class="err">Please tell us your name.</p>
+            </div>
+            <div class="field">
+              <label for="email">Work email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+              <p class="err">Please use a valid work email.</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" autocomplete="organization" required>
+              <p class="err">Please add your company.</p>
+            </div>
+            <div class="field">
+              <label for="plants">Number of plants</label>
+              <select id="plants" name="plants" required>
+                <option value="">Select…</option>
+                <option>1</option>
+                <option>2–4</option>
+                <option>5–10</option>
+                <option>More than 10</option>
+              </select>
+              <p class="err">Please choose one.</p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="notes">What would you like to see? <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+            <textarea id="notes" name="notes" placeholder="e.g. We order around 60 custom widget SKUs from four suppliers and track it all in spreadsheets."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Book my demo</button>
+          <p class="fine">No commitment. We never share your details.</p>
+        </div>
+        <div class="thanks" id="thanks" role="status" aria-live="polite">
+          <svg width="120" height="90" viewBox="0 0 120 90" aria-hidden="true">
+            <rect y="66" width="120" height="24" fill="#d2c7b5"/>
+            <g filter="url(#hand)">
+              <path d="M30 70 L30 34 Q30 26 38 24 L38 10 L48 10 L48 24 Q56 26 56 34 L56 70Z" fill="url(#gSlate)"/>
+              <rect x="58" y="40" width="34" height="30" fill="url(#gOchre)"/>
+            </g>
+          </svg>
+          <h3>Thank you, <span id="thanksName">friend</span>.</h3>
+          <p>Your request is in. Someone from our operations team will write to you within one business day with a few times to choose from.</p>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a href="#top" class="logo" aria-label="Acme home">
+          <svg width="34" height="28" viewBox="0 0 34 28" aria-hidden="true">
+            <rect x="2" y="8" width="8" height="18" rx="1.5" fill="#8f9796"/>
+            <rect x="4.5" y="3" width="3" height="6" fill="#8f9796"/>
+            <rect x="12" y="13" width="10" height="13" fill="#bb9f76"/>
+            <rect x="24" y="10" width="8" height="16" rx="3" fill="#c3a397"/>
+          </svg>
+          Acme
+        </a>
+        <p>Custom widget operations for mid-sized manufacturers. Configure, order, and track, all in one steady place.</p>
+      </div>
+      <div>
+        <h4>Platform</h4>
+        <ul><li><a href="#how">How it works</a></li><li><a href="#shelf">The Shelf</a></li><li><a href="#features">Integrations</a></li><li><a href="#features">Security</a></li></ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul><li><a href="#proof">Customers</a></li><li><a href="#top">About</a></li><li><a href="#top">Careers</a></li><li><a href="#top">Press</a></li></ul>
+      </div>
+      <div>
+        <h4>Talk to us</h4>
+        <ul><li><a href="#demo">Book a demo</a></li><li><a href="mailto:hello@acme.example">hello@acme.example</a></li><li><a href="#top">Supplier help</a></li></ul>
+      </div>
+    </div>
+    <div class="legal">
+      <span>© 2025 Acme Widget Systems, Inc.</span>
+      <span>Privacy · Terms · Accessibility</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // slow reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // shelf filters
+  const summary = {
+    all:      [42, 38, 3, 1],
+    Dayton:   [17, 16, 1, 0],
+    Tilburg:  [14, 13, 1, 0],
+    Monterrey:[11, 9, 1, 1]
+  };
+  const tabs = document.querySelectorAll('#tabs button');
+  tabs.forEach(b => b.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    b.classList.add('active');
+    const f = b.dataset.f;
+    document.querySelectorAll('#rows tr').forEach(r => {
+      r.style.display = (f === 'all' || r.dataset.p === f) ? '' : 'none';
+    });
+    const s = summary[f];
+    ['sOpen','sTrack','sWatch','sHold'].forEach((id, i) => document.getElementById(id).textContent = s[i]);
+  }));
+
+  // demo form
+  const form = document.getElementById('demoForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true;
+    const check = (id, test) => {
+      const el = document.getElementById(id);
+      const field = el.closest('.field');
+      const valid = test(el.value.trim());
+      field.classList.toggle('error', !valid);
+      if (!valid && ok) { el.focus(); ok = false; }
+    };
+    check('name', v => v.length > 1);
+    check('email', v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v));
+    check('company', v => v.length > 1);
+    check('plants', v => v !== '');
+    if (!ok) return;
+    const first = document.getElementById('name').value.trim().split(' ')[0];
+    document.getElementById('thanksName').textContent = first;
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('thanks').style.display = 'block';
+  });
+  form.querySelectorAll('input,select').forEach(el =>
+    el.addEventListener('input', () => el.closest('.field') && el.closest('.field').classList.remove('error'))
+  );
+</script>
+</body>
+</html>

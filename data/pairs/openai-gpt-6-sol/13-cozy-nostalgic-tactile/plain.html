@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f3e9">
+  <title>Acme — Custom widgets, without the guesswork</title>
+  <meta name="description" content="Configure, order, and track custom widgets across your supply chain in one calm, connected workspace. Book a demo of Acme.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,20,1;9..144,500,20,1;9..144,600,20,1;9..144,700,20,1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f7f3e9;
+      --cream: #fffcf5;
+      --ink: #292c24;
+      --muted: #65695d;
+      --line: #d9d7c9;
+      --rust: #a74f35;
+      --rust-dark: #873e2b;
+      --sage: #dce3d2;
+      --olive: #344638;
+      --gold: #e9c87d;
+      --mono: "DM Mono", monospace;
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "DM Sans", Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      opacity: .18;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1240px, calc(100% - 80px)); margin: 0 auto; }
+    .eyebrow {
+      font: 500 11px/1.4 var(--mono);
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 17px;
+      min-height: 54px;
+      padding: 0 23px;
+      border: 1px solid var(--rust);
+      border-radius: 5px;
+      background: var(--rust);
+      color: #fffaf1;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 3px 4px 0 #d8c7af;
+      transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .button:hover { background: var(--rust-dark); transform: translate(2px, 2px); box-shadow: 1px 2px 0 #d8c7af; }
+    .button svg { width: 17px; height: 17px; }
+    .button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+      outline: 3px solid #c38249;
+      outline-offset: 3px;
+    }
+
+    /* Header */
+    .site-header { border-bottom: 1px solid var(--line); position: relative; z-index: 5; background: var(--paper); }
+    .header-inner { height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; flex-shrink: 0; }
+    .brand-mark { width: 37px; height: 37px; color: var(--rust); }
+    .brand-name { font: 700 29px/1 var(--serif); letter-spacing: -.055em; }
+    .brand-tag { display: block; margin-top: 3px; font: 500 8px/1 var(--mono); letter-spacing: .13em; color: var(--muted); }
+    .nav-links { display: flex; align-items: center; gap: 39px; margin-left: auto; }
+    .nav-links a { color: #484b41; font-size: 13px; font-weight: 700; transition: color .2s; }
+    .nav-links a:hover { color: var(--rust); }
+    .header-cta {
+      border: 1px solid var(--ink);
+      background: transparent;
+      padding: 11px 17px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      transition: background .2s, color .2s;
+    }
+    .header-cta:hover { background: var(--ink); color: white; }
+    .header-cta span { font-size: 18px; line-height: 10px; font-weight: 400; }
+    .menu-toggle { display: none; border: 0; background: none; color: var(--ink); padding: 8px; }
+
+    /* Hero */
+    .hero { overflow: hidden; }
+    .hero-grid {
+      min-height: 678px;
+      display: grid;
+      grid-template-columns: 48% 52%;
+      align-items: center;
+      gap: 0;
+      padding: 48px 0 66px;
+    }
+    .hero-content { position: relative; z-index: 2; padding: 12px 0 0 3px; }
+    .hero-kicker { display: flex; align-items: center; gap: 11px; color: var(--rust); margin-bottom: 25px; }
+    .hero-kicker::before { content: ""; width: 24px; height: 1px; background: currentColor; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 600px;
+      font: 500 clamp(58px, 5.3vw, 78px)/1.075 var(--serif);
+      letter-spacing: -.065em;
+      margin-bottom: 24px;
+    }
+    h1 em { color: var(--rust); font-weight: 400; }
+    .hero-description { max-width: 485px; color: #55594d; font-size: 17px; line-height: 1.75; margin-bottom: 31px; }
+    .hero-actions { display: flex; align-items: center; gap: 25px; }
+    .text-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--ink); padding-bottom: 3px; }
+    .text-link:hover { color: var(--rust); border-color: var(--rust); }
+    .hero-footnote { display: flex; align-items: center; gap: 10px; margin-top: 48px; font: 11px/1.5 var(--mono); color: #77796d; }
+    .hero-footnote svg { width: 17px; height: 17px; color: var(--rust); flex: none; }
+
+    .hero-art { height: 560px; position: relative; margin-left: 5px; }
+    .art-backdrop {
+      position: absolute;
+      inset: 19px -36px 11px 50px;
+      background: #e9e4d5;
+      border-radius: 46% 43% 45% 48%;
+      transform: rotate(-8deg);
+    }
+    .art-backdrop::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 1px dashed #d2c8af;
+      border-radius: inherit;
+    }
+    .art-stamp {
+      position: absolute;
+      right: -23px;
+      top: 3px;
+      width: 115px;
+      height: 115px;
+      border: 2px solid #b37b5c;
+      border-radius: 50%;
+      color: #a46245;
+      transform: rotate(14deg);
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font: 500 10px/1.35 var(--mono);
+      letter-spacing: .11em;
+      background: #f5ecda;
+      box-shadow: inset 0 0 0 5px #f5ecda, inset 0 0 0 6px #b37b5c;
+    }
+    .art-stamp strong { font: 500 29px/1 var(--serif); letter-spacing: -.04em; display: block; margin: 2px 0; }
+    .workspace {
+      position: absolute;
+      width: 560px;
+      height: 414px;
+      top: 75px;
+      left: 45px;
+      background: #fffdf7;
+      border: 1px solid #c5c5b7;
+      border-radius: 9px;
+      box-shadow: 12px 15px 0 #d2cbbb, 16px 19px 0 rgba(70,61,44,.12);
+      transform: rotate(-2.5deg);
+      overflow: hidden;
+      display: flex;
+    }
+    .workspace-sidebar {
+      width: 145px;
+      flex: none;
+      background: #e8ede3;
+      border-right: 1px solid #d4d9cc;
+      padding: 20px 15px;
+    }
+    .ws-logo { display: flex; align-items: center; gap: 7px; font: 700 16px var(--serif); margin-bottom: 36px; }
+    .ws-logo svg { width: 18px; height: 18px; color: var(--rust); }
+    .ws-side-label { font: 500 8px var(--mono); color: #899083; letter-spacing: .1em; margin-bottom: 14px; }
+    .ws-nav { display: flex; align-items: center; gap: 9px; padding: 10px 8px; font-size: 10px; color: #687063; white-space: nowrap; }
+    .ws-nav svg { width: 13px; height: 13px; }
+    .ws-nav.active { background: #fffdf7; color: var(--ink); border-radius: 4px; font-weight: 700; box-shadow: 0 1px 2px #cbd1c6; }
+    .ws-bottom { position: absolute; bottom: 19px; left: 17px; display: flex; align-items: center; gap: 7px; color: #697165; font-size: 9px; }
+    .ws-avatar { width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; background: #d4aa85; color: #593b2b; font-weight: 700; font-size: 8px; }
+    .workspace-main { flex: 1; min-width: 0; }
+    .ws-toolbar { height: 47px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ecebe2; font-size: 9px; color: #929388; }
+    .ws-toolbar-right { display: flex; gap: 10px; align-items: center; }
+    .ws-toolbar-right span:first-child { width: 12px; height: 12px; border: 1px solid #aaa; border-radius: 50%; position: relative; }
+    .ws-toolbar-right span:first-child::after { content: ""; position: absolute; width: 5px; height: 1px; background: #aaa; right: -4px; bottom: -2px; transform: rotate(45deg); }
+    .ws-body { padding: 20px 22px; }
+    .ws-overline { color: var(--rust); font: 500 8px var(--mono); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 5px; }
+    .ws-title { font: 600 21px/1.2 var(--serif); letter-spacing: -.03em; margin-bottom: 4px; }
+    .ws-subtitle { color: #8a8d80; font-size: 9px; margin-bottom: 18px; }
+    .product-card { display: grid; grid-template-columns: 137px 1fr; gap: 17px; padding: 11px; border: 1px solid #e5e2d6; border-radius: 5px; background: #fffefa; }
+    .product-image {
+      height: 127px;
+      border-radius: 3px;
+      background: #e5e9df;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-image::before, .product-image::after { content: ""; position: absolute; width: 175px; height: 1px; background: #d1d9cc; transform: rotate(-38deg); }
+    .product-image::before { top: 20px; }
+    .product-image::after { bottom: 19px; }
+    .widget-svg { width: 104px; height: 104px; position: relative; z-index: 1; filter: drop-shadow(4px 7px 3px rgba(40,50,40,.18)); }
+    .product-info { padding: 4px 0; }
+    .product-label { font: 500 8px var(--mono); color: #9a9b8d; margin-bottom: 6px; }
+    .product-name { font: 600 16px var(--serif); margin-bottom: 5px; }
+    .product-spec { font-size: 9px; color: #777b70; margin-bottom: 14px; }
+    .product-row { display: flex; justify-content: space-between; font-size: 9px; padding: 6px 0; border-top: 1px solid #eeece4; }
+    .product-row span { color: #85887c; }
+    .product-row strong { font-weight: 600; }
+    .ws-order-head { display: flex; justify-content: space-between; margin: 18px 0 11px; font: 600 10px var(--sans); }
+    .ws-order-head span { color: #9a9d90; font: 9px var(--sans); }
+    .progress-track { height: 5px; border-radius: 9px; background: #e6e9df; position: relative; margin: 0 5px 12px; }
+    .progress-track::before { content: ""; display: block; width: 68%; height: 100%; background: #9caf8d; border-radius: 9px; }
+    .progress-track i { position: absolute; top: -4px; width: 13px; height: 13px; border-radius: 50%; background: #9caf8d; border: 3px solid #fffdf7; box-shadow: 0 0 0 1px #9caf8d; }
+    .progress-track i:nth-child(1) { left: 0; } .progress-track i:nth-child(2) { left: 32%; } .progress-track i:nth-child(3) { left: 65%; } .progress-track i:nth-child(4) { right: 0; background: #fffdf7; box-shadow: 0 0 0 1px #c9cec2; }
+    .progress-labels { display: flex; justify-content: space-between; color: #868b7d; font: 8px var(--sans); }
+    .progress-labels strong { color: #526d4c; font-weight: 700; }
+    .note-card {
+      position: absolute;
+      z-index: 3;
+      left: -8px;
+      bottom: 10px;
+      width: 209px;
+      padding: 19px 20px 18px;
+      background: #edce85;
+      color: #4b4432;
+      transform: rotate(6deg);
+      box-shadow: 5px 7px 12px rgba(74,62,39,.17);
+    }
+    .note-card::before { content: ""; position: absolute; top: -8px; left: 84px; width: 52px; height: 18px; background: rgba(234,228,207,.83); transform: rotate(-5deg); }
+    .note-card small { display: block; font: 500 9px var(--mono); letter-spacing: .08em; margin-bottom: 8px; }
+    .note-card p { font: 500 18px/1.15 var(--serif); letter-spacing: -.02em; margin: 0; }
+
+    /* Bridge strip */
+    .bridge { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #eeeadd; }
+    .bridge-inner { min-height: 90px; display: flex; align-items: center; justify-content: space-between; gap: 25px; }
+    .bridge-intro { font: 500 12px var(--mono); color: #77776a; max-width: 185px; line-height: 1.6; }
+    .bridge-item { display: flex; align-items: center; gap: 12px; font: 600 13px var(--sans); white-space: nowrap; }
+    .bridge-item svg { width: 23px; height: 23px; stroke: var(--rust); }
+    .bridge-divider { height: 26px; width: 1px; background: #d5d0bf; }
+
+    /* Features */
+    .features { padding: 119px 0 122px; }
+    .section-top { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-bottom: 43px; }
+    .section-kicker { color: var(--rust); margin-bottom: 17px; }
+    .section-title { font: 500 clamp(42px, 4vw, 57px)/1.11 var(--serif); letter-spacing: -.055em; max-width: 680px; margin: 0; }
+    .section-top > p { max-width: 320px; color: var(--muted); font-size: 14px; line-height: 1.75; margin: 0 0 5px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .feature-card {
+      min-height: 398px;
+      background: var(--cream);
+      border: 1px solid #dcd9cd;
+      padding: 30px;
+      border-radius: 5px;
+      box-shadow: 4px 5px 0 #ebe5d6;
+      display: flex;
+      flex-direction: column;
+    }
+    .feature-art { height: 177px; display: grid; place-items: center; position: relative; overflow: hidden; border-radius: 3px; margin-bottom: 27px; }
+    .feature-card:nth-child(1) .feature-art { background: #e9e5d7; }
+    .feature-card:nth-child(2) .feature-art { background: #e3e9df; }
+    .feature-card:nth-child(3) .feature-art { background: #f2e5d9; }
+    .feature-number { color: var(--rust); margin-bottom: 11px; }
+    .feature-card h3 { font: 600 25px/1.2 var(--serif); letter-spacing: -.035em; margin-bottom: 10px; }
+    .feature-card > p { color: var(--muted); font-size: 13px; line-height: 1.75; margin: 0; max-width: 330px; }
+    .spec-paper { width: 188px; height: 137px; padding: 16px 18px; background: #fffdf6; border: 1px solid #c9c3b2; box-shadow: 5px 6px 0 #d4cebd; transform: rotate(-6deg); }
+    .spec-paper .tiny { font: 8px var(--mono); letter-spacing: .09em; color: #8d8d7d; }
+    .spec-paper .rule { height: 1px; background: #dedbd0; margin: 11px 0; }
+    .spec-paper .spec-line { display: flex; justify-content: space-between; margin: 8px 0; font-size: 9px; }
+    .spec-paper .spec-line b { color: var(--rust); }
+    .spec-seal { position: absolute; width: 71px; height: 71px; background: #cf936c; border: 3px double #fff8e9; border-radius: 50%; right: 61px; bottom: 8px; display: grid; place-items: center; color: white; transform: rotate(14deg); font: 600 9px var(--mono); letter-spacing: .04em; text-align: center; }
+    .order-stack { position: relative; width: 220px; height: 115px; }
+    .order-sheet { position: absolute; width: 190px; height: 93px; border: 1px solid #c4ccbd; background: #fffdf6; border-radius: 3px; padding: 14px; box-shadow: 3px 4px 0 #d5dbd0; }
+    .order-sheet.back { top: -7px; right: 0; transform: rotate(8deg); }
+    .order-sheet.front { bottom: 0; left: 0; transform: rotate(-5deg); }
+    .order-sheet .tiny { font: 8px var(--mono); color: #898e80; }
+    .order-sheet .bar { height: 6px; width: 80%; background: #e3e8db; margin-top: 12px; border-radius: 2px; }
+    .order-sheet .bar.short { width: 48%; margin-top: 7px; }
+    .order-check { position: absolute; right: -11px; bottom: -10px; width: 52px; height: 52px; display: grid; place-items: center; background: #718b6d; color: white; border-radius: 50%; border: 4px solid #e3e9df; font-size: 26px; }
+    .route { position: relative; width: 242px; height: 112px; border: 2px dashed #bd9d87; border-radius: 50%; transform: rotate(-11deg); }
+    .route-point { position: absolute; width: 42px; height: 42px; background: #fffdf6; border: 1px solid #bbab9c; border-radius: 50%; display: grid; place-items: center; box-shadow: 2px 3px 0 #d9c9bb; transform: rotate(11deg); }
+    .route-point svg { width: 19px; height: 19px; stroke: var(--rust); }
+    .route-point.one { left: -15px; top: 32px; }
+    .route-point.two { left: 100px; top: -22px; }
+    .route-point.three { right: -16px; bottom: 13px; }
+    .route-tag { position: absolute; bottom: 16px; left: 96px; font: 600 9px var(--mono); color: #9f6347; transform: rotate(11deg); }
+
+    /* How it works */
+    .process { background: var(--olive); color: #f8f5e9; padding: 103px 0 109px; position: relative; overflow: hidden; }
+    .process::before {
+      content: ""; position: absolute; width: 600px; height: 600px; border: 1px solid rgba(243,238,218,.11); border-radius: 50%; right: -180px; top: -235px;
+      box-shadow: 0 0 0 55px rgba(243,238,218,.025), 0 0 0 110px rgba(243,238,218,.02);
+    }
+    .process .container { position: relative; }
+    .process-head { display: flex; justify-content: space-between; align-items: end; gap: 50px; margin-bottom: 62px; }
+    .process .section-kicker { color: #dfb880; }
+    .process .section-title { max-width: 650px; }
+    .process-head p { max-width: 320px; color: #cbd2c4; line-height: 1.75; font-size: 14px; margin: 0 0 5px; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
+    .step { border-top: 1px solid #788478; padding-top: 23px; position: relative; }
+    .step::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--gold); position: absolute; top: -5px; left: 0; }
+    .step-num { color: #dfbd86; margin-bottom: 27px; }
+    .step h3 { font: 500 30px/1.15 var(--serif); letter-spacing: -.035em; margin-bottom: 13px; }
+    .step p { color: #cbd2c4; max-width: 290px; line-height: 1.75; font-size: 13px; margin: 0; }
+
+    /* Final CTA */
+    .final-cta { padding: 112px 0; }
+    .cta-panel { position: relative; overflow: hidden; background: #eedfc8; border: 1px solid #dfceb5; border-radius: 6px; min-height: 340px; display: flex; align-items: center; padding: 60px 76px; box-shadow: 6px 7px 0 #e8e0d1; }
+    .cta-panel::before, .cta-panel::after { content: ""; position: absolute; border: 1px solid #d8bea0; border-radius: 50%; width: 410px; height: 410px; right: 80px; top: -210px; }
+    .cta-panel::after { width: 310px; height: 310px; right: 129px; top: -160px; }
+    .cta-copy { position: relative; z-index: 1; max-width: 675px; }
+    .cta-copy .eyebrow { color: var(--rust); margin-bottom: 16px; }
+    .cta-copy h2 { font: 500 53px/1.12 var(--serif); letter-spacing: -.055em; margin-bottom: 16px; }
+    .cta-copy p { font-size: 15px; line-height: 1.7; color: #625d50; margin: 0; }
+    .cta-panel .button { position: relative; z-index: 1; margin-left: auto; white-space: nowrap; }
+    footer { border-top: 1px solid var(--line); padding: 36px 0 43px; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 25px; }
+    .footer-left { display: flex; align-items: center; gap: 24px; }
+    .footer-left .brand-mark { width: 26px; height: 26px; }
+    .footer-left .brand-name { font-size: 22px; }
+    .footer-left .brand-tag { display: none; }
+    .footer-note, .footer-links { color: #77796c; font-size: 11px; }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a:hover { color: var(--rust); }
+
+    /* Demo dialog */
+    .modal { border: 0; padding: 0; width: min(490px, calc(100% - 32px)); max-height: calc(100% - 32px); border-radius: 7px; background: var(--cream); color: var(--ink); box-shadow: 12px 14px 0 rgba(31,37,29,.25); }
+    .modal::backdrop { background: rgba(31,39,30,.63); }
+    .modal-inner { padding: 39px; }
+    .modal-close { position: absolute; right: 20px; top: 16px; border: 0; background: transparent; color: var(--ink); font-size: 27px; line-height: 1; }
+    .modal .eyebrow { color: var(--rust); margin-bottom: 13px; }
+    .modal h2 { font: 500 39px/1.1 var(--serif); letter-spacing: -.05em; margin-bottom: 12px; }
+    .modal-intro { color: var(--muted); font-size: 13px; line-height: 1.65; margin-bottom: 25px; }
+    .demo-form { display: grid; gap: 15px; }
+    .demo-form label { display: grid; gap: 6px; font-size: 12px; font-weight: 700; }
+    .demo-form input, .demo-form select { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #c8c8ba; border-radius: 3px; background: white; color: var(--ink); font-size: 13px; }
+    .demo-form .button { margin-top: 7px; width: 100%; }
+    .form-note { margin: 3px 0 0; color: #77796c; font-size: 11px; line-height: 1.5; }
+    @media (max-width: 1100px) {
+      .container { width: min(100% - 56px, 1240px); }
+      .hero-grid { grid-template-columns: 48% 52%; }
+      h1 { font-size: 61px; }
+      .hero-art { transform: scale(.82); transform-origin: left center; width: 620px; }
+      .bridge-intro { display: none; }
+      .cta-panel { padding: 55px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 36px, 550px); }
+      .header-inner { height: 69px; }
+      .brand-mark { width: 32px; height: 32px; }
+      .brand-name { font-size: 25px; }
+      .menu-toggle { display: block; margin-left: auto; }
+      .nav-links { display: none; position: absolute; top: 69px; left: 0; right: 0; margin: 0; padding: 18px; flex-direction: column; align-items: stretch; gap: 0; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 12px 18px rgba(0,0,0,.07); }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 13px 8px; }
+      .header-cta { display: none; }
+      .hero-grid { display: block; min-height: 0; padding: 75px 0 65px; }
+      .hero-content { padding: 0; }
+      h1 { font-size: clamp(48px, 12vw, 67px); }
+      .hero-description { font-size: 15px; }
+      .hero-footnote { margin-top: 29px; }
+      .hero-art { width: 620px; height: 460px; margin: 30px 0 -25px; transform: scale(.72); transform-origin: left top; }
+      .bridge-inner { flex-wrap: wrap; justify-content: center; gap: 17px 24px; padding: 22px 0; }
+      .bridge-item { font-size: 11px; }
+      .bridge-item svg { width: 19px; height: 19px; }
+      .bridge-divider { display: none; }
+      .features, .final-cta { padding: 80px 0; }
+      .section-top, .process-head { display: block; }
+      .section-title { font-size: clamp(39px, 9vw, 52px); }
+      .section-top > p, .process-head p { margin-top: 17px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 0; }
+      .process { padding: 80px 0; }
+      .process-head { margin-bottom: 45px; }
+      .steps { grid-template-columns: 1fr; gap: 38px; }
+      .step-num { margin-bottom: 15px; }
+      .cta-panel { display: block; min-height: 0; padding: 43px 28px; }
+      .cta-copy h2 { font-size: 42px; }
+      .cta-panel .button { margin: 28px 0 0; }
+      .footer-inner, .footer-left { align-items: flex-start; flex-direction: column; gap: 16px; }
+      .footer-links { flex-wrap: wrap; gap: 16px; }
+    }
+    @media (max-width: 420px) {
+      .hero-actions { gap: 17px; }
+      .hero-actions .button { padding: 0 14px; gap: 7px; }
+      .text-link { font-size: 12px; }
+      .hero-art { transform: scale(.57); height: 350px; }
+      .bridge-inner { justify-content: flex-start; }
+      .modal-inner { padding: 30px 23px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M20 2.5 35.2 11v18L20 37.5 4.8 29V11L20 2.5Z" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M20 9.5 29.2 14.8v10.4L20 30.5l-9.2-5.3V14.8L20 9.5Z" stroke="currentColor" stroke-width="2.2"/>
+          <circle cx="20" cy="20" r="3.5" fill="currentColor"/>
+        </svg>
+        <span><span class="brand-name">acme.</span><span class="brand-tag">THE WIDGET WORKSPACE</span></span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Main navigation">
+        <a href="#platform">The platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#why-acme">Why Acme</a>
+      </nav>
+      <button class="header-cta" type="button" data-demo>Book a demo <span aria-hidden="true">↗</span></button>
+      <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <div class="hero-kicker eyebrow">Made for the makers behind the scenes</div>
+          <h1 id="hero-title">Custom widgets.<br><em>Clear as day.</em></h1>
+          <p class="hero-description">From the first specification to the final delivery, Acme keeps every custom widget order in one tidy place. Less chasing. More making things happen.</p>
+          <div class="hero-actions">
+            <button class="button" type="button" data-demo>Book a demo
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5"/></svg>
+            </button>
+            <a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="hero-footnote">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m10 2 2.2 5.8L18 10l-5.8 2.2L10 18l-2.2-5.8L2 10l5.8-2.2L10 2Z"/></svg>
+            A little more order for your whole operation.
+          </div>
+        </div>
+        <div class="hero-art" aria-label="Illustration of the Acme widget ordering workspace">
+          <div class="art-backdrop"></div>
+          <div class="art-stamp" aria-hidden="true"><div>BUILT TO<br><strong>fit.</strong><br>MADE TO LAST</div></div>
+          <div class="workspace">
+            <aside class="workspace-sidebar" aria-hidden="true">
+              <div class="ws-logo">
+                <svg viewBox="0 0 40 40" fill="none"><path d="M20 3 35 11.5v17L20 37 5 28.5v-17L20 3Z" stroke="currentColor" stroke-width="3"/><circle cx="20" cy="20" r="6" stroke="currentColor" stroke-width="3"/></svg>
+                acme.
+              </div>
+              <div class="ws-side-label">WORKSPACE</div>
+              <div class="ws-nav active"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg> Overview</div>
+              <div class="ws-nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M3 2h8l2 2v10H3V2Zm2 4h6M5 9h6"/></svg> My widgets</div>
+              <div class="ws-nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M2 5h12v9H2V5Zm2-3h8v3M5 8h6"/></svg> Orders</div>
+              <div class="ws-nav"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M2 11h8V4H2v7Zm8-4h3l2 2v2h-5V7ZM5 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm7 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg> Deliveries</div>
+              <div class="ws-bottom"><span class="ws-avatar">JD</span> Your workspace</div>
+            </aside>
+            <div class="workspace-main" aria-hidden="true">
+              <div class="ws-toolbar"><span>Operations / Overview</span><div class="ws-toolbar-right"><span></span><span>J. Davis &nbsp;⌄</span></div></div>
+              <div class="ws-body">
+                <div class="ws-overline">Wednesday's good news</div>
+                <div class="ws-title">Everything's taking shape.</div>
+                <div class="ws-subtitle">Here's the latest on your custom widgets.</div>
+                <div class="product-card">
+                  <div class="product-image">
+                    <svg class="widget-svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                      <path d="m60 12 38 22v43L60 99 22 77V34L60 12Z" fill="#82917b" stroke="#4f6252" stroke-width="2"/>
+                      <path d="m60 18 32 19v37L60 93 28 74V37l32-19Z" fill="#aebba3" stroke="#61735f" stroke-width="2"/>
+                      <path d="m60 27 24 14v28L60 83 36 69V41l24-14Z" fill="#647c68"/>
+                      <circle cx="60" cy="55" r="17" fill="#d7ddd0" stroke="#526951" stroke-width="4"/>
+                      <circle cx="60" cy="55" r="8" fill="#718874" stroke="#526951" stroke-width="2"/>
+                      <path d="M28 37 22 34m70 3 6-3M60 93v6" stroke="#405648" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div class="product-info">
+                    <div class="product-label">YOUR WIDGET · #AW-2048</div>
+                    <div class="product-name">Precision Hex Mount</div>
+                    <div class="product-spec">Configured for the way you work.</div>
+                    <div class="product-row"><span>Material</span><strong>Brushed alloy</strong></div>
+                    <div class="product-row"><span>Finish</span><strong>Sage coating</strong></div>
+                    <div class="product-row"><span>Quantity</span><strong>240 units</strong></div>
+                  </div>
+                </div>
+                <div class="ws-order-head">Order progress <span>View details ↗</span></div>
+                <div class="progress-track"><i></i><i></i><i></i><i></i></div>
+                <div class="progress-labels"><span>Configured</span><span>Approved</span><strong>In production</strong><span>Delivered</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="note-card" aria-hidden="true"><small>GOOD TO KNOW / 01</small><p>Every detail, right where you left it.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="bridge" id="why-acme">
+      <div class="container bridge-inner">
+        <span class="bridge-intro">The whole journey,<br>thoughtfully connected.</span>
+        <div class="bridge-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7l9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg> Configure with confidence</div>
+        <span class="bridge-divider"></span>
+        <div class="bridge-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" aria-hidden="true"><path d="M5 3h14v18H5V3Zm3 5h8M8 12h8M8 16h5"/></svg> Order without the back-and-forth</div>
+        <span class="bridge-divider"></span>
+        <div class="bridge-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" aria-hidden="true"><path d="M3 17h13V7H3v10Zm13-7h3l2 3v4h-5v-7Z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg> Know what's coming next</div>
+      </div>
+    </div>
+
+    <section class="features" id="platform" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow section-kicker">One home for the moving parts</div>
+            <h2 class="section-title" id="features-title">Good work starts with<br>everyone on the same page.</h2>
+          </div>
+          <p>Specifications, approvals, orders, updates: bring the details together so your team can get back to doing its best work.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-art" aria-hidden="true">
+              <div class="spec-paper">
+                <div class="tiny">WIDGET SPECIFICATION / 001</div>
+                <div class="rule"></div>
+                <div class="spec-line"><span>Dimensions</span><b>Made to fit ✓</b></div>
+                <div class="spec-line"><span>Material</span><b>Selected ✓</b></div>
+                <div class="spec-line"><span>Finish</span><b>Selected ✓</b></div>
+              </div>
+              <div class="spec-seal">JUST<br>RIGHT</div>
+            </div>
+            <div class="eyebrow feature-number">01 / Configure</div>
+            <h3>Get every detail right.</h3>
+            <p>Build custom widget specs in a shared workspace, where the right choices are easy to make and easy to find later.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-art" aria-hidden="true">
+              <div class="order-stack">
+                <div class="order-sheet back"><div class="tiny">ORDER DETAILS</div><div class="bar"></div><div class="bar short"></div></div>
+                <div class="order-sheet front"><div class="tiny">READY FOR APPROVAL</div><div class="bar"></div><div class="bar short"></div></div>
+                <div class="order-check">✓</div>
+              </div>
+            </div>
+            <div class="eyebrow feature-number">02 / Order</div>
+            <h3>Keep orders moving.</h3>
+            <p>Turn approved configurations into orders without piecing together old emails, scattered files, or crossed fingers.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-art" aria-hidden="true">
+              <div class="route">
+                <div class="route-point one"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 7h16v12H4V7Zm4-3h8v3M8 11h8"/></svg></div>
+                <div class="route-point two"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="m4 12 5 5L20 6"/></svg></div>
+                <div class="route-point three"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M2 17h14V8H2v9Zm14-6h3l3 3v3h-6v-6Z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></div>
+                <span class="route-tag">ON ITS WAY →</span>
+              </div>
+            </div>
+            <div class="eyebrow feature-number">03 / Track</div>
+            <h3>Stay a step ahead.</h3>
+            <p>See where each order stands across your supply chain, so you can plan the next move before anyone has to ask.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="process" id="how-it-works" aria-labelledby="process-title">
+      <div class="container">
+        <div class="process-head">
+          <div>
+            <div class="eyebrow section-kicker">How Acme works</div>
+            <h2 class="section-title" id="process-title">A straighter path from<br>“what if” to “here it is.”</h2>
+          </div>
+          <p>Complex supply chains don't need complicated tools. Acme gives your operations team a clear path through every widget order.</p>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="eyebrow step-num">STEP 01 — MAKE IT YOURS</div>
+            <h3>Set the spec.</h3>
+            <p>Bring requirements together and configure the widget your operation actually needs.</p>
+          </div>
+          <div class="step">
+            <div class="eyebrow step-num">STEP 02 — GIVE IT THE GO-AHEAD</div>
+            <h3>Place the order.</h3>
+            <p>Review the details, get aligned with your team, and send it on its way.</p>
+          </div>
+          <div class="step">
+            <div class="eyebrow step-num">STEP 03 — STAY IN THE KNOW</div>
+            <h3>Follow it through.</h3>
+            <p>Keep tabs on progress and delivery from the same place you started.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-panel">
+          <div class="cta-copy">
+            <div class="eyebrow">Let's make something work better</div>
+            <h2 id="cta-title">See what a little clarity can do.</h2>
+            <p>Tell us about your widget workflow. We'll show you how Acme fits into it.</p>
+          </div>
+          <button class="button" type="button" data-demo>Book your demo
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <a class="brand" href="#" aria-label="Acme home">
+          <svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 2.5 35.2 11v18L20 37.5 4.8 29V11L20 2.5Z" stroke="currentColor" stroke-width="2.2"/><path d="M20 9.5 29.2 14.8v10.4L20 30.5l-9.2-5.3V14.8L20 9.5Z" stroke="currentColor" stroke-width="2.2"/><circle cx="20" cy="20" r="3.5" fill="currentColor"/></svg>
+          <span class="brand-name">acme.</span>
+        </a>
+        <span class="footer-note">A better way to get widgets made.</span>
+      </div>
+      <div class="footer-links"><a href="#platform">Platform</a><a href="#how-it-works">How it works</a><a href="mailto:hello@acme.com">Get in touch</a></div>
+    </div>
+  </footer>
+
+  <dialog class="modal" id="demo-modal" aria-labelledby="modal-title">
+    <div class="modal-inner">
+      <button class="modal-close" type="button" aria-label="Close dialog">×</button>
+      <div class="eyebrow">A good place to start</div>
+      <h2 id="modal-title">Let's talk widgets.</h2>
+      <p class="modal-intro">Share a few details and we'll prepare an email to our team to get your demo conversation started.</p>
+      <form class="demo-form" id="demo-form">
+        <label>Your name<input name="name" type="text" autocomplete="name" required placeholder="Your name"></label>
+        <label>Work email<input name="email" type="email" autocomplete="email" required placeholder="you@company.com"></label>
+        <label>Company<input name="company" type="text" autocomplete="organization" required placeholder="Your company"></label>
+        <label>What are you looking to improve?
+          <select name="interest" required>
+            <option value="" disabled selected>Choose one</option>
+            <option>Configuring custom widgets</option>
+            <option>Ordering and approvals</option>
+            <option>Tracking orders and deliveries</option>
+            <option>A bit of everything</option>
+          </select>
+        </label>
+        <button class="button" type="submit">Prepare demo request <span aria-hidden="true">↗</span></button>
+        <p class="form-note">This opens your email app with your request ready to send. No information is submitted from this page.</p>
+      </form>
+    </div>
+  </dialog>
+
+  <script>
+    const modal = document.getElementById('demo-modal');
+    document.querySelectorAll('[data-demo]').forEach(button => {
+      button.addEventListener('click', () => modal.showModal());
+    });
+    document.querySelector('.modal-close').addEventListener('click', () => modal.close());
+    modal.addEventListener('click', event => {
+      if (event.target === modal) modal.close();
+    });
+
+    document.getElementById('demo-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      const subject = 'Acme demo request — ' + data.get('company');
+      const body = `Hello Acme team,\n\nI'd like to learn more about Acme and book a demo.\n\nName: ${data.get('name')}\nWork email: ${data.get('email')}\nCompany: ${data.get('company')}\nInterested in: ${data.get('interest')}\n\nThanks!`;
+      window.location.href = `mailto:hello@acme.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+    menuToggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      menuToggle.setAttribute('aria-expanded', String(open));
+    });
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }));
+  </script>
+</body>
+</html>

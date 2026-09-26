@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="Configure, order, and track custom widgets in one place. Acme helps manufacturing operations teams keep every order moving.">
+  <title>Acme — Custom widgets, without the chaos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #20251f;
+      --muted: #626960;
+      --paper: #f6f5ef;
+      --white: #fffefa;
+      --lime: #d9fa69;
+      --violet: #aeb2ff;
+      --peach: #ffba99;
+      --line: #d9dcd2;
+      --font-display: "Space Grotesk", sans-serif;
+      --font-body: "DM Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--lime); color: var(--ink); }
+
+    .container { width: min(100% - 112px, 1328px); margin-inline: auto; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font: 700 12px/1.2 var(--font-display);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow-dot { width: 9px; height: 9px; border-radius: 50%; background: #a8de31; box-shadow: 0 0 0 4px #a8de312e; }
+    .arrow { display: inline-block; transition: transform .22s ease; }
+    a:hover .arrow, button:hover .arrow { transform: translate(3px, -3px); }
+
+    /* Header */
+    .utility {
+      height: 32px;
+      background: var(--ink);
+      color: #e9eee1;
+      font: 600 10px var(--font-display);
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .utility .container { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .utility-right { display: flex; align-items: center; gap: 12px; }
+    .utility-right i { width: 5px; height: 5px; background: var(--lime); border-radius: 50%; }
+
+    .site-header { position: relative; z-index: 20; border-bottom: 1px solid var(--line); background: var(--paper); }
+    .nav { height: 83px; display: flex; align-items: center; justify-content: space-between; gap: 36px; }
+    .logo { display: inline-flex; align-items: center; gap: 12px; font: 700 29px/1 var(--font-display); letter-spacing: -.075em; }
+    .logo-symbol { width: 34px; height: 34px; position: relative; display: inline-block; flex: none; }
+    .logo-symbol span { position: absolute; width: 15px; height: 15px; background: var(--ink); }
+    .logo-symbol span:nth-child(1) { left: 0; top: 0; }
+    .logo-symbol span:nth-child(2) { right: 0; top: 0; background: #8f94ed; }
+    .logo-symbol span:nth-child(3) { left: 0; bottom: 0; background: #b8e647; }
+    .logo-symbol span:nth-child(4) { right: 0; bottom: 0; }
+    .nav-links { display: flex; align-items: center; gap: 38px; margin-left: auto; }
+    .nav-links a { font-size: 14px; font-weight: 700; transition: color .2s; }
+    .nav-links a:hover { color: #7277d5; }
+    .nav-cta {
+      display: inline-flex; align-items: center; justify-content: space-between; gap: 36px;
+      background: var(--ink); color: white; padding: 15px 17px 15px 21px;
+      min-width: 170px; font: 700 13px var(--font-display);
+      transition: background .2s, transform .2s;
+    }
+    .nav-cta:hover { background: #454a40; transform: translateY(-2px); }
+    .menu-toggle { display: none; border: 0; background: transparent; padding: 10px; cursor: pointer; }
+
+    /* Hero */
+    .hero { position: relative; overflow: hidden; }
+    .hero::before {
+      content: ""; position: absolute; inset: 0 0 auto auto; width: 48%; height: 100%;
+      background-image: radial-gradient(#aeb4a6 1px, transparent 1px);
+      background-size: 24px 24px; opacity: .22; pointer-events: none;
+      mask-image: linear-gradient(to left, black, transparent);
+    }
+    .hero-inner {
+      min-height: 666px;
+      display: grid; grid-template-columns: 51% 49%; align-items: center;
+      position: relative;
+    }
+    .hero-copy { position: relative; z-index: 3; padding: 72px 0 79px; }
+    .hero-copy .eyebrow { margin-bottom: 25px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: var(--font-display); }
+    h1 {
+      font-size: clamp(66px, 6.05vw, 89px);
+      line-height: .99; letter-spacing: -.079em;
+      font-weight: 700; margin-bottom: 30px;
+    }
+    h1 .line { display: block; white-space: nowrap; }
+    .highlight { position: relative; white-space: nowrap; z-index: 0; }
+    .highlight::after {
+      content: ""; position: absolute; left: 0; right: -2%; bottom: .045em; height: .17em;
+      background: var(--lime); z-index: -1; transform: rotate(-1.5deg);
+    }
+    .hero-sub {
+      font-size: 18px; line-height: 1.65; color: #535a51; max-width: 495px; margin-bottom: 31px;
+    }
+    .hero-actions { display: flex; align-items: center; gap: 28px; }
+    .primary-button {
+      display: inline-flex; justify-content: space-between; align-items: center; gap: 44px;
+      background: var(--lime); border: 1.5px solid var(--ink); color: var(--ink);
+      min-height: 58px; padding: 0 18px 0 23px;
+      box-shadow: 5px 5px 0 var(--ink);
+      font: 700 15px var(--font-display); cursor: pointer;
+      transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .primary-button:hover { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); background: #e6ff91; }
+    .text-link { display: inline-flex; align-items: center; gap: 9px; font: 700 14px var(--font-display); border-bottom: 1px solid var(--ink); padding-bottom: 4px; }
+    .hero-note { margin: 28px 0 0; color: #7b8178; font-size: 12px; }
+    .hero-note span { color: #81a623; font-weight: 700; }
+
+    /* Product illustration */
+    .hero-art { height: 580px; position: relative; margin-right: -25px; }
+    .art-orbit {
+      position: absolute; width: 502px; height: 502px; border: 1px solid #c7ccbc;
+      border-radius: 50%; top: 20px; right: 17px;
+    }
+    .art-orbit::after { content: ""; position: absolute; inset: 42px; border: 1px solid #dbe0d2; border-radius: 50%; }
+    .art-lime { position: absolute; width: 132px; height: 132px; border-radius: 50%; background: var(--lime); right: -33px; top: 5px; }
+    .art-peach { position: absolute; width: 74px; height: 74px; border-radius: 50%; background: var(--peach); bottom: 12px; left: 4px; }
+    .art-cross {
+      position: absolute; top: 26px; left: 49px; color: #8488e9; font: 400 56px/1 var(--font-display);
+      animation: turn 14s linear infinite;
+    }
+    .back-plate {
+      position: absolute; width: 566px; height: 420px; right: 1px; top: 91px;
+      background: var(--violet); border: 1.5px solid var(--ink); transform: rotate(4deg);
+    }
+    .dashboard {
+      position: absolute; width: 570px; height: 428px; right: 23px; top: 78px;
+      background: #fffefa; border: 1.5px solid var(--ink);
+      box-shadow: 12px 14px 0 #20251f18;
+      overflow: hidden; transform: rotate(-2deg);
+      animation: float 6s ease-in-out infinite;
+    }
+    .dash-top {
+      height: 44px; border-bottom: 1px solid #dfe2d9;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 17px;
+    }
+    .dash-brand { font: 700 15px var(--font-display); letter-spacing: -.06em; }
+    .dash-brand i { display: inline-block; width: 10px; height: 10px; background: #a6d83c; margin-right: 5px; }
+    .dash-workspace { color: #83897f; font: 600 9px var(--font-display); letter-spacing: .1em; }
+    .dash-avatar { width: 24px; height: 24px; display: grid; place-items: center; background: var(--peach); border-radius: 50%; font: 700 10px var(--font-display); }
+    .dash-body { height: calc(100% - 44px); display: grid; grid-template-columns: 110px 1fr; }
+    .dash-sidebar { background: #f3f4ee; border-right: 1px solid #dfe2d9; padding: 20px 9px; }
+    .side-label { padding-left: 9px; margin-bottom: 16px; color: #939b91; font: 700 8px var(--font-display); letter-spacing: .12em; }
+    .side-item { display: flex; align-items: center; gap: 8px; padding: 9px 7px; font: 600 9px var(--font-display); color: #777e74; }
+    .side-item.active { background: #e1f3ac; color: var(--ink); }
+    .side-icon { width: 12px; height: 12px; border: 1.5px solid currentColor; border-radius: 2px; flex: none; }
+    .side-item:nth-of-type(3) .side-icon { border-radius: 50%; }
+    .dash-main { padding: 20px 21px; min-width: 0; }
+    .dash-heading { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 17px; }
+    .dash-heading small { display: block; color: #989e94; font: 700 8px var(--font-display); letter-spacing: .12em; margin-bottom: 4px; }
+    .dash-heading strong { font: 700 21px var(--font-display); letter-spacing: -.05em; }
+    .dash-heading button { border: 1px solid #d5d9d0; background: white; font: 700 9px var(--font-display); padding: 7px 9px; }
+    .dash-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 13px; }
+    .dash-stat { border: 1px solid #e0e3da; padding: 10px 10px 8px; min-height: 67px; }
+    .dash-stat span { display: block; color: #899087; font: 600 8px var(--font-display); margin-bottom: 4px; }
+    .dash-stat strong { font: 700 18px var(--font-display); }
+    .dash-stat em { color: #5f9e2b; font: 700 8px var(--font-display); font-style: normal; margin-left: 4px; }
+    .dash-product { height: 187px; border: 1px solid #dfe2d9; display: grid; grid-template-columns: 1.15fr 1fr; overflow: hidden; }
+    .product-visual {
+      display: flex; justify-content: center; align-items: center;
+      background-color: #eef0e9;
+      background-image: linear-gradient(#dfe3d9 1px, transparent 1px), linear-gradient(90deg, #dfe3d9 1px, transparent 1px);
+      background-size: 21px 21px;
+    }
+    .product-visual svg { width: 91%; height: 91%; }
+    .product-details { padding: 16px 12px; }
+    .product-details small { color: #8e958a; font: 700 8px var(--font-display); letter-spacing: .1em; }
+    .product-details h4 { font: 700 16px/1.1 var(--font-display); letter-spacing: -.04em; margin: 7px 0 5px; }
+    .product-details p { font-size: 9px; line-height: 1.4; color: #777f73; margin-bottom: 13px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid #e8eae3; font-size: 9px; }
+    .detail-row span { color: #899086; }
+    .detail-row b { font-family: var(--font-display); }
+    .float-card {
+      position: absolute; z-index: 4; right: -16px; bottom: 23px;
+      display: flex; gap: 12px; align-items: center;
+      min-width: 205px; padding: 13px 15px; background: var(--white);
+      border: 1.5px solid var(--ink); box-shadow: 5px 5px 0 var(--ink);
+      animation: float 5s ease-in-out infinite reverse;
+    }
+    .float-icon { width: 33px; height: 33px; background: var(--lime); border-radius: 50%; display: grid; place-items: center; font-size: 17px; }
+    .float-card small { display: block; font: 700 9px var(--font-display); color: #7a8077; letter-spacing: .08em; margin-bottom: 3px; }
+    .float-card strong { font: 700 13px var(--font-display); }
+    .art-caption { position: absolute; left: 35px; bottom: 24px; font: 700 10px var(--font-display); letter-spacing: .11em; color: #898f83; transform: rotate(-90deg); transform-origin: left bottom; }
+
+    /* Ticker */
+    .ticker { overflow: hidden; background: var(--ink); color: var(--lime); height: 67px; display: flex; align-items: center; }
+    .ticker-track { width: max-content; display: flex; align-items: center; animation: ticker 27s linear infinite; }
+    .ticker-group { display: flex; align-items: center; flex: none; }
+    .ticker span { font: 700 20px var(--font-display); letter-spacing: -.035em; white-space: nowrap; margin-right: 27px; }
+    .ticker b { font: 400 25px var(--font-display); color: var(--peach); margin-right: 27px; }
+
+    /* Intro and features */
+    .section-pad { padding: 113px 0 120px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 45px; margin-bottom: 44px; }
+    .section-heading h2 { font-size: clamp(48px, 5vw, 70px); line-height: 1.05; letter-spacing: -.075em; margin: 16px 0 0; max-width: 730px; }
+    .section-heading > p { font-size: 16px; line-height: 1.65; color: var(--muted); max-width: 320px; margin: 0 0 6px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
+    .feature-card { min-height: 460px; border: 1px solid var(--ink); display: flex; flex-direction: column; overflow: hidden; transition: transform .25s, box-shadow .25s; }
+    .feature-card:hover { transform: translateY(-6px); box-shadow: 6px 6px 0 var(--ink); }
+    .feature-card:nth-child(1) { background: #e2e9cf; }
+    .feature-card:nth-child(2) { background: #e2e1ff; }
+    .feature-card:nth-child(3) { background: #f9dfd0; }
+    .card-art { height: 237px; position: relative; overflow: hidden; border-bottom: 1px solid var(--ink); }
+    .card-art::before {
+      content: ""; position: absolute; inset: 0; opacity: .22;
+      background-image: radial-gradient(var(--ink) .8px, transparent .8px); background-size: 17px 17px;
+    }
+    .card-content { padding: 25px 27px 28px; flex: 1; display: flex; flex-direction: column; }
+    .card-number { font: 700 11px var(--font-display); letter-spacing: .1em; }
+    .card-content h3 { font-size: 31px; letter-spacing: -.065em; margin: 20px 0 10px; }
+    .card-content p { color: #51584f; line-height: 1.58; font-size: 14px; margin: 0; max-width: 300px; }
+    .art-spec { position: absolute; width: 240px; height: 160px; top: 38px; left: 50%; transform: translateX(-50%) rotate(-7deg); border: 1.5px solid var(--ink); background: #fbfcf4; box-shadow: 10px 10px 0 #b6d777; padding: 16px; }
+    .mini-top { display: flex; justify-content: space-between; font: 700 10px var(--font-display); border-bottom: 1px solid #dce1d5; padding-bottom: 12px; }
+    .mini-top span:last-child { color: #789d30; }
+    .mini-fields { display: flex; gap: 7px; margin-top: 13px; }
+    .mini-field { width: 33.33%; height: 47px; border: 1px solid #dce1d5; padding: 7px; font: 700 9px var(--font-display); }
+    .mini-field small { display: block; color: #90988a; font-size: 7px; margin-bottom: 5px; }
+    .mini-bottom { background: var(--ink); color: white; padding: 7px; margin-top: 10px; font: 700 9px var(--font-display); text-align: center; }
+    .art-order { position: absolute; width: 265px; height: 146px; top: 45px; left: 50%; transform: translateX(-50%) rotate(6deg); background: white; border: 1.5px solid var(--ink); box-shadow: -10px 10px 0 #b6b8ef; padding: 16px; }
+    .order-title { font: 700 14px var(--font-display); margin-bottom: 15px; }
+    .order-row { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #e5e5ed; padding: 8px 0; font: 600 9px var(--font-display); }
+    .order-row i { width: 8px; height: 8px; background: #a9b070; border-radius: 50%; margin-right: 5px; display: inline-block; }
+    .order-row b { background: #e9f2cb; padding: 4px 6px; }
+    .order-row:nth-child(3) b { background: #e6e5ff; }
+    .art-track { position: absolute; width: 260px; height: 157px; top: 41px; left: 50%; transform: translateX(-50%) rotate(-5deg); background: white; border: 1.5px solid var(--ink); box-shadow: 10px 10px 0 #f5ae89; padding: 18px 20px; }
+    .track-head { display: flex; justify-content: space-between; font: 700 11px var(--font-display); margin-bottom: 24px; }
+    .track-head span { color: #8c9288; font-size: 9px; }
+    .track-line { height: 3px; background: linear-gradient(to right, #95bb3c 70%, #e5e6de 70%); position: relative; margin: 0 8px 18px; }
+    .track-line i { position: absolute; top: -6px; width: 15px; height: 15px; background: #9bc544; border: 3px solid white; outline: 1px solid #9bc544; border-radius: 50%; }
+    .track-line i:nth-child(1) { left: 0; } .track-line i:nth-child(2) { left: 49%; } .track-line i:nth-child(3) { right: 0; background: white; outline-color: #bfc3b9; }
+    .track-text { display: flex; justify-content: space-between; font: 700 8px var(--font-display); }
+    .track-status { background: #e8f5cc; display: inline-block; padding: 6px 8px; font: 700 9px var(--font-display); margin-top: 15px; }
+
+    /* Workflow */
+    .workflow { background: var(--ink); color: var(--white); padding: 105px 0 112px; overflow: hidden; }
+    .workflow .eyebrow { color: var(--lime); }
+    .workflow-layout { display: grid; grid-template-columns: 42% 58%; gap: 30px; align-items: center; }
+    .workflow-copy h2 { font-size: clamp(48px, 5vw, 70px); line-height: 1.04; letter-spacing: -.075em; margin: 18px 0 24px; }
+    .workflow-copy > p { color: #bac0b5; line-height: 1.7; font-size: 16px; max-width: 410px; }
+    .workflow-list { border-top: 1px solid #596056; margin-top: 36px; max-width: 405px; }
+    .workflow-item { padding: 18px 0; border-bottom: 1px solid #596056; display: flex; gap: 18px; align-items: baseline; }
+    .workflow-item span { color: var(--lime); font: 700 12px var(--font-display); }
+    .workflow-item strong { font: 600 17px var(--font-display); }
+    .workflow-visual { position: relative; min-height: 460px; display: grid; place-items: center; }
+    .workflow-visual::before { content: ""; width: 435px; height: 435px; border-radius: 50%; background: #353a34; position: absolute; }
+    .workflow-visual::after { content: ""; width: 560px; height: 560px; border: 1px solid #454d43; border-radius: 50%; position: absolute; }
+    .route-card { position: relative; z-index: 1; background: var(--white); color: var(--ink); width: min(485px, 90%); border: 1.5px solid var(--ink); box-shadow: 12px 12px 0 var(--violet); transform: rotate(3deg); }
+    .route-top { padding: 18px 21px; border-bottom: 1px solid #e0e4da; display: flex; justify-content: space-between; align-items: center; }
+    .route-top strong { font: 700 16px var(--font-display); }
+    .route-top span { background: #e1f2b3; padding: 7px 9px; font: 700 9px var(--font-display); }
+    .route-main { padding: 30px 28px 29px; }
+    .route-meta { display: flex; justify-content: space-between; gap: 15px; padding-bottom: 22px; border-bottom: 1px solid #e0e4da; }
+    .route-meta small { display: block; color: #899087; font: 700 9px var(--font-display); letter-spacing: .08em; margin-bottom: 5px; }
+    .route-meta b { font: 700 14px var(--font-display); }
+    .route-steps { display: flex; justify-content: space-between; position: relative; margin-top: 31px; }
+    .route-steps::before { content: ""; position: absolute; height: 2px; background: #d9dfd0; left: 22px; right: 22px; top: 12px; }
+    .route-steps::after { content: ""; position: absolute; height: 2px; background: #a4cf47; left: 22px; width: 63%; top: 12px; }
+    .route-step { position: relative; z-index: 1; text-align: center; width: 25%; font: 700 9px var(--font-display); }
+    .route-step i { width: 25px; height: 25px; display: grid; place-items: center; background: var(--lime); border: 1px solid var(--ink); border-radius: 50%; font-style: normal; font-size: 12px; margin: 0 auto 12px; }
+    .route-step:last-child i { background: white; color: #a0a69a; border-color: #cfd5c8; }
+    .route-foot { margin-top: 27px; padding: 13px; background: #f0f4e8; display: flex; gap: 10px; align-items: center; font: 600 11px var(--font-display); }
+    .route-foot i { width: 8px; height: 8px; border-radius: 50%; background: #94c140; box-shadow: 0 0 0 4px #94c14030; }
+
+    /* Final CTA */
+    .demo { padding: 112px 0; background: var(--lime); position: relative; overflow: hidden; }
+    .demo::after { content: "✳"; position: absolute; right: -65px; top: -145px; font: 400 500px/1 var(--font-display); color: #c2e755; opacity: .8; pointer-events: none; }
+    .demo-layout { display: grid; grid-template-columns: 1fr 440px; gap: 100px; align-items: center; position: relative; z-index: 1; }
+    .demo h2 { font-size: clamp(56px, 6vw, 86px); line-height: 1; letter-spacing: -.08em; margin: 17px 0 22px; max-width: 700px; }
+    .demo-copy > p { font-size: 17px; line-height: 1.65; max-width: 480px; margin: 0; }
+    .demo-form { background: var(--white); border: 1.5px solid var(--ink); box-shadow: 9px 9px 0 var(--ink); padding: 30px; }
+    .demo-form h3 { font-size: 25px; letter-spacing: -.055em; margin-bottom: 6px; }
+    .demo-form > p { color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 23px; }
+    .field { display: block; margin-bottom: 14px; }
+    .field span { display: block; font: 700 11px var(--font-display); margin-bottom: 7px; }
+    .field input { width: 100%; height: 45px; border: 1px solid #cfd5c9; border-radius: 0; background: white; padding: 0 12px; outline: none; font-size: 13px; }
+    .field input:focus { border-color: var(--ink); box-shadow: 0 0 0 2px var(--lime); }
+    .form-submit { width: 100%; height: 48px; background: var(--ink); color: white; border: 1px solid var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; font: 700 13px var(--font-display); margin-top: 20px; transition: background .2s; }
+    .form-submit:hover { background: #42483f; }
+    .form-note { font-size: 11px; color: #777e72; line-height: 1.4; margin: 12px 0 0; }
+
+    footer { background: var(--ink); color: #fffefa; padding: 49px 0 28px; }
+    .footer-top { display: flex; justify-content: space-between; gap: 40px; padding-bottom: 75px; }
+    .footer-logo { font: 700 41px var(--font-display); letter-spacing: -.08em; }
+    .footer-top p { color: #b8bfb4; font-size: 14px; line-height: 1.6; max-width: 295px; margin: 10px 0 0; }
+    .footer-links { display: flex; gap: 80px; }
+    .footer-links div { display: flex; flex-direction: column; gap: 13px; }
+    .footer-links strong { font: 700 11px var(--font-display); letter-spacing: .1em; color: var(--lime); margin-bottom: 7px; }
+    .footer-links a { font-size: 13px; color: #d7ddd2; }
+    .footer-links a:hover { color: var(--lime); }
+    .footer-bottom { border-top: 1px solid #4c5349; padding-top: 23px; display: flex; justify-content: space-between; font-size: 11px; color: #a5ada0; }
+
+    @keyframes ticker { to { transform: translateX(-50%); } }
+    @keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+    @keyframes turn { to { transform: rotate(360deg); } }
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .feature-card:nth-child(2) { transition-delay: .1s; }
+    .feature-card:nth-child(3) { transition-delay: .2s; }
+
+    @media (max-width: 1150px) {
+      .container { width: min(100% - 64px, 1328px); }
+      .hero-inner { grid-template-columns: 49% 51%; }
+      h1 { font-size: clamp(57px, 6.2vw, 78px); }
+      .hero-art { transform: scale(.82); transform-origin: center right; margin-left: -45px; margin-right: -10px; }
+      .demo-layout { gap: 45px; }
+    }
+    @media (max-width: 800px) {
+      .container { width: min(100% - 40px, 650px); }
+      .utility-right { display: none; }
+      .nav { height: 72px; }
+      .menu-toggle { display: block; margin-left: auto; }
+      .menu-toggle span { display: block; width: 23px; height: 2px; background: var(--ink); margin: 5px 0; }
+      .nav > .nav-cta { display: none; }
+      .nav-links { display: none; position: absolute; left: 0; right: 0; top: 72px; padding: 22px 20px; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 12px 16px #20251f12; flex-direction: column; align-items: stretch; gap: 20px; }
+      .nav-links.open { display: flex; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-copy { padding: 68px 0 30px; }
+      h1 { font-size: clamp(55px, 10vw, 82px); }
+      .hero-art { width: 620px; max-width: 100%; height: 510px; transform: scale(.85); transform-origin: top left; margin: 0 0 -65px; }
+      .section-pad { padding: 82px 0; }
+      .section-heading { display: block; }
+      .section-heading > p { margin-top: 20px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 0; }
+      .card-art { height: 220px; }
+      .card-content { min-height: 200px; }
+      .workflow { padding: 80px 0; }
+      .workflow-layout, .demo-layout { grid-template-columns: 1fr; }
+      .workflow-visual { min-height: 430px; }
+      .demo { padding: 80px 0 90px; }
+      .demo-layout { gap: 42px; }
+    }
+    @media (max-width: 560px) {
+      .hero-copy { padding-top: 55px; }
+      h1 { font-size: clamp(48px, 11.6vw, 65px); }
+      .hero-sub { font-size: 16px; }
+      .hero-actions { gap: 20px; flex-wrap: wrap; }
+      .hero-art { transform: scale(.59); width: 620px; height: 370px; max-width: none; margin-bottom: -70px; }
+      .ticker { height: 56px; }
+      .ticker span { font-size: 17px; }
+      .section-heading h2, .workflow-copy h2 { font-size: 47px; }
+      .workflow-visual { min-height: 350px; }
+      .workflow-visual::before { width: 320px; height: 320px; }
+      .workflow-visual::after { width: 420px; height: 420px; }
+      .route-card { width: 100%; }
+      .route-main { padding: 24px 15px; }
+      .route-meta b { font-size: 12px; }
+      .route-step { font-size: 8px; }
+      .demo h2 { font-size: 58px; }
+      .demo-form { padding: 23px; }
+      .footer-top, .footer-bottom { flex-direction: column; gap: 25px; }
+      .footer-top { padding-bottom: 48px; }
+      .footer-links { gap: 50px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="utility">
+    <div class="container">
+      <span>Good things are in motion.</span>
+      <div class="utility-right"><span>Configure</span><i></i><span>Order</span><i></i><span>Track</span></div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="logo" href="#" aria-label="Acme home">
+        <span class="logo-symbol" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        acme
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#demo">Get in touch</a>
+      </div>
+      <a class="nav-cta" href="#demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+      <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> The better way to widget</div>
+          <h1 id="hero-title"><span class="line">Custom widgets.</span><span class="line"><span class="highlight">Zero guesswork.</span></span></h1>
+          <p class="hero-sub">Configure, order, and track custom widgets in one place. Acme gives your operations team a clear path from first spec to final delivery.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">↓</span></a>
+          </div>
+          <p class="hero-note"><span>✳</span> Built for the teams who keep production moving.</p>
+        </div>
+
+        <div class="hero-art" aria-label="Illustration of the Acme widget management dashboard">
+          <div class="art-orbit" aria-hidden="true"></div>
+          <div class="art-lime" aria-hidden="true"></div>
+          <div class="art-peach" aria-hidden="true"></div>
+          <div class="art-cross" aria-hidden="true">✳</div>
+          <div class="back-plate" aria-hidden="true"></div>
+          <div class="dashboard">
+            <div class="dash-top">
+              <div class="dash-brand"><i></i>acme <span class="dash-workspace">/ WORKSPACE</span></div>
+              <div class="dash-avatar">JD</div>
+            </div>
+            <div class="dash-body">
+              <div class="dash-sidebar">
+                <div class="side-label">WORKSPACE</div>
+                <div class="side-item active"><span class="side-icon"></span> Overview</div>
+                <div class="side-item"><span class="side-icon"></span> Configure</div>
+                <div class="side-item"><span class="side-icon"></span> Orders</div>
+                <div class="side-item"><span class="side-icon"></span> Tracking</div>
+              </div>
+              <div class="dash-main">
+                <div class="dash-heading">
+                  <div><small>MONDAY, SEPTEMBER 21</small><strong>Widget control</strong></div>
+                  <button type="button" tabindex="-1">+ New widget</button>
+                </div>
+                <div class="dash-stats">
+                  <div class="dash-stat"><span>Active orders</span><strong>24</strong><em>↗ 4</em></div>
+                  <div class="dash-stat"><span>In production</span><strong>12</strong></div>
+                  <div class="dash-stat"><span>On-time rate</span><strong>98%</strong></div>
+                </div>
+                <div class="dash-product">
+                  <div class="product-visual">
+                    <svg viewBox="0 0 200 155" role="img" aria-label="Technical drawing of a custom widget">
+                      <defs><linearGradient id="widgetGrad" x1="0" x2="1"><stop stop-color="#b4b7ff"/><stop offset="1" stop-color="#797fdf"/></linearGradient></defs>
+                      <path d="M22 118H180M30 40V126M167 35V126" stroke="#aeb6a9" stroke-width="1" stroke-dasharray="3 4"/>
+                      <path d="M56 43L117 25L158 48L96 69Z" fill="#d9daff" stroke="#28302a" stroke-width="1.5"/>
+                      <path d="M56 43V105L96 128V69Z" fill="#858be7" stroke="#28302a" stroke-width="1.5"/>
+                      <path d="M96 69L158 48V107L96 128Z" fill="url(#widgetGrad)" stroke="#28302a" stroke-width="1.5"/>
+                      <path d="M69 52V104M82 61V113M111 74V119M126 69V114M141 62V109" stroke="#5c63bf" stroke-width="1" opacity=".6"/>
+                      <ellipse cx="109" cy="47" rx="15" ry="6" fill="#d9fa69" stroke="#28302a" stroke-width="1.5"/>
+                      <path d="M94 47V33C94 29 101 27 109 27C117 27 124 29 124 33V47" fill="#d9fa69" stroke="#28302a" stroke-width="1.5"/>
+                      <ellipse cx="109" cy="33" rx="15" ry="6" fill="#eeffa7" stroke="#28302a" stroke-width="1.5"/>
+                      <path d="M17 32H75M17 27V37M75 27V37M166 45H187M166 108H187M181 45V108" stroke="#596457" stroke-width="1"/>
+                      <text x="32" y="24" font-size="7" fill="#596457" font-family="sans-serif">42 MM</text>
+                      <text x="184" y="79" font-size="7" fill="#596457" font-family="sans-serif" transform="rotate(90 184 79)">80 MM</text>
+                    </svg>
+                  </div>
+                  <div class="product-details">
+                    <small>FEATURED CONFIGURATION</small>
+                    <h4>Series 04<br>Connector</h4>
+                    <p>Ready for your next production run.</p>
+                    <div class="detail-row"><span>Material</span><b>Aluminum</b></div>
+                    <div class="detail-row"><span>Finish</span><b>Matte silver</b></div>
+                    <div class="detail-row"><span>Lead time</span><b>12 days</b></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="float-card">
+            <span class="float-icon" aria-hidden="true">✓</span>
+            <span><small>ORDER #AC-2048</small><strong>Right on track.</strong></span>
+          </div>
+          <div class="art-caption">ONE PLACE. FULL PICTURE.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-label="Spec it. Order it. Track it. Keep moving.">
+      <div class="ticker-track" aria-hidden="true">
+        <div class="ticker-group"><span>SPEC IT.</span><b>✳</b><span>ORDER IT.</span><b>✳</b><span>TRACK IT.</span><b>✳</b><span>KEEP MOVING.</span><b>✳</b></div>
+        <div class="ticker-group"><span>SPEC IT.</span><b>✳</b><span>ORDER IT.</span><b>✳</b><span>TRACK IT.</span><b>✳</b><span>KEEP MOVING.</span><b>✳</b></div>
+      </div>
+    </div>
+
+    <section class="section-pad" id="platform" aria-labelledby="platform-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span> Meet your new workflow</div>
+            <h2 id="platform-title">One platform.<br>Every moving part.</h2>
+          </div>
+          <p>Less time piecing together emails and spreadsheets. More time getting the right widgets where they need to be.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card reveal">
+            <div class="card-art" aria-hidden="true">
+              <div class="art-spec">
+                <div class="mini-top"><span>NEW CONFIGURATION</span><span>● SAVED</span></div>
+                <div class="mini-fields">
+                  <div class="mini-field"><small>MATERIAL</small>Aluminum</div>
+                  <div class="mini-field"><small>SIZE</small>42 mm</div>
+                  <div class="mini-field"><small>FINISH</small>Matte</div>
+                </div>
+                <div class="mini-bottom">Review your widget →</div>
+              </div>
+            </div>
+            <div class="card-content">
+              <span class="card-number">01 / CONFIGURE</span>
+              <h3>Get the spec right.</h3>
+              <p>Build exactly what you need with a clear, repeatable way to capture every custom detail.</p>
+            </div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="card-art" aria-hidden="true">
+              <div class="art-order">
+                <div class="order-title">Your orders <span style="float:right">↗</span></div>
+                <div class="order-row"><span><i></i>Series 04 Connector</span><b>In production</b></div>
+                <div class="order-row"><span><i></i>Precision Housing</span><b>Confirmed</b></div>
+                <div class="order-row"><span><i></i>Assembly Kit B</span><b>In production</b></div>
+              </div>
+            </div>
+            <div class="card-content">
+              <span class="card-number">02 / ORDER</span>
+              <h3>Make it official.</h3>
+              <p>Turn approved configurations into orders without starting over or losing the important details.</p>
+            </div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="card-art" aria-hidden="true">
+              <div class="art-track">
+                <div class="track-head">Order #AC-2048 <span>TRACKING</span></div>
+                <div class="track-line"><i></i><i></i><i></i></div>
+                <div class="track-text"><span>Confirmed</span><span>Production</span><span>Delivered</span></div>
+                <div class="track-status">● On track for delivery</div>
+              </div>
+            </div>
+            <div class="card-content">
+              <span class="card-number">03 / TRACK</span>
+              <h3>Stay in the know.</h3>
+              <p>See where orders stand across your supply chain, so the next update never comes as a surprise.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="workflow" id="how-it-works" aria-labelledby="workflow-title">
+      <div class="container workflow-layout">
+        <div class="workflow-copy reveal">
+          <div class="eyebrow">✳ &nbsp; Clarity, from end to end</div>
+          <h2 id="workflow-title">Your whole process. In sync.</h2>
+          <p>Custom doesn't have to mean complicated. Keep specifications, orders, and progress connected in one shared view your team can actually use.</p>
+          <div class="workflow-list">
+            <div class="workflow-item"><span>01</span><strong>Know what was ordered.</strong></div>
+            <div class="workflow-item"><span>02</span><strong>Know where it stands.</strong></div>
+            <div class="workflow-item"><span>03</span><strong>Know what's next.</strong></div>
+          </div>
+        </div>
+        <div class="workflow-visual reveal" aria-label="Illustration showing an order progressing from configuration to delivery">
+          <div class="route-card">
+            <div class="route-top"><strong>Order journey</strong><span>● ON TRACK</span></div>
+            <div class="route-main">
+              <div class="route-meta">
+                <div><small>ORDER</small><b>#AC-2048</b></div>
+                <div><small>ITEM</small><b>Series 04 Connector</b></div>
+                <div><small>QUANTITY</small><b>500 units</b></div>
+              </div>
+              <div class="route-steps">
+                <div class="route-step"><i>✓</i>Configured</div>
+                <div class="route-step"><i>✓</i>Approved</div>
+                <div class="route-step"><i>✓</i>In production</div>
+                <div class="route-step"><i>4</i>Delivered</div>
+              </div>
+              <div class="route-foot"><i></i>Production is moving as planned. You're all caught up.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo" id="demo" aria-labelledby="demo-title">
+      <div class="container demo-layout">
+        <div class="demo-copy reveal">
+          <div class="eyebrow">Let's make it happen ↗</div>
+          <h2 id="demo-title">Ready to put better in motion?</h2>
+          <p>See how Acme can simplify the way your team manages custom widgets. Tell us a little about yourself and let's talk.</p>
+        </div>
+        <form class="demo-form reveal" id="demo-form">
+          <h3>Book your demo.</h3>
+          <p>A better widget workflow starts with a conversation.</p>
+          <label class="field"><span>Your name</span><input name="name" type="text" autocomplete="name" placeholder="Alex Morgan" required></label>
+          <label class="field"><span>Work email</span><input name="email" type="email" autocomplete="email" placeholder="alex@company.com" required></label>
+          <label class="field"><span>Company</span><input name="company" type="text" autocomplete="organization" placeholder="Your company" required></label>
+          <button class="form-submit" type="submit">Send demo request <span class="arrow" aria-hidden="true">↗</span></button>
+          <p class="form-note">Submitting opens your email app with your request ready to send.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <a class="footer-logo" href="#">acme<span style="color:var(--lime)">.</span></a>
+          <p>Custom widgets, without the chaos.<br>Made for operations in motion.</p>
+        </div>
+        <div class="footer-links">
+          <div><strong>EXPLORE</strong><a href="#platform">Platform</a><a href="#how-it-works">How it works</a><a href="#demo">Book a demo</a></div>
+          <div><strong>CONNECT</strong><a href="mailto:hello@acme.com">hello@acme.com</a><a href="#demo">Get in touch ↗</a></div>
+        </div>
+      </div>
+      <div class="footer-bottom"><span>© <span id="year">2026</span> Acme. Built for what's next.</span><span>Configure better. Move faster.</span></div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const menuButton = document.querySelector('.menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+    menuButton.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      menuButton.setAttribute('aria-expanded', String(isOpen));
+    });
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      menuButton.setAttribute('aria-expanded', 'false');
+    }));
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    } else {
+      document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    }
+
+    document.getElementById('demo-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!this.reportValidity()) return;
+      const data = new FormData(this);
+      const subject = encodeURIComponent('Acme demo request — ' + data.get('company'));
+      const body = encodeURIComponent(
+        'Hi Acme,\n\nI’d like to book a demo.\n\nName: ' + data.get('name') +
+        '\nWork email: ' + data.get('email') +
+        '\nCompany: ' + data.get('company') +
+        '\n\nThanks!'
+      );
+      window.location.href = 'mailto:hello@acme.com?subject=' + subject + '&body=' + body;
+    });
+  </script>
+</body>
+</html>

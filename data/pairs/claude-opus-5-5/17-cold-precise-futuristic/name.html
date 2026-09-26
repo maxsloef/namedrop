@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme — Widget Operations Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Inter+Tight:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000;
+    --fg:#fff;
+    --dim:#8c8c8c;
+    --faint:#4a4a4a;
+    --line:rgba(255,255,255,.16);
+    --line-strong:rgba(255,255,255,.45);
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+    --sans:'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+    --pad:56px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--bg);scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--fg);
+    font-family:var(--mono);font-size:13px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:#fff;color:#000}
+
+  .wrap{max-width:1440px;margin:0 auto;padding:0 var(--pad)}
+  .micro{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .micro b{color:var(--fg);font-weight:400}
+  .rule{height:1px;background:var(--line)}
+
+  /* ---------- TOP BAR ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(0,0,0,.88);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar{display:grid;grid-template-columns:220px 1fr auto auto;align-items:center;height:56px;gap:40px}
+  .logo{display:flex;align-items:center;gap:12px;font-family:var(--sans);font-weight:500;font-size:15px;letter-spacing:.32em}
+  .logo i{display:block;width:14px;height:14px;background:
+     repeating-linear-gradient(90deg,#fff 0 1px,transparent 1px 3px)}
+  nav{display:flex;gap:36px}
+  nav a{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);transition:color .15s}
+  nav a:hover{color:var(--fg)}
+  .clock{font-size:10.5px;letter-spacing:.12em;color:var(--dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .btn{
+    display:inline-flex;align-items:center;gap:14px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    padding:12px 20px;border:1px solid var(--fg);background:var(--fg);color:#000;cursor:pointer;
+    transition:background .12s,color .12s;
+  }
+  .btn:hover{background:#000;color:#fff}
+  .btn.ghost{background:transparent;color:var(--fg);border-color:var(--line-strong)}
+  .btn.ghost:hover{background:#fff;color:#000;border-color:#fff}
+  .btn.sm{padding:9px 16px;font-size:10.5px}
+
+  /* ---------- HERO ---------- */
+  .hero{padding-top:72px}
+  .hero-meta{display:flex;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid var(--line)}
+  .hero-grid{display:grid;grid-template-columns:1fr 360px;gap:80px;padding:72px 0 64px}
+  h1{
+    font-family:var(--sans);font-weight:200;
+    font-size:112px;line-height:.94;letter-spacing:-.045em;
+  }
+  h1 span{display:block}
+  h1 .thin{color:var(--dim)}
+  .lede{max-width:600px;margin-top:44px;font-size:15px;line-height:1.7;color:#cfcfcf;font-weight:300}
+  .ctas{display:flex;gap:14px;margin-top:40px}
+  .readouts{border-left:1px solid var(--line);padding-left:32px;display:flex;flex-direction:column;justify-content:flex-end;gap:0}
+  .ro{padding:16px 0;border-bottom:1px solid var(--line)}
+  .ro:first-child{border-top:1px solid var(--line)}
+  .ro .v{font-family:var(--sans);font-weight:300;font-size:30px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:4px}
+  .ro .v small{font-family:var(--mono);font-size:11px;color:var(--dim);margin-left:6px;letter-spacing:.08em}
+
+  .band{position:relative;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  #band{display:block;width:100%;height:260px}
+  .band-cap{display:flex;justify-content:space-between;padding:12px 0}
+
+  /* ---------- STATS ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+  .stat{padding:44px 32px 40px 0;border-right:1px solid var(--line)}
+  .stat:not(:first-child){padding-left:32px}
+  .stat:last-child{border-right:none}
+  .stat .n{font-family:var(--sans);font-weight:200;font-size:64px;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+  .stat .n sup{font-size:22px;vertical-align:top;margin-left:4px;color:var(--dim);font-weight:300}
+  .stat p{margin-top:18px;color:#cfcfcf;max-width:240px}
+  .stat .micro{margin-top:14px;display:block}
+
+  /* ---------- SECTIONS ---------- */
+  section.blk{padding:120px 0 0}
+  .sh{display:grid;grid-template-columns:220px 1fr auto;align-items:baseline;gap:40px;padding-bottom:18px;border-bottom:1px solid var(--line-strong)}
+  .sh .idx{font-size:11px;letter-spacing:.16em;color:var(--dim)}
+  .sh h2{font-family:var(--sans);font-weight:300;font-size:44px;letter-spacing:-.03em;line-height:1.05}
+  .intro{display:grid;grid-template-columns:220px 1fr;gap:40px;padding:36px 0 56px}
+  .intro p{max-width:720px;font-size:15px;line-height:1.75;color:#cfcfcf;font-weight:300}
+
+  /* process */
+  .proc{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+  .pcol{border-right:1px solid var(--line);padding:0 32px 40px}
+  .pcol:first-child{padding-left:0}
+  .pcol:last-child{border-right:none;padding-right:0}
+  .pcol .top{display:flex;justify-content:space-between;padding:18px 0}
+  .pcol canvas{display:block;width:100%;height:220px;border:1px solid var(--line);background:#000}
+  .pcol h3{font-family:var(--sans);font-weight:400;font-size:26px;letter-spacing:-.02em;margin:32px 0 14px}
+  .pcol p{color:#cfcfcf;font-weight:300;line-height:1.75}
+  .pcol ul{list-style:none;margin-top:24px;border-top:1px solid var(--line)}
+  .pcol li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--dim)}
+  .pcol li span:last-child{color:var(--fg)}
+
+  /* trace */
+  .trace{position:relative;padding:60px 0 40px}
+  .track{position:relative;height:1px;background:var(--line-strong);margin:0 40px}
+  .pulse{position:absolute;top:-1px;left:0;height:3px;width:120px;
+    background:linear-gradient(90deg,transparent,#fff);
+    animation:run 6s linear infinite}
+  @keyframes run{from{left:-120px}to{left:100%}}
+  .nodes{display:grid;grid-template-columns:repeat(6,1fr);margin-top:-8px}
+  .node{padding:0 16px 0 40px;position:relative}
+  .node:before{content:"";position:absolute;left:34px;top:3px;width:11px;height:11px;background:#000;border:1px solid #fff}
+  .node.done:before{background:#fff}
+  .node.now:before{background:#fff;animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{background:#000}}
+  .node .t{margin-top:32px;font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .node .e{font-family:var(--sans);font-size:18px;font-weight:400;margin:6px 0 10px;letter-spacing:-.01em}
+  .node .d{font-size:11.5px;color:#bdbdbd;line-height:1.65}
+  .trace-log{margin-top:56px;border:1px solid var(--line);height:176px;overflow:hidden;position:relative;padding:14px 20px;font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .trace-log div{white-space:nowrap}
+  .trace-log div b{color:#fff;font-weight:400}
+  .trace-log:after{content:"";position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(transparent,#000)}
+
+  /* spec */
+  .spec{display:grid;grid-template-columns:1fr 420px;gap:64px}
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  th{font-weight:400;text-align:left;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding:0 0 12px;border-bottom:1px solid var(--line-strong)}
+  td{padding:13px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+  td:first-child{color:var(--dim);width:32%}
+  td.ok:before{content:"";display:inline-block;width:7px;height:7px;background:#fff;margin-right:10px;vertical-align:1px}
+  td.warn:before{content:"";display:inline-block;width:7px;height:7px;border:1px solid #fff;margin-right:10px;vertical-align:1px}
+  .spec-side{border:1px solid var(--line);padding:28px;display:flex;flex-direction:column}
+  .spec-side svg{width:100%;height:auto;display:block}
+  .spec-side p{margin-top:24px;color:#cfcfcf;font-weight:300;line-height:1.75}
+
+  /* quote */
+  .quote{display:grid;grid-template-columns:220px 1fr;gap:40px;padding:72px 0 16px}
+  blockquote{font-family:var(--sans);font-weight:200;font-size:46px;line-height:1.14;letter-spacing:-.03em;max-width:1040px}
+  blockquote em{font-style:normal;color:var(--dim)}
+  .cite{display:flex;gap:48px;margin-top:40px;padding-top:20px;border-top:1px solid var(--line);max-width:1040px}
+
+  /* integrations */
+  .intg{display:grid;grid-template-columns:repeat(4,1fr);border-left:1px solid var(--line);border-top:1px solid var(--line)}
+  .cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px 24px 28px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;transition:background .15s,color .15s}
+  .cell:hover{background:#fff;color:#000}
+  .cell:hover .micro{color:#000}
+  .cell .nm{font-family:var(--sans);font-size:20px;font-weight:400;letter-spacing:-.01em}
+
+  /* demo */
+  .demo{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line-strong);margin-top:56px}
+  .demo-l{padding:48px;border-right:1px solid var(--line-strong)}
+  .demo-l h2{font-family:var(--sans);font-weight:200;font-size:72px;line-height:.98;letter-spacing:-.045em}
+  .demo-l > p{margin-top:28px;color:#cfcfcf;font-weight:300;font-size:14px;line-height:1.75;max-width:460px}
+  .agenda{margin-top:40px;border-top:1px solid var(--line)}
+  .agenda div{display:grid;grid-template-columns:130px 1fr;padding:14px 0;border-bottom:1px solid var(--line);font-size:12px}
+  .agenda div span:first-child{color:var(--dim);font-variant-numeric:tabular-nums}
+  form{padding:48px;display:grid;grid-template-columns:1fr 1fr;gap:28px 28px;align-content:start}
+  .f{display:flex;flex-direction:column;gap:8px}
+  .f.full{grid-column:1/-1}
+  label{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  input,select,textarea{
+    background:transparent;border:none;border-bottom:1px solid var(--line-strong);
+    color:#fff;font-family:var(--mono);font-size:14px;padding:10px 0;outline:none;border-radius:0;
+  }
+  textarea{resize:none;height:72px}
+  select{appearance:none;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,#fff 50%),linear-gradient(-45deg,transparent 50%,#fff 50%);background-position:calc(100% - 10px) 50%,calc(100% - 5px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+  select option{background:#000}
+  input:focus,select:focus,textarea:focus{border-bottom-color:#fff}
+  input::placeholder,textarea::placeholder{color:var(--faint)}
+  .submit-row{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .confirm{grid-column:1/-1;display:none;border:1px solid #fff;padding:24px;font-size:12.5px;line-height:1.8}
+  .confirm.on{display:block}
+  .confirm b{font-weight:400;background:#fff;color:#000;padding:0 6px}
+
+  /* footer */
+  footer{margin-top:120px;border-top:1px solid var(--line)}
+  #barcode{display:block;width:100%;height:120px}
+  .foot{display:grid;grid-template-columns:220px 1fr 1fr 1fr auto;gap:40px;padding:40px 0 48px;border-top:1px solid var(--line)}
+  .foot a{display:block;color:var(--dim);font-size:11.5px;padding:3px 0}
+  .foot a:hover{color:#fff}
+
+  @media (prefers-reduced-motion:reduce){
+    .pulse,.node.now:before{animation:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a href="#" class="logo"><i></i>ACME</a>
+    <nav>
+      <a href="#process">Platform</a>
+      <a href="#trace">Tracking</a>
+      <a href="#spec">Specification</a>
+      <a href="#integrations">Integrations</a>
+    </nav>
+    <div class="clock" id="clock">UTC 00:00:00.000</div>
+    <a href="#demo" class="btn sm">Book a demo</a>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-meta">
+        <span class="micro">Acme / Widget Operations Platform / <b>v4.2</b></span>
+        <span class="micro">For operations teams at mid-sized manufacturers</span>
+        <span class="micro">Frame <b id="frame">000000</b></span>
+      </div>
+      <div class="hero-grid">
+        <div>
+          <h1><span>Custom widgets.</span><span class="thin">Zero ambiguity.</span></h1>
+          <p class="lede">Acme is one precise system to configure, order, and track custom widgets across every supplier, plant, and receiving dock. Parameters instead of PDFs. Events instead of email chains. A single source of truth your entire supply chain can read.</p>
+          <div class="ctas">
+            <a href="#demo" class="btn">Book a 30-min demo <span>→</span></a>
+            <a href="#spec" class="btn ghost">Read the spec <span>↓</span></a>
+          </div>
+        </div>
+        <div class="readouts">
+          <div class="ro"><div class="micro">Widgets in transit · network</div><div class="v" id="r1">128,440</div></div>
+          <div class="ro"><div class="micro">Supplier nodes online</div><div class="v" id="r2">4,812</div></div>
+          <div class="ro"><div class="micro">Configs validated · 24h</div><div class="v" id="r3">31,907</div></div>
+          <div class="ro"><div class="micro">Median tolerance held</div><div class="v">±0.02<small>MM</small></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="band">
+      <canvas id="band" aria-hidden="true"></canvas>
+    </div>
+    <div class="wrap band-cap">
+      <span class="micro">Fig. 00 — live order stream, one bar per widget event</span>
+      <span class="micro" id="evrate">events/s 0000</span>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><div class="n" data-count="38">0<sup>%</sup></div><p>Fewer widget order errors in the first quarter after rollout.</p><span class="micro">Median · customer cohort 2024</span></div>
+      <div class="stat"><div class="n" data-count="6.2" data-dec="1">0<sup>days</sup></div><p>Average lead time, down from 11.4 days across configured widgets.</p><span class="micro">Across 214 manufacturers</span></div>
+      <div class="stat"><div class="n" data-count="214">0</div><p>Mid-sized manufacturers running their widget supply chain on Acme.</p><span class="micro">Industrial · automotive · medical</span></div>
+      <div class="stat"><div class="n" data-count="99.98" data-dec="2">0<sup>%</sup></div><p>Platform uptime over the trailing twelve months.</p><span class="micro">SOC 2 Type II audited</span></div>
+    </div>
+  </div>
+
+  <!-- PROCESS -->
+  <section class="blk" id="process">
+    <div class="wrap">
+      <div class="sh"><span class="idx">01 / 06</span><h2>Configure. Order. Track.</h2><span class="micro">Three operations, one record</span></div>
+      <div class="intro"><span class="micro">Method</span><p>Every widget in Acme begins as structured data and stays that way. The configuration you define is the same record your supplier quotes against, your carrier scans, and your receiving team signs off. Nothing is retyped. Nothing drifts.</p></div>
+      <div class="proc">
+        <div class="pcol">
+          <div class="top"><span class="micro">01.a</span><span class="micro">Parameter matrix</span></div>
+          <canvas class="mini" data-kind="grid"></canvas>
+          <h3>Configure</h3>
+          <p>Define widgets as parameters, not drawings attached to emails. Dimensions, materials, tolerances, and finish are captured as structured fields and validated against each supplier's real capability before a single request is sent.</p>
+          <ul><li><span>Parameters per widget</span><span>up to 480</span></li><li><span>Validation time</span><span>&lt; 400 ms</span></li><li><span>Version history</span><span>immutable</span></li></ul>
+        </div>
+        <div class="pcol">
+          <div class="top"><span class="micro">01.b</span><span class="micro">Order allocation</span></div>
+          <canvas class="mini" data-kind="bars"></canvas>
+          <h3>Order</h3>
+          <p>Route each configuration to the right supplier automatically. Acme weighs capacity, unit cost, and lead time across your approved vendors, then issues purchase orders your ERP already understands.</p>
+          <ul><li><span>Approved vendors compared</span><span>all, every order</span></li><li><span>PO formats</span><span>EDI 850 · API · PDF</span></li><li><span>Approval rules</span><span>by value, plant, SKU</span></li></ul>
+        </div>
+        <div class="pcol">
+          <div class="top"><span class="micro">01.c</span><span class="micro">Unit trajectory</span></div>
+          <canvas class="mini" data-kind="track"></canvas>
+          <h3>Track</h3>
+          <p>Follow every unit from raw stock to your receiving dock. Event-level telemetry from suppliers, carriers, and your own floor is reconciled into one timeline, with deviations flagged the moment they occur.</p>
+          <ul><li><span>Event latency</span><span>&lt; 90 s</span></li><li><span>Granularity</span><span>lot · pallet · unit</span></li><li><span>Exception alerts</span><span>email · Slack · Teams</span></li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRACE -->
+  <section class="blk" id="trace">
+    <div class="wrap">
+      <div class="sh"><span class="idx">02 / 06</span><h2>One widget, fully traced.</h2><span class="micro">Unit WX-40218-C · lot 7731</span></div>
+      <div class="intro"><span class="micro">Timeline</span><p>This is the actual shape of a record in Acme. Six handoffs, three organizations, one timeline. When the anodizing step ran six hours long, the plant scheduler knew before the supplier's own account manager did.</p></div>
+      <div class="trace">
+        <div class="track"><div class="pulse"></div></div>
+        <div class="nodes">
+          <div class="node done"><div class="t">T+00:00:00</div><div class="e">Configured</div><div class="d">Rev C approved by J. Marsh. 42 parameters, 3 tolerance overrides.</div></div>
+          <div class="node done"><div class="t">T+00:14:08</div><div class="e">Allocated</div><div class="d">Routed to Bremer Metalworks. Best of 4 vendors on cost × lead time.</div></div>
+          <div class="node done"><div class="t">T+02d 06:41</div><div class="e">Machined</div><div class="d">CNC cell 3. First-article inspection passed, 0.011 mm deviation.</div></div>
+          <div class="node done"><div class="t">T+03d 19:22</div><div class="e">Finished</div><div class="d">Type II anodize. Step ran +6h; downstream ETA recalculated.</div></div>
+          <div class="node now"><div class="t">T+04d 08:05</div><div class="e">In transit</div><div class="d">Carrier scan, Columbus OH hub. On revised ETA.</div></div>
+          <div class="node"><div class="t">ETA 05d 14:00</div><div class="e">Received</div><div class="d">Dock 2, Plant Dayton. Auto-reconciles against PO 88-10442.</div></div>
+        </div>
+        <div class="trace-log" id="log"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPEC -->
+  <section class="blk" id="spec">
+    <div class="wrap">
+      <div class="sh"><span class="idx">03 / 06</span><h2>The configuration is the contract.</h2><span class="micro">Sample record · WX-40218 rev C</span></div>
+      <div class="intro"><span class="micro">Specification</span><p>Suppliers quote against fields, not interpretations. When a value is outside what a vendor has proven they can hold, Acme flags it before the order leaves your building, not after the parts arrive.</p></div>
+      <div class="spec">
+        <table>
+          <thead><tr><th>Parameter</th><th>Value</th><th>Tolerance</th><th>Supplier check</th></tr></thead>
+          <tbody>
+            <tr><td>Body length</td><td>124.00 mm</td><td>±0.02</td><td class="ok">Capable · 4 of 4</td></tr>
+            <tr><td>Outer diameter</td><td>38.10 mm</td><td>±0.015</td><td class="ok">Capable · 3 of 4</td></tr>
+            <tr><td>Bore diameter</td><td>12.70 mm</td><td>+0.01 / −0.00</td><td class="warn">Capable · 1 of 4</td></tr>
+            <tr><td>Material</td><td>Al 6061-T6</td><td>ASTM B221</td><td class="ok">Certified stock</td></tr>
+            <tr><td>Surface finish</td><td>Ra 0.8 µm</td><td>max</td><td class="ok">Capable · 4 of 4</td></tr>
+            <tr><td>Coating</td><td>Anodize Type II, black</td><td>10–25 µm</td><td class="ok">Capable · 2 of 4</td></tr>
+            <tr><td>Thread</td><td>M8 × 1.25</td><td>6H</td><td class="ok">Capable · 4 of 4</td></tr>
+            <tr><td>Quantity / cadence</td><td>2,400 / month</td><td>±5%</td><td class="ok">Capacity confirmed</td></tr>
+            <tr><td>Inspection</td><td>AQL 1.0, FAI per lot</td><td>—</td><td class="ok">Report auto-attached</td></tr>
+          </tbody>
+        </table>
+        <div class="spec-side">
+          <span class="micro" style="margin-bottom:20px">Fig. 03 — WX-40218 section, dimensions in mm</span>
+          <svg viewBox="0 0 360 260" fill="none" stroke="#fff" stroke-width="1" aria-hidden="true">
+            <g stroke="rgba(255,255,255,.12)">
+              <path d="M0 20H360M0 60H360M0 100H360M0 140H360M0 180H360M0 220H360"/>
+              <path d="M30 0V260M90 0V260M150 0V260M210 0V260M270 0V260M330 0V260"/>
+            </g>
+            <rect x="50" y="90" width="260" height="80"/>
+            <rect x="50" y="113" width="260" height="34" stroke-dasharray="3 3"/>
+            <path d="M310 100h14v60h-14" />
+            <path d="M40 130H320" stroke-dasharray="10 3 2 3" stroke="rgba(255,255,255,.5)"/>
+            <path d="M50 60V84M310 60V84M50 68H310" />
+            <path d="M50 68l6 -3v6zM310 68l-6 -3v6z" fill="#fff"/>
+            <text x="180" y="62" fill="#fff" stroke="none" font-family="IBM Plex Mono" font-size="10" text-anchor="middle">124.00 ±0.02</text>
+            <path d="M332 90H350M332 170H350M344 90V170"/>
+            <text x="352" y="134" fill="#fff" stroke="none" font-family="IBM Plex Mono" font-size="10" transform="rotate(-90 352 134)" text-anchor="middle">Ø38.10</text>
+            <path d="M18 113H44M18 147H44M24 113V147"/>
+            <text x="14" y="134" fill="#fff" stroke="none" font-family="IBM Plex Mono" font-size="10" transform="rotate(-90 14 134)" text-anchor="middle">Ø12.70</text>
+            <path d="M50 200h260" stroke="rgba(255,255,255,.35)"/>
+            <text x="50" y="222" fill="#8c8c8c" stroke="none" font-family="IBM Plex Mono" font-size="9">AL 6061-T6 · RA 0.8 · ANODIZE II · M8×1.25-6H</text>
+            <text x="50" y="240" fill="#8c8c8c" stroke="none" font-family="IBM Plex Mono" font-size="9">REV C · 2024-11-04 · APPROVED J.MARSH</text>
+          </svg>
+          <p>One flag on this record: only one approved vendor has held the bore tolerance historically. Acme routed the order there and proposed a second source for qualification.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="blk">
+    <div class="wrap">
+      <div class="sh"><span class="idx">04 / 06</span><h2>Field report.</h2><span class="micro">Halvorsen Precision Components</span></div>
+      <div class="quote">
+        <span class="micro">Record 0417</span>
+        <div>
+          <blockquote>“We used to reconcile widget orders across four suppliers in a spreadsheet on Friday nights. <em>Now the discrepancy report is empty most weeks, and when it isn't, we know exactly which unit, which lot, which truck.”</em></blockquote>
+          <div class="cite">
+            <div><div class="micro">Name</div><div>Dana Okafor</div></div>
+            <div><div class="micro">Role</div><div>Director of Operations</div></div>
+            <div><div class="micro">Footprint</div><div>3 plants · 1,100 SKUs</div></div>
+            <div><div class="micro">On Acme since</div><div>March 2023</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTEGRATIONS -->
+  <section class="blk" id="integrations">
+    <div class="wrap">
+      <div class="sh"><span class="idx">05 / 06</span><h2>Connects to what you already run.</h2><span class="micro">ERP · EDI · API · Identity</span></div>
+      <div class="intro"><span class="micro">Interfaces</span><p>Acme sits between your ERP and your suppliers without replacing either. Typical deployments are live on a first product line in under six weeks, with no change to how your vendors receive orders.</p></div>
+      <div class="intg">
+        <div class="cell"><span class="micro">ERP</span><span class="nm">SAP S/4HANA</span></div>
+        <div class="cell"><span class="micro">ERP</span><span class="nm">Oracle NetSuite</span></div>
+        <div class="cell"><span class="micro">ERP</span><span class="nm">Microsoft Dynamics 365</span></div>
+        <div class="cell"><span class="micro">ERP</span><span class="nm">Epicor Kinetic</span></div>
+        <div class="cell"><span class="micro">Supplier</span><span class="nm">EDI X12 · EDIFACT</span></div>
+        <div class="cell"><span class="micro">Developer</span><span class="nm">REST API · Webhooks</span></div>
+        <div class="cell"><span class="micro">Identity</span><span class="nm">SAML SSO · SCIM</span></div>
+        <div class="cell"><span class="micro">Assurance</span><span class="nm">SOC 2 Type II · ISO 27001</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="blk" id="demo">
+    <div class="wrap">
+      <div class="sh"><span class="idx">06 / 06</span><h2>Book a demo.</h2><span class="micro">30 minutes · with a solutions engineer</span></div>
+      <div class="demo">
+        <div class="demo-l">
+          <h2>Bring one widget.<br>We'll trace it.</h2>
+          <p>Send us a part you order today. In the demo we configure it live in Acme, run it against a sample supplier network, and show you the full timeline, using your parameters, not ours.</p>
+          <div class="agenda">
+            <div><span>00:00 — 05:00</span><span>Your current widget workflow and where it breaks</span></div>
+            <div><span>05:00 — 20:00</span><span>Live configuration and order routing of your part</span></div>
+            <div><span>20:00 — 30:00</span><span>Rollout plan, integration scope, and pricing</span></div>
+          </div>
+        </div>
+        <form id="demoForm" novalidate>
+          <div class="f"><label for="n">Full name</label><input id="n" name="n" placeholder="Dana Okafor" required></div>
+          <div class="f"><label for="e">Work email</label><input id="e" name="e" type="email" placeholder="dana@company.com" required></div>
+          <div class="f"><label for="c">Company</label><input id="c" name="c" placeholder="Halvorsen Precision" required></div>
+          <div class="f"><label for="r">Role</label><input id="r" name="r" placeholder="Director of Operations"></div>
+          <div class="f"><label for="p">Plants</label>
+            <select id="p" name="p"><option>1</option><option selected>2 – 5</option><option>6 – 15</option><option>16+</option></select></div>
+          <div class="f"><label for="s">Active widget SKUs</label>
+            <select id="s" name="s"><option>&lt; 100</option><option selected>100 – 1,000</option><option>1,000 – 10,000</option><option>10,000+</option></select></div>
+          <div class="f full"><label for="m">The widget you'd like us to trace (optional)</label><textarea id="m" name="m" placeholder="e.g. anodized aluminum housing, 3 suppliers, frequent tolerance disputes"></textarea></div>
+          <div class="submit-row">
+            <span class="micro">Reply within 1 business day</span>
+            <button class="btn" type="submit">Request demo <span>→</span></button>
+          </div>
+          <div class="confirm" id="confirm"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <svg id="barcode" preserveAspectRatio="none" aria-hidden="true"></svg>
+  <div class="wrap foot">
+    <div><a href="#" class="logo" style="padding:0;color:#fff"><i></i>ACME</a><div class="micro" style="margin-top:16px">Widget operations,<br>measured.</div></div>
+    <div><div class="micro" style="margin-bottom:10px">Platform</div><a href="#process">Configure</a><a href="#process">Order</a><a href="#trace">Track</a><a href="#integrations">Integrations</a></div>
+    <div><div class="micro" style="margin-bottom:10px">Company</div><a href="#">About</a><a href="#">Customers</a><a href="#">Careers</a><a href="#">Security</a></div>
+    <div><div class="micro" style="margin-bottom:10px">Contact</div><a href="#demo">Book a demo</a><a href="#">support@acme.example</a><a href="#">Status: all systems nominal</a></div>
+    <div class="micro" style="text-align:right">© 2025 Acme Inc.<br><span id="ft">00000000</span></div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pad = (n, l) => String(n).padStart(l, '0');
+
+  /* ---------- clock + frame ---------- */
+  const clock = document.getElementById('clock');
+  const frameEl = document.getElementById('frame');
+  const ft = document.getElementById('ft');
+  let frame = 0;
+
+  /* ---------- canvas sizing ---------- */
+  function fit(c) {
+    const r = c.getBoundingClientRect();
+    c.width = Math.round(r.width * DPR);
+    c.height = Math.round(r.height * DPR);
+    const ctx = c.getContext('2d');
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    return { ctx, w: r.width, h: r.height };
+  }
+
+  /* ---------- hero band ---------- */
+  const band = document.getElementById('band');
+  let B, rows = [];
+  function buildBand() {
+    B = fit(band);
+    rows = [];
+    const heights = [2, 34, 6, 1, 52, 3, 18, 1, 8, 44, 2, 12, 26, 4, 30, 1, 14];
+    const total = heights.reduce((a, b) => a + b, 0);
+    let y = 0;
+    heights.forEach((hh, i) => {
+      const h = hh / total * B.h;
+      const len = 4000;
+      const pat = [];
+      let x = 0, on = Math.random() < .5;
+      const scale = i % 3 === 0 ? 1 : i % 3 === 1 ? 4 : 12;
+      while (x < len) {
+        const wv = Math.max(1, Math.round(rnd(1, 6) * scale * (Math.random() < .1 ? 6 : 1)));
+        if (on) pat.push([x, wv]);
+        x += wv; on = !on;
+      }
+      rows.push({ y, h, pat, len, off: rnd(0, len), speed: rnd(.3, 4) * (i % 2 ? 1 : -1), text: hh === 6 || hh === 8 });
+      y += h;
+    });
+  }
+  let flash = 0;
+  function drawBand() {
+    const { ctx, w, h } = B;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+    if (Math.random() < .004) flash = 3;
+    const inv = flash > 0;
+    if (inv) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); flash--; }
+    rows.forEach(r => {
+      r.off = (r.off + r.speed + r.len) % r.len;
+      if (r.text) {
+        ctx.fillStyle = inv ? '#000' : '#fff';
+        ctx.font = `${Math.max(6, r.h - 1)}px IBM Plex Mono`;
+        ctx.textBaseline = 'top';
+        let s = '';
+        for (let i = 0; i < 260; i++) s += (Math.random() < .5 ? '0' : '1');
+        ctx.globalAlpha = .7;
+        ctx.fillText(s, -(r.off % 20), r.y);
+        ctx.globalAlpha = 1;
+        return;
+      }
+      ctx.fillStyle = inv ? '#000' : '#fff';
+      for (const [x, wv] of r.pat) {
+        let px = x - r.off;
+        if (px < -wv) px += r.len;
+        if (px > w) continue;
+        ctx.fillRect(px, r.y, wv, r.h);
+      }
+    });
+    // scan line
+    const sx = (performance.now() * .25) % (w + 200) - 100;
+    ctx.fillStyle = inv ? '#000' : '#fff';
+    ctx.fillRect(sx, 0, 1, h);
+    ctx.globalCompositeOperation = 'difference';
+    ctx.fillRect(sx - 40, 0, 40, h);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* ---------- mini canvases ---------- */
+  const minis = [...document.querySelectorAll('canvas.mini')].map(c => ({ c, kind: c.dataset.kind }));
+  function buildMinis() {
+    minis.forEach(m => {
+      Object.assign(m, fit(m.c));
+      if (m.kind === 'grid') {
+        m.cols = 32; m.rws = 14;
+        m.cells = Array.from({ length: m.cols * m.rws }, () => Math.random() < .3);
+        m.cur = 0;
+      }
+      if (m.kind === 'bars') {
+        m.n = 16;
+        m.v = Array.from({ length: m.n }, () => Math.random());
+        m.t = m.v.map(() => Math.random());
+      }
+      if (m.kind === 'track') {
+        m.pts = [];
+      }
+    });
+  }
+  function drawMini(m, t) {
+    const { ctx, w, h } = m;
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+    ctx.font = '9px IBM Plex Mono';
+    ctx.textBaseline = 'top';
+    if (m.kind === 'grid') {
+      const px = 14, py = 14;
+      const cw = (w - px * 2) / m.cols, ch = (h - py * 2 - 16) / m.rws;
+      for (let k = 0; k < 6; k++) { const i = (Math.random() * m.cells.length) | 0; m.cells[i] = !m.cells[i]; }
+      if (frame % 3 === 0) m.cur = (m.cur + 1) % m.cells.length;
+      const cc = m.cur % m.cols, cr = (m.cur / m.cols) | 0;
+      for (let r = 0; r < m.rws; r++) for (let c = 0; c < m.cols; c++) {
+        const on = m.cells[r * m.cols + c];
+        const x = px + c * cw, y = py + r * ch;
+        if (on) { ctx.fillStyle = '#fff'; ctx.fillRect(x + 1, y + 1, cw - 2, ch - 2); }
+        else { ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fillRect(x + cw / 2 - .5, y + ch / 2 - .5, 1, 1); }
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,.6)';
+      ctx.beginPath();
+      ctx.moveTo(px + cc * cw + cw / 2, py); ctx.lineTo(px + cc * cw + cw / 2, py + m.rws * ch);
+      ctx.moveTo(px, py + cr * ch + ch / 2); ctx.lineTo(px + m.cols * cw, py + cr * ch + ch / 2);
+      ctx.stroke();
+      ctx.fillStyle = '#8c8c8c';
+      ctx.fillText(`P[${pad(cr, 2)},${pad(cc, 2)}] = ${m.cells[m.cur] ? '1' : '0'}   VALID ${pad(m.cells.filter(Boolean).length, 3)}/${m.cells.length}`, px, h - 20);
+    }
+    if (m.kind === 'bars') {
+      const px = 14, top = 14, bh = (h - top * 2 - 16) / m.n;
+      if (frame % 50 === 0) m.t = m.t.map(() => Math.random());
+      for (let i = 0; i < m.n; i++) {
+        m.v[i] += (m.t[i] - m.v[i]) * .06;
+        const y = top + i * bh;
+        const bw = (w - px * 2 - 70) * m.v[i];
+        ctx.fillStyle = 'rgba(255,255,255,.12)';
+        ctx.fillRect(px + 50, y + bh / 2, w - px * 2 - 70, 1);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(px + 50, y + 2, bw, bh - 4);
+        ctx.fillStyle = '#8c8c8c';
+        ctx.fillText('V-' + pad(i + 1, 2), px, y + bh / 2 - 5);
+        ctx.fillText((m.v[i] * 100).toFixed(0).padStart(3, ' '), w - px - 18, y + bh / 2 - 5);
+      }
+      ctx.fillStyle = '#8c8c8c';
+      ctx.fillText('ALLOCATION · COST × LEAD × CAPACITY', px, h - 20);
+    }
+    if (m.kind === 'track') {
+      const px = 14;
+      ctx.strokeStyle = 'rgba(255,255,255,.12)';
+      ctx.beginPath();
+      for (let i = 0; i <= 8; i++) { const x = px + (w - px * 2) * i / 8; ctx.moveTo(x, 14); ctx.lineTo(x, h - 30); }
+      for (let i = 0; i <= 4; i++) { const y = 14 + (h - 44) * i / 4; ctx.moveTo(px, y); ctx.lineTo(w - px, y); }
+      ctx.stroke();
+      const N = 120, mid = 14 + (h - 44) / 2, amp = (h - 44) * .38;
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      let hx = 0, hy = 0;
+      for (let i = 0; i < N; i++) {
+        const x = px + (w - px * 2) * i / (N - 1);
+        const y = mid + Math.sin(i * .09 + t * .0012) * amp * .6 + Math.sin(i * .31 - t * .002) * amp * .25 + (Math.random() - .5) * 2;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        if (i === ((t * .02) | 0) % N) { hx = x; hy = y; }
+      }
+      ctx.stroke();
+      for (let i = 0; i < 40; i++) {
+        const x = px + Math.random() * (w - px * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(x, mid + (Math.random() - .5) * amp * 1.8, 1, 1);
+      }
+      ctx.strokeStyle = '#fff';
+      ctx.strokeRect(hx - 5, hy - 5, 10, 10);
+      ctx.fillStyle = '#8c8c8c';
+      ctx.fillText(`UNIT WX-40218 · x ${hx.toFixed(1)} y ${hy.toFixed(1)} · Δ ${(Math.random() * .02).toFixed(3)} mm`, px, h - 20);
+    }
+  }
+
+  /* ---------- readouts ---------- */
+  const r1 = document.getElementById('r1'), r2 = document.getElementById('r2'), r3 = document.getElementById('r3');
+  const ev = document.getElementById('evrate');
+  let v1 = 128440, v2 = 4812, v3 = 31907;
+  const fmt = n => n.toLocaleString('en-US');
+
+  /* ---------- trace log ---------- */
+  const log = document.getElementById('log');
+  const evs = ['SCAN', 'TEMP', 'GPS', 'HANDOFF', 'QC.PASS', 'ETA.RECALC', 'DOCK.ASSIGN', 'EDI.856', 'LOT.SPLIT', 'PO.ACK'];
+  const locs = ['COLUMBUS.OH', 'BREMER.CNC3', 'DAYTON.D2', 'I-70.MM112', 'ANODIZE.L2', 'TOLEDO.XDOCK'];
+  function logLine() {
+    const d = new Date();
+    const line = document.createElement('div');
+    const e = evs[(Math.random() * evs.length) | 0];
+    line.innerHTML = `${d.toISOString().replace('T', ' ').slice(0, 23)}  <b>WX-${pad((Math.random() * 99999) | 0, 5)}</b>  ${e.padEnd(12, '\u00a0')} ${locs[(Math.random() * locs.length) | 0].padEnd(14, '\u00a0')} lot ${pad((Math.random() * 9999) | 0, 4)}  Δ ${(Math.random() * .03).toFixed(4)}  ok`;
+    log.prepend(line);
+    while (log.children.length > 12) log.lastChild.remove();
+  }
+  for (let i = 0; i < 10; i++) logLine();
+
+  /* ---------- counters ---------- */
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target; io.unobserve(el);
+      const target = parseFloat(el.dataset.count), dec = +(el.dataset.dec || 0);
+      const sup = el.querySelector('sup'); const supHTML = sup ? sup.outerHTML : '';
+      const t0 = performance.now(), dur = reduce ? 1 : 1400;
+      (function step(now) {
+        const p = Math.min(1, (now - t0) / dur);
+        const k = 1 - Math.pow(1 - p, 4);
+        let val = target * k;
+        if (p < 1 && Math.random() < .3) val = target * Math.random();
+        el.innerHTML = val.toFixed(dec) + supHTML;
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+    });
+  }, { threshold: .5 });
+  document.querySelectorAll('[data-count]').forEach(el => io.observe(el));
+
+  /* ---------- barcode ---------- */
+  function buildBarcode() {
+    const svg = document.getElementById('barcode');
+    const W = 1440; let x = 0, s = '';
+    while (x < W) {
+      const bw = [1, 1, 2, 3, 1, 4, 1, 8][(Math.random() * 8) | 0];
+      if (Math.random() < .55) s += `<rect x="${x}" y="0" width="${bw}" height="120" fill="#fff"/>`;
+      x += bw + [1, 2, 3, 1, 5][(Math.random() * 5) | 0];
+    }
+    svg.setAttribute('viewBox', `0 0 ${W} 120`);
+    svg.innerHTML = s;
+  }
+
+  /* ---------- form ---------- */
+  const form = document.getElementById('demoForm');
+  const confirm = document.getElementById('confirm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const n = form.n.value.trim(), em = form.e.value.trim(), c = form.c.value.trim();
+    const bad = [];
+    if (!n) bad.push(form.n);
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) bad.push(form.e);
+    if (!c) bad.push(form.c);
+    [form.n, form.e, form.c].forEach(f => f.style.borderBottomColor = '');
+    if (bad.length) {
+      bad.forEach(f => f.style.borderBottomColor = '#fff');
+      confirm.classList.add('on');
+      confirm.innerHTML = `ERR · ${bad.length} field${bad.length > 1 ? 's' : ''} incomplete: ${bad.map(f => f.previousElementSibling.textContent.toLowerCase()).join(', ')}.`;
+      bad[0].focus();
+      return;
+    }
+    const id = 'A-' + pad((Math.random() * 99999) | 0, 5);
+    confirm.classList.add('on');
+    confirm.innerHTML = `REQUEST <b>${id}</b> RECEIVED · ${new Date().toISOString().slice(0, 19).replace('T', ' ')} UTC<br>
+      ${n.split(' ')[0]}, a solutions engineer will email ${em} within one business day with times for a 30-minute session.<br>
+      Scope logged: ${c} · ${form.p.value} plants · ${form.s.value} SKUs.`;
+    form.querySelector('button').disabled = true;
+    form.querySelector('button').innerHTML = 'Received ✓';
+  });
+
+  /* ---------- loop ---------- */
+  function resize() { buildBand(); buildMinis(); }
+  resize(); buildBarcode();
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 150); });
+
+  let last = 0;
+  function loop(t) {
+    frame++;
+    const d = new Date();
+    clock.textContent = `UTC ${pad(d.getUTCHours(), 2)}:${pad(d.getUTCMinutes(), 2)}:${pad(d.getUTCSeconds(), 2)}.${pad(d.getUTCMilliseconds(), 3)}`;
+    frameEl.textContent = pad(frame, 6);
+    ft.textContent = (d.getTime() >>> 0).toString(2).slice(-16);
+    drawBand();
+    minis.forEach(m => drawMini(m, t));
+    if (t - last > 700) {
+      last = t;
+      v1 += ((Math.random() * 30) | 0) - 8; v2 += Math.random() < .3 ? (Math.random() < .5 ? 1 : -1) : 0; v3 += (Math.random() * 12) | 0;
+      r1.textContent = fmt(v1); r2.textContent = fmt(v2); r3.textContent = fmt(v3);
+      ev.textContent = 'events/s ' + pad(1400 + ((Math.random() * 600) | 0), 4);
+      logLine();
+    }
+    if (!reduce) requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

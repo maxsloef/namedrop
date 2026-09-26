@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf7ef">
+  <meta name="description" content="Acme helps manufacturing operations teams configure, order, and track custom widgets in one calm, connected place.">
+  <title>Acme — Custom widgets, minus the wild goose chase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,600,50,1;9..144,700,50,1&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #fbf7ef;
+      --paper: #fffdf8;
+      --ink: #26372e;
+      --muted: #657168;
+      --line: #dcded2;
+      --orange: #ed7355;
+      --orange-dark: #cf553a;
+      --mint: #dceee1;
+      --green: #426b51;
+      --yellow: #f8e6a3;
+      --lilac: #e8e0f1;
+      --serif: "Fraunces", Georgia, serif;
+      --sans: "DM Sans", Arial, sans-serif;
+      --hand: "Kalam", cursive;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+    svg { display: block; }
+    ::selection { background: var(--yellow); color: var(--ink); }
+
+    .wrap { width: min(1240px, calc(100% - 80px)); margin: auto; }
+    .site-header { position: relative; z-index: 10; border-bottom: 1px solid rgba(38,55,46,.11); }
+    .nav { height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+    .logo { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; font: 700 30px/.9 var(--serif); letter-spacing: -1.7px; white-space: nowrap; }
+    .logo-mark { width: 36px; height: 36px; transform: rotate(-10deg); }
+    .nav-links { display: flex; align-items: center; gap: 36px; margin-left: auto; }
+    .nav-links a { text-decoration: none; font-size: 14px; font-weight: 700; transition: color .2s; }
+    .nav-links a:hover { color: var(--orange-dark); }
+    .nav-cta, .button { display: inline-flex; align-items: center; justify-content: center; gap: 13px; text-decoration: none; font-weight: 700; white-space: nowrap; transition: transform .2s, background .2s, box-shadow .2s; }
+    .nav-cta { padding: 12px 18px; border: 1.5px solid var(--ink); border-radius: 9px; font-size: 13px; box-shadow: 3px 3px 0 var(--ink); }
+    .nav-cta:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); background: var(--yellow); }
+    .menu-toggle { display: none; }
+
+    .hero { position: relative; overflow: hidden; }
+    .hero-inner { min-height: 637px; display: grid; grid-template-columns: 51% 49%; align-items: center; gap: 0; padding: 44px 0 59px; }
+    .hero-copy { position: relative; z-index: 2; padding-bottom: 6px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--green); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+    .eyebrow .sun { color: var(--orange); font-size: 25px; line-height: .7; font-family: var(--hand); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 670px; margin: 20px 0 24px; font: 700 clamp(58px, 5.35vw, 78px)/1.065 var(--serif); letter-spacing: -3.7px; }
+    .underline { position: relative; white-space: nowrap; }
+    .underline::after { content: ""; position: absolute; bottom: -10px; left: 0; right: 0; height: 13px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 330 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11C85 1 191 4 327 9M28 14c103-7 216-5 275-7' fill='none' stroke='%23ed7355' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat; }
+    .hero-lede { max-width: 500px; margin-bottom: 29px; color: #526057; font-size: 18px; line-height: 1.7; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 22px; }
+    .button { min-height: 55px; padding: 0 23px; border: 1.5px solid var(--ink); border-radius: 10px; background: var(--orange); color: var(--ink); box-shadow: 4px 4px 0 var(--ink); cursor: pointer; font-size: 15px; }
+    .button:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); background: #f38b6c; }
+    .button svg { width: 17px; height: 17px; }
+    .text-link { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 700; text-decoration-thickness: 1.5px; text-underline-offset: 5px; }
+    .text-link:hover { color: var(--orange-dark); }
+    .hero-footnote { display: flex; align-items: center; gap: 10px; margin-top: 31px; color: #737d72; font: 16px var(--hand); }
+    .hero-footnote svg { width: 27px; height: 27px; }
+
+    /* A little illustrated workspace, made entirely from HTML and SVG. */
+    .hero-art { position: relative; width: 100%; height: 520px; }
+    .art-backdrop { position: absolute; inset: 13px 0 13px 28px; border-radius: 47% 53% 46% 54% / 44% 45% 55% 56%; background: #e6f0e3; transform: rotate(-7deg); }
+    .art-backdrop::before { content: ""; position: absolute; inset: 25px; border: 1.5px dashed #a8c8ad; border-radius: 49% 51% 45% 55% / 50% 46% 54% 50%; }
+    .art-dots { position: absolute; right: 9px; top: 31px; width: 100px; height: 90px; opacity: .6; background-image: radial-gradient(#92b899 2px, transparent 2px); background-size: 17px 17px; transform: rotate(14deg); }
+    .workspace { position: absolute; top: 67px; left: 69px; width: 456px; min-height: 375px; padding: 19px; background: var(--paper); border: 1.5px solid var(--ink); border-radius: 17px; box-shadow: 9px 11px 0 rgba(38,55,46,.14); transform: rotate(-2.4deg); }
+    .workspace-top { display: flex; justify-content: space-between; align-items: center; padding: 0 2px 16px; border-bottom: 1px solid #e8e9df; }
+    .workspace-brand { display: flex; align-items: center; gap: 7px; font: 700 17px var(--serif); }
+    .workspace-brand .tiny-flower { width: 19px; height: 19px; }
+    .workspace-top small { color: #899188; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; }
+    .workspace-content { padding: 18px 3px 0; }
+    .workspace-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .workspace-title strong { font-size: 17px; letter-spacing: -.5px; }
+    .workspace-title span { padding: 6px 9px; background: #e3f2e6; color: #3b7751; border-radius: 100px; font-size: 10px; font-weight: 700; }
+    .order-card { display: flex; gap: 17px; align-items: center; padding: 13px; background: #f8f5ed; border: 1px solid #e8e4d9; border-radius: 12px; }
+    .widget-tile { width: 118px; height: 116px; flex: none; display: grid; place-items: center; border-radius: 9px; background: #f5e5b7; }
+    .widget-tile svg { width: 105px; height: 101px; filter: drop-shadow(3px 5px 0 rgba(68,76,55,.1)); }
+    .order-info { flex: 1; min-width: 0; }
+    .order-info .order-overline { display: block; margin-bottom: 5px; color: #858c81; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .order-info strong { display: block; margin-bottom: 7px; font-size: 15px; }
+    .order-info p { margin: 0 0 12px; color: #737c71; font-size: 11px; }
+    .progress { height: 7px; overflow: hidden; border-radius: 10px; background: #dedfd5; }
+    .progress span { display: block; width: 72%; height: 100%; border-radius: 10px; background: #80b38b; }
+    .progress-label { display: flex; justify-content: space-between; margin-top: 6px; color: #667669; font-size: 10px; }
+    .timeline { display: flex; justify-content: space-between; position: relative; margin: 25px 7px 5px; }
+    .timeline::before { content: ""; position: absolute; left: 12%; right: 12%; top: 11px; border-top: 2px dashed #c6d8c8; }
+    .timeline-step { position: relative; z-index: 1; width: 25%; text-align: center; font-size: 10px; color: #778276; }
+    .timeline-step i { display: grid; place-items: center; width: 23px; height: 23px; margin: 0 auto 7px; border: 1.5px solid #9abfa3; border-radius: 50%; background: var(--paper); color: #4d865b; font-size: 12px; font-style: normal; font-weight: 700; }
+    .timeline-step.done i { background: #7cab89; color: white; }
+    .timeline-step.active { color: var(--ink); font-weight: 700; }
+    .timeline-step.active i { background: #f6dc8c; border-color: var(--ink); color: var(--ink); }
+    .float-note { position: absolute; z-index: 3; border: 1.5px solid var(--ink); box-shadow: 4px 5px 0 rgba(38,55,46,.17); }
+    .note-top { top: 13px; right: -8px; display: flex; align-items: center; gap: 9px; padding: 12px 16px; background: #fffdf8; border-radius: 11px; transform: rotate(6deg); font: 700 14px var(--hand); }
+    .note-top span { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 50%; background: var(--mint); color: var(--green); font: 700 16px var(--sans); }
+    .note-bottom { bottom: 13px; left: 18px; width: 210px; padding: 13px 17px 11px; background: var(--yellow); border-radius: 9px; transform: rotate(5deg); font: 700 17px/1.2 var(--hand); }
+    .note-bottom::after { content: "↗"; position: absolute; right: 12px; bottom: 7px; font: 25px var(--hand); }
+    .art-sparkle { position: absolute; z-index: 2; right: 5px; bottom: 36px; width: 71px; transform: rotate(-10deg); }
+    .art-arrow { position: absolute; z-index: 2; left: 8px; top: 39px; width: 100px; transform: rotate(-3deg); }
+
+    .promise-strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #f4efe4; }
+    .promise-inner { min-height: 103px; display: flex; align-items: center; justify-content: space-between; gap: 26px; }
+    .promise-intro { width: 228px; flex: none; color: #6d776c; font: 17px/1.25 var(--hand); transform: rotate(-3deg); }
+    .promise-item { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+    .promise-icon { display: grid; place-items: center; width: 38px; height: 38px; border: 1.5px solid var(--ink); border-radius: 12px; background: var(--yellow); font-size: 20px; transform: rotate(-8deg); }
+    .promise-item:nth-child(3) .promise-icon { background: var(--mint); transform: rotate(8deg); }
+    .promise-item:nth-child(4) .promise-icon { background: var(--lilac); transform: rotate(-5deg); }
+
+    .section { padding: 108px 0; }
+    .section-heading { max-width: 660px; margin: 0 auto 45px; text-align: center; }
+    .section-heading .eyebrow { margin-bottom: 16px; }
+    h2 { font: 700 clamp(39px, 4vw, 54px)/1.13 var(--serif); letter-spacing: -2.2px; }
+    .section-heading h2 { margin-bottom: 15px; }
+    .section-heading p { color: var(--muted); font-size: 16px; line-height: 1.7; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .feature { min-height: 390px; padding: 27px; border: 1.5px solid var(--ink); border-radius: 15px; background: var(--paper); box-shadow: 4px 5px 0 var(--ink); }
+    .feature-visual { position: relative; display: grid; place-items: center; height: 177px; margin-bottom: 26px; overflow: hidden; border-radius: 10px; background: #f7eabf; }
+    .feature:nth-child(2) .feature-visual { background: #e3efe2; }
+    .feature:nth-child(3) .feature-visual { background: #eee4ef; }
+    .feature-visual svg { width: 190px; height: 145px; }
+    .feature-number { display: inline-block; margin-bottom: 9px; color: var(--orange-dark); font: 18px var(--hand); }
+    .feature h3 { margin-bottom: 9px; font: 700 24px/1.2 var(--serif); letter-spacing: -.6px; }
+    .feature p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+
+    .how { padding: 86px 0; background: #e5efe3; border-top: 1px solid #d0dfce; border-bottom: 1px solid #d0dfce; }
+    .how-inner { display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: 100px; }
+    .how-copy h2 { margin: 18px 0 16px; }
+    .how-copy > p { max-width: 430px; color: #596b5d; line-height: 1.7; }
+    .how-list { display: grid; gap: 12px; margin-top: 27px; }
+    .how-list div { display: flex; align-items: center; gap: 13px; font-weight: 700; font-size: 14px; }
+    .how-list span { display: grid; place-items: center; width: 31px; height: 31px; border: 1px solid var(--ink); border-radius: 50%; background: var(--paper); font: 18px var(--hand); }
+    .how-board { position: relative; min-height: 392px; padding: 28px; border: 1.5px solid var(--ink); border-radius: 15px; background: var(--paper); box-shadow: 8px 9px 0 #b6d1b7; transform: rotate(1.5deg); }
+    .board-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 19px; border-bottom: 1px solid var(--line); }
+    .board-head strong { font: 700 19px var(--serif); }
+    .board-head small { color: var(--muted); font-size: 11px; }
+    .board-row { display: grid; grid-template-columns: 39px 1fr auto; align-items: center; gap: 13px; padding: 16px 0; border-bottom: 1px dashed #d9ded4; }
+    .board-row:last-child { border: 0; }
+    .board-row-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--yellow); font-size: 20px; }
+    .board-row:nth-child(3) .board-row-icon { background: var(--mint); }
+    .board-row:nth-child(4) .board-row-icon { background: var(--lilac); }
+    .board-row strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .board-row small { color: var(--muted); font-size: 11px; }
+    .status { padding: 6px 9px; border-radius: 30px; background: #e4f0e4; color: #477452; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .status.orange { background: #fce9dd; color: #b46c4d; }
+    .status.purple { background: #eee8f4; color: #806797; }
+    .board-sticker { position: absolute; right: -27px; bottom: -22px; padding: 10px 17px; border: 1.5px solid var(--ink); border-radius: 8px; background: var(--yellow); box-shadow: 3px 4px 0 var(--ink); font: 17px var(--hand); transform: rotate(-8deg); }
+
+    .demo-section { padding: 107px 0 115px; }
+    .demo-panel { display: grid; grid-template-columns: 1fr 440px; gap: 70px; align-items: center; padding: 65px 75px; border: 1.5px solid var(--ink); border-radius: 22px; background: #f8e6d5; box-shadow: 7px 8px 0 var(--ink); }
+    .demo-copy h2 { max-width: 550px; margin: 18px 0; }
+    .demo-copy p { max-width: 430px; margin-bottom: 28px; color: #655e53; line-height: 1.7; }
+    .demo-doodle { width: 110px; }
+    .demo-form { padding: 28px; border: 1px solid #d7c9b8; border-radius: 13px; background: var(--paper); box-shadow: 4px 5px 0 rgba(38,55,46,.11); }
+    .demo-form h3 { margin-bottom: 6px; font: 700 25px var(--serif); }
+    .demo-form > p { margin-bottom: 19px; color: var(--muted); font-size: 13px; }
+    .field { margin-bottom: 13px; }
+    .field label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; }
+    .field input, .field select { width: 100%; height: 43px; padding: 0 12px; border: 1px solid #cbd0c5; border-radius: 7px; outline: 0; background: white; color: var(--ink); font-size: 13px; }
+    .field input:focus, .field select:focus { border-color: var(--green); box-shadow: 0 0 0 3px #dceee1; }
+    .demo-form .button { width: 100%; min-height: 47px; margin-top: 7px; font-size: 13px; }
+    .form-note { margin: 15px 0 0; color: #798077; font-size: 11px; text-align: center; }
+    .form-success { display: none; padding: 20px 8px; text-align: center; }
+    .form-success .success-icon { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 18px; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--mint); font-size: 28px; }
+    .form-success p { color: var(--muted); line-height: 1.6; }
+    .demo-form.submitted form, .demo-form.submitted > h3, .demo-form.submitted > p { display: none; }
+    .demo-form.submitted .form-success { display: block; }
+
+    footer { padding: 27px 0; border-top: 1px solid var(--line); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .footer-inner .logo { font-size: 23px; }
+    .footer-inner .logo-mark { width: 28px; height: 28px; }
+    .footer-inner p { margin: 0; color: var(--muted); font-size: 12px; }
+    .footer-inner a:last-child { color: var(--muted); font-size: 12px; text-underline-offset: 3px; }
+
+    @media (max-width: 1050px) {
+      .hero-inner { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: clamp(52px, 6vw, 69px); }
+      .hero-art { transform: scale(.85); transform-origin: center left; width: 118%; }
+      .promise-intro { display: none; }
+      .how-inner { gap: 50px; }
+      .demo-panel { gap: 35px; padding: 50px; grid-template-columns: 1fr 400px; }
+    }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 36px, 540px); }
+      .nav { height: 72px; }
+      .logo { font-size: 27px; }
+      .menu-toggle { display: grid; place-items: center; width: 41px; height: 41px; margin-left: auto; border: 1.5px solid var(--ink); border-radius: 8px; background: transparent; cursor: pointer; }
+      .menu-toggle svg { width: 22px; }
+      .nav > .nav-cta { display: none; }
+      .nav-links { display: none; position: absolute; top: 71px; left: 0; right: 0; margin: 0; padding: 22px; border-bottom: 1px solid var(--line); background: var(--cream); box-shadow: 0 10px 20px #26372e15; }
+      .nav-links.open { display: flex; flex-direction: column; align-items: stretch; gap: 19px; }
+      .hero-inner { display: flex; flex-direction: column; align-items: stretch; min-height: auto; padding: 65px 0 40px; }
+      h1 { max-width: 570px; margin-top: 17px; font-size: clamp(46px, 11vw, 68px); letter-spacing: -2.5px; }
+      .hero-lede { font-size: 16px; }
+      .hero-art { width: 580px; max-width: none; height: 460px; margin: 25px 0 -30px 50%; transform: translateX(-50%) scale(.82); transform-origin: top center; }
+      .promise-inner { flex-wrap: wrap; justify-content: center; gap: 17px 27px; padding: 25px 0; }
+      .promise-item { font-size: 12px; }
+      .promise-icon { width: 32px; height: 32px; }
+      .section { padding: 75px 0; }
+      .section-heading { margin-bottom: 30px; }
+      h2 { font-size: clamp(37px, 9vw, 49px); letter-spacing: -1.5px; }
+      .feature-grid { grid-template-columns: 1fr; gap: 16px; }
+      .feature { min-height: 0; }
+      .feature-visual { height: 160px; }
+      .how { padding: 70px 0 85px; }
+      .how-inner { grid-template-columns: 1fr; gap: 40px; }
+      .how-board { margin-right: 13px; }
+      .demo-section { padding: 75px 0 85px; }
+      .demo-panel { grid-template-columns: 1fr; gap: 24px; padding: 32px 22px; }
+      .demo-doodle { display: none; }
+      .footer-inner { flex-wrap: wrap; }
+    }
+    @media (max-width: 450px) {
+      .hero-art { transform: translateX(-50%) scale(.66); margin-bottom: -105px; }
+      .hero-actions { gap: 18px; }
+      .button { min-height: 51px; }
+      .promise-inner { justify-content: flex-start; }
+      .promise-item { width: 100%; }
+      .board-row { grid-template-columns: 36px 1fr; }
+      .board-row .status { grid-column: 2; justify-self: start; }
+      .board-sticker { right: -10px; }
+      .demo-form { padding: 22px 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="logo" href="#" aria-label="Acme home">
+        <svg class="logo-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M20 3.5 24.2 11l8.6-1.2-1.2 8.6 7.5 4.2-7.5 4.2 1.2 8.6-8.6-1.2-4.2 7.5-4.2-7.5-8.6 1.2 1.2-8.6L1 22.6l7.4-4.2-1.2-8.6 8.6 1.2L20 3.5Z" transform="translate(0 -2.6) scale(1 .96)" fill="#ED7355" stroke="#26372E" stroke-width="1.7" stroke-linejoin="round"/>
+          <circle cx="20" cy="19.3" r="5.1" fill="#F8E6A3" stroke="#26372E" stroke-width="1.5"/>
+        </svg>
+        acme<span style="color:var(--orange)">.</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#26372e" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="nav-links" id="nav-links">
+        <a href="#features">Why Acme</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#demo">Get in touch</a>
+      </div>
+      <a class="nav-cta" href="#demo">Book a demo <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner wrap">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="sun" aria-hidden="true">✳</span> A happier way to manage custom widgets</div>
+          <h1 id="hero-title">Custom widgets, without the <span class="underline">wild goose chase.</span></h1>
+          <p class="hero-lede">From first configuration to final delivery, Acme brings your widget orders together in one delightfully clear place. Less chasing. More making things happen.</p>
+          <div class="hero-actions">
+            <a class="button" href="#demo">Book a demo
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 10h13m-5-5 5 5-5 5"/></svg>
+            </a>
+            <a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="hero-footnote">
+            <svg viewBox="0 0 30 30" fill="none" stroke="#ed7355" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 2v7M15 21v7M2 15h7M21 15h7M5.8 5.8l5 5m8.4 8.4 5 5m0-18.4-5 5m-8.4 8.4-5 5"/></svg>
+            Made for busy manufacturing teams with better things to do.
+          </div>
+        </div>
+
+        <div class="hero-art" role="img" aria-label="Illustration of an Acme workspace showing a custom widget order moving through production">
+          <div class="art-backdrop"></div>
+          <div class="art-dots"></div>
+          <svg class="art-arrow" viewBox="0 0 110 100" fill="none" aria-hidden="true"><path d="M11 80C12 34 47 13 88 31M75 17l14 14-18 8" stroke="#ED7355" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 6"/></svg>
+          <div class="workspace">
+            <div class="workspace-top">
+              <div class="workspace-brand">
+                <svg class="tiny-flower" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 25 10l9-1-1 9 7 5-8 5 1 9-9-2-4 5-5-7-9 2 1-9-7-5 8-5-1-9 9 1Z" fill="#ed7355"/><circle cx="20" cy="20" r="5" fill="#f8e6a3"/></svg>
+                acme.
+              </div>
+              <small>YOUR WORKSPACE</small>
+            </div>
+            <div class="workspace-content">
+              <div class="workspace-title">
+                <strong>Orders in motion</strong>
+                <span>● All on track</span>
+              </div>
+              <div class="order-card">
+                <div class="widget-tile">
+                  <svg viewBox="0 0 110 110" fill="none" aria-hidden="true">
+                    <path d="m25 43 30-16 32 16v36L55 96 25 79V43Z" fill="#ED8A6B" stroke="#26372E" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="m25 43 30 16 32-16M55 59v37" stroke="#26372E" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="m55 28 31 16-31 16-30-17 30-15Z" fill="#F4AD8B" stroke="#26372E" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M36 50v-9l19-10 19 10v9L55 61 36 50Z" fill="#E66E54" stroke="#26372E" stroke-width="1.7"/>
+                    <ellipse cx="55" cy="42" rx="11" ry="5.5" fill="#F8E6A3" stroke="#26372E" stroke-width="1.7"/>
+                    <path d="M34 65v9m5-6v9M75 63v10m5-13v10" stroke="#26372E" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="order-info">
+                  <span class="order-overline">Order #WD-2048</span>
+                  <strong>Custom housing kit</strong>
+                  <p>240 units · Brushed finish</p>
+                  <div class="progress"><span></span></div>
+                  <div class="progress-label"><span>In production</span><span>72%</span></div>
+                </div>
+              </div>
+              <div class="timeline">
+                <div class="timeline-step done"><i>✓</i>Configured</div>
+                <div class="timeline-step done"><i>✓</i>Ordered</div>
+                <div class="timeline-step active"><i>3</i>Making</div>
+                <div class="timeline-step"><i>4</i>Delivered</div>
+              </div>
+            </div>
+          </div>
+          <div class="float-note note-top"><span>✓</span> Looking good!</div>
+          <div class="float-note note-bottom">Everything in its<br>right place.</div>
+          <svg class="art-sparkle" viewBox="0 0 75 75" fill="none" aria-hidden="true"><path d="M37 2 43 29l27 8-27 7-6 28-7-28L3 37l27-8 7-27Z" fill="#F8E6A3" stroke="#26372E" stroke-width="2" stroke-linejoin="round"/><circle cx="37" cy="37" r="4" fill="#ED7355"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <div class="promise-strip" aria-label="Platform benefits">
+      <div class="promise-inner wrap">
+        <div class="promise-intro">A little less chaos.<br>A lot more clarity. ↗</div>
+        <div class="promise-item"><span class="promise-icon" aria-hidden="true">✳</span> Configure confidently</div>
+        <div class="promise-item"><span class="promise-icon" aria-hidden="true">▣</span> Order all in one place</div>
+        <div class="promise-item"><span class="promise-icon" aria-hidden="true">↗</span> Know what’s happening</div>
+      </div>
+    </div>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="section-heading">
+          <div class="eyebrow"><span class="sun" aria-hidden="true">✳</span> Finally, some breathing room</div>
+          <h2 id="features-title">The whole widget journey, wonderfully untangled.</h2>
+          <p>No scattered spreadsheets, mystery updates, or digging through old email threads. Just the details your team needs, right where you need them.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature">
+            <div class="feature-visual">
+              <svg viewBox="0 0 190 145" fill="none" aria-hidden="true">
+                <rect x="23" y="19" width="143" height="108" rx="9" fill="#FFFDF8" stroke="#26372E" stroke-width="2" transform="rotate(-5 23 19)"/>
+                <path d="M38 48h104M42 60h33M42 70h24" stroke="#B6BAA9" stroke-width="3" stroke-linecap="round"/>
+                <path d="m94 75 22-12 22 12v25l-22 12-22-12V75Z" fill="#ED8A6B" stroke="#26372E" stroke-width="2" stroke-linejoin="round"/>
+                <path d="m94 75 22 12 22-12m-22 12v25" stroke="#26372E" stroke-width="2"/>
+                <circle cx="115" cy="73" r="6" fill="#F8E6A3" stroke="#26372E" stroke-width="2"/>
+                <path d="m35 108 8 7 14-17" stroke="#4C8962" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="m148 30 3-9m5 13 8-5" stroke="#ED7355" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="feature-number">01 / Get it just right</span>
+            <h3>Configure with confidence.</h3>
+            <p>Capture the specs, finishes, and quantities you actually need. Keep every custom detail together before an order goes out.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-visual">
+              <svg viewBox="0 0 190 145" fill="none" aria-hidden="true">
+                <rect x="34" y="26" width="119" height="96" rx="8" fill="#FFFDF8" stroke="#26372E" stroke-width="2" transform="rotate(5 34 26)"/>
+                <path d="M54 54h66M54 68h49M54 82h55" stroke="#CBD2C5" stroke-width="4" stroke-linecap="round"/>
+                <rect x="91" y="91" width="50" height="19" rx="5" fill="#ED7355" stroke="#26372E" stroke-width="1.5"/>
+                <path d="m103 100 5 4 8-9" stroke="#26372E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M42 14c-10 10-12 20-8 29m-9-8 9 9 8-10" stroke="#ED7355" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="151" cy="44" r="13" fill="#F8E6A3" stroke="#26372E" stroke-width="2"/>
+                <path d="M145 44h12m-6-6v12" stroke="#26372E" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="feature-number">02 / Keep it moving</span>
+            <h3>Order without the back-and-forth.</h3>
+            <p>Give your team one straightforward place to place orders and keep the important information connected to them.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-visual">
+              <svg viewBox="0 0 190 145" fill="none" aria-hidden="true">
+                <path d="M30 83h126" stroke="#26372E" stroke-width="2" stroke-dasharray="4 5"/>
+                <circle cx="45" cy="83" r="13" fill="#DCEEE1" stroke="#26372E" stroke-width="2"/>
+                <circle cx="94" cy="83" r="13" fill="#F8E6A3" stroke="#26372E" stroke-width="2"/>
+                <circle cx="145" cy="83" r="13" fill="#FFFDF8" stroke="#26372E" stroke-width="2"/>
+                <path d="m40 83 4 4 7-8m38 4 4 4 7-8" stroke="#26372E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="69" y="25" width="68" height="29" rx="7" fill="#FFFDF8" stroke="#26372E" stroke-width="2" transform="rotate(-6 69 25)"/>
+                <path d="M83 39h39" stroke="#80B38B" stroke-width="4" stroke-linecap="round"/>
+                <path d="M92 62v-9m-60 49 7 8m105-2 8-8" stroke="#ED7355" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M61 110h66" stroke="#B0A6BA" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="feature-number">03 / Stay in the know</span>
+            <h3>Track every step, easily.</h3>
+            <p>See where each order stands across your supply chain, so you can answer “where’s my widget?” before anyone asks.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="how-it-works" aria-labelledby="how-title">
+      <div class="how-inner wrap">
+        <div class="how-copy">
+          <div class="eyebrow"><span class="sun" aria-hidden="true">✳</span> How it works</div>
+          <h2 id="how-title">One home for all the moving parts.</h2>
+          <p>Custom shouldn’t mean complicated. Acme gives operations teams a shared view of every widget, every order, and every next step.</p>
+          <div class="how-list">
+            <div><span>1</span> Choose your widget’s details</div>
+            <div><span>2</span> Place and manage your order</div>
+            <div><span>3</span> Follow along through delivery</div>
+          </div>
+        </div>
+        <div class="how-board" aria-label="Example of an order overview in Acme">
+          <div class="board-head"><strong>Tuesday’s widget lineup</strong><small>ORDER OVERVIEW · 3 ORDERS</small></div>
+          <div class="board-row">
+            <div class="board-row-icon" aria-hidden="true">⬡</div>
+            <div><strong>Custom housing kit</strong><small>240 units · Order #WD-2048</small></div>
+            <span class="status">In production</span>
+          </div>
+          <div class="board-row">
+            <div class="board-row-icon" aria-hidden="true">✳</div>
+            <div><strong>Precision mount</strong><small>100 units · Order #WD-2049</small></div>
+            <span class="status orange">Ready to order</span>
+          </div>
+          <div class="board-row">
+            <div class="board-row-icon" aria-hidden="true">▣</div>
+            <div><strong>Connector assembly</strong><small>560 units · Order #WD-2050</small></div>
+            <span class="status purple">On its way</span>
+          </div>
+          <div class="board-sticker">Ahh, that’s better. ✳</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-section" id="demo" aria-labelledby="demo-title">
+      <div class="demo-panel wrap">
+        <div class="demo-copy">
+          <div class="eyebrow"><span class="sun" aria-hidden="true">✳</span> Let’s make this easier</div>
+          <h2 id="demo-title">A clearer way forward starts here.</h2>
+          <p>Show us how your team manages custom widgets today. We’ll show you what it could look like with Acme by your side.</p>
+          <svg class="demo-doodle" viewBox="0 0 110 65" fill="none" aria-hidden="true"><path d="M4 10c19 46 53 58 90 28m-15-3 16 2-3 17" stroke="#ED7355" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 7"/></svg>
+        </div>
+        <div class="demo-form" id="demo-form-box">
+          <h3>Come see Acme in action.</h3>
+          <p>Tell us a bit about yourself and we’ll be in touch.</p>
+          <form id="demo-form">
+            <div class="field">
+              <label for="name">Your name</label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="Alex Morgan" required>
+            </div>
+            <div class="field">
+              <label for="email">Work email</label>
+              <input id="email" name="email" type="email" autocomplete="email" placeholder="alex@yourcompany.com" required>
+            </div>
+            <div class="field">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" autocomplete="organization" placeholder="Your company name" required>
+            </div>
+            <button class="button" type="submit">Request a demo <span aria-hidden="true">↗</span></button>
+            <p class="form-note">No pressure. Just a friendly conversation.</p>
+          </form>
+          <div class="form-success" role="status" aria-live="polite">
+            <div class="success-icon" aria-hidden="true">✓</div>
+            <h3>Thanks for reaching out!</h3>
+            <p>This demo form is a preview. Connect it to your booking or CRM service to receive requests.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner wrap">
+      <a class="logo" href="#" aria-label="Acme home">
+        <svg class="logo-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 1 25 9l9-1-1 9 7 5-8 5 1 9-9-2-4 6-5-8-9 2 1-9-7-5 8-5-1-9 9 1Z" fill="#ED7355" stroke="#26372E" stroke-width="1.6"/><circle cx="20" cy="20" r="5" fill="#F8E6A3" stroke="#26372E" stroke-width="1.5"/></svg>
+        acme<span style="color:var(--orange)">.</span>
+      </a>
+      <p>Better widget days are ahead. © <span id="year">2026</span> Acme.</p>
+      <a href="mailto:hello@acme.example">Say hello ↗</a>
+    </div>
+  </footer>
+
+  <script>
+    const menuButton = document.querySelector(".menu-toggle");
+    const navLinks = document.querySelector(".nav-links");
+
+    menuButton.addEventListener("click", () => {
+      const open = navLinks.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(open));
+      menuButton.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    });
+
+    navLinks.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        navLinks.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "Open menu");
+      });
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("demo-form").addEventListener("submit", event => {
+      event.preventDefault();
+      document.getElementById("demo-form-box").classList.add("submitted");
+    });
+  </script>
+</body>
+</html>

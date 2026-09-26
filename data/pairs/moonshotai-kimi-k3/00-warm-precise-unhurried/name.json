@@ -1,0 +1,7 @@
+{
+  "model": "moonshotai/kimi-k3",
+  "stop_reason": "end_turn",
+  "input_tokens": 255,
+  "output_tokens": 9263,
+  "cost": 0.104870403
+}

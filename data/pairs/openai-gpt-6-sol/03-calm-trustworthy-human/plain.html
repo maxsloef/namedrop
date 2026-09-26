@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f6f2" />
+  <meta name="description" content="Acme helps manufacturing operations teams configure, order, and track custom widgets in one place." />
+  <title>Acme — Custom widgets, without the custom chaos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #18312c;
+      --muted: #60716b;
+      --green: #245e4b;
+      --green-dark: #194c3d;
+      --sage: #dce9df;
+      --cream: #f7f6f2;
+      --line: #e2e6df;
+      --white: #fff;
+      --orange: #e8a979;
+      --shadow: 0 24px 70px rgba(28, 54, 44, .11);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, textarea { font: inherit; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; }
+    svg { display: block; }
+    ::selection { background: #c7dfce; }
+
+    .container { width: min(100% - 96px, 1248px); margin-inline: auto; }
+    .site-header {
+      height: 92px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(24, 49, 44, .075);
+      background: var(--cream);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-family: Manrope, sans-serif; font-size: 25px; font-weight: 800; letter-spacing: -.075em; }
+    .brand-mark { width: 34px; height: 34px; color: var(--green); }
+    .nav-links { display: flex; align-items: center; gap: 38px; margin-left: auto; }
+    .nav-links a { color: #435750; font-size: 14px; font-weight: 600; transition: color .2s; }
+    .nav-links a:hover { color: var(--green); }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 13px;
+      min-height: 52px; padding: 0 23px; border-radius: 9px;
+      font-size: 14px; font-weight: 700; transition: transform .2s, background .2s, box-shadow .2s;
+      white-space: nowrap;
+    }
+    .button:hover { transform: translateY(-2px); }
+    .button-primary { background: var(--green); color: white; box-shadow: 0 7px 15px rgba(36, 94, 75, .12); }
+    .button-primary:hover { background: var(--green-dark); box-shadow: 0 10px 20px rgba(36, 94, 75, .2); }
+    .button-outline { border: 1px solid #cdd9cf; color: var(--ink); background: transparent; }
+    .button-outline:hover { background: white; }
+    .header-cta { min-height: 43px; padding-inline: 19px; margin-left: 19px; }
+    .arrow { width: 17px; height: 17px; flex: none; }
+
+    .hero { overflow: hidden; }
+    .hero-inner {
+      display: grid; grid-template-columns: minmax(0, .91fr) minmax(0, 1.09fr);
+      align-items: center; gap: 44px; min-height: 670px; padding-block: 65px 76px;
+    }
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; color: var(--green); text-transform: uppercase; font-size: 11px; font-weight: 800; letter-spacing: .145em; }
+    .eyebrow-dot { width: 8px; height: 8px; border-radius: 50%; background: #6da885; box-shadow: 0 0 0 4px #e3efe6; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: Manrope, sans-serif; }
+    h1 { max-width: 590px; margin: 24px 0 22px; font-size: clamp(48px, 4.4vw, 68px); line-height: 1.105; letter-spacing: -.068em; font-weight: 700; }
+    h1 em { color: var(--green); font-style: normal; }
+    .hero-copy > p { max-width: 495px; color: var(--muted); font-size: 18px; line-height: 1.72; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 31px; }
+    .hero-actions .button { min-height: 54px; }
+    .hero-note { display: flex; align-items: center; gap: 9px; margin-top: 25px; color: #78877e; font-size: 12px; }
+    .hero-note svg { color: var(--green); }
+
+    .visual-wrap { position: relative; padding: 23px 5px 22px 30px; }
+    .visual-wrap::before {
+      content: ""; position: absolute; inset: 0 -80px -20px 45px; border-radius: 50%;
+      background: radial-gradient(ellipse at center, #dfece0 0%, #eaf1e8 43%, transparent 72%);
+      z-index: 0;
+    }
+    .dashboard {
+      position: relative; z-index: 1; width: 100%; height: 490px; overflow: hidden;
+      display: grid; grid-template-columns: 112px 1fr; grid-template-rows: 53px 1fr;
+      background: #fff; border: 1px solid #e2e8e2; border-radius: 13px;
+      box-shadow: 0 32px 75px rgba(37, 66, 53, .15), 0 3px 10px rgba(37, 66, 53, .04);
+    }
+    .dash-top {
+      grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 19px; border-bottom: 1px solid #edf0eb;
+    }
+    .dash-logo { display: flex; align-items: center; gap: 7px; font-family: Manrope, sans-serif; font-weight: 800; letter-spacing: -.06em; font-size: 16px; }
+    .dash-logo svg { color: var(--green); }
+    .dash-top-right { display: flex; align-items: center; gap: 13px; }
+    .dash-search { display: flex; align-items: center; gap: 7px; color: #98a59d; font-size: 10px; background: #f7f9f6; border: 1px solid #eef1ec; border-radius: 5px; width: 145px; height: 26px; padding: 0 9px; }
+    .dash-avatar { display: grid; place-items: center; width: 26px; height: 26px; background: #e6d9cc; color: #73594b; border-radius: 50%; font-size: 9px; font-weight: 700; }
+    .dash-side { border-right: 1px solid #edf0eb; padding: 20px 10px; }
+    .side-label { color: #b2bbb4; font-size: 8px; letter-spacing: .12em; font-weight: 800; margin: 0 0 12px 9px; }
+    .side-item { height: 29px; display: flex; align-items: center; gap: 8px; padding: 0 8px; color: #85958a; font-size: 9px; font-weight: 600; border-radius: 5px; margin-bottom: 4px; }
+    .side-item.active { color: var(--green); background: #eaf3ec; }
+    .side-item svg { width: 13px; height: 13px; }
+    .dash-main { background: #fcfdfa; padding: 23px 25px; overflow: hidden; }
+    .dash-breadcrumb { color: #94a299; font-size: 9px; margin-bottom: 12px; }
+    .dash-breadcrumb strong { color: #42594b; font-weight: 600; }
+    .dash-heading { display: flex; justify-content: space-between; align-items: start; gap: 10px; margin-bottom: 19px; }
+    .dash-heading h3 { font-size: 18px; letter-spacing: -.045em; margin: 0 0 3px; }
+    .dash-heading p { color: #8b9a90; font-size: 9px; margin: 0; }
+    .dash-chip { background: #e9f3eb; color: #427953; border: 1px solid #d7e9d9; padding: 6px 9px; border-radius: 5px; font-size: 8px; font-weight: 700; }
+    .dash-grid { display: grid; grid-template-columns: 1.09fr .91fr; gap: 12px; }
+    .panel { background: #fff; border: 1px solid #e8ede7; border-radius: 8px; }
+    .widget-panel { padding: 15px; }
+    .panel-top { display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: 700; }
+    .panel-top span:last-child { color: #7c9a83; font-size: 8px; font-weight: 600; }
+    .widget-figure { height: 147px; display: grid; place-items: center; margin: 11px 0; background: #f5f8f4; border-radius: 6px; overflow: hidden; }
+    .widget-figure svg { width: 188px; height: 135px; }
+    .spec-row { display: flex; justify-content: space-between; border-top: 1px solid #edf0ec; padding: 8px 0; font-size: 9px; }
+    .spec-row span:first-child { color: #8b9a90; }
+    .spec-row span:last-child { font-weight: 700; color: #40594c; }
+    .status-panel { padding: 15px 14px; }
+    .status-title { font-size: 10px; font-weight: 700; margin-bottom: 5px; }
+    .status-sub { font-size: 9px; color: #92a096; margin-bottom: 18px; }
+    .timeline { position: relative; margin-left: 5px; }
+    .timeline::before { content: ""; position: absolute; top: 8px; bottom: 23px; left: 4px; width: 1px; background: #dce8de; }
+    .timeline-step { display: flex; gap: 12px; min-height: 63px; position: relative; }
+    .timeline-dot { width: 9px; height: 9px; margin-top: 2px; border-radius: 50%; background: #fff; border: 2px solid #c8d6cb; flex: none; z-index: 1; }
+    .timeline-step.done .timeline-dot { background: #4b9167; border-color: #4b9167; box-shadow: 0 0 0 3px #e7f3e9; }
+    .timeline-step.current .timeline-dot { border-color: #4b9167; box-shadow: 0 0 0 3px #e7f3e9; }
+    .timeline-step strong { display: block; font-size: 9px; line-height: 1.3; }
+    .timeline-step small { display: block; color: #9aaa9e; font-size: 8px; margin-top: 4px; }
+    .dash-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding: 12px 14px; background: #edf4ed; border: 1px solid #e2eee2; border-radius: 7px; font-size: 9px; color: #42624c; }
+    .dash-bottom strong { font-weight: 700; }
+    .dash-bottom span { color: #6a8b71; }
+    .float-card {
+      position: absolute; z-index: 2; left: -18px; bottom: 1px;
+      width: 204px; padding: 14px 15px; background: white; border: 1px solid #e8ece5;
+      border-radius: 9px; box-shadow: 0 16px 35px rgba(29, 55, 44, .14);
+    }
+    .float-top { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 700; }
+    .float-icon { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 6px; color: #4c8b61; background: #eaf4ec; }
+    .float-card p { font-size: 9px; line-height: 1.5; color: #8b9b90; margin: 9px 0 0 35px; }
+
+    .trust { background: #fff; border-top: 1px solid #eeeee9; border-bottom: 1px solid #eeeee9; }
+    .trust-inner { min-height: 117px; display: flex; align-items: center; justify-content: space-between; gap: 35px; }
+    .trust-label { max-width: 170px; color: #748279; font-size: 11px; line-height: 1.5; font-weight: 600; }
+    .customer-logos { display: flex; align-items: center; justify-content: space-between; gap: 65px; width: min(100%, 870px); color: #74847a; }
+    .customer-logos span { font-family: Manrope, sans-serif; font-weight: 800; white-space: nowrap; letter-spacing: -.055em; font-size: 20px; opacity: .88; }
+    .customer-logos .wide { letter-spacing: .12em; font-size: 15px; }
+    .customer-logos .serif { font-family: Georgia, serif; font-style: italic; letter-spacing: -.055em; font-size: 23px; }
+    .customer-logos .small-logo { font-size: 17px; }
+
+    .section { padding-block: 108px; }
+    .section-header { max-width: 690px; margin-bottom: 44px; }
+    .section-header h2, .split-copy h2, .cta-copy h2 { font-size: clamp(35px, 3.2vw, 46px); line-height: 1.2; letter-spacing: -.055em; margin: 16px 0 13px; }
+    .section-header p, .split-copy > p { color: var(--muted); font-size: 16px; line-height: 1.7; margin-bottom: 0; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
+    .feature-card { min-height: 285px; padding: 29px; background: white; border: 1px solid #e9ece6; border-radius: 12px; box-shadow: 0 5px 20px rgba(27, 52, 40, .025); }
+    .feature-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; background: #eaf3eb; color: var(--green); }
+    .feature-card h3 { font-size: 19px; letter-spacing: -.04em; margin: 27px 0 10px; }
+    .feature-card p { color: var(--muted); line-height: 1.65; font-size: 14px; margin: 0; }
+
+    .benefits { background: #eaf0e9; }
+    .benefits-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 112px; align-items: center; }
+    .split-copy { max-width: 500px; }
+    .split-copy > p { margin-bottom: 27px; }
+    .check-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 17px; }
+    .check-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; font-weight: 600; line-height: 1.5; }
+    .check-list svg { color: var(--green); flex: none; margin-top: 1px; }
+    .quote-card { background: white; border-radius: 13px; padding: 43px 44px; box-shadow: 0 16px 45px rgba(33, 68, 47, .06); }
+    .quote-mark { color: #7aa98a; font-family: Georgia, serif; font-size: 75px; line-height: .7; }
+    blockquote { font-family: Manrope, sans-serif; font-size: 23px; line-height: 1.55; letter-spacing: -.035em; font-weight: 600; margin: 20px 0 28px; }
+    .quote-person { display: flex; align-items: center; gap: 11px; padding-top: 21px; border-top: 1px solid var(--line); }
+    .person-avatar { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 50%; background: #dce9df; color: var(--green); font-weight: 800; font-size: 12px; }
+    .quote-person strong { display: block; font-size: 12px; }
+    .quote-person span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .testimonial-note { color: #829187; font-size: 11px; margin-top: 15px; }
+
+    .cta-section { padding-block: 100px; }
+    .cta-panel {
+      display: grid; grid-template-columns: 1fr 390px; gap: 75px; align-items: center;
+      background: var(--ink); color: #fff; border-radius: 17px; padding: 68px 76px;
+      position: relative; overflow: hidden;
+    }
+    .cta-panel::after { content: ""; position: absolute; width: 540px; height: 540px; right: -170px; top: -270px; border: 1px solid rgba(210, 235, 214, .1); border-radius: 50%; box-shadow: 0 0 0 65px rgba(210, 235, 214, .025), 0 0 0 130px rgba(210, 235, 214, .018); pointer-events: none; }
+    .cta-copy, .demo-form { position: relative; z-index: 1; }
+    .cta-copy .eyebrow { color: #a8d4af; }
+    .cta-copy h2 { max-width: 500px; margin-top: 17px; font-size: 43px; }
+    .cta-copy p { max-width: 440px; color: #b8cbc0; font-size: 15px; line-height: 1.7; margin-bottom: 0; }
+    .demo-form { padding: 25px; background: #fff; border-radius: 11px; color: var(--ink); }
+    .demo-form h3 { font-size: 17px; letter-spacing: -.035em; margin: 0 0 4px; }
+    .demo-form > p { font-size: 11px; color: #77877d; line-height: 1.5; margin-bottom: 17px; }
+    .field { display: block; margin-bottom: 12px; }
+    .field span { display: block; font-size: 10px; font-weight: 700; margin-bottom: 6px; }
+    .field input {
+      display: block; width: 100%; height: 39px; padding: 0 11px; outline: none;
+      border: 1px solid #dfe6df; border-radius: 6px; background: #fff; color: var(--ink); font-size: 12px;
+    }
+    .field input:focus { border-color: #55916d; box-shadow: 0 0 0 3px #e7f2e9; }
+    .field input::placeholder { color: #a2afa5; }
+    .form-submit { width: 100%; min-height: 42px; border: 0; margin-top: 5px; font-size: 12px; }
+    .form-note { color: #849187; text-align: center; font-size: 10px; margin: 11px 0 0; }
+
+    .footer { border-top: 1px solid var(--line); padding-block: 29px; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 25px; }
+    .footer .brand { font-size: 20px; }
+    .footer .brand-mark { width: 27px; height: 27px; }
+    .footer p { margin: 0; color: #829087; font-size: 12px; }
+    .footer-links { display: flex; gap: 25px; color: #586c60; font-size: 12px; font-weight: 600; }
+    .footer-links a:hover { color: var(--green); }
+
+    @media (max-width: 1100px) {
+      .container { width: min(100% - 64px, 1248px); }
+      .hero-inner { gap: 15px; }
+      .dashboard { transform: scale(.91); transform-origin: center left; width: 110%; }
+      .float-card { bottom: 15px; }
+      .customer-logos { gap: 30px; }
+      .benefits-inner { gap: 50px; }
+      .cta-panel { gap: 35px; padding: 55px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 40px, 580px); }
+      .site-header { height: 72px; }
+      .nav-links { display: none; }
+      .header-cta { margin-left: auto; }
+      .hero-inner { grid-template-columns: 1fr; padding-block: 70px 75px; gap: 35px; }
+      h1 { font-size: clamp(45px, 10vw, 62px); }
+      .hero-copy > p { font-size: 16px; }
+      .visual-wrap { padding-left: 20px; padding-right: 0; }
+      .dashboard { transform: none; width: 100%; height: 450px; grid-template-columns: 85px 1fr; }
+      .dash-main { padding: 18px 13px; }
+      .dash-side { padding-inline: 5px; }
+      .side-item { font-size: 8px; gap: 5px; }
+      .dash-grid { gap: 7px; }
+      .widget-panel, .status-panel { padding: 10px; }
+      .float-card { left: -9px; bottom: -10px; }
+      .trust-inner { flex-direction: column; align-items: flex-start; gap: 20px; padding-block: 25px; }
+      .trust-label { max-width: none; }
+      .customer-logos { flex-wrap: wrap; justify-content: flex-start; gap: 15px 28px; }
+      .customer-logos span { font-size: 17px; }
+      .section { padding-block: 75px; }
+      .feature-grid, .benefits-inner, .cta-panel { grid-template-columns: 1fr; }
+      .feature-card { min-height: auto; }
+      .benefits-inner { gap: 38px; }
+      .cta-section { padding-block: 75px; }
+      .cta-panel { padding: 37px 25px; gap: 35px; }
+      .cta-copy h2 { font-size: 36px; }
+      .footer-inner { flex-wrap: wrap; }
+    }
+    @media (max-width: 430px) {
+      .header-cta { padding-inline: 13px; font-size: 12px; }
+      .dashboard { height: 400px; grid-template-columns: 68px 1fr; }
+      .dash-top { padding-inline: 10px; }
+      .dash-search { display: none; }
+      .dash-main { padding: 14px 9px; }
+      .side-item { font-size: 0; justify-content: center; }
+      .side-item svg { width: 15px; height: 15px; }
+      .side-label { font-size: 7px; margin-left: 3px; }
+      .widget-figure { height: 105px; }
+      .widget-figure svg { width: 125px; }
+      .timeline-step { min-height: 53px; gap: 7px; }
+      .float-card { width: 175px; }
+      .dash-bottom { margin-top: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <path d="M18 3.5 32.5 28.5h-8.1L18 17.2l-6.4 11.3H3.5L18 3.5Z" fill="currentColor"/>
+          <path d="M13.5 29.5h9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        acme
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#platform">Platform</a>
+        <a href="#why-acme">Why Acme</a>
+        <a href="#book-demo">Get in touch</a>
+      </nav>
+      <a class="button button-primary header-cta" href="#book-demo">Book a demo <svg class="arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> A better way to manage custom widgets</div>
+          <h1 id="hero-title">Custom widgets, without the <em>custom chaos.</em></h1>
+          <p>From the first configuration to the final delivery, Acme gives your operations team one clear place to keep every widget order moving.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#book-demo">Book a demo <svg class="arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+            <a class="button button-outline" href="#platform">See how it works</a>
+          </div>
+          <div class="hero-note">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4 10 4 4 8-8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Built for the people who keep production moving
+          </div>
+        </div>
+
+        <div class="visual-wrap" aria-label="Preview of the Acme order tracking dashboard">
+          <div class="dashboard">
+            <div class="dash-top">
+              <div class="dash-logo">
+                <svg width="17" height="17" viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M18 3.5 32.5 28.5h-8.1L18 17.2l-6.4 11.3H3.5L18 3.5Z" fill="currentColor"/><path d="M13.5 29.5h9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+                acme
+              </div>
+              <div class="dash-top-right">
+                <div class="dash-search"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor"/><path d="m10.5 10.5 3 3" stroke="currentColor" stroke-linecap="round"/></svg>Search orders</div>
+                <div class="dash-avatar">JM</div>
+              </div>
+            </div>
+            <aside class="dash-side" aria-hidden="true">
+              <div class="side-label">WORKSPACE</div>
+              <div class="side-item"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor"/></svg>Overview</div>
+              <div class="side-item active"><svg viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h10M3 12h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Orders</div>
+              <div class="side-item"><svg viewBox="0 0 16 16" fill="none"><path d="m8 1.8 5.4 3.1v6.2L8 14.2l-5.4-3.1V4.9L8 1.8Z" stroke="currentColor" stroke-width="1.2"/><path d="m2.8 5 5.2 3 5.2-3M8 8v6" stroke="currentColor" stroke-width="1.2"/></svg>Widgets</div>
+              <div class="side-item"><svg viewBox="0 0 16 16" fill="none"><path d="M3 13V6l5-3 5 3v7H3Z" stroke="currentColor" stroke-width="1.2"/><path d="M6 13V9h4v4" stroke="currentColor" stroke-width="1.2"/></svg>Suppliers</div>
+            </aside>
+            <div class="dash-main">
+              <div class="dash-breadcrumb">Orders <span style="padding:0 5px">/</span> <strong>Order #AC-2847</strong></div>
+              <div class="dash-heading">
+                <div><h3>Widget order #AC-2847</h3><p>Created May 14 · Northline Components</p></div>
+                <span class="dash-chip">In production</span>
+              </div>
+              <div class="dash-grid">
+                <div class="panel widget-panel">
+                  <div class="panel-top"><span>Configured widget</span><span>View specs ↗</span></div>
+                  <div class="widget-figure">
+                    <svg viewBox="0 0 200 140" fill="none" aria-hidden="true">
+                      <ellipse cx="100" cy="115" rx="69" ry="12" fill="#DDE8DD"/>
+                      <path d="M48 54 98 28l53 25-51 27-52-26Z" fill="#C9DCCF" stroke="#688F77" stroke-width="1.4"/>
+                      <path d="M48 54v39l52 27V80L48 54Z" fill="#9FBDA8" stroke="#688F77" stroke-width="1.4"/>
+                      <path d="M100 80v40l51-27V53l-51 27Z" fill="#B6D0BC" stroke="#688F77" stroke-width="1.4"/>
+                      <path d="m70 43 52 27M81 37l52 27" stroke="#8EB19A" stroke-width="1.3"/>
+                      <path d="M69 65v39M80 71v39" stroke="#80A58B" stroke-width="1.3"/>
+                      <path d="m119 70 0 40M131 64v40" stroke="#90B29A" stroke-width="1.3"/>
+                      <path d="m69 74 10 5v13l-10-5V74Z" fill="#EAF3E9" stroke="#648A70" stroke-width="1.2"/>
+                      <circle cx="127" cy="85" r="8" fill="#E6EFE5" stroke="#709778" stroke-width="1.2"/>
+                      <circle cx="127" cy="85" r="3" fill="#9FC2A6"/>
+                      <path d="M45 103h34M146 102h16" stroke="#B9CDBB" stroke-width="1.2" stroke-dasharray="3 3"/>
+                    </svg>
+                  </div>
+                  <div class="spec-row"><span>Material</span><span>Brushed aluminum</span></div>
+                  <div class="spec-row"><span>Finish</span><span>Forest green</span></div>
+                  <div class="spec-row"><span>Quantity</span><span>1,200 units</span></div>
+                </div>
+                <div class="panel status-panel">
+                  <div class="status-title">Order progress</div>
+                  <div class="status-sub">Estimated delivery: Jun 12</div>
+                  <div class="timeline">
+                    <div class="timeline-step done"><span class="timeline-dot"></span><div><strong>Order approved</strong><small>May 14 · 9:42 AM</small></div></div>
+                    <div class="timeline-step done"><span class="timeline-dot"></span><div><strong>Specs confirmed</strong><small>May 16 · 2:18 PM</small></div></div>
+                    <div class="timeline-step current"><span class="timeline-dot"></span><div><strong>In production</strong><small>Started May 20</small></div></div>
+                    <div class="timeline-step"><span class="timeline-dot"></span><div><strong>Quality check</strong><small>Up next</small></div></div>
+                    <div class="timeline-step"><span class="timeline-dot"></span><div><strong>On its way</strong><small>Pending</small></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="dash-bottom"><strong>Everything is on track</strong><span>Last updated 12 minutes ago</span></div>
+            </div>
+          </div>
+          <div class="float-card">
+            <div class="float-top"><span class="float-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4 10 4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Specs confirmed</div>
+            <p>Your team and supplier are working from the same details.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust" aria-label="The kinds of teams Acme supports">
+      <div class="container trust-inner">
+        <div class="trust-label">Made for modern manufacturing teams</div>
+        <div class="customer-logos" aria-label="Example manufacturing sectors">
+          <span>NORTHLINE</span>
+          <span class="serif">Form &amp; Foundry</span>
+          <span class="wide">MERIDIAN</span>
+          <span class="small-logo">everwell<span style="color:#92ad98">.</span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="platform" aria-labelledby="platform-title">
+      <div class="container">
+        <div class="section-header">
+          <div class="eyebrow">One connected workflow</div>
+          <h2 id="platform-title">Less chasing. More making.</h2>
+          <p>Custom orders have a lot of moving parts. Acme brings the details, decisions, and updates together so nothing gets lost between teams.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-icon"><svg width="25" height="25" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="m13 2.5 9 5.2v10.6l-9 5.2-9-5.2V7.7l9-5.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m4 7.8 9 5.2 9-5.2M13 13v10" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m8.5 5.1 9 5.3" stroke="currentColor" stroke-width="1.6"/></svg></div>
+            <h3>Configure with confidence</h3>
+            <p>Capture dimensions, materials, finishes, and quantities in a clear spec everyone can reference before an order goes out.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon"><svg width="25" height="25" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="5" y="3" width="16" height="20" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 8h8M9 12h8M9 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="m16 18 2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <h3>Order without the back-and-forth</h3>
+            <p>Turn approved configurations into orders, with the right information ready for your team and your suppliers.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon"><svg width="25" height="25" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M5 19V8m8 11V4m8 15v-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="5" cy="7" r="2" fill="#EAF3EB" stroke="currentColor" stroke-width="1.6"/><circle cx="13" cy="18" r="2" fill="#EAF3EB" stroke="currentColor" stroke-width="1.6"/><circle cx="21" cy="11" r="2" fill="#EAF3EB" stroke="currentColor" stroke-width="1.6"/></svg></div>
+            <h3>Know where things stand</h3>
+            <p>Follow each order from approval through production and delivery. Give stakeholders an answer without sending another email.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section benefits" id="why-acme" aria-labelledby="benefits-title">
+      <div class="container benefits-inner">
+        <div class="split-copy">
+          <div class="eyebrow">A little more breathing room</div>
+          <h2 id="benefits-title">Good operations run on clarity.</h2>
+          <p>Your team shouldn't have to piece together the story of an order from spreadsheets, inboxes, and status calls. Acme makes the next step visible to everyone involved.</p>
+          <ul class="check-list">
+            <li><svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8.5" stroke="currentColor"/><path d="m6 10 2.5 2.5L14 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Fewer surprises when specifications change</li>
+            <li><svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8.5" stroke="currentColor"/><path d="m6 10 2.5 2.5L14 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>A shared view across operations and suppliers</li>
+            <li><svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8.5" stroke="currentColor"/><path d="m6 10 2.5 2.5L14 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>More time for the work that actually needs you</li>
+          </ul>
+        </div>
+        <div>
+          <div class="quote-card">
+            <div class="quote-mark" aria-hidden="true">“</div>
+            <blockquote>Finally, one place to see what we ordered, what was approved, and what's happening next.</blockquote>
+            <div class="quote-person">
+              <div class="person-avatar">OP</div>
+              <div><strong>Built for operations teams</strong><span>Who need answers at a glance</span></div>
+            </div>
+          </div>
+          <div class="testimonial-note">A familiar challenge, and the experience Acme is designed to deliver.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section" id="book-demo" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-panel">
+          <div class="cta-copy">
+            <div class="eyebrow">Let's make it simpler</div>
+            <h2 id="cta-title">See what a calmer workflow looks like.</h2>
+            <p>Tell us a little about your team. We'll walk you through how Acme can help you manage custom widgets from request to arrival.</p>
+          </div>
+          <form class="demo-form" id="demo-form">
+            <h3>Book a conversation</h3>
+            <p>No long sales pitch. Just a look at what could work for your team.</p>
+            <label class="field"><span>Your name</span><input name="name" type="text" placeholder="Alex Morgan" autocomplete="name" required /></label>
+            <label class="field"><span>Work email</span><input name="email" type="email" placeholder="alex@company.com" autocomplete="email" required /></label>
+            <label class="field"><span>Company</span><input name="company" type="text" placeholder="Your company" autocomplete="organization" required /></label>
+            <button class="button button-primary form-submit" type="submit">Request a demo <svg class="arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <p class="form-note">This opens your email app with your request ready to send.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M18 3.5 32.5 28.5h-8.1L18 17.2l-6.4 11.3H3.5L18 3.5Z" fill="currentColor"/><path d="M13.5 29.5h9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        acme
+      </a>
+      <p>Better visibility for every widget in motion.</p>
+      <div class="footer-links"><a href="#platform">Platform</a><a href="#why-acme">Why Acme</a><a href="#book-demo">Book a demo</a></div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('demo-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!this.reportValidity()) return;
+      const data = new FormData(this);
+      const name = String(data.get('name')).trim();
+      const email = String(data.get('email')).trim();
+      const company = String(data.get('company')).trim();
+      const subject = encodeURIComponent('Acme demo request — ' + company);
+      const body = encodeURIComponent(
+        'Hi Acme team,\n\nI would like to book a demo.\n\nName: ' + name +
+        '\nWork email: ' + email +
+        '\nCompany: ' + company +
+        '\n\nPlease get in touch to find a time.\n'
+      );
+      window.location.href = 'mailto:hello@acme.com?subject=' + subject + '&body=' + body;
+    });
+  </script>
+</body>
+</html>

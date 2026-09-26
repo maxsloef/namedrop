@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f2ec">
+  <meta name="description" content="Acme brings custom widget configuration, ordering, and tracking into one clear system for manufacturing operations teams.">
+  <title>Acme — Custom widgets. One clear system.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f3f2ec;
+      --white: #fbfaf6;
+      --ink: #172b35;
+      --muted: #59676a;
+      --blue: #245c9b;
+      --blue-dark: #194b85;
+      --blue-pale: #dce8ed;
+      --orange: #e46c3d;
+      --line: #cbd0c9;
+      --mono: "IBM Plex Mono", monospace;
+      --sans: "IBM Plex Sans", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+    .container { width: min(1320px, calc(100% - 112px)); margin-inline: auto; }
+    .mono { font-family: var(--mono); }
+    .eyebrow { display: flex; align-items: center; gap: 11px; font: 500 11px/1.4 var(--mono); letter-spacing: .095em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 9px; height: 9px; background: var(--orange); flex: none; }
+    .section-index { font: 500 11px var(--mono); letter-spacing: .08em; color: var(--blue); }
+
+    .site-header { height: 88px; }
+    .header-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .brand { display: inline-flex; align-items: center; gap: 13px; flex: none; }
+    .brand-mark { width: 34px; height: 34px; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 3px; }
+    .brand-mark i { display: block; background: var(--blue); }
+    .brand-mark i:nth-child(2) { border-radius: 50% 50% 0 0; background: var(--orange); }
+    .brand-mark i:nth-child(3) { border-radius: 0 0 0 100%; }
+    .brand-mark i:nth-child(4) { background: var(--ink); }
+    .brand-name { font-size: 26px; font-weight: 700; letter-spacing: -.055em; line-height: 1; }
+    .brand-divider { width: 1px; height: 27px; background: var(--line); margin-left: 7px; }
+    .brand-descriptor { font: 500 9px/1.35 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+    .desktop-nav { display: flex; align-items: center; gap: 42px; margin-left: auto; margin-right: 42px; }
+    .desktop-nav a { font-size: 14px; font-weight: 600; transition: color .2s; }
+    .desktop-nav a:hover, .text-link:hover { color: var(--orange); }
+    .header-cta { display: inline-flex; align-items: center; justify-content: center; gap: 25px; min-width: 160px; min-height: 43px; padding: 10px 15px; border: 1px solid var(--ink); font-size: 13px; font-weight: 600; transition: background .2s, color .2s; }
+    .header-cta:hover { background: var(--ink); color: var(--white); }
+    .arrow { font-family: var(--sans); font-size: 19px; font-weight: 400; line-height: .7; }
+    .menu-toggle { display: none; border: 0; background: transparent; padding: 10px; }
+    .menu-toggle span { display: block; width: 24px; height: 2px; margin: 5px 0; background: var(--ink); }
+    .mobile-nav { display: none; }
+
+    .hero { padding-top: 58px; padding-bottom: 69px; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 53px; align-items: stretch; }
+    .hero-copy { display: flex; flex-direction: column; align-items: flex-start; min-height: 548px; padding-top: 28px; }
+    .hero .eyebrow { color: var(--blue); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 690px; margin: 34px 0 27px; font-size: clamp(62px, 5.5vw, 84px); line-height: .985; font-weight: 600; letter-spacing: -.065em; }
+    h1 span { color: var(--blue); }
+    .hero-lede { max-width: 495px; margin-bottom: 29px; color: #415257; font-size: 18px; line-height: 1.55; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 27px; }
+    .button-primary { display: inline-flex; justify-content: space-between; align-items: center; gap: 42px; min-height: 55px; padding: 0 20px; background: var(--blue); border: 1px solid var(--blue); color: white; font-size: 14px; font-weight: 600; transition: background .2s, transform .2s; }
+    .button-primary:hover { background: var(--blue-dark); transform: translateY(-2px); }
+    .text-link { display: inline-flex; align-items: center; gap: 11px; border-bottom: 1px solid currentColor; padding-bottom: 4px; font-size: 14px; font-weight: 600; transition: color .2s; }
+    .hero-foot { display: flex; align-items: center; gap: 18px; margin-top: auto; padding-top: 35px; }
+    .hero-foot .rule { width: 41px; height: 1px; background: var(--blue); }
+    .hero-foot span:last-child { max-width: 290px; color: var(--muted); font: 11px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .04em; }
+
+    .hero-panel { position: relative; overflow: hidden; min-height: 548px; background: var(--blue); color: #f5f7f2; }
+    .hero-panel::after { content: ""; position: absolute; top: 63px; right: 0; width: 48px; height: 48px; background: var(--orange); clip-path: polygon(100% 0,100% 100%,0 0); }
+    .panel-top { position: relative; z-index: 1; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; border-bottom: 1px solid rgba(255,255,255,.28); font: 10px var(--mono); letter-spacing: .08em; }
+    .panel-top .live { display: inline-flex; align-items: center; gap: 9px; }
+    .panel-top .live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #f1a17c; }
+    .blueprint { position: relative; height: 394px; overflow: hidden; }
+    .blueprint svg { display: block; width: 100%; height: 100%; }
+    .panel-bottom { display: grid; grid-template-columns: repeat(3, 1fr); height: 90px; border-top: 1px solid rgba(255,255,255,.35); }
+    .panel-bottom div { padding: 19px 20px; border-right: 1px solid rgba(255,255,255,.28); }
+    .panel-bottom div:last-child { border: 0; }
+    .panel-bottom b { display: block; margin-bottom: 8px; font: 500 10px var(--mono); color: #b6d0e6; }
+    .panel-bottom span { display: block; font-size: 12px; font-weight: 600; letter-spacing: .01em; }
+
+    .system-strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .strip-inner { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); align-items: center; min-height: 98px; }
+    .strip-title { font: 500 11px/1.5 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .strip-item { display: flex; align-items: center; gap: 13px; min-height: 44px; padding-left: 29px; border-left: 1px solid var(--line); font-size: 15px; font-weight: 600; }
+    .strip-item span { font: 11px var(--mono); color: var(--blue); }
+
+    .platform { padding: 112px 0 120px; }
+    .section-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 45px; align-items: end; margin-bottom: 52px; }
+    .section-heading h2 { max-width: 610px; margin: 15px 0 0; font-size: clamp(40px, 4vw, 57px); line-height: 1.07; letter-spacing: -.055em; font-weight: 600; }
+    .section-heading p { max-width: 470px; margin: 0 0 5px auto; color: var(--muted); font-size: 17px; line-height: 1.55; }
+    .workflow { display: grid; grid-template-columns: 45% 55%; min-height: 474px; border: 1px solid var(--line); }
+    .workflow-list { background: var(--white); }
+    .workflow-step { display: grid; grid-template-columns: 48px 1fr 23px; width: 100%; min-height: 157px; align-items: center; gap: 10px; padding: 24px 31px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; color: var(--ink); transition: background .2s; }
+    .workflow-step:last-child { border-bottom: 0; }
+    .workflow-step:hover { background: #f1f4f0; }
+    .workflow-step[aria-selected="true"] { background: var(--blue-pale); box-shadow: inset 5px 0 var(--blue); }
+    .step-number { align-self: start; padding-top: 7px; font: 500 12px var(--mono); color: var(--blue); }
+    .step-content strong { display: block; margin-bottom: 7px; font-size: 22px; line-height: 1.15; letter-spacing: -.035em; font-weight: 600; }
+    .step-content small { display: block; max-width: 355px; color: #57676b; font-size: 14px; line-height: 1.45; }
+    .step-arrow { align-self: start; padding-top: 3px; font-size: 23px; font-weight: 400; color: var(--blue); }
+    .workflow-visual { position: relative; display: flex; flex-direction: column; min-height: 474px; padding: 28px 32px 30px; background: #dce7e9; overflow: hidden; }
+    .workflow-visual::before { content: ""; position: absolute; inset: 0; opacity: .31; background-image: linear-gradient(#a9bfc3 1px, transparent 1px), linear-gradient(90deg, #a9bfc3 1px, transparent 1px); background-size: 30px 30px; }
+    .visual-head, .visual-main, .visual-footer { position: relative; z-index: 1; }
+    .visual-head { display: flex; justify-content: space-between; align-items: center; font: 500 10px var(--mono); letter-spacing: .07em; }
+    .visual-head span:last-child { color: var(--blue); }
+    .visual-main { display: flex; flex: 1; align-items: center; justify-content: center; min-height: 260px; }
+    .visual-main svg { width: min(100%, 540px); height: 255px; overflow: visible; }
+    .visual-footer { display: flex; justify-content: space-between; gap: 20px; align-items: end; padding-top: 20px; border-top: 1px solid #aabec1; }
+    .visual-footer h3 { margin: 0 0 5px; font-size: 22px; letter-spacing: -.035em; font-weight: 600; }
+    .visual-footer p { max-width: 370px; margin: 0; color: #53666a; font-size: 13px; line-height: 1.4; }
+    .visual-count { font: 12px var(--mono); color: var(--blue); white-space: nowrap; }
+
+    .clarity { background: var(--ink); color: var(--white); padding: 101px 0 110px; overflow: hidden; }
+    .clarity-grid { display: grid; grid-template-columns: 43% 57%; gap: 30px; align-items: center; }
+    .clarity .eyebrow { color: #b7d0e1; }
+    .clarity h2 { max-width: 520px; margin: 25px 0 23px; font-size: clamp(43px, 4vw, 59px); line-height: 1.06; letter-spacing: -.055em; font-weight: 600; }
+    .clarity-copy > p { max-width: 420px; color: #bdc9c8; font-size: 17px; line-height: 1.58; }
+    .clarity .text-link { margin-top: 20px; color: white; }
+    .clarity .text-link:hover { color: #f5a67e; }
+    .tracking { position: relative; margin-left: 20px; border: 1px solid #55707b; background: #203c48; }
+    .tracking-top { display: flex; justify-content: space-between; gap: 20px; padding: 19px 22px; border-bottom: 1px solid #55707b; font: 10px var(--mono); letter-spacing: .08em; color: #bcd0d4; }
+    .tracking-top span:last-child { color: #f5aa83; }
+    .tracking-body { padding: 24px 27px 31px; }
+    .tracking-label { margin-bottom: 24px; font: 10px var(--mono); letter-spacing: .08em; color: #a8c0c6; }
+    .tracking-route { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+    .route-stop { position: relative; padding-top: 35px; border-top: 2px solid #7ba9bf; }
+    .route-stop:last-child { border-top-color: #56717c; }
+    .route-stop::before { content: ""; position: absolute; top: -8px; left: 0; width: 12px; height: 12px; background: #b5d4e0; border: 1px solid #b5d4e0; border-radius: 50%; }
+    .route-stop.current::before { top: -10px; width: 16px; height: 16px; background: var(--orange); border: 3px solid #203c48; box-shadow: 0 0 0 1px var(--orange); }
+    .route-stop.future::before { background: #203c48; border-color: #8299a0; }
+    .route-stop b { display: block; margin-bottom: 9px; font: 500 10px var(--mono); color: #adc2c7; }
+    .route-stop span { display: block; padding-right: 6px; font-size: 13px; font-weight: 600; }
+    .tracking-update { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 31px; padding: 17px 18px; background: #315261; }
+    .tracking-update div { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+    .tracking-update i { display: block; width: 8px; height: 8px; background: var(--orange); flex: none; }
+    .tracking-update span { font: 10px var(--mono); color: #b9cdd0; white-space: nowrap; }
+
+    .closing { padding: 107px 0 100px; }
+    .closing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+    .closing h2 { max-width: 590px; margin: 23px 0 20px; font-size: clamp(45px, 4.3vw, 62px); line-height: 1.06; letter-spacing: -.058em; font-weight: 600; }
+    .closing-copy { max-width: 460px; color: var(--muted); font-size: 17px; line-height: 1.55; }
+    .demo-box { align-self: center; padding: 34px 37px 35px; background: #e6ebe6; border-top: 5px solid var(--orange); }
+    .demo-box .box-label { margin-bottom: 25px; font: 500 11px var(--mono); letter-spacing: .07em; color: var(--blue); }
+    .demo-box label { display: block; margin-bottom: 9px; font-size: 14px; font-weight: 600; }
+    .demo-form-row { display: flex; gap: 9px; }
+    .demo-box input { min-width: 0; flex: 1; height: 51px; padding: 0 15px; border: 1px solid #aab8b5; border-radius: 0; background: var(--white); color: var(--ink); font-size: 14px; }
+    .demo-box input::placeholder { color: #718080; }
+    .demo-box button { min-width: 128px; padding: 0 16px; border: 0; background: var(--blue); color: white; font-size: 13px; font-weight: 600; transition: background .2s; }
+    .demo-box button:hover { background: var(--blue-dark); }
+    .demo-note { margin: 15px 0 0; color: #667472; font: 11px/1.5 var(--mono); }
+
+    .site-footer { border-top: 1px solid var(--line); }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 25px; min-height: 94px; }
+    .footer-inner .brand-mark { width: 25px; height: 25px; gap: 2px; }
+    .footer-inner .brand-name { font-size: 21px; }
+    .footer-right { display: flex; gap: 32px; color: var(--muted); font: 11px var(--mono); }
+    .footer-right a:hover { color: var(--blue); }
+
+    @media (max-width: 1050px) {
+      .container { width: min(100% - 64px, 1320px); }
+      .hero-grid { gap: 28px; }
+      h1 { font-size: clamp(53px, 6.3vw, 72px); }
+      .hero-copy, .hero-panel { min-height: 520px; }
+      .blueprint { height: 366px; }
+      .desktop-nav { gap: 20px; margin-right: 22px; }
+      .brand-descriptor, .brand-divider { display: none; }
+      .strip-inner { grid-template-columns: 1.2fr repeat(3, 1fr); }
+      .strip-item { padding-left: 18px; }
+      .workflow-step { padding-inline: 20px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: calc(100% - 40px); }
+      .site-header { height: 72px; }
+      .desktop-nav, .header-cta { display: none; }
+      .menu-toggle { display: block; }
+      .mobile-nav.is-open { display: flex; flex-direction: column; position: absolute; z-index: 10; top: 72px; left: 0; right: 0; padding: 14px 20px 22px; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 12px 18px #172b351a; }
+      .mobile-nav a { padding: 13px 0; font-weight: 600; }
+      .mobile-nav a:last-child { color: var(--blue); }
+      .hero { padding: 40px 0 45px; }
+      .hero-grid, .section-heading, .workflow, .clarity-grid, .closing-grid { grid-template-columns: 1fr; }
+      .hero-copy { min-height: auto; padding: 0 0 32px; }
+      h1 { margin: 25px 0; font-size: clamp(50px, 10vw, 75px); }
+      .hero-lede { font-size: 16px; }
+      .hero-foot { margin-top: 18px; }
+      .hero-panel { min-height: auto; }
+      .blueprint { height: 330px; }
+      .panel-bottom { height: 83px; }
+      .panel-bottom div { padding: 16px 10px; }
+      .panel-bottom span { font-size: 10px; }
+      .strip-inner { grid-template-columns: 1fr; padding: 17px 0; }
+      .strip-title { margin-bottom: 12px; }
+      .strip-item { min-height: 40px; padding-left: 0; border: 0; }
+      .platform, .closing { padding: 75px 0; }
+      .section-heading { gap: 18px; margin-bottom: 30px; }
+      .section-heading h2, .clarity h2, .closing h2 { font-size: clamp(40px, 8vw, 56px); }
+      .section-heading p { margin-left: 0; font-size: 16px; }
+      .workflow-step { min-height: 125px; }
+      .workflow-visual { min-height: 405px; }
+      .visual-main { min-height: 225px; }
+      .clarity { padding: 75px 0; }
+      .clarity-grid { gap: 37px; }
+      .tracking { margin-left: 0; }
+      .closing-grid { gap: 28px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; padding: 25px 0; }
+      .footer-right { flex-wrap: wrap; gap: 15px; }
+    }
+    @media (max-width: 430px) {
+      .hero-actions { gap: 20px; }
+      .blueprint { height: 270px; }
+      .panel-top { padding-inline: 16px; font-size: 9px; }
+      .panel-bottom b { font-size: 9px; }
+      .panel-bottom span { font-size: 9px; }
+      .workflow-step { grid-template-columns: 30px 1fr 18px; gap: 6px; padding: 18px 15px; }
+      .step-content strong { font-size: 20px; }
+      .workflow-visual { padding-inline: 18px; }
+      .tracking-body { padding-inline: 16px; }
+      .route-stop span { font-size: 10px; }
+      .tracking-update span { display: none; }
+      .demo-box { padding: 27px 20px; }
+      .demo-form-row { flex-direction: column; }
+      .demo-box button { min-height: 48px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-name">acme</span>
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-descriptor">Widget systems<br>for industry</span>
+      </a>
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#visibility">Why Acme</a>
+      </nav>
+      <a class="header-cta" href="#book-demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-controls="mobile-nav" aria-expanded="false"><span></span><span></span></button>
+    </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+      <a href="#platform">Platform</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#visibility">Why Acme</a>
+      <a href="#book-demo">Book a demo ↗</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">The operating system for custom widgets</div>
+          <h1 id="hero-title">Custom widgets.<br><span>One clear system.</span></h1>
+          <p class="hero-lede">Specify exactly what you need. Place orders with confidence. See every widget through to delivery—all in one place built for operations teams.</p>
+          <div class="hero-actions">
+            <a class="button-primary" href="#book-demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="hero-foot">
+            <span class="mono section-index">01 / 03</span><span class="rule" aria-hidden="true"></span>
+            <span>From first specification to final shipment</span>
+          </div>
+        </div>
+
+        <div class="hero-panel" role="img" aria-label="Technical drawing of a custom widget with configuration, order, and tracking stages">
+          <div class="panel-top"><span>ACME / COMPONENT SYSTEM</span><span class="live">SPECIFICATION ACTIVE</span></div>
+          <div class="blueprint">
+            <svg viewBox="0 0 620 394" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <pattern id="hero-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+                  <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#fff" stroke-opacity=".13" stroke-width="1"/>
+                </pattern>
+              </defs>
+              <rect width="620" height="394" fill="url(#hero-grid)"/>
+              <g fill="none" stroke="#d8e7ed" stroke-width="1" opacity=".64">
+                <path d="M64 58h492M64 336h492M102 36v324M520 36v324"/>
+                <path d="M82 58v278M76 58h12M76 336h12M103 358h417M103 352v12M520 352v12"/>
+                <path d="M310 42v305M129 197h362" stroke-dasharray="5 7" opacity=".6"/>
+              </g>
+              <g fill="#d9e8ef" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1.2">
+                <text x="106" y="49">TOP VIEW / W-4821</text>
+                <text x="428" y="49">SCALE 1:2</text>
+                <text x="52" y="208" transform="rotate(-90 52 208)">84 MM</text>
+                <text x="281" y="379">120 MM</text>
+                <text x="455" y="325">REV. 04</text>
+              </g>
+              <!-- Mounting arms and body -->
+              <g fill="#245c9b" stroke="#f5f7f2" stroke-width="2.2">
+                <rect x="144" y="172" width="332" height="50" rx="8"/>
+                <rect x="283" y="83" width="54" height="228" rx="8"/>
+                <circle cx="310" cy="197" r="105"/>
+                <circle cx="310" cy="197" r="83" stroke-opacity=".85"/>
+                <circle cx="310" cy="197" r="58"/>
+              </g>
+              <!-- Evenly spaced assembly marks -->
+              <g stroke="#f5f7f2" stroke-width="2">
+                <path d="M310 106v30M310 258v30M219 197h30M371 197h30"/>
+                <path d="M246 133l21 21M353 240l21 21M374 133l-21 21M267 240l-21 21"/>
+              </g>
+              <circle cx="310" cy="197" r="37" fill="#e46c3d" stroke="#f5f7f2" stroke-width="2"/>
+              <circle cx="310" cy="197" r="16" fill="#245c9b" stroke="#f5f7f2" stroke-width="2"/>
+              <g fill="#245c9b" stroke="#f5f7f2" stroke-width="2">
+                <circle cx="161" cy="197" r="10"/><circle cx="459" cy="197" r="10"/>
+                <circle cx="310" cy="100" r="8"/><circle cx="310" cy="294" r="8"/>
+              </g>
+              <g stroke="#f5f7f2" stroke-width="1.2" fill="none" opacity=".9">
+                <path d="M383 117l38-33h106M371 267l38 37h96"/>
+                <circle cx="383" cy="117" r="3" fill="#f5f7f2"/>
+                <circle cx="371" cy="267" r="3" fill="#f5f7f2"/>
+              </g>
+              <g fill="#f5f7f2" font-family="IBM Plex Mono, monospace" font-size="9" letter-spacing=".7">
+                <text x="426" y="79">ALLOY / 6061-T6</text>
+                <text x="414" y="319">TOL. / ±0.2 MM</text>
+              </g>
+              <g stroke="#f5f7f2" stroke-width="1.2" opacity=".7"><path d="M25 25h18M34 16v18M577 25h18M586 16v18M25 370h18M34 361v18M577 370h18M586 361v18"/></g>
+            </svg>
+          </div>
+          <div class="panel-bottom">
+            <div><b>01 / DEFINE</b><span>Configure to spec</span></div>
+            <div><b>02 / EXECUTE</b><span>Order in one flow</span></div>
+            <div><b>03 / MONITOR</b><span>Track every step</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="system-strip" id="platform">
+      <div class="container strip-inner">
+        <div class="strip-title">One connected workflow<br>for the whole supply chain.</div>
+        <div class="strip-item"><span>01</span> Fewer handoffs</div>
+        <div class="strip-item"><span>02</span> Clearer decisions</div>
+        <div class="strip-item"><span>03</span> Full visibility</div>
+      </div>
+    </div>
+
+    <section class="platform" id="how-it-works" aria-labelledby="platform-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <span class="section-index">02 / THE PLATFORM</span>
+            <h2 id="platform-title">Every moving part, moving together.</h2>
+          </div>
+          <p>Replace scattered spreadsheets, email threads, and status calls with a single path from a finished spec to a received order.</p>
+        </div>
+
+        <div class="workflow">
+          <div class="workflow-list" role="tablist" aria-label="Explore the Acme workflow">
+            <button class="workflow-step" id="tab-configure" type="button" role="tab" aria-selected="true" aria-controls="workflow-panel" data-step="0">
+              <span class="step-number">01</span>
+              <span class="step-content"><strong>Configure precisely.</strong><small>Set dimensions, materials, tolerances, and quantities in a guided specification.</small></span>
+              <span class="step-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button class="workflow-step" id="tab-order" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel" data-step="1" tabindex="-1">
+              <span class="step-number">02</span>
+              <span class="step-content"><strong>Order confidently.</strong><small>Turn approved configurations into orders without re-entering a single detail.</small></span>
+              <span class="step-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button class="workflow-step" id="tab-track" type="button" role="tab" aria-selected="false" aria-controls="workflow-panel" data-step="2" tabindex="-1">
+              <span class="step-number">03</span>
+              <span class="step-content"><strong>Track completely.</strong><small>Keep production milestones, shipment updates, and order history in view.</small></span>
+              <span class="step-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+          <div class="workflow-visual" id="workflow-panel" role="tabpanel" aria-labelledby="tab-configure">
+            <div class="visual-head"><span id="visual-code">SPECIFICATION / W-4821</span><span id="visual-state">READY FOR REVIEW ↗</span></div>
+            <div class="visual-main">
+              <svg viewBox="0 0 540 255" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schematic of a widget and its dimensions">
+                <g fill="none" stroke="#245c9b" stroke-width="2">
+                  <rect x="159" y="99" width="222" height="56" rx="5"/>
+                  <circle cx="270" cy="127" r="89" fill="#dce7e9"/>
+                  <circle cx="270" cy="127" r="64"/>
+                  <circle cx="270" cy="127" r="38"/>
+                  <circle cx="270" cy="127" r="16" fill="#e46c3d"/>
+                  <circle cx="177" cy="127" r="8"/><circle cx="363" cy="127" r="8"/>
+                  <path d="M270 16v222M139 127h262" stroke-dasharray="4 7" opacity=".55"/>
+                  <path d="M159 210h222M159 204v12M381 204v12M108 38v178M102 38h12M102 216h12" stroke-width="1.3"/>
+                  <path d="M324 74l43-41h98M315 179l47 38h103" stroke-width="1.3"/>
+                </g>
+                <g fill="#245c9b" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing=".5">
+                  <text x="245" y="232">120 MM</text>
+                  <text x="92" y="150" transform="rotate(-90 92 150)">84 MM</text>
+                  <text x="371" y="30">MATERIAL / 6061-T6</text>
+                  <text x="366" y="224">TOLERANCE / ±0.2</text>
+                </g>
+                <circle cx="458" cy="33" r="3" fill="#e46c3d"/>
+                <circle cx="458" cy="217" r="3" fill="#e46c3d"/>
+              </svg>
+            </div>
+            <div class="visual-footer">
+              <div>
+                <h3 id="visual-title">A spec everyone can work from.</h3>
+                <p id="visual-description">Capture the details once, then give every stakeholder the same source of truth.</p>
+              </div>
+              <span class="visual-count" id="visual-count">01 / 03</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="clarity" id="visibility" aria-labelledby="clarity-title">
+      <div class="container clarity-grid">
+        <div class="clarity-copy">
+          <div class="eyebrow">Visibility, built in</div>
+          <h2 id="clarity-title">No more wondering where an order stands.</h2>
+          <p>From production start to delivery, your team sees what happened, what’s next, and what needs attention. That means fewer follow-ups and better answers for everyone downstream.</p>
+          <a class="text-link" href="#book-demo">See Acme in action <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="tracking" role="img" aria-label="Example order timeline showing specification approved, production started, quality check in progress, and shipment next">
+          <div class="tracking-top"><span>ORDER / AC-4821-07</span><span>IN PRODUCTION ●</span></div>
+          <div class="tracking-body">
+            <div class="tracking-label">ORDER PROGRESS / 04 MILESTONES</div>
+            <div class="tracking-route">
+              <div class="route-stop"><b>01 / DONE</b><span>Spec approved</span></div>
+              <div class="route-stop"><b>02 / DONE</b><span>Production started</span></div>
+              <div class="route-stop current"><b>03 / NOW</b><span>Quality check</span></div>
+              <div class="route-stop future"><b>04 / NEXT</b><span>Shipment</span></div>
+            </div>
+            <div class="tracking-update">
+              <div><i aria-hidden="true"></i><strong>Quality check is underway</strong></div>
+              <span>LAST UPDATE / 09:42</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" id="book-demo" aria-labelledby="closing-title">
+      <div class="container closing-grid">
+        <div>
+          <div class="eyebrow">Let's get to work</div>
+          <h2 id="closing-title">A better way to keep things in motion.</h2>
+          <p class="closing-copy">Tell us about your widget workflow. We’ll show you how Acme can bring your specs, orders, and supply chain into focus.</p>
+        </div>
+        <div class="demo-box">
+          <div class="box-label">REQUEST A DEMO / 01</div>
+          <form id="demo-form">
+            <label for="work-email">Where can we reach you?</label>
+            <div class="demo-form-row">
+              <input id="work-email" name="email" type="email" autocomplete="email" placeholder="Your work email" required>
+              <button type="submit">Book a demo ↗</button>
+            </div>
+          </form>
+          <p class="demo-note">Submitting opens your email app with a ready-to-send demo request.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="brand-name">acme</span>
+      </a>
+      <div class="footer-right"><span>WIDGET SYSTEMS FOR INDUSTRY</span><a href="mailto:demo@acme.com">CONTACT ↗</a><a href="#">BACK TO TOP ↑</a></div>
+    </div>
+  </footer>
+
+  <script>
+    const menuButton = document.querySelector(".menu-toggle");
+    const mobileNav = document.querySelector(".mobile-nav");
+
+    menuButton.addEventListener("click", () => {
+      const isOpen = mobileNav.classList.toggle("is-open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
+    });
+
+    mobileNav.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        mobileNav.classList.remove("is-open");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "Open menu");
+      });
+    });
+
+    const steps = [
+      {
+        code: "SPECIFICATION / W-4821",
+        state: "READY FOR REVIEW ↗",
+        title: "A spec everyone can work from.",
+        description: "Capture the details once, then give every stakeholder the same source of truth."
+      },
+      {
+        code: "PURCHASE ORDER / AC-4821-07",
+        state: "ORDER CONFIRMED ↗",
+        title: "From approved to ordered.",
+        description: "Carry every approved requirement forward, with a clear record of what was ordered."
+      },
+      {
+        code: "ORDER STATUS / AC-4821-07",
+        state: "IN PRODUCTION ↗",
+        title: "The full picture, on demand.",
+        description: "Follow progress across production and shipping without chasing another update."
+      }
+    ];
+
+    const tabs = [...document.querySelectorAll(".workflow-step")];
+    const panel = document.getElementById("workflow-panel");
+
+    function selectStep(index, moveFocus = false) {
+      tabs.forEach((tab, i) => {
+        const selected = i === index;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      panel.setAttribute("aria-labelledby", tabs[index].id);
+      document.getElementById("visual-code").textContent = steps[index].code;
+      document.getElementById("visual-state").textContent = steps[index].state;
+      document.getElementById("visual-title").textContent = steps[index].title;
+      document.getElementById("visual-description").textContent = steps[index].description;
+      document.getElementById("visual-count").textContent = `0${index + 1} / 03`;
+      if (moveFocus) tabs[index].focus();
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => selectStep(index));
+      tab.addEventListener("keydown", event => {
+        let next = index;
+        if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (index + 1) % tabs.length;
+        else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = tabs.length - 1;
+        else return;
+        event.preventDefault();
+        selectStep(next, true);
+      });
+    });
+
+    document.getElementById("demo-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const email = document.getElementById("work-email");
+      if (!email.reportValidity()) return;
+      const subject = encodeURIComponent("Acme demo request");
+      const body = encodeURIComponent(`Hi Acme,\n\nI'd like to book a demo of the Acme platform.\n\nYou can reach me at: ${email.value.trim()}\n\nThanks!`);
+      window.location.href = `mailto:demo@acme.com?subject=${subject}&body=${body}`;
+    });
+  </script>
+</body>
+</html>

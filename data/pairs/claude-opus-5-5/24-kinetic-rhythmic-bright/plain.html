@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme | Custom widgets, configured, ordered and tracked in one place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFF8EC;
+  --paper-2:#FFEFD6;
+  --ink:#16130F;
+  --ink-2:#4A4238;
+  --tomato:#FF4F2B;
+  --sun:#FFC933;
+  --cobalt:#2E4BFF;
+  --mint:#3DDC97;
+  --pink:#FF8FC7;
+  --beat:.6s;
+  --r:22px;
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--display);font-size:18px;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px}
+.mono{font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+:focus-visible{outline:3px solid var(--cobalt);outline-offset:3px;border-radius:6px}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(255,248,236,.82);backdrop-filter:blur(12px);border-bottom:2px solid var(--ink)}
+nav .wrap{display:flex;align-items:center;height:76px;gap:48px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:26px;letter-spacing:-.02em}
+.logo svg{animation:spin calc(var(--beat)*16) linear infinite}
+.links{display:flex;gap:34px;font-weight:600;font-size:16px;margin-left:auto}
+.links a{position:relative}
+.links a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:3px;background:var(--tomato);transform:scaleX(0);transform-origin:left;transition:transform .25s}
+.links a:hover::after{transform:scaleX(1)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border-radius:999px;font-weight:700;font-size:17px;border:2px solid var(--ink);cursor:pointer;transition:transform .15s,box-shadow .15s;background:var(--sun);color:var(--ink);box-shadow:4px 4px 0 var(--ink)}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghost{background:transparent;box-shadow:none}
+.btn.ghost:hover{background:#fff;box-shadow:4px 4px 0 var(--ink)}
+.btn.small{padding:11px 20px;font-size:15px}
+.btn .arr{transition:transform .2s}
+.btn:hover .arr{transform:translateX(4px)}
+
+/* HERO */
+.hero{padding:72px 0 40px;position:relative}
+.hero .wrap{display:grid;grid-template-columns:1.02fr 1fr;gap:56px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--ink);border-radius:999px;padding:7px 16px 7px 10px;margin-bottom:28px}
+.eyebrow .dot{width:10px;height:10px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(61,220,151,.7);animation:ping calc(var(--beat)*2) infinite}
+h1{font-size:92px;line-height:.92;letter-spacing:-.045em;font-weight:800}
+h1 .w{display:inline-block;animation:drop .7s cubic-bezier(.2,1.6,.4,1) both}
+h1 .hl{position:relative;color:var(--tomato)}
+h1 .hl svg{position:absolute;left:-2%;bottom:-10px;width:104%;height:20px}
+h1 .hl svg path{stroke-dasharray:420;stroke-dashoffset:420;animation:draw 1s 1.6s ease forwards}
+.lede{font-size:21px;color:var(--ink-2);max-width:540px;margin:28px 0 36px}
+.cta-row{display:flex;gap:16px;align-items:center}
+.trust{display:flex;gap:26px;margin-top:40px;color:var(--ink-2);font-size:15px}
+.trust b{color:var(--ink);font-size:22px;display:block;letter-spacing:-.02em}
+
+.stage{position:relative;height:540px}
+.panel{position:absolute;inset:20px 0 30px 20px;background:#fff;border:2px solid var(--ink);border-radius:28px;box-shadow:10px 10px 0 var(--ink);overflow:hidden}
+.panel-top{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:2px dashed #E6DCCB}
+.panel-top .live{display:flex;align-items:center;gap:8px;color:var(--tomato)}
+.panel-top .live i{width:8px;height:8px;border-radius:50%;background:var(--tomato);animation:blink var(--beat) steps(2) infinite}
+.stations{display:grid;grid-template-columns:repeat(4,1fr);padding:22px 24px 0;gap:12px}
+.st{border:2px solid var(--ink);border-radius:16px;padding:14px;background:var(--paper)}
+.st .lamp{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);margin-bottom:26px;animation:lamp calc(var(--beat)*8) infinite}
+.st:nth-child(1) .lamp{--c:var(--sun)}
+.st:nth-child(2) .lamp{--c:var(--pink);animation-delay:calc(var(--beat)*2)}
+.st:nth-child(3) .lamp{--c:var(--cobalt);animation-delay:calc(var(--beat)*4)}
+.st:nth-child(4) .lamp{--c:var(--mint);animation-delay:calc(var(--beat)*6)}
+.st b{display:block;font-size:17px;line-height:1.1}
+.st span{font-size:12px;color:var(--ink-2)}
+.belt-zone{position:relative;height:150px;margin-top:22px}
+.belt{position:absolute;left:0;right:0;bottom:22px;height:34px;background:repeating-linear-gradient(90deg,var(--ink) 0 18px,#3a332b 18px 36px);animation:belt calc(var(--beat)*2) linear infinite;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.rollers{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:space-around}
+.rollers i{width:16px;height:16px;border-radius:50%;background:var(--sun);border:2px solid var(--ink)}
+.widget{position:absolute;bottom:52px;left:-80px;width:70px;height:70px;animation:ride calc(var(--beat)*10) linear infinite}
+.widget svg{width:100%;height:100%;animation:spin calc(var(--beat)*4) linear infinite;filter:drop-shadow(3px 3px 0 var(--ink))}
+.widget:nth-child(2){animation-delay:calc(var(--beat)*-2.5)}
+.widget:nth-child(3){animation-delay:calc(var(--beat)*-5)}
+.widget:nth-child(4){animation-delay:calc(var(--beat)*-7.5)}
+.panel-foot{display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid var(--ink);position:absolute;bottom:0;left:0;right:0}
+.panel-foot div{padding:16px 22px;border-right:2px solid var(--ink)}
+.panel-foot div:last-child{border-right:0}
+.panel-foot b{font-size:28px;letter-spacing:-.03em;display:block;line-height:1.1}
+.panel-foot span{font-size:13px;color:var(--ink-2)}
+.chip{position:absolute;background:#fff;border:2px solid var(--ink);border-radius:16px;padding:12px 16px;box-shadow:5px 5px 0 var(--ink);font-size:14px;z-index:3;animation:bob calc(var(--beat)*4) ease-in-out infinite}
+.chip b{display:block;font-size:16px}
+.chip.a{top:0;right:-14px;background:var(--mint)}
+.chip.b{bottom:0;left:-10px;background:var(--pink);animation-delay:calc(var(--beat)*-2)}
+.blob{position:absolute;border-radius:50%;z-index:-1}
+.blob.s{width:220px;height:220px;background:var(--sun);top:-10px;left:-40px}
+.blob.c{width:140px;height:140px;background:var(--cobalt);bottom:10px;right:-30px}
+
+/* EQUALIZER */
+.eq{display:flex;align-items:flex-end;gap:6px;height:64px;overflow:hidden;padding:0 40px;max-width:1440px;margin:0 auto}
+.eq i{flex:1;height:100%;border-radius:6px 6px 0 0;transform-origin:bottom;animation:eq calc(var(--beat)*2) ease-in-out infinite}
+
+/* MARQUEE */
+.marquee{background:var(--ink);color:var(--paper);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);overflow:hidden;padding:22px 0}
+.track{display:flex;gap:64px;width:max-content;animation:marq 38s linear infinite}
+.track span{font-size:30px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:center;gap:64px}
+.track span::after{content:"✳";color:var(--sun);font-size:24px}
+.marquee:hover .track{animation-play-state:paused}
+
+/* SECTIONS */
+section{padding:120px 0}
+.kicker{display:inline-block;background:var(--ink);color:var(--paper);padding:6px 12px;border-radius:8px;margin-bottom:22px}
+h2{font-size:68px;line-height:.98;letter-spacing:-.04em;font-weight:800;max-width:900px}
+h2 em{font-style:normal;color:var(--tomato)}
+.sub{font-size:20px;color:var(--ink-2);max-width:620px;margin-top:20px}
+.head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:64px}
+
+/* STEPS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.step{border:2px solid var(--ink);border-radius:var(--r);padding:32px;background:#fff;position:relative;overflow:hidden;transition:transform .25s}
+.step:hover{transform:translateY(-6px) rotate(-.6deg)}
+.step:nth-child(1){background:var(--sun)}
+.step:nth-child(2){background:var(--pink)}
+.step:nth-child(3){background:var(--mint)}
+.step .num{font-family:var(--mono);font-weight:700;font-size:14px;border:2px solid var(--ink);border-radius:999px;padding:4px 12px;display:inline-block;background:#fff}
+.step .art{height:170px;margin:26px 0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.5);border:2px solid var(--ink);border-radius:16px;overflow:hidden;position:relative}
+.step h3{font-size:34px;letter-spacing:-.03em;line-height:1;margin-bottom:12px}
+.step p{font-size:17px;color:#2b251f}
+.step ul{list-style:none;margin-top:18px;display:grid;gap:8px;font-size:15px;font-weight:600}
+.step li::before{content:"→ ";}
+.sliders{width:78%;display:grid;gap:14px}
+.sl{height:10px;background:#fff;border:2px solid var(--ink);border-radius:999px;position:relative}
+.sl i{position:absolute;top:50%;width:20px;height:20px;background:var(--ink);border-radius:50%;transform:translate(-50%,-50%);animation:knob calc(var(--beat)*4) ease-in-out infinite}
+.sl:nth-child(2) i{animation-delay:calc(var(--beat)*-1)}
+.sl:nth-child(3) i{animation-delay:calc(var(--beat)*-2.3)}
+.cart{display:flex;gap:10px;align-items:flex-end}
+.cart i{width:38px;border:2px solid var(--ink);border-radius:8px;background:#fff;animation:stack calc(var(--beat)*4) cubic-bezier(.3,1.5,.5,1) infinite both}
+.cart i:nth-child(1){height:40px}
+.cart i:nth-child(2){height:70px;animation-delay:calc(var(--beat)*.5);background:var(--sun)}
+.cart i:nth-child(3){height:100px;animation-delay:calc(var(--beat)*1);background:var(--tomato)}
+.cart i:nth-child(4){height:56px;animation-delay:calc(var(--beat)*1.5);background:var(--cobalt)}
+.route{width:84%;height:120px}
+.route path.dash{stroke-dasharray:8 8;animation:dash calc(var(--beat)*2) linear infinite}
+
+/* CONFIGURATOR */
+.config{background:var(--paper-2);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.cfg{display:grid;grid-template-columns:1fr 1.05fr;gap:0;border:2px solid var(--ink);border-radius:28px;overflow:hidden;background:#fff;box-shadow:10px 10px 0 var(--ink)}
+.cfg-l{padding:40px;border-right:2px solid var(--ink)}
+.grp{margin-bottom:28px}
+.grp label.t{display:block;margin-bottom:12px;color:var(--ink-2)}
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opt{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:10px 18px;font-weight:600;font-size:16px;cursor:pointer;transition:background .15s,transform .15s}
+.opt:hover{transform:translateY(-2px)}
+.opt[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:12px;border:2px solid var(--ink);border-radius:999px;background:linear-gradient(90deg,var(--tomato) var(--p,30%),#fff var(--p,30%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:var(--sun);border:2px solid var(--ink);cursor:grab}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--sun);border:2px solid var(--ink)}
+.qty-row{display:flex;justify-content:space-between;align-items:baseline}
+.qty-row b{font-size:28px;letter-spacing:-.02em}
+.cfg-r{background:var(--cobalt);color:#fff;padding:40px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.cfg-r::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.18) 1.5px,transparent 1.5px);background-size:22px 22px}
+.preview{position:relative;height:300px;display:flex;align-items:center;justify-content:center}
+.preview svg{width:260px;height:260px;filter:drop-shadow(8px 8px 0 var(--ink));transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.preview svg.pop{animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+.preview .ring{position:absolute;width:300px;height:300px;border:2px dashed rgba(255,255,255,.5);border-radius:50%;animation:spin 30s linear infinite}
+.spec{position:relative;display:inline-block;background:var(--sun);color:var(--ink);padding:6px 12px;border-radius:8px;border:2px solid var(--ink);align-self:flex-start}
+.readout{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+.readout div{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.4);border-radius:14px;padding:14px}
+.readout span{font-size:13px;opacity:.85}
+.readout b{display:block;font-size:30px;letter-spacing:-.03em;line-height:1.1}
+.cfg-r .btn{position:relative;margin-top:24px;align-self:flex-start}
+
+/* TRACKING */
+.tracking{background:var(--tomato);color:var(--ink)}
+.tracking h2 em{color:#fff}
+.lane{background:#fff;border:2px solid var(--ink);border-radius:28px;padding:40px;box-shadow:10px 10px 0 var(--ink)}
+.nodes{position:relative;display:grid;grid-template-columns:repeat(5,1fr);margin-bottom:40px}
+.nodes::before{content:"";position:absolute;top:22px;left:10%;right:10%;height:4px;background:repeating-linear-gradient(90deg,var(--ink) 0 10px,transparent 10px 18px)}
+.nodes .runner{position:absolute;top:13px;left:10%;width:22px;height:22px;border-radius:50%;background:var(--tomato);border:2px solid var(--ink);animation:run calc(var(--beat)*10) cubic-bezier(.6,0,.4,1) infinite;z-index:2;margin-left:-11px}
+.node{text-align:center;position:relative}
+.node .c{width:48px;height:48px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:14px;position:relative;z-index:1}
+.node:nth-child(2) .c{background:var(--sun)}
+.node:nth-child(3) .c{background:var(--pink)}
+.node:nth-child(4) .c{background:#9DB0FF}
+.node:nth-child(5) .c{background:var(--mint)}
+.node:nth-child(6) .c{background:var(--ink);color:#fff}
+.node b{display:block;font-size:18px}
+.node span{font-size:14px;color:var(--ink-2)}
+table{width:100%;border-collapse:collapse;font-size:16px}
+th{text-align:left;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);padding:0 12px 12px;border-bottom:2px solid var(--ink)}
+td{padding:16px 12px;border-bottom:1px solid #EADFCC}
+tr:last-child td{border-bottom:0}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--paper)}
+td.po{font-family:var(--mono);font-weight:700}
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;border:2px solid var(--ink);font-size:13px;font-weight:700}
+.bar{height:12px;border:2px solid var(--ink);border-radius:999px;background:#fff;overflow:hidden;width:180px}
+.bar i{display:block;height:100%;width:0;background:var(--ink);transition:width 1.4s cubic-bezier(.3,1,.4,1)}
+.integr{display:flex;align-items:center;gap:14px;margin-top:32px;flex-wrap:wrap}
+.integr span.tag{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:8px 14px;font-weight:700;font-size:15px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--ink);border-radius:28px;overflow:hidden}
+.stat{padding:40px 32px;border-right:2px solid var(--ink);position:relative}
+.stat:last-child{border-right:0}
+.stat:nth-child(odd){background:#fff}
+.stat b{font-size:78px;letter-spacing:-.05em;line-height:1;display:block}
+.stat b small{font-size:40px}
+.stat p{margin-top:14px;font-size:17px;color:var(--ink-2)}
+.stat .tick{position:absolute;top:24px;right:24px;width:14px;height:14px;border-radius:50%;animation:lamp calc(var(--beat)*4) infinite}
+.stat:nth-child(1) .tick{--c:var(--tomato)}
+.stat:nth-child(2) .tick{--c:var(--sun);animation-delay:var(--beat)}
+.stat:nth-child(3) .tick{--c:var(--cobalt);animation-delay:calc(var(--beat)*2)}
+.stat:nth-child(4) .tick{--c:var(--mint);animation-delay:calc(var(--beat)*3)}
+
+.quote{margin-top:96px;display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center}
+.avatar{width:220px;height:220px;border-radius:50%;border:2px solid var(--ink);background:var(--sun);position:relative;overflow:hidden;box-shadow:8px 8px 0 var(--ink)}
+blockquote{font-size:42px;line-height:1.12;letter-spacing:-.03em;font-weight:600}
+blockquote mark{background:linear-gradient(transparent 55%,var(--pink) 55%);color:inherit}
+cite{display:block;margin-top:24px;font-style:normal;font-size:17px;color:var(--ink-2)}
+cite b{color:var(--ink)}
+
+/* DEMO */
+.demo{background:var(--sun);border-top:2px solid var(--ink);position:relative;overflow:hidden}
+.demo .wrap{display:grid;grid-template-columns:1fr 520px;gap:72px;align-items:start;position:relative}
+.demo h2{font-size:80px}
+.demo .list{list-style:none;margin-top:36px;display:grid;gap:18px}
+.demo .list li{display:flex;gap:16px;align-items:flex-start;font-size:19px}
+.demo .list li i{flex:none;width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--sun);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;font-size:15px}
+.form{background:#fff;border:2px solid var(--ink);border-radius:28px;padding:36px;box-shadow:12px 12px 0 var(--ink)}
+.form h3{font-size:30px;letter-spacing:-.03em;margin-bottom:4px}
+.form .hint{font-size:15px;color:var(--ink-2);margin-bottom:24px}
+.field{margin-bottom:16px}
+.field label{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+.field input,.field select{width:100%;padding:14px 16px;border:2px solid var(--ink);border-radius:14px;background:var(--paper);font-size:16px;transition:background .15s,box-shadow .15s}
+.field input:focus,.field select:focus{outline:none;background:#fff;box-shadow:4px 4px 0 var(--cobalt)}
+.field.err input{border-color:var(--tomato);background:#FFF0EC}
+.field .msg{font-size:13px;color:#C8301A;margin-top:4px;display:none}
+.field.err .msg{display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form .btn{width:100%;justify-content:center;background:var(--tomato);color:#fff;margin-top:8px;font-size:18px;padding:18px}
+.fine{font-size:13px;color:var(--ink-2);margin-top:14px;text-align:center}
+.success{display:none;text-align:center;padding:30px 0}
+.success .big{width:96px;height:96px;border-radius:50%;background:var(--mint);border:2px solid var(--ink);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+.form.done .success{display:block}
+.form.done form{display:none}
+.demo .spin-bg{position:absolute;right:-160px;top:-160px;width:520px;opacity:.14;animation:spin 40s linear infinite}
+
+footer{background:var(--ink);color:var(--paper);padding:64px 0 40px}
+footer .wrap{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}
+footer h4{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--sun);margin-bottom:16px}
+footer ul{list-style:none;display:grid;gap:10px;font-size:16px;opacity:.85}
+footer ul a:hover{color:var(--sun)}
+footer .bottom{grid-column:1/-1;display:flex;justify-content:space-between;border-top:1px solid #3a332b;padding-top:24px;margin-top:24px;font-size:14px;opacity:.7}
+footer p{opacity:.75;font-size:16px;margin-top:14px;max-width:320px}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,1,.3,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.12s}.rv.d2{transition-delay:.24s}.rv.d3{transition-delay:.36s}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(61,220,151,.7)}100%{box-shadow:0 0 0 12px rgba(61,220,151,0)}}
+@keyframes drop{0%{opacity:0;transform:translateY(-60px) rotate(-6deg)}100%{opacity:1;transform:none}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes blink{50%{opacity:0}}
+@keyframes lamp{0%,20%{background:var(--c);transform:scale(1.25)}30%,100%{background:#fff;transform:scale(1)}}
+@keyframes belt{to{background-position:36px 0}}
+@keyframes ride{0%{left:-80px}100%{left:calc(100% + 10px)}}
+@keyframes bob{50%{transform:translateY(-12px)}}
+@keyframes eq{0%,100%{transform:scaleY(var(--lo))}50%{transform:scaleY(var(--hi))}}
+@keyframes marq{to{transform:translateX(-50%)}}
+@keyframes knob{0%,100%{left:12%}50%{left:88%}}
+@keyframes stack{0%{transform:translateY(-120px);opacity:0}25%,85%{transform:none;opacity:1}100%{opacity:0}}
+@keyframes dash{to{stroke-dashoffset:-32}}
+@keyframes pop{0%{transform:scale(.6) rotate(-40deg)}100%{transform:none}}
+@keyframes run{0%{left:10%}20%{left:10%}25%{left:30%}40%{left:30%}45%{left:50%}60%{left:50%}65%{left:70%}80%{left:70%}85%{left:90%}100%{left:90%}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg width="34" height="34" viewBox="0 0 100 100" aria-hidden="true"><path class="gear" data-teeth="8" data-ro="48" data-ri="38" fill="#FF4F2B" stroke="#16130F" stroke-width="5"/><circle cx="50" cy="50" r="14" fill="#FFC933" stroke="#16130F" stroke-width="5"/></svg>
+      Acme
+    </a>
+    <div class="links">
+      <a href="#how">How it works</a>
+      <a href="#configure">Configurator</a>
+      <a href="#track">Tracking</a>
+      <a href="#results">Results</a>
+    </div>
+    <a href="#demo" class="btn small">Book a demo <span class="arr">→</span></a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow mono"><span class="dot"></span> 1.8M widgets tracked last quarter</div>
+      <h1>
+        <span class="w" style="animation-delay:.05s">Keep</span>
+        <span class="w" style="animation-delay:.2s">every</span>
+        <span class="w" style="animation-delay:.35s">custom</span><br>
+        <span class="w" style="animation-delay:.5s">widget</span>
+        <span class="w" style="animation-delay:.65s">in</span>
+        <span class="w hl" style="animation-delay:.8s">rhythm.<svg viewBox="0 0 300 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 14 Q 40 2 80 12 T 160 10 T 240 12 T 296 8" fill="none" stroke="#FFC933" stroke-width="7" stroke-linecap="round"/></svg></span>
+      </h1>
+      <p class="lede">Acme gives operations teams at mid-sized manufacturers one place to configure, order and track custom widgets, from the first spec sheet to the receiving dock. No more spreadsheet relays or supplier phone tag.</p>
+      <div class="cta-row">
+        <a href="#demo" class="btn">Book a 30-minute demo <span class="arr">→</span></a>
+        <a href="#configure" class="btn ghost">Try the configurator</a>
+      </div>
+      <div class="trust">
+        <div><b>140+</b>plants running on Acme</div>
+        <div><b>4.2 days</b>faster order-to-dock</div>
+        <div><b>SOC 2</b>Type II certified</div>
+      </div>
+    </div>
+
+    <div class="stage" aria-hidden="true">
+      <div class="blob s"></div><div class="blob c"></div>
+      <div class="chip a"><b>PO-48213 received</b>2,400 flanges · Plant 3</div>
+      <div class="chip b"><b>Spec approved</b>Brass hex, anodized</div>
+      <div class="panel">
+        <div class="panel-top">
+          <span class="mono"><b>Widget pipeline</b> · Line A</span>
+          <span class="live mono"><i></i> Live</span>
+        </div>
+        <div class="stations">
+          <div class="st"><div class="lamp"></div><b>Configure</b><span>Spec locked</span></div>
+          <div class="st"><div class="lamp"></div><b>Order</b><span>PO issued</span></div>
+          <div class="st"><div class="lamp"></div><b>Transit</b><span>On the road</span></div>
+          <div class="st"><div class="lamp"></div><b>Receive</b><span>At the dock</span></div>
+        </div>
+        <div class="belt-zone">
+          <div class="widget"><svg viewBox="0 0 100 100"><path class="gear" data-teeth="10" data-ro="48" data-ri="38" fill="#FFC933" stroke="#16130F" stroke-width="4"/><circle cx="50" cy="50" r="13" fill="#fff" stroke="#16130F" stroke-width="4"/></svg></div>
+          <div class="widget"><svg viewBox="0 0 100 100"><polygon points="50,4 90,27 90,73 50,96 10,73 10,27" fill="#FF8FC7" stroke="#16130F" stroke-width="4"/><circle cx="50" cy="50" r="17" fill="#fff" stroke="#16130F" stroke-width="4"/></svg></div>
+          <div class="widget"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#3DDC97" stroke="#16130F" stroke-width="4"/><circle cx="50" cy="50" r="15" fill="#fff" stroke="#16130F" stroke-width="4"/><circle cx="50" cy="20" r="6" fill="#16130F"/><circle cx="80" cy="50" r="6" fill="#16130F"/><circle cx="50" cy="80" r="6" fill="#16130F"/><circle cx="20" cy="50" r="6" fill="#16130F"/></svg></div>
+          <div class="widget"><svg viewBox="0 0 100 100"><path class="gear" data-teeth="7" data-ro="48" data-ri="36" fill="#2E4BFF" stroke="#16130F" stroke-width="4"/><circle cx="50" cy="50" r="12" fill="#FFC933" stroke="#16130F" stroke-width="4"/></svg></div>
+          <div class="belt"></div>
+          <div class="rollers"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="panel-foot">
+          <div><b>312</b><span>Open orders</span></div>
+          <div><b>97.8%</b><span>On-time this month</span></div>
+          <div><b>6</b><span>Suppliers synced</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="eq" id="eq" aria-hidden="true"></div>
+
+<div class="marquee" aria-label="Manufacturers using Acme">
+  <div class="track">
+    <span>Northgate Castings</span><span>Hollis Fabrication</span><span>Brightwater Tool &amp; Die</span><span>Kessler Motion</span><span>Oakridge Assemblies</span><span>Vantor Pumps</span><span>Meridian Controls</span><span>Larkspur Hydraulics</span>
+    <span>Northgate Castings</span><span>Hollis Fabrication</span><span>Brightwater Tool &amp; Die</span><span>Kessler Motion</span><span>Oakridge Assemblies</span><span>Vantor Pumps</span><span>Meridian Controls</span><span>Larkspur Hydraulics</span>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="head-row">
+      <div>
+        <span class="kicker mono">How it works</span>
+        <h2 class="rv">Three steps. <em>One beat</em> your whole team can follow.</h2>
+      </div>
+      <p class="sub rv d1">Engineering, purchasing and the plant floor finally work from the same record. Every widget carries its spec, its PO and its location with it.</p>
+    </div>
+    <div class="steps">
+      <article class="step rv">
+        <span class="num">01 · Configure</span>
+        <div class="art" aria-hidden="true"><div class="sliders"><div class="sl"><i></i></div><div class="sl"><i></i></div><div class="sl"><i></i></div></div></div>
+        <h3>Spec it once.</h3>
+        <p>Build custom widgets from approved materials, tolerances and finishes. Acme flags anything your suppliers can't make before it ever becomes a PO.</p>
+        <ul><li>Reusable spec templates</li><li>Engineering sign-off built in</li><li>Revision history on every part</li></ul>
+      </article>
+      <article class="step rv d1">
+        <span class="num">02 · Order</span>
+        <div class="art" aria-hidden="true"><div class="cart"><i></i><i></i><i></i><i></i></div></div>
+        <h3>Order in minutes.</h3>
+        <p>Turn an approved spec into a purchase order routed to the right supplier, at contracted pricing, with volume breaks applied automatically.</p>
+        <ul><li>Multi-supplier quotes side by side</li><li>Approval rules by spend and plant</li><li>Pushes straight to your ERP</li></ul>
+      </article>
+      <article class="step rv d2">
+        <span class="num">03 · Track</span>
+        <div class="art" aria-hidden="true">
+          <svg class="route" viewBox="0 0 260 120"><path class="dash" d="M20 90 C 70 90, 70 30, 130 30 S 200 90, 240 40" fill="none" stroke="#16130F" stroke-width="4"/><circle cx="20" cy="90" r="10" fill="#FFC933" stroke="#16130F" stroke-width="3"/><circle cx="130" cy="30" r="10" fill="#FF4F2B" stroke="#16130F" stroke-width="3"/><circle cx="240" cy="40" r="12" fill="#2E4BFF" stroke="#16130F" stroke-width="3"/></svg>
+        </div>
+        <h3>See it land.</h3>
+        <p>Follow each batch from supplier floor to your dock. When something slips, Acme tells you which lines it affects and what to do next.</p>
+        <ul><li>Live status from 6,000+ carriers</li><li>Delay alerts before they bite</li><li>Receiving scans close the loop</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="config" id="configure">
+  <div class="wrap">
+    <div class="head-row">
+      <div>
+        <span class="kicker mono">Live configurator</span>
+        <h2 class="rv">Go on, <em>build a widget.</em></h2>
+      </div>
+      <p class="sub rv d1">This is a simplified version of the configurator your team gets on day one. Pricing and lead times are illustrative; yours pull from your actual supplier contracts.</p>
+    </div>
+
+    <div class="cfg rv">
+      <div class="cfg-l">
+        <div class="grp">
+          <label class="t mono">Widget type</label>
+          <div class="opts" data-key="type">
+            <button class="opt" data-v="gear" aria-pressed="true">Spur gear</button>
+            <button class="opt" data-v="hex" aria-pressed="false">Hex fastener</button>
+            <button class="opt" data-v="flange" aria-pressed="false">Mounting flange</button>
+          </div>
+        </div>
+        <div class="grp">
+          <label class="t mono">Material</label>
+          <div class="opts" data-key="mat">
+            <button class="opt" data-v="steel" aria-pressed="true">Stainless steel</button>
+            <button class="opt" data-v="alu" aria-pressed="false">6061 aluminum</button>
+            <button class="opt" data-v="brass" aria-pressed="false">C360 brass</button>
+            <button class="opt" data-v="nylon" aria-pressed="false">Nylon 66</button>
+          </div>
+        </div>
+        <div class="grp">
+          <label class="t mono">Finish</label>
+          <div class="opts" data-key="fin">
+            <button class="opt" data-v="raw" aria-pressed="true">Raw</button>
+            <button class="opt" data-v="anod" aria-pressed="false">Anodized</button>
+            <button class="opt" data-v="powder" aria-pressed="false">Powder coat</button>
+          </div>
+        </div>
+        <div class="grp" style="margin-bottom:0">
+          <div class="qty-row"><label class="t mono" for="qty">Quantity</label><b id="qtyOut">2,500</b></div>
+          <input type="range" id="qty" min="100" max="20000" step="100" value="2500">
+        </div>
+      </div>
+      <div class="cfg-r">
+        <span class="spec mono" id="spec">GR-SS-RW · 2500</span>
+        <div class="preview">
+          <div class="ring"></div>
+          <svg id="pv" viewBox="0 0 100 100" aria-label="Widget preview"></svg>
+        </div>
+        <div class="readout">
+          <div><span>Unit price</span><b id="price">$4.20</b></div>
+          <div><span>Lead time</span><b id="lead">12 days</b></div>
+          <div><span>Order total</span><b id="total">$10.5k</b></div>
+        </div>
+        <a href="#demo" class="btn">Price this with your suppliers <span class="arr">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tracking" id="track">
+  <div class="wrap">
+    <div class="head-row">
+      <div>
+        <span class="kicker mono">Supply chain tracking</span>
+        <h2 class="rv">Know where every batch is. <em>Every beat.</em></h2>
+      </div>
+      <p class="sub rv d1" style="color:#2b1a12">Acme syncs with suppliers, carriers and your ERP so status updates itself. Your team stops chasing emails and starts fixing the one order that actually needs attention.</p>
+    </div>
+
+    <div class="lane rv">
+      <div class="nodes">
+        <div class="runner" aria-hidden="true"></div>
+        <div class="node"><div class="c">01</div><b>Spec approved</b><span>Engineering sign-off</span></div>
+        <div class="node"><div class="c">02</div><b>Supplier confirmed</b><span>Price &amp; date locked</span></div>
+        <div class="node"><div class="c">03</div><b>In production</b><span>Batch QC logged</span></div>
+        <div class="node"><div class="c">04</div><b>Shipped</b><span>Carrier ETA live</span></div>
+        <div class="node"><div class="c">05</div><b>Received</b><span>Scanned at dock</span></div>
+      </div>
+      <table>
+        <thead><tr><th>PO</th><th>Widget</th><th>Plant</th><th>Stage</th><th>Progress</th><th>ETA</th></tr></thead>
+        <tbody>
+          <tr><td class="po">PO-48213</td><td>Mounting flange · 2,400</td><td>Dayton, OH</td><td><span class="pill" style="background:var(--mint)">Received</span></td><td><div class="bar"><i data-w="100"></i></div></td><td>Delivered</td></tr>
+          <tr><td class="po">PO-48240</td><td>Spur gear · 9,000</td><td>Greenville, SC</td><td><span class="pill" style="background:#9DB0FF">Shipped</span></td><td><div class="bar"><i data-w="78"></i></div></td><td>Thu, 2 days</td></tr>
+          <tr><td class="po">PO-48266</td><td>Hex fastener · 40,000</td><td>Dayton, OH</td><td><span class="pill" style="background:var(--pink)">In production</span></td><td><div class="bar"><i data-w="52"></i></div></td><td>Next Tue</td></tr>
+          <tr><td class="po">PO-48271</td><td>Spur gear · 1,200</td><td>Monterrey, MX</td><td><span class="pill" style="background:var(--tomato);color:#fff">Delay risk</span></td><td><div class="bar"><i data-w="40" style="background:var(--tomato)"></i></div></td><td>+3 days, reroute ready</td></tr>
+          <tr><td class="po">PO-48289</td><td>Mounting flange · 600</td><td>Greenville, SC</td><td><span class="pill" style="background:var(--sun)">Supplier confirmed</span></td><td><div class="bar"><i data-w="24"></i></div></td><td>In 11 days</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="integr rv">
+      <span class="mono" style="font-weight:700">Syncs with</span>
+      <span class="tag">SAP S/4HANA</span><span class="tag">NetSuite</span><span class="tag">Epicor Kinetic</span><span class="tag">Plex</span><span class="tag">Microsoft Dynamics 365</span><span class="tag">Infor CloudSuite</span>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div class="head-row">
+      <div>
+        <span class="kicker mono">Results</span>
+        <h2 class="rv">What happens when ops <em>stops chasing</em> widgets.</h2>
+      </div>
+      <p class="sub rv d1">Averages across Acme customers in their first 12 months, measured against their own prior-year baseline.</p>
+    </div>
+    <div class="stats rv">
+      <div class="stat"><span class="tick"></span><b><span class="count" data-to="38">0</span><small>%</small></b><p>fewer expedite fees paid to suppliers and carriers</p></div>
+      <div class="stat"><span class="tick"></span><b><span class="count" data-to="4.2" data-dec="1">0</span><small>d</small></b><p>faster from approved spec to widget on the dock</p></div>
+      <div class="stat"><span class="tick"></span><b><span class="count" data-to="99.1" data-dec="1">0</span><small>%</small></b><p>of deliveries arrive matching the approved spec</p></div>
+      <div class="stat"><span class="tick"></span><b><span class="count" data-to="11">0</span><small>hrs</small></b><p>saved per buyer, per week, on status follow-ups</p></div>
+    </div>
+
+    <div class="quote rv">
+      <div class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 220 220" width="220" height="220"><circle cx="110" cy="92" r="42" fill="#FF8FC7" stroke="#16130F" stroke-width="4"/><path d="M30 230 C 40 160, 180 160, 190 230" fill="#2E4BFF" stroke="#16130F" stroke-width="4"/><circle cx="96" cy="88" r="5" fill="#16130F"/><circle cx="124" cy="88" r="5" fill="#16130F"/><path d="M96 106 Q110 118 124 106" fill="none" stroke="#16130F" stroke-width="4" stroke-linecap="round"/><path d="M68 80 Q 80 40 118 46 Q 150 50 152 84 Q 140 62 110 64 Q 84 66 68 80Z" fill="#16130F"/></svg>
+      </div>
+      <div>
+        <blockquote>“We used to run widget orders off three spreadsheets and a whiteboard. With Acme, <mark>my buyers know by 8 a.m. which orders need them</mark>, and the rest just move.”</blockquote>
+        <cite><b>Dana Okafor</b>, VP of Operations, Northgate Castings · 4 plants, 1,100 employees</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <svg class="spin-bg" viewBox="0 0 100 100" aria-hidden="true"><path class="gear" data-teeth="12" data-ro="49" data-ri="40" fill="#16130F"/></svg>
+  <div class="wrap">
+    <div>
+      <span class="kicker mono">Book a demo</span>
+      <h2 class="rv">See your widget pipeline in 30 minutes.</h2>
+      <p class="sub rv d1" style="color:#2b251f">Bring a real order you're wrestling with. We'll walk it through Acme live, with your specs and your suppliers, so you can see exactly what changes on Monday.</p>
+      <ul class="list">
+        <li class="rv"><i>1</i><span><b>A walkthrough built for your plants</b>, not a canned slide deck.</span></li>
+        <li class="rv d1"><i>2</i><span><b>A rollout plan</b> showing how teams like yours go live in under six weeks.</span></li>
+        <li class="rv d2"><i>3</i><span><b>A savings estimate</b> based on your current order volume and expedite spend.</span></li>
+      </ul>
+    </div>
+    <div class="form rv d1" id="formBox">
+      <form id="demoForm" novalidate>
+        <h3>Pick a time that works</h3>
+        <p class="hint">A product specialist replies within one business day.</p>
+        <div class="two">
+          <div class="field"><label for="fn">First name</label><input id="fn" name="fn" autocomplete="given-name" required><div class="msg">Please add your first name.</div></div>
+          <div class="field"><label for="ln">Last name</label><input id="ln" name="ln" autocomplete="family-name" required><div class="msg">Please add your last name.</div></div>
+        </div>
+        <div class="field"><label for="em">Work email</label><input id="em" name="em" type="email" autocomplete="email" placeholder="you@company.com" required><div class="msg">Use a valid work email so we can send the invite.</div></div>
+        <div class="field"><label for="co">Company</label><input id="co" name="co" autocomplete="organization" required><div class="msg">Which company are you with?</div></div>
+        <div class="two">
+          <div class="field"><label for="pl">Plants</label>
+            <select id="pl" name="pl"><option>1 plant</option><option selected>2–5 plants</option><option>6–15 plants</option><option>16+ plants</option></select></div>
+          <div class="field"><label for="vol">Widget orders / month</label>
+            <select id="vol" name="vol"><option>Under 50</option><option selected>50–250</option><option>250–1,000</option><option>1,000+</option></select></div>
+        </div>
+        <button type="submit" class="btn">Book my demo <span class="arr">→</span></button>
+        <p class="fine">No credit card, no commitment. We never share your details.</p>
+      </form>
+      <div class="success" role="status">
+        <div class="big"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16130F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></div>
+        <h3 id="thanks">You're on the schedule.</h3>
+        <p class="hint" style="margin-top:8px">Check your inbox for a calendar link. Bring a tricky widget order, and we'll bring the answers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a href="#" class="logo"><svg width="30" height="30" viewBox="0 0 100 100" aria-hidden="true"><path class="gear" data-teeth="8" data-ro="48" data-ri="38" fill="#FFC933"/><circle cx="50" cy="50" r="14" fill="#16130F"/></svg>Acme</a>
+      <p>The widget platform for operations teams at mid-sized manufacturers. Configure, order and track, all in rhythm.</p>
+    </div>
+    <div><h4>Product</h4><ul><li><a href="#configure">Configurator</a></li><li><a href="#how">Ordering</a></li><li><a href="#track">Tracking</a></li><li><a href="#track">Integrations</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="#results">Customers</a></li><li><a href="#">Careers</a></li><li><a href="#">Security</a></li><li><a href="#">Press</a></li></ul></div>
+    <div><h4>Talk to us</h4><ul><li><a href="#demo">Book a demo</a></li><li><a href="mailto:hello@acme.example">hello@acme.example</a></li><li>Columbus, OH</li></ul></div>
+    <div class="bottom"><span>© 2025 Acme Widgets, Inc.</span><span>Privacy · Terms · SOC 2 Type II</span></div>
+  </div>
+</footer>
+
+<script>
+// Gear path generator
+function gearPath(teeth, ro, ri){
+  const cx=50, cy=50, pts=[], step=Math.PI*2/teeth;
+  for(let i=0;i<teeth;i++){
+    const a=i*step;
+    const seg=[[ri,a],[ro,a+step*.15],[ro,a+step*.45],[ri,a+step*.6]];
+    seg.forEach(([r,t])=>pts.push([cx+r*Math.cos(t), cy+r*Math.sin(t)]));
+  }
+  return "M"+pts.map(p=>p[0].toFixed(2)+" "+p[1].toFixed(2)).join(" L")+" Z";
+}
+document.querySelectorAll("path.gear").forEach(p=>{
+  p.setAttribute("d", gearPath(+p.dataset.teeth, +p.dataset.ro, +p.dataset.ri));
+});
+
+// Equalizer
+const eq=document.getElementById("eq");
+const eqColors=["#FF4F2B","#FFC933","#2E4BFF","#3DDC97","#FF8FC7"];
+for(let i=0;i<64;i++){
+  const b=document.createElement("i");
+  const wave=(Math.sin(i/4)+1)/2;
+  b.style.background=eqColors[i%5];
+  b.style.setProperty("--lo",(0.15+wave*0.2).toFixed(2));
+  b.style.setProperty("--hi",(0.55+wave*0.45).toFixed(2));
+  b.style.animationDelay=(-(i%8)*0.15)+"s";
+  eq.appendChild(b);
+}
+
+// Configurator
+const state={type:"gear",mat:"steel",fin:"raw",qty:2500};
+const matColor={steel:"#A9B2BC",alu:"#DDE3EA",brass:"#E8B53E",nylon:"#F6F1E4"};
+const finColor={anod:"#FF8FC7",powder:"#FF4F2B"};
+const base={gear:4.2,hex:1.1,flange:6.8};
+const matMul={steel:1,alu:1.15,brass:1.6,nylon:.6};
+const finAdd={raw:0,anod:.45,powder:.3};
+const leadBase={gear:12,hex:6,flange:14};
+const leadFin={raw:0,anod:3,powder:2};
+const code={gear:"GR",hex:"HX",flange:"FL",steel:"SS",alu:"AL",brass:"BR",nylon:"NY",raw:"RW",anod:"AN",powder:"PC"};
+const pv=document.getElementById("pv");
+
+function drawWidget(){
+  const fill=state.fin==="raw"?matColor[state.mat]:finColor[state.fin];
+  const s='stroke="#16130F" stroke-width="3"';
+  let svg="";
+  if(state.type==="gear"){
+    svg=`<path d="${gearPath(14,47,38)}" fill="${fill}" ${s}/><circle cx="50" cy="50" r="24" fill="none" ${s} stroke-dasharray="4 4"/><circle cx="50" cy="50" r="11" fill="#FFF8EC" ${s}/><rect x="47" y="36" width="6" height="6" fill="#16130F"/>`;
+  }else if(state.type==="hex"){
+    svg=`<polygon points="50,4 90,27 90,73 50,96 10,73 10,27" fill="${fill}" ${s}/><polygon points="50,18 78,34 78,66 50,82 22,66 22,34" fill="none" ${s} opacity=".35"/><circle cx="50" cy="50" r="18" fill="#FFF8EC" ${s}/><circle cx="50" cy="50" r="12" fill="none" ${s} stroke-dasharray="3 3"/>`;
+  }else{
+    svg=`<circle cx="50" cy="50" r="46" fill="${fill}" ${s}/><circle cx="50" cy="50" r="30" fill="none" ${s} opacity=".35"/><circle cx="50" cy="50" r="16" fill="#FFF8EC" ${s}/>`+
+      [0,1,2,3,4,5].map(i=>{const a=i*Math.PI/3;return `<circle cx="${(50+36*Math.cos(a)).toFixed(1)}" cy="${(50+36*Math.sin(a)).toFixed(1)}" r="5" fill="#16130F"/>`}).join("");
+  }
+  pv.innerHTML=svg;
+  pv.classList.remove("pop"); void pv.getBoundingClientRect(); pv.classList.add("pop");
+}
+function money(n){return n>=1000?"$"+(n/1000).toFixed(n>=100000?0:1)+"k":"$"+n.toFixed(0)}
+function update(redraw){
+  const q=state.qty;
+  const disc=Math.min(.3,Math.max(0,Math.log10(q/100)*.13));
+  const unit=(base[state.type]*matMul[state.mat]+finAdd[state.fin])*(1-disc);
+  const lead=leadBase[state.type]+leadFin[state.fin]+(q>10000?5:q>5000?2:0);
+  document.getElementById("price").textContent="$"+unit.toFixed(2);
+  document.getElementById("lead").textContent=lead+" days";
+  document.getElementById("total").textContent=money(unit*q);
+  document.getElementById("qtyOut").textContent=q.toLocaleString();
+  document.getElementById("spec").textContent=`${code[state.type]}-${code[state.mat]}-${code[state.fin]} · ${q}`;
+  if(redraw) drawWidget();
+}
+document.querySelectorAll(".opts").forEach(g=>{
+  g.addEventListener("click",e=>{
+    const b=e.target.closest(".opt"); if(!b) return;
+    g.querySelectorAll(".opt").forEach(o=>o.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true");
+    state[g.dataset.key]=b.dataset.v;
+    update(true);
+  });
+});
+const qty=document.getElementById("qty");
+function qtyFill(){qty.style.setProperty("--p",((qty.value-qty.min)/(qty.max-qty.min)*100)+"%")}
+qty.addEventListener("input",()=>{state.qty=+qty.value;qtyFill();update(false)});
+qtyFill();update(true);
+
+// Reveal + counters + bars
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{
+    if(!en.isIntersecting) return;
+    const el=en.target;
+    el.classList.add("in");
+    el.querySelectorAll(".count").forEach(runCount);
+    el.querySelectorAll(".bar i").forEach(b=>b.style.width=b.dataset.w+"%");
+    io.unobserve(el);
+  });
+},{threshold:.18});
+document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+
+function runCount(el){
+  const to=parseFloat(el.dataset.to), dec=+(el.dataset.dec||0), dur=1400, t0=performance.now();
+  (function tick(t){
+    const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3);
+    el.textContent=(to*e).toFixed(dec);
+    if(k<1) requestAnimationFrame(tick);
+  })(t0);
+}
+
+// Demo form
+const form=document.getElementById("demoForm");
+form.addEventListener("submit",e=>{
+  e.preventDefault();
+  let ok=true;
+  ["fn","ln","em","co"].forEach(id=>{
+    const inp=document.getElementById(id), f=inp.closest(".field");
+    let valid=inp.value.trim().length>0;
+    if(id==="em") valid=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(inp.value.trim());
+    f.classList.toggle("err",!valid);
+    if(!valid) ok=false;
+  });
+  if(!ok){form.querySelector(".err input").focus();return}
+  const name=document.getElementById("fn").value.trim();
+  document.getElementById("thanks").textContent=`You're on the schedule, ${name}.`;
+  document.getElementById("formBox").classList.add("done");
+});
+form.querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>i.closest(".field").classList.remove("err")));
+</script>
+</body>
+</html>

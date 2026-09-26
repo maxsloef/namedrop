@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f5ee" />
+  <title>Acme — Custom widgets. Zero guesswork.</title>
+  <meta name="description" content="Configure, order, and track custom widgets across your supply chain. Meet the less-chaotic way to keep production moving." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #191919;
+      --paper: #f7f5ee;
+      --blue: #4935e8;
+      --orange: #ff704c;
+      --yellow: #ffdc4c;
+      --mint: #b9e6c9;
+      --line: 2px solid var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: "DM Sans", sans-serif; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    svg { display: block; }
+    ::selection { background: var(--yellow); color: var(--ink); }
+    :focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+
+    .container { width: min(100% - 104px, 1336px); margin-inline: auto; }
+    .display { font-family: "Space Grotesk", sans-serif; font-weight: 700; letter-spacing: -.075em; }
+    .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .button {
+      min-height: 51px; display: inline-flex; align-items: center; justify-content: center; gap: 25px;
+      padding: 0 20px; border: var(--line); border-radius: 3px; background: var(--ink); color: white;
+      font-family: "Space Grotesk", sans-serif; font-size: 15px; font-weight: 700;
+      transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .button:hover { transform: translate(-3px, -3px); box-shadow: 5px 5px 0 var(--ink); }
+    .button svg { width: 19px; height: 19px; }
+    .button-light { background: var(--yellow); color: var(--ink); }
+    .button-white { background: var(--paper); color: var(--ink); }
+
+    /* Navigation */
+    .site-header { border-bottom: var(--line); position: relative; z-index: 10; background: var(--paper); }
+    .nav { height: 86px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+    .brand { display: flex; align-items: center; gap: 10px; font: 700 29px/1 "Space Grotesk", sans-serif; letter-spacing: -.09em; }
+    .brand-mark { width: 35px; height: 35px; flex: none; }
+    .nav-links { display: flex; align-items: center; gap: 38px; margin-left: auto; }
+    .nav-links a { font-size: 14px; font-weight: 700; transition: color .2s; }
+    .nav-links a:hover { color: var(--blue); }
+    .nav .button { margin-left: 15px; }
+    .menu-toggle { display: none; background: transparent; border: 0; padding: 8px; }
+
+    /* Hero */
+    .hero { overflow: hidden; border-bottom: var(--line); }
+    .hero-inner { min-height: 677px; display: grid; grid-template-columns: 55% 45%; position: relative; }
+    .hero-copy { position: relative; z-index: 2; padding: 72px 0 71px; }
+    .hero-kicker { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; }
+    .hero-kicker .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--orange); border: 1.5px solid var(--ink); }
+    h1 { max-width: 790px; margin: 0; font-size: clamp(70px, 7.2vw, 107px); line-height: .99; }
+    h1 .underline { position: relative; white-space: nowrap; }
+    h1 .underline::after {
+      content: ""; position: absolute; left: 2%; right: 0; bottom: -6px; height: 10px;
+      background: var(--orange); border-radius: 60% 40% 55% 40%; z-index: -1; transform: rotate(-1deg);
+    }
+    .hero-bottom { display: flex; align-items: flex-end; gap: 33px; margin-top: 34px; }
+    .hero-description { max-width: 365px; margin: 0; font-size: 17px; line-height: 1.55; }
+    .hero-bottom .button { flex: none; min-height: 57px; padding-inline: 23px; }
+    .hero-footnote { display: flex; align-items: center; gap: 9px; margin-top: 39px; font-size: 12px; font-weight: 700; }
+    .hero-footnote span { display: block; width: 35px; border-top: 2px solid var(--ink); }
+    .hero-art { position: relative; min-width: 0; }
+    .art-back {
+      position: absolute; width: 720px; height: 720px; top: 20px; left: 4px;
+      background: var(--blue); border: var(--line); border-radius: 50%;
+    }
+    .hero-illustration { position: absolute; width: 660px; height: 650px; top: 14px; left: -30px; overflow: visible; }
+    .hero-sticker {
+      position: absolute; top: 71px; right: -3px; width: 125px; height: 125px;
+      background: var(--yellow); border: var(--line); border-radius: 50%; display: grid; place-items: center;
+      transform: rotate(14deg); text-align: center; font: 700 15px/1.08 "Space Grotesk", sans-serif;
+      box-shadow: 5px 6px 0 var(--ink);
+    }
+    .art-caption { position: absolute; bottom: 37px; right: -2px; padding: 9px 14px; border: var(--line); background: var(--paper); transform: rotate(-3deg); font: 700 11px "Space Grotesk", sans-serif; letter-spacing: .04em; }
+    .spark { position: absolute; color: var(--ink); font-size: 39px; font-family: "Space Grotesk", sans-serif; line-height: 1; }
+    .spark-one { left: -60px; top: 85px; transform: rotate(-13deg); }
+    .spark-two { right: 28px; bottom: 115px; color: var(--yellow); font-size: 54px; }
+
+    /* Ribbon */
+    .ribbon { background: var(--yellow); border-bottom: var(--line); overflow: hidden; }
+    .ribbon-inner { min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 25px; }
+    .ribbon-label { flex: none; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .ribbon-words { display: flex; align-items: center; gap: 19px; font: 700 23px "Space Grotesk", sans-serif; letter-spacing: -.045em; white-space: nowrap; }
+    .ribbon-words i { width: 12px; height: 12px; background: var(--orange); border: 1.5px solid var(--ink); transform: rotate(45deg); }
+
+    /* Intro */
+    .intro { padding: 109px 0 110px; border-bottom: var(--line); }
+    .section-top { display: flex; justify-content: space-between; align-items: start; gap: 35px; }
+    .section-index { display: flex; align-items: center; gap: 13px; white-space: nowrap; }
+    .section-index::before { content: ""; width: 30px; height: 2px; background: currentColor; }
+    .intro h2, .workflow h2, .how h2, .closing h2 { margin: 0; font-size: clamp(49px, 5.4vw, 78px); line-height: 1.04; }
+    .intro h2 { max-width: 880px; }
+    .intro h2 em { color: var(--blue); font-style: normal; }
+    .intro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; margin-top: 56px; }
+    .benefit { min-height: 312px; padding: 27px 28px 29px; border: var(--line); display: flex; flex-direction: column; }
+    .benefit:nth-child(1) { background: var(--mint); }
+    .benefit:nth-child(2) { background: var(--orange); }
+    .benefit:nth-child(3) { background: var(--yellow); }
+    .benefit-top { display: flex; justify-content: space-between; align-items: start; }
+    .benefit-number { font: 700 13px "Space Grotesk", sans-serif; }
+    .benefit-icon { width: 74px; height: 74px; }
+    .benefit h3 { margin: auto 0 11px; font: 700 29px/1.05 "Space Grotesk", sans-serif; letter-spacing: -.055em; }
+    .benefit p { max-width: 280px; margin: 0; font-size: 15px; line-height: 1.48; }
+
+    /* Workflow */
+    .workflow { padding: 107px 0 117px; background: var(--paper); border-bottom: var(--line); }
+    .workflow-head { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-bottom: 46px; }
+    .workflow-head h2 { max-width: 680px; margin-top: 23px; }
+    .workflow-head p { max-width: 315px; margin: 0 0 6px; font-size: 17px; line-height: 1.5; }
+    .workflow-board { display: grid; grid-template-columns: 390px 1fr; min-height: 484px; border: var(--line); }
+    .workflow-tabs { display: flex; flex-direction: column; border-right: var(--line); }
+    .workflow-tab {
+      flex: 1; width: 100%; padding: 27px 30px; display: flex; align-items: center; gap: 21px;
+      border: 0; border-bottom: var(--line); background: var(--paper); color: var(--ink); text-align: left;
+      font: 700 28px "Space Grotesk", sans-serif; letter-spacing: -.055em; transition: background .2s;
+    }
+    .workflow-tab:last-child { border-bottom: 0; }
+    .workflow-tab[aria-selected="true"] { background: var(--yellow); }
+    .workflow-tab:hover:not([aria-selected="true"]) { background: #ebe8df; }
+    .workflow-tab .tab-num { align-self: flex-start; margin-top: 8px; font: 700 12px "DM Sans", sans-serif; letter-spacing: 0; }
+    .workflow-tab .tab-arrow { margin-left: auto; font-size: 30px; }
+    .workflow-panel { position: relative; overflow: hidden; background: var(--blue); color: white; }
+    .panel-pattern { position: absolute; inset: 0; opacity: .17; background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 22px 22px; }
+    .panel-content { position: relative; z-index: 1; padding: 39px 44px; height: 100%; display: flex; flex-direction: column; align-items: start; }
+    .panel-label { padding: 8px 12px; border: 1.5px solid white; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .panel-visual { height: 237px; width: 100%; display: grid; place-items: center; }
+    .panel-visual svg { height: 221px; max-width: 100%; overflow: visible; }
+    .panel-content h3 { margin: auto 0 8px; font: 700 30px/1.1 "Space Grotesk", sans-serif; letter-spacing: -.055em; }
+    .panel-content p { max-width: 550px; margin: 0; font-size: 15px; line-height: 1.5; }
+    .panel-hidden { display: none; }
+
+    /* How it works */
+    .how { padding: 107px 0 112px; background: var(--orange); border-bottom: var(--line); }
+    .how-head { display: flex; justify-content: space-between; align-items: end; gap: 35px; }
+    .how h2 { max-width: 730px; margin-top: 20px; }
+    .how-head p { max-width: 285px; margin: 0 0 8px; font-size: 17px; line-height: 1.5; }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 58px; border: var(--line); background: var(--paper); }
+    .step { min-height: 304px; padding: 26px 29px 30px; display: flex; flex-direction: column; border-right: var(--line); }
+    .step:last-child { border-right: 0; }
+    .step-top { display: flex; justify-content: space-between; align-items: start; }
+    .step-top span { font: 700 14px "Space Grotesk", sans-serif; }
+    .step-top svg { width: 75px; height: 75px; }
+    .step h3 { margin: auto 0 11px; font: 700 31px/1.06 "Space Grotesk", sans-serif; letter-spacing: -.055em; }
+    .step p { max-width: 310px; margin: 0; font-size: 15px; line-height: 1.48; }
+
+    /* Quote */
+    .quote-section { overflow: hidden; background: var(--ink); color: var(--paper); border-bottom: var(--line); }
+    .quote-inner { min-height: 355px; display: flex; align-items: center; gap: 100px; position: relative; }
+    .quote-symbol { flex: none; color: var(--yellow); font: 700 260px/.75 "Space Grotesk", sans-serif; letter-spacing: -.16em; transform: translateY(32px); }
+    .quote-text { max-width: 810px; padding: 65px 0; position: relative; z-index: 1; }
+    blockquote { margin: 0 0 26px; font: 700 clamp(30px, 3.15vw, 45px)/1.17 "Space Grotesk", sans-serif; letter-spacing: -.06em; }
+    .quote-credit { color: var(--yellow); font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .quote-decoration { position: absolute; width: 280px; height: 280px; right: -164px; top: 38px; border: 35px solid var(--blue); border-radius: 50%; }
+
+    /* Closing */
+    .closing { overflow: hidden; background: var(--blue); color: white; }
+    .closing-inner { min-height: 477px; position: relative; display: flex; align-items: center; }
+    .closing-copy { position: relative; z-index: 2; padding: 88px 0; }
+    .closing h2 { max-width: 850px; margin: 23px 0 19px; font-size: clamp(65px, 7vw, 98px); }
+    .closing h2 span { color: var(--yellow); }
+    .closing p { max-width: 490px; margin: 0 0 30px; font-size: 18px; line-height: 1.5; }
+    .closing-art { position: absolute; right: -45px; top: 9px; width: 440px; height: 440px; }
+    .footer { background: var(--paper); border-top: var(--line); }
+    .footer-inner { min-height: 96px; display: flex; align-items: center; justify-content: space-between; gap: 25px; }
+    .footer .brand { font-size: 25px; }
+    .footer .brand-mark { width: 30px; height: 30px; }
+    .footer-links { display: flex; gap: 30px; font-size: 13px; font-weight: 700; }
+    .copyright { font-size: 12px; }
+
+    /* Demo dialog */
+    .modal { position: fixed; inset: 0; z-index: 30; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(25,25,25,.72); }
+    .modal.open { display: flex; }
+    .modal-card { width: min(100%, 520px); max-height: min(90vh, 760px); overflow-y: auto; padding: 36px; border: var(--line); background: var(--yellow); box-shadow: 9px 9px 0 var(--ink); position: relative; }
+    .modal-close { position: absolute; top: 17px; right: 18px; border: 0; background: transparent; font: 700 32px/1 "Space Grotesk", sans-serif; }
+    .modal-card h2 { max-width: 390px; margin: 18px 0 10px; font: 700 45px/1.02 "Space Grotesk", sans-serif; letter-spacing: -.07em; }
+    .modal-card p { margin: 0 0 24px; line-height: 1.5; }
+    .demo-form { display: grid; gap: 15px; }
+    .demo-form label { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
+    .demo-form input, .demo-form select { width: 100%; height: 46px; padding: 0 13px; border: var(--line); border-radius: 0; background: var(--paper); color: var(--ink); outline-offset: 2px; }
+    .demo-form .button { margin-top: 7px; width: 100%; }
+    .form-note { margin-top: 15px; font-size: 12px; }
+    .success { display: none; padding: 20px 0 10px; }
+    .success h2 { margin-top: 20px; }
+    .success-icon { display: grid; place-items: center; width: 65px; height: 65px; border: var(--line); border-radius: 50%; background: var(--mint); font-size: 35px; font-weight: 700; }
+
+    @media (max-width: 1100px) {
+      .container { width: min(100% - 64px, 1336px); }
+      .hero-inner { grid-template-columns: 58% 42%; }
+      h1 { font-size: clamp(65px, 7.6vw, 90px); }
+      .hero-art { transform: scale(.83); transform-origin: left center; }
+      .hero-bottom { align-items: start; flex-direction: column; gap: 22px; }
+      .hero-footnote { margin-top: 30px; }
+      .ribbon-words { font-size: 19px; gap: 13px; }
+      .workflow-board { grid-template-columns: 320px 1fr; }
+      .workflow-tab { font-size: 24px; }
+      .quote-inner { gap: 50px; }
+    }
+
+    @media (max-width: 760px) {
+      .container { width: min(100% - 36px, 1336px); }
+      .nav { height: 72px; }
+      .nav .button { margin-left: auto; min-height: 43px; padding: 0 12px; font-size: 13px; gap: 8px; }
+      .nav-links { display: none; position: absolute; top: 72px; left: 0; right: 0; padding: 23px 18px; border-bottom: var(--line); background: var(--paper); flex-direction: column; align-items: start; gap: 22px; }
+      .nav-links.open { display: flex; }
+      .menu-toggle { display: block; }
+      .menu-toggle svg { width: 24px; height: 24px; }
+      .hero-inner { display: flex; flex-direction: column; min-height: 0; }
+      .hero-copy { padding: 56px 0 15px; }
+      h1 { font-size: clamp(58px, 12vw, 88px); }
+      .hero-bottom { margin-top: 32px; }
+      .hero-description { font-size: 16px; }
+      .hero-footnote { margin-top: 28px; }
+      .hero-art { height: 440px; transform: scale(.68); transform-origin: 0 0; }
+      .art-back { left: 5%; top: 5px; }
+      .hero-illustration { left: 0; top: -11px; }
+      .hero-sticker { left: 470px; right: auto; }
+      .art-caption { left: 480px; right: auto; bottom: 70px; white-space: nowrap; }
+      .ribbon-inner { min-height: 70px; }
+      .ribbon-label { display: none; }
+      .ribbon-words { font-size: 17px; }
+      .ribbon-words span:last-child, .ribbon-words i:last-of-type { display: none; }
+      .intro, .workflow, .how { padding: 75px 0; }
+      .section-top, .workflow-head, .how-head { display: block; }
+      .intro h2, .workflow h2, .how h2 { font-size: clamp(48px, 10vw, 70px); }
+      .intro h2 { margin-top: 25px; }
+      .intro-grid { grid-template-columns: 1fr; margin-top: 35px; }
+      .benefit { min-height: 220px; }
+      .workflow-head p, .how-head p { margin-top: 20px; }
+      .workflow-board { display: block; margin-top: 32px; }
+      .workflow-tabs { flex-direction: row; border-right: 0; border-bottom: var(--line); }
+      .workflow-tab { padding: 17px 10px; justify-content: center; border-bottom: 0; border-right: var(--line); font-size: 17px; }
+      .workflow-tab:last-child { border-right: 0; }
+      .workflow-tab .tab-num, .workflow-tab .tab-arrow { display: none; }
+      .workflow-panel { min-height: 460px; }
+      .panel-content { padding: 25px; }
+      .steps { grid-template-columns: 1fr; margin-top: 36px; }
+      .step { min-height: 230px; border-right: 0; border-bottom: var(--line); }
+      .step:last-child { border-bottom: 0; }
+      .quote-inner { min-height: 0; gap: 20px; }
+      .quote-symbol { font-size: 120px; align-self: start; padding-top: 75px; }
+      .quote-text { padding: 70px 0; }
+      blockquote { font-size: 30px; }
+      .closing-inner { min-height: 540px; align-items: start; }
+      .closing-copy { padding: 70px 0 180px; }
+      .closing h2 { font-size: clamp(60px, 12vw, 90px); }
+      .closing-art { width: 250px; height: 250px; right: -65px; top: auto; bottom: -37px; }
+      .footer-inner { padding: 28px 0; flex-wrap: wrap; }
+      .copyright { width: 100%; }
+    }
+    @media (max-width: 450px) {
+      .brand { font-size: 25px; }
+      .brand-mark { width: 31px; height: 31px; }
+      .nav .button svg { display: none; }
+      h1 { font-size: 57px; }
+      .hero-art { transform: scale(.53); height: 350px; }
+      .hero-sticker { left: 460px; }
+      .ribbon-words { font-size: 14px; gap: 10px; }
+      .ribbon-words i { width: 8px; height: 8px; }
+      .workflow-tab { font-size: 14px; }
+      .quote-symbol { display: none; }
+      .modal-card { padding: 28px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="18" fill="#4935e8" stroke="#191919" stroke-width="2"/>
+          <path d="M20 5 23.7 16.3 35 20l-11.3 3.7L20 35l-3.7-11.3L5 20l11.3-3.7Z" fill="#ffdc4c" stroke="#191919" stroke-width="1.7" stroke-linejoin="round"/>
+        </svg>
+        acme<span style="color:var(--orange)">.</span>
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="#why">Why Acme</a>
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+      </div>
+      <button class="button demo-trigger" type="button">Book a demo
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>
+      </button>
+      <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2.5" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner container">
+        <div class="hero-copy">
+          <div class="hero-kicker eyebrow"><span class="dot"></span> THE NEW WAY TO WIDGET</div>
+          <h1 class="display" id="hero-title">Custom widgets.<br>Zero <span class="underline">guesswork.</span></h1>
+          <div class="hero-bottom">
+            <p class="hero-description">Configure, order, and track every custom widget in one place. Less chasing. More making things happen.</p>
+            <button class="button button-light demo-trigger" type="button">Show me Acme
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>
+            </button>
+          </div>
+          <div class="hero-footnote"><span></span> BUILT FOR THE PEOPLE WHO KEEP PRODUCTION MOVING</div>
+        </div>
+
+        <div class="hero-art" aria-label="Colorful illustration of an assembled custom widget" role="img">
+          <div class="art-back"></div>
+          <span class="spark spark-one" aria-hidden="true">✳</span>
+          <span class="spark spark-two" aria-hidden="true">✳</span>
+          <svg class="hero-illustration" viewBox="0 0 660 650" fill="none" aria-hidden="true">
+            <!-- orbit and small accents -->
+            <path d="M85 353c8-119 110-242 253-248" stroke="#F7F5EE" stroke-width="2.5" stroke-dasharray="6 11" opacity=".8"/>
+            <path d="M536 221c46 71 48 162 10 236" stroke="#F7F5EE" stroke-width="2.5" stroke-dasharray="6 11" opacity=".8"/>
+            <circle cx="79" cy="361" r="8" fill="#FFDC4C" stroke="#191919" stroke-width="2"/>
+            <circle cx="543" cy="454" r="8" fill="#FFDC4C" stroke="#191919" stroke-width="2"/>
+
+            <!-- orange rear wheel -->
+            <g transform="translate(124 148) rotate(-18 170 170)">
+              <circle cx="170" cy="170" r="143" fill="#FF704C" stroke="#191919" stroke-width="4"/>
+              <circle cx="170" cy="170" r="109" fill="#FFDC4C" stroke="#191919" stroke-width="4"/>
+              <circle cx="170" cy="170" r="79" fill="#FF704C" stroke="#191919" stroke-width="4"/>
+              <path d="M170 30v55m0 170v55M30 170h55m170 0h55M71 71l39 39m120 120 39 39M269 71l-39 39M110 230l-39 39" stroke="#191919" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="170" cy="170" r="40" fill="#F7F5EE" stroke="#191919" stroke-width="4"/>
+              <circle cx="170" cy="170" r="14" fill="#191919"/>
+            </g>
+
+            <!-- protruding teal tube -->
+            <g transform="rotate(-30 336 328)">
+              <rect x="290" y="85" width="92" height="284" rx="45" fill="#B9E6C9" stroke="#191919" stroke-width="4"/>
+              <ellipse cx="336" cy="87" rx="46" ry="19" fill="#F7F5EE" stroke="#191919" stroke-width="4"/>
+              <ellipse cx="336" cy="87" rx="24" ry="9" fill="#191919"/>
+              <path d="M297 144h78M297 158h78" stroke="#191919" stroke-width="3"/>
+            </g>
+
+            <!-- tilted main widget body -->
+            <g transform="rotate(16 330 366)">
+              <path d="M190 277 330 224l148 66v147l-143 63-145-68V277Z" fill="#B9E6C9" stroke="#191919" stroke-width="4" stroke-linejoin="round"/>
+              <path d="m190 277 145 68 143-55M335 345v155" stroke="#191919" stroke-width="4" stroke-linejoin="round"/>
+              <path d="m211 311 102 48v98l-102-47v-99Z" fill="#FFDC4C" stroke="#191919" stroke-width="3"/>
+              <path d="m355 358 105-46v104l-105 46V358Z" fill="#FF704C" stroke="#191919" stroke-width="3"/>
+              <circle cx="261" cy="383" r="25" fill="#F7F5EE" stroke="#191919" stroke-width="3"/>
+              <circle cx="261" cy="383" r="9" fill="#191919"/>
+              <path d="m376 385 62-27m-62 42 62-27m-62 42 62-27" stroke="#191919" stroke-width="3" stroke-linecap="round"/>
+              <path d="m229 278 103-39 107 49-103 42-107-52Z" fill="#FF704C" stroke="#191919" stroke-width="3"/>
+              <ellipse cx="334" cy="282" rx="49" ry="21" fill="#F7F5EE" stroke="#191919" stroke-width="3"/>
+              <ellipse cx="334" cy="282" rx="25" ry="9" fill="#191919"/>
+            </g>
+
+            <!-- bolts and accent bursts -->
+            <g fill="#FFDC4C" stroke="#191919" stroke-width="3">
+              <circle cx="127" cy="455" r="21"/><circle cx="490" cy="145" r="18"/>
+            </g>
+            <path d="M127 444v22m-11-11h22M490 136v18m-9-9h18" stroke="#191919" stroke-width="3"/>
+            <path d="m466 516 10 15 17-5-9 16 12 14-18-4-8 17-2-19-19-3 17-8Z" fill="#FFDC4C" stroke="#191919" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M64 241h40m-20-20v40M535 360h31m-15-15v30" stroke="#FFDC4C" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <div class="hero-sticker">GOODBYE<br>“ANY<br>UPDATES?”</div>
+          <div class="art-caption">YOUR SUPPLY CHAIN, BUT MAKE IT MAKE SENSE ↗</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ribbon" aria-label="One place to configure, order, and track">
+      <div class="ribbon-inner container">
+        <div class="ribbon-label">A BETTER WAY FROM A TO Z</div>
+        <div class="ribbon-words"><span>Configure it</span><i></i><span>Order it</span><i></i><span>Track it</span><i></i><span>Get on with it ↗</span></div>
+      </div>
+    </div>
+
+    <section class="intro" id="why" aria-labelledby="why-title">
+      <div class="container">
+        <div class="section-top">
+          <div class="section-index eyebrow">01 / THE PROBLEM, SOLVED</div>
+          <h2 class="display" id="why-title">Your widgets are custom.<br>Your chaos <em>doesn’t have to be.</em></h2>
+        </div>
+        <div class="intro-grid">
+          <article class="benefit">
+            <div class="benefit-top">
+              <span class="benefit-number">01 — NO MORE GUESSING</span>
+              <svg class="benefit-icon" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+                <path d="m11 25 29-16 29 16v32L40 73 11 57V25Z" fill="#F7F5EE" stroke="#191919" stroke-width="2.5"/>
+                <path d="m11 25 29 16 29-16M40 41v32" stroke="#191919" stroke-width="2.5"/>
+                <path d="m27 17 29 16v15" stroke="#191919" stroke-width="2.5"/>
+                <circle cx="56" cy="54" r="13" fill="#FFDC4C" stroke="#191919" stroke-width="2.5"/>
+                <path d="m51 54 4 4 7-8" stroke="#191919" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Specs that stick.</h3>
+            <p>Build exactly what you need with clear options and a shared source of truth for every detail.</p>
+          </article>
+          <article class="benefit">
+            <div class="benefit-top">
+              <span class="benefit-number">02 — NO MORE CHASING</span>
+              <svg class="benefit-icon" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+                <rect x="11" y="17" width="51" height="44" fill="#F7F5EE" stroke="#191919" stroke-width="2.5"/>
+                <path d="M11 29h51M21 41h24M21 49h16" stroke="#191919" stroke-width="2.5"/>
+                <circle cx="59" cy="57" r="15" fill="#FFDC4C" stroke="#191919" stroke-width="2.5"/>
+                <path d="M59 48v9l6 4" stroke="#191919" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>Orders with order.</h3>
+            <p>Keep requests, approvals, and purchases together. Goodbye, “which spreadsheet was that?”</p>
+          </article>
+          <article class="benefit">
+            <div class="benefit-top">
+              <span class="benefit-number">03 — NO MORE SURPRISES</span>
+              <svg class="benefit-icon" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+                <path d="M10 57h60M17 57V37l16-11 16 11v20M49 41h15v16" stroke="#191919" stroke-width="2.5" stroke-linejoin="round"/>
+                <rect x="22" y="43" width="12" height="14" fill="#F7F5EE" stroke="#191919" stroke-width="2.5"/>
+                <circle cx="27" cy="64" r="6" fill="#4935E8" stroke="#191919" stroke-width="2.5"/>
+                <circle cx="58" cy="64" r="6" fill="#4935E8" stroke="#191919" stroke-width="2.5"/>
+                <path d="m40 11 4 7 8 1-6 6 1 8-7-4-7 4 1-8-6-6 8-1 4-7Z" fill="#FF704C" stroke="#191919" stroke-width="2"/>
+              </svg>
+            </div>
+            <h3>Visibility, finally.</h3>
+            <p>Know where every widget stands, from first configuration to final delivery.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="workflow" id="platform" aria-labelledby="platform-title">
+      <div class="container">
+        <div class="workflow-head">
+          <div>
+            <div class="section-index eyebrow">02 / ONE VERY HANDY PLATFORM</div>
+            <h2 class="display" id="platform-title">All the moving parts.<br>One happy place.</h2>
+          </div>
+          <p>Acme connects the people, decisions, and details behind every custom widget.</p>
+        </div>
+        <div class="workflow-board">
+          <div class="workflow-tabs" role="tablist" aria-label="Explore the Acme platform">
+            <button class="workflow-tab" id="tab-configure" role="tab" aria-selected="true" aria-controls="panel-configure" data-panel="configure"><span class="tab-num">01</span> Configure <span class="tab-arrow">↗</span></button>
+            <button class="workflow-tab" id="tab-order" role="tab" aria-selected="false" aria-controls="panel-order" data-panel="order"><span class="tab-num">02</span> Order <span class="tab-arrow">↗</span></button>
+            <button class="workflow-tab" id="tab-track" role="tab" aria-selected="false" aria-controls="panel-track" data-panel="track"><span class="tab-num">03</span> Track <span class="tab-arrow">↗</span></button>
+          </div>
+          <div class="workflow-panel">
+            <div class="panel-pattern"></div>
+            <div class="panel-content" id="panel-configure" role="tabpanel" aria-labelledby="tab-configure">
+              <span class="panel-label">BUILT RIGHT FROM THE START</span>
+              <div class="panel-visual">
+                <svg viewBox="0 0 520 230" fill="none" aria-hidden="true">
+                  <rect x="68" y="26" width="300" height="180" fill="#F7F5EE" stroke="#191919" stroke-width="3"/>
+                  <path d="M68 58h300" stroke="#191919" stroke-width="3"/>
+                  <circle cx="89" cy="43" r="5" fill="#FF704C" stroke="#191919" stroke-width="1.5"/><circle cx="106" cy="43" r="5" fill="#FFDC4C" stroke="#191919" stroke-width="1.5"/>
+                  <path d="M93 82h116M93 99h76M93 131h97M93 148h58" stroke="#191919" stroke-width="4" stroke-linecap="round"/>
+                  <rect x="90" y="166" width="113" height="20" fill="#B9E6C9" stroke="#191919" stroke-width="2"/>
+                  <path d="m253 103 43-22 44 22v57l-43 22-44-22v-57Z" fill="#FF704C" stroke="#191919" stroke-width="3"/>
+                  <path d="m253 103 44 22 43-22M297 125v57" stroke="#191919" stroke-width="3"/>
+                  <circle cx="407" cy="96" r="49" fill="#FFDC4C" stroke="#191919" stroke-width="3"/>
+                  <path d="m386 97 14 14 26-30" stroke="#191919" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M388 170h61m-30-31v62" stroke="#F7F5EE" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3>Every detail, nailed down.</h3>
+              <p>Give your team a guided way to choose specs, save configurations, and get everyone aligned before anything goes into production.</p>
+            </div>
+            <div class="panel-content panel-hidden" id="panel-order" role="tabpanel" aria-labelledby="tab-order">
+              <span class="panel-label">LESS BACK-AND-FORTH, MORE GO</span>
+              <div class="panel-visual">
+                <svg viewBox="0 0 520 230" fill="none" aria-hidden="true">
+                  <rect x="112" y="17" width="258" height="195" fill="#F7F5EE" stroke="#191919" stroke-width="3"/>
+                  <path d="M137 50h109m-109 18h76M137 102h208M137 123h208M137 144h135" stroke="#191919" stroke-width="4" stroke-linecap="round"/>
+                  <rect x="136" y="166" width="111" height="25" fill="#B9E6C9" stroke="#191919" stroke-width="2"/>
+                  <circle cx="355" cy="157" r="57" fill="#FFDC4C" stroke="#191919" stroke-width="3"/>
+                  <path d="m331 155 16 16 33-37" stroke="#191919" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="m68 69 29-16 29 16v32l-29 16-29-16V69Z" fill="#FF704C" stroke="#191919" stroke-width="3"/>
+                  <path d="m68 69 29 16 29-16M97 85v32" stroke="#191919" stroke-width="3"/>
+                  <path d="m401 43 12-12m10 34 16-4m-44-46 4-16" stroke="#FFDC4C" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <h3>From approved to on its way.</h3>
+              <p>Turn approved configurations into orders without re-entering the details. Keep purchasing and operations on the same page.</p>
+            </div>
+            <div class="panel-content panel-hidden" id="panel-track" role="tabpanel" aria-labelledby="tab-track">
+              <span class="panel-label">ANSWERS BEFORE ANYONE ASKS</span>
+              <div class="panel-visual">
+                <svg viewBox="0 0 520 230" fill="none" aria-hidden="true">
+                  <rect x="54" y="44" width="410" height="144" fill="#F7F5EE" stroke="#191919" stroke-width="3"/>
+                  <path d="M54 78h410" stroke="#191919" stroke-width="3"/>
+                  <circle cx="78" cy="61" r="5" fill="#FF704C" stroke="#191919" stroke-width="1.5"/>
+                  <path d="M91 133h333" stroke="#191919" stroke-width="4" stroke-dasharray="9 9"/>
+                  <circle cx="104" cy="133" r="18" fill="#B9E6C9" stroke="#191919" stroke-width="3"/>
+                  <circle cx="207" cy="133" r="18" fill="#B9E6C9" stroke="#191919" stroke-width="3"/>
+                  <circle cx="310" cy="133" r="18" fill="#FFDC4C" stroke="#191919" stroke-width="3"/>
+                  <circle cx="413" cy="133" r="18" fill="#F7F5EE" stroke="#191919" stroke-width="3"/>
+                  <path d="m96 133 6 6 11-13m86 7 6 6 11-13" stroke="#191919" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M93 101h37m55 0h44m59 0h45m58 0h44M90 166h46m48 0h47m59 0h43m58 0h44" stroke="#191919" stroke-width="3" stroke-linecap="round"/>
+                  <path d="m289 132 15 15 28-32" stroke="#191919" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3>Know what’s happening. Always.</h3>
+              <p>Follow order progress in one clear view and give your team the updates they need—without another status-request email.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="how-it-works" aria-labelledby="how-title">
+      <div class="container">
+        <div class="how-head">
+          <div>
+            <div class="section-index eyebrow">03 / RIDICULOUSLY SIMPLE</div>
+            <h2 class="display" id="how-title">A smoother supply chain starts here.</h2>
+          </div>
+          <p>No grand overhaul required. Just a smarter way to move your widgets forward.</p>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <div class="step-top"><span>STEP 01</span>
+              <svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M16 17h48v47H16z" fill="#FFDC4C" stroke="#191919" stroke-width="2.5"/><path d="M26 30h28M26 40h19M26 50h23" stroke="#191919" stroke-width="3" stroke-linecap="round"/><path d="m55 10 4 7 8 1-6 6 1 8-7-4-7 4 1-8-6-6 8-1 4-7Z" fill="#4935E8" stroke="#191919" stroke-width="2"/></svg>
+            </div>
+            <h3>Tell us what you need.</h3>
+            <p>Bring your widget requirements, your team, and your most ambitious “what ifs.”</p>
+          </article>
+          <article class="step">
+            <div class="step-top"><span>STEP 02</span>
+              <svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><circle cx="40" cy="40" r="28" fill="#B9E6C9" stroke="#191919" stroke-width="2.5"/><path d="M40 17v46M17 40h46M24 24l32 32m0-32L24 56" stroke="#191919" stroke-width="2.5"/><circle cx="40" cy="40" r="11" fill="#FF704C" stroke="#191919" stroke-width="2.5"/></svg>
+            </div>
+            <h3>Make it yours.</h3>
+            <p>We’ll show you how Acme fits the way your operation actually works.</p>
+          </article>
+          <article class="step">
+            <div class="step-top"><span>STEP 03</span>
+              <svg viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M13 55h55M18 55V32l18-11 18 11v23M54 37h9v18" stroke="#191919" stroke-width="2.5" stroke-linejoin="round"/><path d="m22 34 14 8 14-8" stroke="#191919" stroke-width="2.5"/><circle cx="28" cy="61" r="6" fill="#4935E8" stroke="#191919" stroke-width="2.5"/><circle cx="58" cy="61" r="6" fill="#4935E8" stroke="#191919" stroke-width="2.5"/><path d="m61 12 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6Z" fill="#FFDC4C" stroke="#191919" stroke-width="2"/></svg>
+            </div>
+            <h3>Keep things moving.</h3>
+            <p>Configure, order, and track with a lot more confidence—and a lot less inbox archaeology.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-section" aria-label="Our philosophy">
+      <div class="quote-inner container">
+        <div class="quote-symbol" aria-hidden="true">“</div>
+        <div class="quote-text">
+          <blockquote>Operations is complicated enough. Your widget platform shouldn’t be.</blockquote>
+          <div class="quote-credit">THE ACME WAY OF THINKING</div>
+        </div>
+        <div class="quote-decoration" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="closing-inner container">
+        <div class="closing-copy">
+          <div class="eyebrow">LESS MESS. MORE MOMENTUM.</div>
+          <h2 class="display" id="closing-title">Ready to get your widgets <span>together?</span></h2>
+          <p>Let’s see what a clearer, calmer supply chain could look like for your team.</p>
+          <button class="button button-white demo-trigger" type="button">Book your demo
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>
+          </button>
+        </div>
+        <svg class="closing-art" viewBox="0 0 440 440" fill="none" aria-hidden="true">
+          <circle cx="220" cy="220" r="192" fill="#FFDC4C" stroke="#191919" stroke-width="4"/>
+          <circle cx="220" cy="220" r="146" fill="#FF704C" stroke="#191919" stroke-width="4"/>
+          <circle cx="220" cy="220" r="100" fill="#B9E6C9" stroke="#191919" stroke-width="4"/>
+          <circle cx="220" cy="220" r="51" fill="#4935E8" stroke="#191919" stroke-width="4"/>
+          <path d="M220 28v384M28 220h384M84 84l272 272m0-272L84 356" stroke="#191919" stroke-width="4"/>
+          <circle cx="220" cy="220" r="17" fill="#F7F5EE" stroke="#191919" stroke-width="4"/>
+        </svg>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner container">
+      <a class="brand" href="#top" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#4935e8" stroke="#191919" stroke-width="2"/><path d="M20 5 23.7 16.3 35 20l-11.3 3.7L20 35l-3.7-11.3L5 20l11.3-3.7Z" fill="#ffdc4c" stroke="#191919" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        acme<span style="color:var(--orange)">.</span>
+      </a>
+      <div class="footer-links"><a href="#why">Why Acme</a><a href="#platform">Platform</a><a href="#how-it-works">How it works</a></div>
+      <div class="copyright">© 2026 Acme. Make better moves.</div>
+    </div>
+  </footer>
+
+  <div class="modal" id="demoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <button class="modal-close" type="button" aria-label="Close demo form">×</button>
+      <div id="formView">
+        <div class="eyebrow">LET’S TALK WIDGETS</div>
+        <h2 id="modalTitle">See Acme in action.</h2>
+        <p>Tell us a little about your team. We’ll be in touch to find a time that works.</p>
+        <form class="demo-form" id="demoForm">
+          <label>Full name <input type="text" name="name" autocomplete="name" required placeholder="Your name" /></label>
+          <label>Work email <input type="email" name="email" autocomplete="email" required placeholder="you@company.com" /></label>
+          <label>Company <input type="text" name="company" autocomplete="organization" required placeholder="Your company" /></label>
+          <label>What best describes your role?
+            <select name="role" required>
+              <option value="" disabled selected>Select your role</option>
+              <option>Operations</option>
+              <option>Procurement</option>
+              <option>Supply chain</option>
+              <option>Manufacturing</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <button class="button" type="submit">Request my demo <span aria-hidden="true">↗</span></button>
+        </form>
+        <div class="form-note">No widget-shaped spam. Promise.</div>
+      </div>
+      <div class="success" id="successView" role="status">
+        <div class="success-icon">✓</div>
+        <h2>Nice move.</h2>
+        <p>Your demo request is ready. In a live deployment, this form would send your details to the Acme team.</p>
+        <button class="button" type="button" id="successClose">Back to the site <span aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('demoModal');
+    const form = document.getElementById('demoForm');
+    const formView = document.getElementById('formView');
+    const successView = document.getElementById('successView');
+    let previousFocus = null;
+
+    function openModal() {
+      previousFocus = document.activeElement;
+      form.reset();
+      formView.style.display = '';
+      successView.style.display = 'none';
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      modal.querySelector('input').focus();
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+      if (previousFocus) previousFocus.focus();
+    }
+
+    document.querySelectorAll('.demo-trigger').forEach(button => button.addEventListener('click', openModal));
+    document.querySelector('.modal-close').addEventListener('click', closeModal);
+    document.getElementById('successClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+      if (event.key === 'Tab' && modal.classList.contains('open')) {
+        const focusable = [...modal.querySelectorAll('button, input, select')].filter(el => el.offsetParent !== null);
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      formView.style.display = 'none';
+      successView.style.display = 'block';
+      document.getElementById('successClose').focus();
+    });
+
+    const tabs = [...document.querySelectorAll('.workflow-tab')];
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activateTab(tab));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        let next = index;
+        if (event.key === 'Home') next = 0;
+        else if (event.key === 'End') next = tabs.length - 1;
+        else next = (index + (['ArrowRight', 'ArrowDown'].includes(event.key) ? 1 : -1) + tabs.length) % tabs.length;
+        activateTab(tabs[next]);
+        tabs[next].focus();
+      });
+    });
+    function activateTab(active) {
+      tabs.forEach(tab => {
+        const selected = tab === active;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        document.getElementById('panel-' + tab.dataset.panel).classList.toggle('panel-hidden', !selected);
+      });
+    }
+    tabs.slice(1).forEach(tab => tab.tabIndex = -1);
+
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      menuToggle.setAttribute('aria-expanded', String(open));
+    });
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }));
+  </script>
+</body>
+</html>

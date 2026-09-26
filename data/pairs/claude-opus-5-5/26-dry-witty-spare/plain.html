@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme: Widgets, handled.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F2ED; --paper:#FBFAF7; --ink:#16150F; --muted:#6B685F; --line:#D9D5CB;
+    --accent:#E8541E; --serif:'Instrument Serif',Georgia,serif; --sans:'Inter Tight',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 40px}
+  .mono{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;line-height:1.02}
+  em{font-style:italic}
+  .btn{display:inline-flex;align-items:center;gap:10px;font:500 15px var(--sans);padding:14px 22px;border-radius:2px;border:1px solid var(--ink);cursor:pointer;transition:background .15s,color .15s,transform .15s}
+  .btn-solid{background:var(--ink);color:var(--bg)}
+  .btn-solid:hover{background:var(--accent);border-color:var(--accent)}
+  .btn-ghost{background:transparent;color:var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:var(--bg)}
+  .btn .arr{transition:transform .15s}
+  .btn:hover .arr{transform:translateX(3px)}
+
+  /* nav */
+  nav{border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-size:28px}
+  .logo svg{width:22px;height:22px}
+  .links{display:flex;gap:36px;font-size:15px;color:var(--muted)}
+  .links a:hover{color:var(--ink)}
+  nav .btn{padding:10px 18px;font-size:14px}
+
+  /* hero */
+  .hero{padding:96px 0 104px;border-bottom:1px solid var(--line)}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:72px;align-items:center}
+  .hero h1{font-size:112px;margin:22px 0 28px}
+  .hero h1 em{color:var(--accent)}
+  .hero p.lede{font-size:21px;max-width:500px;color:#35332C}
+  .hero .ctas{display:flex;gap:14px;margin-top:40px}
+  .hero .fine{margin-top:18px;font-size:14px;color:var(--muted)}
+
+  /* configurator */
+  .cfg{background:var(--paper);border:1px solid var(--line);position:relative}
+  .cfg-head{display:flex;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line)}
+  .cfg-draw{height:300px;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:24px 24px;background-position:-1px -1px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);position:relative}
+  .cfg-draw::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,transparent 30%,var(--paper) 85%)}
+  .cfg-draw svg{position:relative;z-index:1}
+  .cfg-body{padding:20px;display:grid;gap:18px}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .seg{display:flex;border:1px solid var(--line)}
+  .seg button{font:500 13px var(--sans);background:none;border:0;padding:8px 14px;cursor:pointer;color:var(--muted)}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button.on{background:var(--ink);color:var(--bg)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:200px;height:1px;background:var(--ink)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--accent);border-radius:0;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--accent);border:0;border-radius:0}
+  .val{font-family:var(--mono);font-size:13px;min-width:62px;text-align:right}
+  .cfg-foot{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--line)}
+  .cfg-foot div{padding:14px 20px}
+  .cfg-foot div+div{border-left:1px solid var(--line)}
+  .cfg-foot strong{display:block;font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.1;margin-top:4px}
+  .tag{position:absolute;top:-12px;right:20px;background:var(--accent);color:#fff;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 9px}
+
+  /* logos */
+  .logos{padding:36px 0;border-bottom:1px solid var(--line)}
+  .logos .wrap{display:flex;align-items:center;justify-content:space-between}
+  .logos span.n{font-family:var(--serif);font-size:24px;color:#8A867B}
+
+  /* section generic */
+  section.s{padding:120px 0;border-bottom:1px solid var(--line)}
+  .s-head{display:grid;grid-template-columns:260px 1fr;gap:40px;margin-bottom:72px}
+  .s-head h2{font-size:64px;max-width:760px}
+
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ink)}
+  .step{padding:32px 36px 8px 0}
+  .step+.step{padding-left:36px;border-left:1px solid var(--line)}
+  .step .num{font-family:var(--mono);font-size:13px;color:var(--accent)}
+  .step h3{font-size:44px;margin:18px 0 14px}
+  .step p{color:#3E3C35}
+  .step .aside{margin-top:22px;font-size:14px;color:var(--muted);font-style:italic;font-family:var(--serif);font-size:19px}
+
+  /* compare */
+  .compare{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line)}
+  .compare > div{padding:40px}
+  .compare > div + div{border-left:1px solid var(--line);background:var(--paper)}
+  .compare h3{font-size:34px;margin:10px 0 24px}
+  .compare ul{list-style:none}
+  .compare li{padding:14px 0;border-top:1px solid var(--line);display:flex;gap:14px;font-size:16px}
+  .compare li:last-child{border-bottom:1px solid var(--line)}
+  .compare li .k{font-family:var(--mono);font-size:12px;color:var(--muted);width:90px;flex-shrink:0;padding-top:3px}
+  .compare .old li span:last-child{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(232,84,30,.6)}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+  .stat{padding:0 28px;border-left:1px solid var(--line)}
+  .stat:first-child{padding-left:0;border-left:0}
+  .stat .big{font-family:var(--serif);font-size:88px;line-height:1}
+  .stat .big sup{font-size:40px;vertical-align:top;position:relative;top:10px}
+  .stat p{margin-top:14px;font-size:15px;color:#3E3C35;max-width:220px}
+  .foot-note{margin-top:48px;font-size:13px;color:var(--muted)}
+
+  /* quote */
+  .quote{padding:130px 0;border-bottom:1px solid var(--line);text-align:center}
+  .quote blockquote{font-family:var(--serif);font-size:58px;line-height:1.1;max-width:980px;margin:0 auto}
+  .quote blockquote em{color:var(--accent)}
+  .quote cite{display:block;margin-top:36px;font-style:normal}
+
+  /* faq */
+  .faq{display:grid;grid-template-columns:1fr 1fr;gap:0 64px}
+  details{border-top:1px solid var(--line);padding:22px 0}
+  details:nth-last-child(-n+2){border-bottom:1px solid var(--line)}
+  summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;font-size:19px;font-weight:500}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-family:var(--mono);color:var(--accent);transition:transform .2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details p{margin-top:12px;color:#3E3C35;max-width:480px}
+
+  /* demo */
+  .demo{padding:130px 0;background:var(--ink);color:var(--bg)}
+  .demo .wrap{display:grid;grid-template-columns:1fr 1fr;gap:96px;align-items:start}
+  .demo h2{font-size:96px}
+  .demo h2 em{color:var(--accent)}
+  .demo p{color:#B9B5AA;font-size:19px;margin-top:28px;max-width:460px}
+  .demo ul{list-style:none;margin-top:36px;color:#B9B5AA;font-size:15px}
+  .demo ul li{padding:10px 0;border-top:1px solid #34322B;display:flex;gap:14px}
+  .demo ul li::before{content:"—";color:var(--accent)}
+  form{display:grid;gap:22px}
+  .field label{display:block;font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:#8C887D;margin-bottom:8px}
+  .field input,.field select{width:100%;background:transparent;border:0;border-bottom:1px solid #4A473F;color:var(--bg);font:400 20px var(--sans);padding:8px 0 12px;outline:none;border-radius:0;-webkit-appearance:none;appearance:none}
+  .field select option{color:var(--ink)}
+  .field input:focus,.field select:focus{border-color:var(--accent)}
+  .field input::placeholder{color:#5E5B52}
+  .field.err input{border-color:var(--accent)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  form .btn{justify-content:center;background:var(--accent);border-color:var(--accent);color:#fff;font-size:16px;padding:18px;margin-top:8px}
+  form .btn:hover{background:var(--bg);color:var(--ink);border-color:var(--bg)}
+  .form-note{font-size:13px;color:#8C887D}
+  .done{display:none;border:1px solid #34322B;padding:40px}
+  .done h3{font-size:48px;margin-bottom:14px}
+  .done p{margin-top:0}
+
+  footer{background:var(--ink);color:#8C887D;border-top:1px solid #34322B}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;height:88px;font-size:14px}
+  footer .logo{color:var(--bg);font-size:24px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg viewBox="0 0 24 24" fill="none"><polygon points="12,1.5 21.5,7 21.5,17 12,22.5 2.5,17 2.5,7" stroke="#16150F" stroke-width="2"/><circle cx="12" cy="12" r="3.5" fill="#E8541E"/></svg>
+      Acme
+    </a>
+    <div class="links">
+      <a href="#how">How it works</a>
+      <a href="#proof">Results</a>
+      <a href="#faq">Questions</a>
+    </div>
+    <a href="#demo" class="btn btn-solid">Book a demo <span class="arr">→</span></a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="mono">Widget operations software</div>
+      <h1>Widgets,<br><em>handled.</em></h1>
+      <p class="lede">Acme lets operations teams configure, order, and track custom widgets across the whole supply chain. It is not exciting. That is rather the point.</p>
+      <div class="ctas">
+        <a href="#demo" class="btn btn-solid">Book a demo <span class="arr">→</span></a>
+        <a href="#how" class="btn btn-ghost">See how it works</a>
+      </div>
+      <p class="fine">30 minutes. No slide about our founding story.</p>
+    </div>
+
+    <div class="cfg" aria-label="Widget configurator demo">
+      <span class="tag">Try it. It's a widget.</span>
+      <div class="cfg-head"><span class="mono">Configure · WX-2210</span><span class="mono" id="rev">Rev. A</span></div>
+      <div class="cfg-draw">
+        <svg width="300" height="260" viewBox="0 0 300 260" aria-hidden="true">
+          <g id="widget" transform="translate(150 130)">
+            <polygon id="hex" points="0,-96 83,-48 83,48 0,96 -83,48 -83,-48" fill="#A7ADB3" stroke="#16150F" stroke-width="1.5"/>
+            <circle r="70" fill="none" stroke="#16150F" stroke-width="1" stroke-dasharray="3 4" opacity=".45"/>
+            <circle id="bore" r="28" fill="#FBFAF7" stroke="#16150F" stroke-width="1.5"/>
+            <line x1="-110" y1="0" x2="110" y2="0" stroke="#E8541E" stroke-width="1" stroke-dasharray="8 3 2 3"/>
+            <line x1="0" y1="-118" x2="0" y2="118" stroke="#E8541E" stroke-width="1" stroke-dasharray="8 3 2 3"/>
+          </g>
+          <g font-family="IBM Plex Mono" font-size="10" fill="#16150F">
+            <line id="dimL" x1="122" y1="236" x2="178" y2="236" stroke="#16150F"/>
+            <line id="tickL" x1="122" y1="230" x2="122" y2="242" stroke="#16150F"/>
+            <line id="tickR" x1="178" y1="230" x2="178" y2="242" stroke="#16150F"/>
+            <text id="dimT" x="150" y="254" text-anchor="middle">Ø 14.0 mm</text>
+            <text x="8" y="16" fill="#6B685F">SCALE 1:1 (ROUGHLY)</text>
+          </g>
+        </svg>
+      </div>
+      <div class="cfg-body">
+        <div class="row"><span class="mono">Material</span>
+          <div class="seg" id="mat">
+            <button class="on" data-m="steel">Steel</button><button data-m="alu">Aluminum</button><button data-m="brass">Brass</button>
+          </div>
+        </div>
+        <div class="row"><span class="mono">Bore diameter</span>
+          <div style="display:flex;align-items:center;gap:14px"><input type="range" id="bore-in" min="6" max="24" step="0.5" value="14" aria-label="Bore diameter"><span class="val" id="bore-v">14.0 mm</span></div>
+        </div>
+        <div class="row"><span class="mono">Quantity</span>
+          <div style="display:flex;align-items:center;gap:14px"><input type="range" id="qty-in" min="500" max="50000" step="500" value="10000" aria-label="Quantity"><span class="val" id="qty-v">10,000</span></div>
+        </div>
+      </div>
+      <div class="cfg-foot">
+        <div><span class="mono">Unit price</span><strong id="unit">$0.42</strong></div>
+        <div><span class="mono">Lead time</span><strong id="lead">12 days</strong></div>
+        <div><span class="mono">Emails sent</span><strong>0</strong></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="logos">
+  <div class="wrap">
+    <span class="mono">Quietly relied upon by</span>
+    <span class="n">Halvorsen Fittings</span>
+    <span class="n"><em>Brightwater</em> Industrial</span>
+    <span class="n">Keel &amp; Co.</span>
+    <span class="n">Marlow Precision</span>
+    <span class="n"><em>Orrin</em> Tool Works</span>
+  </div>
+</div>
+
+<section class="s" id="how">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="mono">01 — How it works</span>
+      <h2>Three steps. We checked whether it could be two. It could not.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="num">Step 01</span>
+        <h3>Configure</h3>
+        <p>Specify material, tolerances, finish, and packaging against your approved spec library. Acme flags anything your supplier can't actually make before they tell you three weeks later.</p>
+        <p class="aside">Revision history included, for settling arguments.</p>
+      </div>
+      <div class="step">
+        <span class="num">Step 02</span>
+        <h3>Order</h3>
+        <p>Route purchase orders to the right supplier, with approvals that follow your rules rather than whoever is loudest. Quotes are compared side by side, like adults.</p>
+        <p class="aside">Integrates with SAP, NetSuite, and Oracle. Also Dave's spreadsheet, reluctantly.</p>
+      </div>
+      <div class="step">
+        <span class="num">Step 03</span>
+        <h3>Track</h3>
+        <p>Watch every widget from mill to dock: production status, shipping, customs, receipt. Delays surface on day one, not the morning the line stops.</p>
+        <p class="aside">You will know where your widgets are. Imagine.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="mono">02 — The difference</span>
+      <h2>What you do now, and what you could be doing instead.</h2>
+    </div>
+    <div class="compare">
+      <div class="old">
+        <span class="mono">Currently</span>
+        <h3>The Spreadsheet Era</h3>
+        <ul>
+          <li><span class="k">Specs</span><span>A PDF called FINAL_v7_actual.pdf</span></li>
+          <li><span class="k">Ordering</span><span>An email thread with 43 replies</span></li>
+          <li><span class="k">Approvals</span><span>Walking to someone's desk</span></li>
+          <li><span class="k">Tracking</span><span>Calling the supplier and hoping</span></li>
+          <li><span class="k">Reporting</span><span>A Friday afternoon, gone</span></li>
+        </ul>
+      </div>
+      <div>
+        <span class="mono">With Acme</span>
+        <h3>The Acme Era</h3>
+        <ul>
+          <li><span class="k">Specs</span><span>One versioned source of truth</span></li>
+          <li><span class="k">Ordering</span><span>Structured POs, sent in a click</span></li>
+          <li><span class="k">Approvals</span><span>Rule-based, from anywhere</span></li>
+          <li><span class="k">Tracking</span><span>Live status for every line item</span></li>
+          <li><span class="k">Reporting</span><span>Already done. Go home.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="proof">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="mono">03 — Results</span>
+      <h2>Numbers, since you'll ask.</h2>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="big">41<sup>%</sup></div><p>Shorter average order-to-dock time in the first two quarters.</p></div>
+      <div class="stat"><div class="big">6.2<sup>h</sup></div><p>Saved per ops manager, per week. Most spend it on lunch.</p></div>
+      <div class="stat"><div class="big">93<sup>%</sup></div><p>Fewer spec errors reaching suppliers. The other 7% were fonts.</p></div>
+      <div class="stat"><div class="big">38<sup>%</sup></div><p>Fewer internal emails with "URGENT" in the subject line.</p></div>
+    </div>
+    <p class="foot-note">Median across 140 mid-sized manufacturers, 2023–2024. The last one we measured mostly for fun.</p>
+  </div>
+</section>
+
+<section class="quote">
+  <div class="wrap">
+    <span class="mono">Customer, unprompted</span>
+    <blockquote style="margin-top:28px">“I used to spend Mondays finding out what went wrong on Friday. Now I spend Mondays on <em>Monday.</em>”</blockquote>
+    <cite class="mono">Renata Okafor — Director of Operations, Marlow Precision</cite>
+  </div>
+</section>
+
+<section class="s" id="faq">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="mono">04 — Questions</span>
+      <h2>Reasonable questions, straight answers.</h2>
+    </div>
+    <div class="faq">
+      <details><summary>How long does setup take?</summary><p>Most teams are placing orders within three weeks. We import your specs, suppliers, and open POs. You mostly watch.</p></details>
+      <details><summary>Do our suppliers need to sign up?</summary><p>No. They can use a free supplier portal, or keep replying to emails. Acme reads those too, and turns them into status updates.</p></details>
+      <details><summary>What does it cost?</summary><p>Annual plans priced by order volume, not seats. Add your whole team; we won't send a sternly worded invoice.</p></details>
+      <details><summary>Is it secure?</summary><p>SOC 2 Type II, SSO, role-based permissions, and full audit logs. Your widget specs are safer than they've ever been in that PDF.</p></details>
+      <details><summary>We only make some custom widgets. Is that enough?</summary><p>If you order more than a few hundred SKUs a year, yes. If you order four, we admire your restraint and suggest a notebook.</p></details>
+      <details><summary>What happens in the demo?</summary><p>We load one of your real widgets, order it, and track it. Thirty minutes. Questions encouraged; slides discouraged.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div>
+      <span class="mono" style="color:#8C887D">Book a demo</span>
+      <h2 style="margin-top:22px">Let's talk <em>widgets.</em></h2>
+      <p>Thirty minutes with someone who has actually run a plant floor. Bring your worst purchase order. We'd like to see it.</p>
+      <ul>
+        <li>A walkthrough using your own widget specs</li>
+        <li>A realistic rollout plan, with dates</li>
+        <li>Pricing, stated plainly, on the call</li>
+      </ul>
+    </div>
+    <div>
+      <form id="demo-form" novalidate>
+        <div class="two">
+          <div class="field"><label for="f-name">Name</label><input id="f-name" type="text" placeholder="Jordan Reyes" autocomplete="name"></div>
+          <div class="field"><label for="f-co">Company</label><input id="f-co" type="text" placeholder="Reyes Manufacturing" autocomplete="organization"></div>
+        </div>
+        <div class="field"><label for="f-email">Work email</label><input id="f-email" type="email" placeholder="jordan@reyesmfg.com" autocomplete="email"></div>
+        <div class="field"><label for="f-vol">Custom widget orders per year</label>
+          <select id="f-vol">
+            <option>Fewer than 500</option>
+            <option selected>500 – 5,000</option>
+            <option>5,000 – 50,000</option>
+            <option>More than 50,000 (hello)</option>
+          </select>
+        </div>
+        <button class="btn" type="submit">Book my demo <span class="arr">→</span></button>
+        <p class="form-note">We'll reply within one business day. No newsletter, unless you ask. Nobody asks.</p>
+      </form>
+      <div class="done" id="done">
+        <span class="mono" style="color:var(--accent)">Received</span>
+        <h3 style="margin-top:14px">Noted, <span id="done-name">friend</span>.</h3>
+        <p>We'll email you a few times within one business day. Probably sooner. We're keen, but professionally so.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="logo">Acme</span>
+    <span>Making widgets boring since 2016.</span>
+    <span>© 2025 Acme Widget Co. · Privacy · Terms</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const mats = {
+    steel:{fill:'#A7ADB3', base:0.34, lead:12, rev:'Rev. A'},
+    alu:{fill:'#D3D7DB', base:0.29, lead:9, rev:'Rev. B'},
+    brass:{fill:'#C9A24A', base:0.61, lead:16, rev:'Rev. C'}
+  };
+  let mat = 'steel';
+  const $ = id => document.getElementById(id);
+  const boreIn = $('bore-in'), qtyIn = $('qty-in');
+
+  function update(){
+    const m = mats[mat], d = parseFloat(boreIn.value), q = parseInt(qtyIn.value,10);
+    $('hex').setAttribute('fill', m.fill);
+    const r = d * 2; // px per mm, approx
+    $('bore').setAttribute('r', r);
+    const x1 = 150 - r, x2 = 150 + r;
+    $('dimL').setAttribute('x1', x1); $('dimL').setAttribute('x2', x2);
+    ['tickL','tickR'].forEach((t,i)=>{const x=i?x2:x1; $(t).setAttribute('x1',x); $(t).setAttribute('x2',x);});
+    $('dimT').textContent = 'Ø ' + d.toFixed(1) + ' mm';
+    $('bore-v').textContent = d.toFixed(1) + ' mm';
+    $('qty-v').textContent = q.toLocaleString('en-US');
+    // less material with bigger bore, volume discount
+    const matFactor = 1 - (d - 6) * 0.012;
+    const discount = Math.max(0.62, 1 - Math.log10(q / 500) * 0.19);
+    const unit = m.base * matFactor * discount + 0.06;
+    $('unit').textContent = '$' + unit.toFixed(2);
+    const lead = Math.round(m.lead + q / 8000);
+    $('lead').textContent = lead + ' days';
+    $('rev').textContent = m.rev;
+  }
+
+  document.querySelectorAll('#mat button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('#mat button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); mat = b.dataset.m; update();
+    });
+  });
+  boreIn.addEventListener('input', update);
+  qtyIn.addEventListener('input', update);
+  update();
+
+  // form
+  const form = $('demo-form');
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fields = [['f-name', v=>v.trim().length>1], ['f-co', v=>v.trim().length>1], ['f-email', v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)]];
+    let ok = true;
+    fields.forEach(([id,test])=>{
+      const el = $(id), wrap = el.parentElement;
+      if(!test(el.value)){ wrap.classList.add('err'); ok = false; } else wrap.classList.remove('err');
+    });
+    if(!ok){
+      const first = form.querySelector('.err input'); if(first) first.focus();
+      return;
+    }
+    $('done-name').textContent = $('f-name').value.trim().split(' ')[0];
+    form.style.display = 'none';
+    $('done').style.display = 'block';
+  });
+  form.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>i.parentElement.classList.remove('err')));
+})();
+</script>
+</body>
+</html>

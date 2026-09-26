@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f0ede4">
+  <meta name="description" content="Acme brings custom widget configuration, ordering, and tracking into one place for manufacturing operations teams.">
+  <title>Acme — Custom widgets. No chaos.</title>
+  <style>
+    :root {
+      --paper: #f0ede4;
+      --white: #fffdf7;
+      --ink: #171714;
+      --orange: #fa5428;
+      --lime: #d9f366;
+      --line: 2px solid var(--ink);
+      --heavy-line: 3px solid var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    button, input, select { font: inherit; }
+    a { color: inherit; }
+    ::selection { background: var(--lime); color: var(--ink); }
+    :focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 12px;
+      z-index: 20;
+      padding: 12px;
+      background: var(--lime);
+      font-weight: 800;
+    }
+    .skip-link:focus { top: 12px; }
+
+    .page { max-width: 1600px; margin: auto; border-left: var(--heavy-line); border-right: var(--heavy-line); }
+    .eyebrow, .mono {
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 800;
+      letter-spacing: .045em;
+      text-transform: uppercase;
+    }
+
+    .utility {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 34px;
+      padding: 5px 32px;
+      background: var(--ink);
+      color: var(--paper);
+      font-size: 11px;
+    }
+    .utility span:last-child { color: var(--lime); }
+
+    header {
+      display: flex;
+      align-items: stretch;
+      min-height: 82px;
+      border-bottom: var(--heavy-line);
+      background: var(--paper);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 33px;
+      border-right: var(--heavy-line);
+      text-decoration: none;
+      font-family: Impact, "Arial Black", sans-serif;
+      font-size: 36px;
+      letter-spacing: -.045em;
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 37px;
+      height: 37px;
+      background: var(--orange);
+      border: 2px solid var(--ink);
+      font: 28px/1 Arial, sans-serif;
+      transform: rotate(-8deg);
+    }
+    nav { display: flex; align-items: stretch; margin-left: auto; }
+    nav a {
+      display: flex;
+      align-items: center;
+      padding: 0 27px;
+      text-decoration: none;
+      text-transform: uppercase;
+      font: 800 12px "Courier New", monospace;
+      border-left: var(--line);
+      transition: background .15s ease;
+    }
+    nav a:hover { background: var(--lime); }
+    nav .nav-cta { background: var(--orange); gap: 22px; font-size: 13px; }
+    nav .nav-cta:hover { background: var(--lime); }
+
+    .hero { display: grid; grid-template-columns: 57% 43%; border-bottom: var(--heavy-line); }
+    .hero-copy {
+      padding: 48px 48px 45px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: 635px;
+    }
+    .hero-kicker { display: flex; align-items: center; gap: 11px; font-size: 12px; }
+    .hero-kicker::before { content: ""; width: 13px; height: 13px; background: var(--orange); border: 2px solid var(--ink); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: Impact, "Arial Black", "Helvetica Neue", Arial, sans-serif; font-weight: 900; text-transform: uppercase; }
+    h1 {
+      margin: 42px 0 25px;
+      font-size: clamp(65px, 6.7vw, 99px);
+      line-height: .91;
+      letter-spacing: -.045em;
+    }
+    h1 .slash { color: var(--orange); }
+    h1 .last { white-space: nowrap; }
+    .hero-sub {
+      max-width: 500px;
+      margin-bottom: 28px;
+      font-size: 19px;
+      line-height: 1.42;
+      font-weight: 600;
+    }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; }
+    .button {
+      display: inline-flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 35px;
+      min-height: 60px;
+      padding: 14px 19px;
+      border: var(--heavy-line);
+      background: var(--orange);
+      box-shadow: 6px 6px 0 var(--ink);
+      text-decoration: none;
+      text-transform: uppercase;
+      font: 900 14px "Courier New", monospace;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .button:hover { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--ink); background: var(--lime); }
+    .button:active { transform: translate(6px, 6px); box-shadow: none; }
+    .button .arrow { font: 30px/1 Arial, sans-serif; }
+    .hero-actions small { max-width: 160px; font: 700 12px/1.45 "Courier New", monospace; text-transform: uppercase; }
+    .hero-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      width: 100%;
+      margin-top: auto;
+      padding-top: 35px;
+      font-size: 11px;
+    }
+
+    .hero-visual {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      padding: 51px 38px 43px;
+      border-left: var(--heavy-line);
+      background-color: var(--orange);
+      background-image: radial-gradient(#171714 1px, transparent 1px);
+      background-size: 19px 19px;
+    }
+    .visual-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 27px;
+      font-size: 12px;
+    }
+    .app-window { position: relative; background: var(--white); border: var(--heavy-line); box-shadow: 10px 10px 0 var(--ink); }
+    .app-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 44px;
+      padding: 0 14px;
+      background: var(--ink);
+      color: var(--white);
+      font-size: 12px;
+    }
+    .app-top .dots { display: flex; gap: 5px; }
+    .app-top .dots i { width: 8px; height: 8px; border: 1px solid var(--white); }
+    .app-body { padding: 19px 21px 20px; }
+    .app-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .app-heading h2 { margin: 4px 0 0; font-size: 28px; letter-spacing: -.025em; line-height: 1; }
+    .app-heading .eyebrow { font-size: 10px; }
+    .pill { padding: 7px 9px; background: var(--lime); border: var(--line); white-space: nowrap; font: 800 10px "Courier New", monospace; }
+    .schematic {
+      display: grid;
+      place-items: center;
+      height: 235px;
+      margin: 17px 0;
+      border: var(--line);
+      background-color: #e8e7de;
+      background-image: linear-gradient(#17171419 1px, transparent 1px), linear-gradient(90deg, #17171419 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .schematic svg { width: min(100%, 340px); height: 210px; filter: drop-shadow(6px 8px 0 #17171430); }
+    .app-data { display: grid; grid-template-columns: repeat(3, 1fr); border: var(--line); }
+    .app-data div { padding: 10px 9px; min-width: 0; }
+    .app-data div + div { border-left: var(--line); }
+    .app-data span { display: block; margin-bottom: 5px; font: 800 9px "Courier New", monospace; text-transform: uppercase; }
+    .app-data strong { font: 900 15px Arial, sans-serif; }
+    .progress-label { display: flex; justify-content: space-between; gap: 5px; margin: 18px 0 7px; font-size: 10px; }
+    .progress { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .progress i { height: 12px; border: 2px solid var(--ink); background: var(--lime); }
+    .progress i:last-child { background: transparent; }
+    .visual-bottom { display: flex; justify-content: space-between; margin-top: 26px; font-size: 11px; }
+    .stamp {
+      position: absolute;
+      right: 6px;
+      top: 88px;
+      transform: rotate(11deg);
+      padding: 9px 11px;
+      border: var(--heavy-line);
+      background: var(--lime);
+      box-shadow: 4px 4px 0 var(--ink);
+      font: 900 11px/1.15 "Courier New", monospace;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .ticker {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow: hidden;
+      min-height: 57px;
+      border-bottom: var(--heavy-line);
+      background: var(--lime);
+      white-space: nowrap;
+      font: 900 13px "Courier New", monospace;
+      text-transform: uppercase;
+    }
+    .ticker span { flex: 1; text-align: center; padding: 15px 18px; }
+    .ticker b { font: 25px Arial, sans-serif; }
+
+    .section { padding: 89px 48px 97px; border-bottom: var(--heavy-line); }
+    .section-label { font-size: 12px; margin-bottom: 24px; }
+    .section-label::before { content: "■"; color: var(--orange); padding-right: 9px; }
+    .problem-head { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: end; padding-bottom: 46px; }
+    .problem-head h2 { margin: 0; font-size: clamp(48px, 5vw, 73px); line-height: .97; letter-spacing: -.035em; }
+    .problem-head p { max-width: 490px; margin: 0 0 5px auto; font-size: 20px; font-weight: 600; line-height: 1.45; }
+    .problem-head mark { background: var(--lime); padding: 0 3px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: var(--heavy-line); }
+    .feature { min-height: 327px; padding: 24px 25px 27px; display: flex; flex-direction: column; }
+    .feature + .feature { border-left: var(--heavy-line); }
+    .feature:nth-child(2) { background: var(--white); }
+    .feature:nth-child(3) { background: var(--lime); }
+    .feature .num { font-size: 13px; }
+    .feature-icon { height: 95px; display: flex; align-items: center; font: 900 77px/1 Impact, "Arial Black", sans-serif; letter-spacing: -.08em; }
+    .feature h3 { margin: 0 0 12px; font-size: 30px; line-height: 1; letter-spacing: -.025em; }
+    .feature p { margin: 0; max-width: 330px; font-size: 15px; line-height: 1.46; font-weight: 600; }
+
+    .statement {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      min-height: 312px;
+      border-bottom: var(--heavy-line);
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .statement-main { padding: 48px; }
+    .statement-main h2 { margin: 18px 0 0; max-width: 720px; font-size: clamp(43px, 4.3vw, 65px); line-height: .99; letter-spacing: -.025em; }
+    .statement-main h2 em { color: var(--orange); font-style: normal; }
+    .statement-side {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 48px;
+      border-left: 2px solid var(--paper);
+    }
+    .statement-side p { font-size: 19px; line-height: 1.45; font-weight: 600; }
+    .statement-side a { width: fit-content; color: var(--lime); font: 900 13px "Courier New", monospace; text-transform: uppercase; text-underline-offset: 5px; }
+
+    .demo { display: grid; grid-template-columns: .95fr 1.05fr; border-bottom: var(--heavy-line); }
+    .demo-copy { padding: 78px 48px; background: var(--orange); border-right: var(--heavy-line); }
+    .demo-copy .section-label::before { color: var(--ink); }
+    .demo-copy h2 { margin: 18px 0 24px; font-size: clamp(55px, 5.4vw, 80px); line-height: .94; letter-spacing: -.04em; }
+    .demo-copy > p { max-width: 440px; font-size: 20px; font-weight: 700; line-height: 1.4; }
+    .demo-note { margin-top: 65px; padding-top: 16px; border-top: var(--line); font-size: 12px; line-height: 1.5; }
+    .demo-form-wrap { padding: 73px 58px 65px; background: var(--white); }
+    .form-title { margin-bottom: 26px; font: 900 14px "Courier New", monospace; text-transform: uppercase; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 19px; }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field.full { grid-column: 1 / -1; }
+    label { font: 900 11px "Courier New", monospace; text-transform: uppercase; }
+    input, select {
+      width: 100%;
+      height: 52px;
+      padding: 0 13px;
+      border: var(--line);
+      border-radius: 0;
+      background: var(--white);
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 600;
+    }
+    input::placeholder { color: #77766f; font-weight: 400; }
+    select { cursor: pointer; }
+    .form-submit { width: 100%; margin-top: 25px; }
+    .form-fine { margin: 19px 0 0; font: 700 11px/1.5 "Courier New", monospace; text-transform: uppercase; }
+    #form-status { min-height: 0; margin: 12px 0 0; font-size: 13px; font-weight: 700; line-height: 1.5; }
+    #form-status:empty { display: none; }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 25px;
+      padding: 25px 33px;
+      background: var(--paper);
+      font: 800 11px "Courier New", monospace;
+      text-transform: uppercase;
+    }
+    footer strong { font: 30px Impact, "Arial Black", sans-serif; letter-spacing: -.04em; }
+    footer a { text-underline-offset: 4px; }
+
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: 55% 45%; }
+      .hero-copy { padding: 38px 32px; }
+      h1 { font-size: clamp(62px, 7.1vw, 82px); }
+      .hero-visual { padding: 45px 25px; }
+      .stamp { right: 0; }
+      .section { padding-left: 34px; padding-right: 34px; }
+    }
+    @media (max-width: 760px) {
+      .page { border: 0; }
+      .utility { padding: 8px 17px; font-size: 10px; }
+      .utility span:last-child { display: none; }
+      header { min-height: 68px; }
+      .brand { padding: 0 16px; font-size: 29px; }
+      .brand-mark { width: 30px; height: 30px; font-size: 23px; }
+      nav a:not(.nav-cta) { display: none; }
+      nav .nav-cta { padding: 0 15px; gap: 8px; font-size: 11px; }
+      .hero, .problem-head, .statement, .demo { grid-template-columns: 1fr; }
+      .hero-copy { min-height: 0; padding: 43px 23px 37px; }
+      h1 { margin-top: 34px; font-size: clamp(56px, 11.8vw, 86px); }
+      .hero-sub { font-size: 17px; }
+      .hero-foot { margin-top: 40px; }
+      .hero-visual { border-left: 0; border-top: var(--heavy-line); padding: 32px 24px 43px; }
+      .app-window { max-width: 540px; margin: auto; }
+      .stamp { right: 13px; top: 69px; }
+      .ticker span { flex: none; }
+      .section { padding: 65px 23px; }
+      .problem-head { gap: 22px; }
+      .problem-head h2 { font-size: 55px; }
+      .problem-head p { margin: 0; font-size: 18px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature { min-height: 230px; }
+      .feature + .feature { border-left: 0; border-top: var(--heavy-line); }
+      .feature-icon { height: 70px; font-size: 59px; }
+      .statement-main, .statement-side { padding: 38px 24px; }
+      .statement-main h2 { font-size: 49px; }
+      .statement-side { border-left: 0; border-top: 2px solid var(--paper); }
+      .demo-copy, .demo-form-wrap { padding: 55px 24px; }
+      .demo-copy { border-right: 0; border-bottom: var(--heavy-line); }
+      .demo-copy h2 { font-size: 65px; }
+      .demo-note { margin-top: 35px; }
+      footer { flex-wrap: wrap; padding: 24px; }
+    }
+    @media (max-width: 430px) {
+      h1 { font-size: 13vw; }
+      .hero-actions small { max-width: none; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .app-body { padding: 14px; }
+      .app-heading h2 { font-size: 23px; }
+      .pill { font-size: 8px; }
+      .app-data strong { font-size: 12px; }
+      .stamp { font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="page">
+    <div class="utility mono">
+      <span>Built for the people who actually keep production moving.</span>
+      <span>Less chasing. More making. ↗</span>
+    </div>
+
+    <header>
+      <a class="brand" href="#" aria-label="Acme home"><span class="brand-mark" aria-hidden="true">✳</span> ACME</a>
+      <nav aria-label="Main navigation">
+        <a href="#how">How it works</a>
+        <a href="#why">Why Acme</a>
+        <a class="nav-cta" href="#demo">Book a demo <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="hero-kicker eyebrow">The custom widget operations platform</div>
+          <h1 id="hero-title">CUSTOM<br>WIDGETS<span class="slash">.</span><br><span class="last">NO CHAOS.</span></h1>
+          <p class="hero-sub">Configure, order, and track every custom widget in one place. No mystery specs. No lost email threads. No “where is it?” meetings.</p>
+          <div class="hero-actions">
+            <a class="button" href="#demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+            <small>See what your supply chain looks like with the lights on.</small>
+          </div>
+          <div class="hero-foot mono"><span>For manufacturing operations teams</span><span>01 / 03</span></div>
+        </div>
+
+        <div class="hero-visual" aria-label="Illustration of a custom widget order being tracked in Acme">
+          <div class="visual-top mono"><span>THE WORK, VISIBLE.</span><span>FIG. 001 ↘</span></div>
+          <div class="app-window">
+            <div class="app-top mono"><span>ACME / ORDER CONTROL</span><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <div class="app-body">
+              <div class="app-heading">
+                <div><span class="eyebrow">CUSTOM BUILD / #0427</span><h2>HOUSING ASSEMBLY</h2></div>
+                <span class="pill">● ON TRACK</span>
+              </div>
+              <div class="schematic">
+                <svg viewBox="0 0 360 215" role="img" aria-label="Technical drawing of a modular widget housing">
+                  <g fill="none" stroke="#171714" stroke-width="3" stroke-linejoin="round">
+                    <path fill="#d9f366" d="M87 87 194 42 298 88 190 135Z"/>
+                    <path fill="#b3d451" d="M87 87v61l103 48v-61Z"/>
+                    <path fill="#f0ede4" d="M190 135 298 88v60l-108 48Z"/>
+                    <path d="m108 79 104 47M132 68l104 47M156 58l104 47"/>
+                    <path d="m118 101 105-46M148 115l105-46M177 128l105-46"/>
+                    <path d="M112 99v35l48 22v-35M210 145v32l53-24v-32"/>
+                    <path fill="#fa5428" d="m143 68 51-22 51 22-52 23Z"/>
+                    <path d="m143 68 50 23 52-23"/>
+                    <path d="M193 91v26"/>
+                    <circle cx="193" cy="67" r="9" fill="#f0ede4"/>
+                    <circle cx="113" cy="122" r="5" fill="#171714"/>
+                    <circle cx="260" cy="131" r="5" fill="#171714"/>
+                    <path stroke-width="1.5" d="M53 87h28M53 148h28M53 87v61M303 88h27M303 148h27M330 88v60M182 20v18M211 20v18M182 20h29"/>
+                  </g>
+                  <g fill="#171714" font-family="monospace" font-size="10" font-weight="bold">
+                    <text x="20" y="119" transform="rotate(-90 20 119)">64 MM</text>
+                    <text x="300" y="31">REV. 04</text>
+                    <text x="159" y="14">118 MM</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="app-data">
+                <div><span>Specification</span><strong>Approved</strong></div>
+                <div><span>Quantity</span><strong>2,400 units</strong></div>
+                <div><span>Next stop</span><strong>Assembly</strong></div>
+              </div>
+              <div class="progress-label mono"><span>ORDER PROGRESS</span><span>4 OF 5 STAGES</span></div>
+              <div class="progress" aria-label="Order progress: four of five stages complete"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+          <div class="stamp">ONE<br>SOURCE<br>OF TRUTH.</div>
+          <div class="visual-bottom mono"><span>SPEC → ORDER → DELIVERY</span><span>NO BLACK BOXES.</span></div>
+        </div>
+      </section>
+
+      <div class="ticker" aria-label="Configure, order, track, repeat">
+        <span>Configure with confidence</span><b aria-hidden="true">✳</b>
+        <span>Order without the back-and-forth</span><b aria-hidden="true">✳</b>
+        <span>Track the actual status</span>
+      </div>
+
+      <section class="section" id="how" aria-labelledby="how-title">
+        <div class="section-label eyebrow">01 / The way work should work</div>
+        <div class="problem-head">
+          <h2 id="how-title">THE MESSY MIDDLE,<br>HANDLED.</h2>
+          <p>Custom shouldn’t mean chaotic. Acme connects the decisions, orders, and updates that usually get scattered across <mark>six tabs and twelve inboxes.</mark></p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature">
+            <span class="num mono">01 / CONFIGURE</span>
+            <div class="feature-icon" aria-hidden="true">⌗</div>
+            <h3>GET THE SPEC RIGHT.</h3>
+            <p>Define the widget you actually need. Keep requirements and revisions together so everyone works from the same version.</p>
+          </article>
+          <article class="feature">
+            <span class="num mono">02 / ORDER</span>
+            <div class="feature-icon" aria-hidden="true">↗</div>
+            <h3>MOVE WITHOUT CHASING.</h3>
+            <p>Turn approved configurations into clear orders. Give suppliers and internal teams the details they need, upfront.</p>
+          </article>
+          <article class="feature">
+            <span class="num mono">03 / TRACK</span>
+            <div class="feature-icon" aria-hidden="true">◎</div>
+            <h3>KNOW WHAT’S NEXT.</h3>
+            <p>See where orders stand across your supply chain. Spot a hold-up early instead of hearing about it at the deadline.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="statement" id="why" aria-labelledby="why-title">
+        <div class="statement-main">
+          <div class="eyebrow">02 / An uncomfortable truth</div>
+          <h2 id="why-title">“WE THINK IT’S ON TRACK” <em>IS NOT A STATUS UPDATE.</em></h2>
+        </div>
+        <div class="statement-side">
+          <p>Your team deserves answers it can act on. Acme makes the full path from configuration to delivery easier to see—and easier to manage.</p>
+          <a href="#demo">Let’s talk about your process ↗</a>
+        </div>
+      </section>
+
+      <section class="demo" id="demo" aria-labelledby="demo-title">
+        <div class="demo-copy">
+          <div class="section-label eyebrow">03 / Your move</div>
+          <h2 id="demo-title">LET’S GET<br>INTO IT.</h2>
+          <p>Show us where custom widget orders get stuck. We’ll show you how Acme helps clear the way.</p>
+          <div class="demo-note mono">A real conversation about your workflow. No 40-slide deck. No mystery pricing pitch.</div>
+        </div>
+        <div class="demo-form-wrap">
+          <p class="form-title">Request your demo / Tell us a little about you</p>
+          <form id="demo-form">
+            <div class="form-grid">
+              <div class="field">
+                <label for="name">Your name *</label>
+                <input id="name" name="name" autocomplete="name" placeholder="Alex Morgan" required>
+              </div>
+              <div class="field">
+                <label for="email">Work email *</label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="alex@company.com" required>
+              </div>
+              <div class="field full">
+                <label for="company">Company *</label>
+                <input id="company" name="company" autocomplete="organization" placeholder="Your manufacturing company" required>
+              </div>
+              <div class="field full">
+                <label for="challenge">What’s the biggest headache?</label>
+                <select id="challenge" name="challenge">
+                  <option value="">Pick one (optional)</option>
+                  <option>Managing specifications and revisions</option>
+                  <option>Placing and coordinating orders</option>
+                  <option>Tracking orders across suppliers</option>
+                  <option>All of the above</option>
+                </select>
+              </div>
+            </div>
+            <button class="button form-submit" type="submit">Request a demo <span class="arrow" aria-hidden="true">↗</span></button>
+            <p class="form-fine">Submitting opens an email to our team. We’ll reply to arrange a time.</p>
+            <p id="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <strong>ACME ✳</strong>
+      <span>Custom widgets. Clear answers.</span>
+      <a href="mailto:demo@acme.com">demo@acme.com ↗</a>
+      <span>© <span id="year">2026</span> Acme</span>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    document.getElementById("demo-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (!this.reportValidity()) return;
+
+      const data = new FormData(this);
+      const name = String(data.get("name")).trim();
+      const email = String(data.get("email")).trim();
+      const company = String(data.get("company")).trim();
+      const challenge = String(data.get("challenge") || "Not specified");
+
+      const subject = "Acme demo request — " + company;
+      const body = [
+        "Hi Acme,",
+        "",
+        "I'd like to arrange a demo.",
+        "",
+        "Name: " + name,
+        "Work email: " + email,
+        "Company: " + company,
+        "Biggest headache: " + challenge,
+        "",
+        "Please get in touch to schedule a time."
+      ].join("\n");
+
+      const mailto = "mailto:demo@acme.com?subject=" +
+        encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+
+      const status = document.getElementById("form-status");
+      status.textContent = "Your email app should open with the request ready to send. If it doesn’t, email demo@acme.com directly.";
+      window.location.href = mailto;
+    });
+  </script>
+</body>
+</html>

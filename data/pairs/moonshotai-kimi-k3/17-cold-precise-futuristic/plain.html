@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Precision Widget Logistics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05070b;
+    --bg2:#090d14;
+    --panel:#0b1019;
+    --line:rgba(148,178,210,.14);
+    --line-strong:rgba(148,178,210,.28);
+    --ink:#dbe7f2;
+    --ink-dim:#7c8ea3;
+    --ink-faint:#46566b;
+    --cyan:#39d3f2;
+    --cyan-dim:rgba(57,211,242,.12);
+    --mono:'IBM Plex Mono',monospace;
+    --sans:'Space Grotesk',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--cyan);color:#02141a}
+
+  /* ---------- global grid overlay ---------- */
+  .gridlines{
+    position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px);
+    background-size:calc(100%/6) 100%;
+    opacity:.35;
+  }
+  .noise{
+    position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  }
+
+  .wrap{max-width:1240px;margin:0 auto;padding:0 48px;position:relative;z-index:2}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    border-bottom:1px solid var(--line);
+    background:rgba(5,7,11,.78);
+    backdrop-filter:blur(14px);
+  }
+  .nav-inner{
+    max-width:1240px;margin:0 auto;padding:0 48px;
+    height:64px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+  .logo-mark{width:26px;height:26px;flex:none}
+  .logo span{font-weight:600;letter-spacing:.18em;font-size:15px}
+  .nav-links{display:flex;gap:36px;align-items:center}
+  .nav-links a{
+    color:var(--ink-dim);text-decoration:none;font-family:var(--mono);
+    font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    transition:color .2s;
+  }
+  .nav-links a:hover{color:var(--cyan)}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    padding:12px 22px;border:1px solid var(--cyan);color:var(--cyan);
+    background:transparent;text-decoration:none;cursor:pointer;
+    position:relative;transition:background .2s,color .2s,box-shadow .2s;
+  }
+  .btn:hover{background:var(--cyan);color:#02141a;box-shadow:0 0 32px rgba(57,211,242,.35)}
+  .btn.solid{background:var(--cyan);color:#02141a}
+  .btn.solid:hover{box-shadow:0 0 44px rgba(57,211,242,.5)}
+  .btn .arrow{transition:transform .2s}
+  .btn:hover .arrow{transform:translateX(4px)}
+
+  /* ---------- hero ---------- */
+  header{
+    min-height:100vh;display:flex;align-items:center;
+    padding:140px 0 80px;position:relative;
+  }
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.9}
+  .hero-content{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 48px;width:100%}
+  .tag{
+    font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--cyan);display:inline-flex;align-items:center;gap:10px;
+    border:1px solid var(--line-strong);padding:8px 14px;margin-bottom:36px;
+  }
+  .tag .dot{width:6px;height:6px;background:var(--cyan);border-radius:50%;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  h1{
+    font-size:clamp(48px,5.6vw,84px);font-weight:500;line-height:1.02;
+    letter-spacing:-.02em;max-width:900px;
+  }
+  h1 .thin{font-weight:300;color:var(--ink-dim)}
+  h1 .accent{color:var(--cyan)}
+  .hero-sub{
+    margin-top:32px;max-width:560px;font-size:18px;line-height:1.65;
+    color:var(--ink-dim);font-weight:300;
+  }
+  .hero-cta{margin-top:48px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+  .hero-meta{
+    margin-top:80px;display:flex;gap:0;border-top:1px solid var(--line);
+  }
+  .hero-meta div{
+    padding:24px 40px 0 0;margin-right:40px;
+  }
+  .hero-meta .num{font-size:32px;font-weight:500;letter-spacing:-.01em}
+  .hero-meta .num em{font-style:normal;color:var(--cyan)}
+  .hero-meta .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px}
+
+  /* ---------- section scaffolding ---------- */
+  section{padding:120px 0;position:relative;border-top:1px solid var(--line)}
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:72px;gap:40px}
+  .sec-index{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.2em;margin-bottom:16px}
+  h2{font-size:clamp(32px,3.4vw,52px);font-weight:500;letter-spacing:-.02em;line-height:1.1;max-width:640px}
+  h2 .thin{font-weight:300;color:var(--ink-dim)}
+  .sec-desc{max-width:380px;color:var(--ink-dim);font-size:15px;line-height:1.7;font-weight:300}
+
+  /* ---------- capabilities ---------- */
+  .caps{display:grid;grid-template-columns:repeat(3,1fr);border-left:1px solid var(--line);border-top:1px solid var(--line)}
+  .cap{
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:44px 36px 52px;position:relative;background:transparent;
+    transition:background .3s;
+  }
+  .cap:hover{background:var(--panel)}
+  .cap:hover .cap-num{color:var(--cyan)}
+  .cap-num{font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.16em;transition:color .3s}
+  .cap-icon{margin:28px 0 24px;height:44px}
+  .cap h3{font-size:20px;font-weight:500;margin-bottom:14px;letter-spacing:-.01em}
+  .cap p{color:var(--ink-dim);font-size:14.5px;line-height:1.7;font-weight:300}
+  .cap::after{
+    content:"";position:absolute;top:-1px;left:0;height:1px;width:0;
+    background:var(--cyan);transition:width .4s;
+  }
+  .cap:hover::after{width:100%}
+
+  /* ---------- configurator demo ---------- */
+  .config{
+    display:grid;grid-template-columns:1fr 1fr;gap:0;
+    border:1px solid var(--line-strong);background:var(--bg2);
+  }
+  .config-left{padding:56px;border-right:1px solid var(--line)}
+  .config-right{padding:56px;display:flex;flex-direction:column;justify-content:center;background:
+    radial-gradient(ellipse at 70% 30%, rgba(57,211,242,.06), transparent 60%)}
+  .field{margin-bottom:32px}
+  .field label{
+    display:flex;justify-content:space-between;
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-dim);margin-bottom:14px;
+  }
+  .field label output{color:var(--cyan)}
+  input[type=range]{
+    width:100%;-webkit-appearance:none;appearance:none;height:1px;
+    background:var(--line-strong);outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:14px;height:14px;background:var(--bg);
+    border:1px solid var(--cyan);cursor:pointer;transform:rotate(45deg);
+  }
+  .chips{display:flex;gap:10px;flex-wrap:wrap}
+  .chip{
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    padding:9px 16px;border:1px solid var(--line-strong);color:var(--ink-dim);
+    cursor:pointer;background:transparent;transition:all .2s;
+  }
+  .chip.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
+  .readout{
+    font-family:var(--mono);font-size:12px;line-height:2.1;color:var(--ink-dim);
+    border:1px solid var(--line);padding:28px 32px;background:var(--bg);
+  }
+  .readout .row{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:4px 0}
+  .readout .row:last-child{border-bottom:none}
+  .readout .val{color:var(--ink)}
+  .readout .val.hi{color:var(--cyan)}
+  .readout-title{font-size:10px;letter-spacing:.24em;color:var(--ink-faint);margin-bottom:16px;text-transform:uppercase}
+  .leadtime{
+    margin-top:28px;font-family:var(--mono);font-size:13px;color:var(--ink-dim);
+    display:flex;align-items:center;gap:12px;
+  }
+  .leadtime strong{color:var(--cyan);font-size:22px;font-weight:500}
+
+  /* ---------- timeline / how it works ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line)}
+  .step{padding:40px 32px 0 0;position:relative}
+  .step::before{
+    content:"";position:absolute;top:-5px;left:0;width:9px;height:9px;
+    background:var(--bg);border:1px solid var(--cyan);transform:rotate(45deg);
+  }
+  .step .s-num{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.2em;margin-bottom:20px}
+  .step h3{font-size:18px;font-weight:500;margin-bottom:12px}
+  .step p{color:var(--ink-dim);font-size:14px;line-height:1.7;font-weight:300}
+
+  /* ---------- metrics band ---------- */
+  .band{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:var(--bg2);padding:0;
+  }
+  .band-inner{display:grid;grid-template-columns:repeat(4,1fr)}
+  .band-cell{
+    padding:56px 40px;border-right:1px solid var(--line);
+  }
+  .band-cell:last-child{border-right:none}
+  .band-cell .big{font-size:44px;font-weight:500;letter-spacing:-.02em}
+  .band-cell .big em{font-style:normal;color:var(--cyan)}
+  .band-cell .small{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-top:10px}
+
+  /* ---------- testimonial ---------- */
+  .quote-block{max-width:880px}
+  .quote-mark{font-family:var(--mono);color:var(--cyan);font-size:14px;letter-spacing:.2em;margin-bottom:32px}
+  blockquote{font-size:clamp(24px,2.4vw,34px);font-weight:300;line-height:1.45;letter-spacing:-.01em}
+  blockquote strong{font-weight:500;color:var(--cyan)}
+  .quote-attr{margin-top:40px;display:flex;align-items:center;gap:20px}
+  .quote-attr .avatar{
+    width:48px;height:48px;border:1px solid var(--line-strong);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:13px;color:var(--cyan);background:var(--panel);
+  }
+  .quote-attr .who{font-size:15px;font-weight:500}
+  .quote-attr .role{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    text-align:center;padding:160px 0;position:relative;overflow:hidden;
+  }
+  .cta::before{
+    content:"";position:absolute;left:50%;top:50%;width:900px;height:900px;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(57,211,242,.09), transparent 55%);
+    pointer-events:none;
+  }
+  .cta h2{margin:0 auto 28px;max-width:760px}
+  .cta p{color:var(--ink-dim);font-size:17px;font-weight:300;max-width:520px;margin:0 auto 48px;line-height:1.7}
+  .cta .fineprint{margin-top:24px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink-faint);text-transform:uppercase}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);padding:64px 0 48px;background:var(--bg2)}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap}
+  .foot-links{display:flex;gap:56px}
+  .foot-col h4{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:18px}
+  .foot-col a{display:block;color:var(--ink-dim);text-decoration:none;font-size:14px;margin-bottom:10px;font-weight:300;transition:color .2s}
+  .foot-col a:hover{color:var(--cyan)}
+  .foot-bottom{
+    margin-top:56px;padding-top:24px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-faint);text-transform:uppercase;
+  }
+
+  /* ---------- reveal animation ---------- */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s cubic-bezier(.2,.6,.2,1),transform .8s cubic-bezier(.2,.6,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:900px){
+    .caps{grid-template-columns:1fr}
+    .config{grid-template-columns:1fr}
+    .config-left{border-right:none;border-bottom:1px solid var(--line)}
+    .steps{grid-template-columns:1fr 1fr;gap:40px}
+    .band-inner{grid-template-columns:1fr 1fr}
+    .nav-links a:not(.btn){display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="gridlines"></div>
+<div class="noise"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#top">
+      <svg class="logo-mark" viewBox="0 0 26 26" fill="none">
+        <rect x="1" y="1" width="24" height="24" stroke="#39d3f2" stroke-width="1.5"/>
+        <path d="M7 19 L13 6 L19 19" stroke="#dbe7f2" stroke-width="1.5" fill="none"/>
+        <line x1="9.5" y1="14.5" x2="16.5" y2="14.5" stroke="#39d3f2" stroke-width="1.5"/>
+      </svg>
+      <span>ACME</span>
+    </a>
+    <div class="nav-links">
+      <a href="#platform">Platform</a>
+      <a href="#configure">Configure</a>
+      <a href="#process">Process</a>
+      <a href="#results">Results</a>
+      <a class="btn" href="#demo">Book a Demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header id="top">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-content">
+    <div class="tag"><span class="dot"></span>SYSTEM ONLINE — WIDGET OS v4.2</div>
+    <h1>Custom widgets.<br><span class="thin">Configured, ordered, and tracked</span><br>with machine <span class="accent">precision.</span></h1>
+    <p class="hero-sub">Acme is the operating layer between your operations team and your widget supply chain. Specify tolerances to the micron, route orders across vetted fabricators, and watch every unit move in real time.</p>
+    <div class="hero-cta">
+      <a class="btn solid" href="#demo">Book a Demo <span class="arrow">→</span></a>
+      <a class="btn" href="#platform" style="border-color:var(--line-strong);color:var(--ink-dim)">Explore the Platform</a>
+    </div>
+    <div class="hero-meta">
+      <div>
+        <div class="num">±0.002<em>mm</em></div>
+        <div class="lbl">Tolerance Verified</div>
+      </div>
+      <div>
+        <div class="num">99.98<em>%</em></div>
+        <div class="lbl">On-Time Delivery</div>
+      </div>
+      <div>
+        <div class="num">14<em>min</em></div>
+        <div class="lbl">Median Quote Time</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PLATFORM -->
+<section id="platform">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-index">01 / PLATFORM</div>
+        <h2>One system of record for every widget <span class="thin">you'll ever order.</span></h2>
+      </div>
+      <p class="sec-desc">Replace spreadsheets, email threads, and tribal knowledge with a single deterministic pipeline — from specification to dock receipt.</p>
+    </div>
+    <div class="caps">
+      <div class="cap reveal">
+        <div class="cap-num">CAP—01</div>
+        <svg class="cap-icon" viewBox="0 0 44 44" fill="none" stroke="#39d3f2" stroke-width="1.2">
+          <rect x="6" y="6" width="32" height="32"/><line x1="6" y1="22" x2="38" y2="22"/><line x1="22" y1="6" x2="22" y2="38"/><circle cx="22" cy="22" r="5"/>
+        </svg>
+        <h3>Parametric Configuration</h3>
+        <p>Define geometry, alloy, coating, and tolerance class through a constrained specification engine. Invalid combinations are rejected before they cost you a production run.</p>
+      </div>
+      <div class="cap reveal">
+        <div class="cap-num">CAP—02</div>
+        <svg class="cap-icon" viewBox="0 0 44 44" fill="none" stroke="#39d3f2" stroke-width="1.2">
+          <circle cx="12" cy="12" r="5"/><circle cx="32" cy="12" r="5"/><circle cx="22" cy="32" r="5"/><line x1="15" y1="16" x2="20" y2="28"/><line x1="29" y1="16" x2="24" y2="28"/><line x1="17" y1="12" x2="27" y2="12"/>
+        </svg>
+        <h3>Fabricator Routing</h3>
+        <p>Orders are matched against 240+ audited fabricators by capability, capacity, and cost. Acme splits multi-line orders automatically and re-routes around disruptions.</p>
+      </div>
+      <div class="cap reveal">
+        <div class="cap-num">CAP—03</div>
+        <svg class="cap-icon" viewBox="0 0 44 44" fill="none" stroke="#39d3f2" stroke-width="1.2">
+          <path d="M6 34 L16 22 L24 28 L38 10"/><circle cx="38" cy="10" r="3"/><line x1="6" y1="40" x2="38" y2="40"/>
+        </svg>
+        <h3>Live Telemetry</h3>
+        <p>Every batch reports machine, inspection, and transit events to a unified timeline. Your ERP stays in sync through a streaming API — no more status-chasing calls.</p>
+      </div>
+      <div class="cap reveal">
+        <div class="cap-num">CAP—04</div>
+        <svg class="cap-icon" viewBox="0 0 44 44" fill="none" stroke="#39d3f2" stroke-width="1.2">
+          <rect x="8" y="8" width="28" height="28"/><path d="M14 22 L20 28 L30 16"/>
+        </svg>
+        <h3>In-Line Quality Gates</h3>
+        <p>CMM inspection data is captured at the source and validated against your spec before shipment. Non-conforming units never leave the fabricator's floor.</p>
+      </div>
+      <div class="cap reveal">
+        <div class="cap-num">CAP—05</div>
+        <svg class="cap-icon" viewBox="0 0 44 44" fill="none" stroke="#39d3f2" stroke-width="1.2">
+          <circle cx="22" cy="22" r="14"/><path d="M22 12 V22 L30 26"/>
+        </svg>
+        <h3>Predictive Lead Times</h3>
+        <p>Quoted dates are computed from live fabricator load, material availability, and lane performance — then held to within a 2% variance band, contractually.</p>
+      </div>
+      <div class="cap reveal">
+        <div class="cap-num">CAP—06</div>
+        <svg class="cap-icon" viewBox="0 0 44 44" fill="none" stroke="#39d3f2" stroke-width="1.2">
+          <rect x="6" y="14" width="32" height="20"/><line x1="6" y1="22" x2="38" y2="22"/><circle cx="14" cy="28" r="2.5"/><circle cx="22" cy="28" r="2.5"/>
+        </svg>
+        <h3>Consolidated Billing</h3>
+        <p>One invoice per period across every fabricator, freight leg, and expedite. Cost centers and GL codes are applied automatically at order time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIGURATOR -->
+<section id="configure">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-index">02 / CONFIGURE</div>
+        <h2>Spec it. Price it. <span class="thin">In under a minute.</span></h2>
+      </div>
+      <p class="sec-desc">A working slice of the Acme specification engine. Adjust the parameters and watch the quote recompute instantly.</p>
+    </div>
+    <div class="config reveal">
+      <div class="config-left">
+        <div class="field">
+          <label>Body Diameter <output id="oDia">42.0 mm</output></label>
+          <input type="range" id="rDia" min="10" max="120" value="42" step="0.5">
+        </div>
+        <div class="field">
+          <label>Tolerance Class <output id="oTol">±0.010 mm</output></label>
+          <input type="range" id="rTol" min="0" max="4" value="2" step="1">
+        </div>
+        <div class="field">
+          <label>Alloy</label>
+          <div class="chips" id="alloyChips">
+            <button class="chip active" data-v="6061-T6">6061-T6</button>
+            <button class="chip" data-v="7075-T6">7075-T6</button>
+            <button class="chip" data-v="316L SS">316L SS</button>
+            <button class="chip" data-v="Ti-6Al-4V">Ti-6Al-4V</button>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Quantity <output id="oQty">500 units</output></label>
+          <input type="range" id="rQty" min="50" max="10000" value="500" step="50">
+        </div>
+      </div>
+      <div class="config-right">
+        <div class="readout">
+          <div class="readout-title">// Live Quote — ACM-Q-88417</div>
+          <div class="row"><span>UNIT PRICE</span><span class="val hi" id="qUnit">$4.82</span></div>
+          <div class="row"><span>LOT TOTAL</span><span class="val" id="qTotal">$2,410.00</span></div>
+          <div class="row"><span>FABRICATOR MATCH</span><span class="val" id="qFab">3 qualified</span></div>
+          <div class="row"><span>INSPECTION PLAN</span><span class="val" id="qInsp">CMM — AQL 0.65</span></div>
+          <div class="row"><span>SPEC STATUS</span><span class="val hi">VALID ✓</span></div>
+        </div>
+        <div class="leadtime">ESTIMATED LEAD TIME <strong id="qLead">11 days</strong> <span style="color:var(--ink-faint)">± 2%</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-index">03 / PROCESS</div>
+        <h2>From specification to dock <span class="thin">in four deterministic steps.</span></h2>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="s-num">STEP / 01</div>
+        <h3>Specify</h3>
+        <p>Build the widget in the configurator or push a CAD-neutral spec through the API. Validation runs instantly against fabricator capability matrices.</p>
+      </div>
+      <div class="step reveal">
+        <div class="s-num">STEP / 02</div>
+        <h3>Route</h3>
+        <p>Acme's routing engine awards the order to the optimal fabricator — or splits it across several — based on price, load, and historical quality.</p>
+      </div>
+      <div class="step reveal">
+        <div class="s-num">STEP / 03</div>
+        <h3>Verify</h3>
+        <p>Dimensional data streams in from the shop floor. Anything outside your tolerance band is flagged, quarantined, and remade at no cost to you.</p>
+      </div>
+      <div class="step reveal">
+        <div class="s-num">STEP / 04</div>
+        <h3>Receive</h3>
+        <p>Track freight to the minute, receive against your PO automatically, and feed consumption data back into reorder triggers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS BAND -->
+<section class="band" id="results" style="padding:0">
+  <div class="wrap" style="padding:0 48px">
+    <div class="band-inner">
+      <div class="band-cell reveal">
+        <div class="big"><em>−38%</em></div>
+        <div class="small">Avg. unit cost vs. brokered sourcing</div>
+      </div>
+      <div class="band-cell reveal">
+        <div class="big">6.2<em>×</em></div>
+        <div class="small">Faster quote-to-order cycle</div>
+      </div>
+      <div class="band-cell reveal">
+        <div class="big">1.4<em>M</em></div>
+        <div class="small">Widgets tracked last year</div>
+      </div>
+      <div class="band-cell reveal">
+        <div class="big">240<em>+</em></div>
+        <div class="small">Audited fabricators in network</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section>
+  <div class="wrap">
+    <div class="quote-block reveal">
+      <div class="quote-mark">// FIELD REPORT — HALLINDALE FABRICATION GROUP</div>
+      <blockquote>"We used to lose two days a week chasing widget orders across eleven suppliers. With Acme, my team sees every unit, every tolerance check, every truck — <strong>in one pane of glass.</strong> Expedites dropped by 71% in the first quarter."</blockquote>
+      <div class="quote-attr">
+        <div class="avatar">MK</div>
+        <div>
+          <div class="who">Mara Kessler</div>
+          <div class="role">VP of Operations — Hallindale Fabrication Group</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="demo">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="sec-index" style="text-align:center">04 / INITIATE</div>
+      <h2>See your supply chain <span class="thin">in focus.</span></h2>
+      <p>A 30-minute working session with an Acme solutions engineer. We'll configure one of your actual widgets live and quote it against the network.</p>
+      <a class="btn solid" href="mailto:demo@acme.example?subject=Demo%20Request" style="font-size:13px;padding:16px 32px">Book a Demo <span class="arrow">→</span></a>
+      <div class="fineprint">No commitment · SOC 2 Type II · Deploys in your VPC or ours</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <a class="logo" href="#top">
+        <svg class="logo-mark" viewBox="0 0 26 26" fill="none">
+          <rect x="1" y="1" width="24" height="24" stroke="#39d3f2" stroke-width="1.5"/>
+          <path d="M7 19 L13 6 L19 19" stroke="#dbe7f2" stroke-width="1.5" fill="none"/>
+          <line x1="9.5" y1="14.5" x2="16.5" y2="14.5" stroke="#39d3f2" stroke-width="1.5"/>
+        </svg>
+        <span>ACME</span>
+      </a>
+      <div class="foot-links">
+        <div class="foot-col">
+          <h4>Platform</h4>
+          <a href="#platform">Capabilities</a>
+          <a href="#configure">Configurator</a>
+          <a href="#process">Process</a>
+        </div>
+        <div class="foot-col">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Careers</a>
+          <a href="#">Security</a>
+        </div>
+        <div class="foot-col">
+          <h4>Contact</h4>
+          <a href="mailto:demo@acme.example">demo@acme.example</a>
+          <a href="#">+1 (555) 014-8800</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2025 Acme Industrial Systems, Inc.</span>
+      <span>LAT 37.7749 / LON −122.4194</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------- hero canvas: drifting wireframe widget lattice ---------- */
+(function(){
+  const c = document.getElementById('heroCanvas');
+  const ctx = c.getContext('2d');
+  let w, h, pts = [], t = 0;
+  const COLS = 16, ROWS = 9, GAP = 90;
+
+  function resize(){
+    w = c.width = c.offsetWidth * devicePixelRatio;
+    h = c.height = c.offsetHeight * devicePixelRatio;
+    pts = [];
+    for(let y=0; y<ROWS; y++){
+      for(let x=0; x<COLS; x++){
+        pts.push({bx:x*GAP*devicePixelRatio, by:y*GAP*devicePixelRatio, ph:Math.random()*Math.PI*2});
+      }
+    }
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  function frame(){
+    t += 0.008;
+    ctx.clearRect(0,0,w,h);
+    const ox = (w - COLS*GAP*devicePixelRatio)/2 + GAP*devicePixelRatio/2;
+    const oy = (h - ROWS*GAP*devicePixelRatio)/2 + GAP*devicePixelRatio/2;
+
+    const pos = pts.map(p => ({
+      x: ox + p.bx + Math.sin(t + p.ph)*8*devicePixelRatio,
+      y: oy + p.by + Math.cos(t*0.8 + p.ph)*8*devicePixelRatio
+    }));
+
+    ctx.strokeStyle = 'rgba(57,211,242,0.10)';
+    ctx.lineWidth = 1;
+    for(let y=0; y<ROWS; y++){
+      for(let x=0; x<COLS; x++){
+        const i = y*COLS+x;
+        if(x<COLS-1){ ctx.beginPath(); ctx.moveTo(pos[i].x,pos[i].y); ctx.lineTo(pos[i+1].x,pos[i+1].y); ctx.stroke(); }
+        if(y<ROWS-1){ ctx.beginPath(); ctx.moveTo(pos[i].x,pos[i].y); ctx.lineTo(pos[i+COLS].x,pos[i+COLS].y); ctx.stroke(); }
+      }
+    }
+    pos.forEach((p,i)=>{
+      const glow = (Math.sin(t*1.5 + pts[i].ph)+1)/2;
+      ctx.fillStyle = `rgba(57,211,242,${0.12 + glow*0.35})`;
+      ctx.fillRect(p.x-1.5*devicePixelRatio, p.y-1.5*devicePixelRatio, 3*devicePixelRatio, 3*devicePixelRatio);
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ---------- scroll reveal ---------- */
+(function(){
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+
+/* ---------- live configurator ---------- */
+(function(){
+  const TOLS = ['±0.100 mm','±0.050 mm','±0.010 mm','±0.005 mm','±0.002 mm'];
+  const TOL_COST = [1, 1.15, 1.45, 1.9, 2.6];
+  const ALLOY_BASE = {'6061-T6':3.1,'7075-T6':4.4,'316L SS':5.8,'Ti-6Al-4V':11.2};
+  const ALLOY_LEAD = {'6061-T6':9,'7075-T6':11,'316L SS':13,'Ti-6Al-4V':18};
+
+  const rDia = document.getElementById('rDia'),
+        rTol = document.getElementById('rTol'),
+        rQty = document.getElementById('rQty'),
+        oDia = document.getElementById('oDia'),
+        oTol = document.getElementById('oTol'),
+        oQty = document.getElementById('oQty'),
+        qUnit = document.getElementById('qUnit'),
+        qTotal = document.getElementById('qTotal'),
+        qFab = document.getElementById('qFab'),
+        qInsp = document.getElementById('qInsp'),
+        qLead = document.getElementById('qLead');
+
+  let alloy = '6061-T6';
+
+  document.getElementById('alloyChips').addEventListener('click', e=>{
+    const b = e.target.closest('.chip'); if(!b) return;
+    document.querySelectorAll('#alloyChips .chip').forEach(c=>c.classList.remove('active'));
+    b.classList.add('active');
+    alloy = b.dataset.v;
+    compute();
+  });
+
+  function money(n){ return '$' + n.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+  function compute(){
+    const dia = parseFloat(rDia.value),
+          tol = parseInt(rTol.value),
+          qty = parseInt(rQty.value);
+
+    oDia.textContent = dia.toFixed(1) + ' mm';
+    oTol.textContent = TOLS[tol];
+    oQty.textContent = qty.toLocaleString() + ' units';
+
+    let unit = ALLOY_BASE[alloy] * (0.6 + dia/120) * TOL_COST[tol];
+    unit *= Math.max(0.55, 1 - Math.log10(qty/50)*0.18); // volume discount
+
+    const fabs = Math.max(1, Math.round(6 - tol - (alloy==='Ti-6Al-4V'?2:0) - (dia>90?1:0)));
+    const lead = ALLOY_LEAD[alloy] + tol + Math.round(qty/1500);
+
+    qUnit.textContent = money(unit);
+    qTotal.textContent = money(unit*qty);
+    qFab.textContent = fabs + ' qualified';
+    qInsp.textContent = tol >= 3 ? 'CMM — 100% inspect' : 'CMM — AQL 0.65';
+    qLead.textContent = lead + ' days';
+  }
+
+  [rDia, rTol, rQty].forEach(r=>r.addEventListener('input', compute));
+  compute();
+})();
+</script>
+</body>
+</html>

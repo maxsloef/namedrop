@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme: Every widget, accounted for.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#060809;
+    --char:#0b0f11;
+    --teal:#10201f;
+    --amber:#d9893d;
+    --haze:#efb56c;
+    --bone:#ece4d6;
+    --ash:#8d918d;
+    --dim:#5d625f;
+    --line:rgba(236,228,214,.12);
+    --serif:'Cormorant Garamond', Georgia, serif;
+    --sans:'Inter Tight', system-ui, sans-serif;
+    --mono:'JetBrains Mono', ui-monospace, monospace;
+    --bar:76px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ink);color:var(--bone);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--amber);color:var(--ink)}
+
+  /* ---------- Grain ---------- */
+  .grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:100;opacity:.075;animation:grain 1s steps(6) infinite}
+  @keyframes grain{
+    0%{transform:translate(0,0)}17%{transform:translate(-3%,2%)}34%{transform:translate(2%,-4%)}
+    51%{transform:translate(-4%,-1%)}68%{transform:translate(3%,3%)}85%{transform:translate(-1%,4%)}100%{transform:translate(0,0)}
+  }
+
+  /* ---------- Type ---------- */
+  .mono{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ash);font-weight:300}
+  .eyebrow{display:flex;align-items:center;gap:14px}
+  .eyebrow::before{content:"";width:36px;height:1px;background:var(--amber);opacity:.8}
+  h1,h2,h3{font-family:var(--serif);font-weight:300;letter-spacing:-.015em;line-height:.98}
+  h2{font-size:76px}
+  h3{font-size:52px}
+  em{font-style:italic;color:var(--haze)}
+  p.lede{font-size:19px;line-height:1.7;color:#c9c2b5;font-weight:300}
+
+  /* ---------- Buttons ---------- */
+  .btn{display:inline-flex;align-items:center;gap:14px;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;padding:19px 30px;border:none;cursor:pointer;transition:all .5s cubic-bezier(.2,.7,.2,1)}
+  .btn-primary{background:var(--haze);color:#150e07;box-shadow:0 0 0 rgba(239,181,108,0)}
+  .btn-primary:hover{background:#f6c887;box-shadow:0 0 60px rgba(239,181,108,.35)}
+  .btn-primary .arrow{transition:transform .5s}
+  .btn-primary:hover .arrow{transform:translateX(5px)}
+  .btn-ghost{background:transparent;color:var(--bone);padding:19px 4px;border-bottom:1px solid rgba(236,228,214,.3)}
+  .btn-ghost:hover{border-color:var(--haze);color:var(--haze)}
+
+  /* ---------- Nav ---------- */
+  nav{position:fixed;top:0;left:0;right:0;height:var(--bar);display:flex;align-items:center;justify-content:space-between;padding:0 56px;z-index:50;transition:background .6s, border-color .6s;border-bottom:1px solid transparent}
+  nav.scrolled{background:rgba(6,8,9,.92);backdrop-filter:blur(10px);border-color:var(--line)}
+  .logo{font-family:var(--serif);font-size:26px;letter-spacing:.42em;font-weight:500;display:flex;align-items:center;gap:14px}
+  .logo svg{width:22px;height:22px}
+  .nav-links{display:flex;gap:44px;align-items:center}
+  .nav-links a:not(.btn){font-size:13px;letter-spacing:.08em;color:#b9b2a5;transition:color .3s}
+  .nav-links a:not(.btn):hover{color:var(--bone)}
+  .nav-links .btn{padding:13px 22px;font-size:11px}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;height:100vh;min-height:820px;overflow:hidden;background:#000}
+  .hero-scene{position:absolute;inset:0;width:100%;height:100%}
+  .hero-scene g{will-change:transform}
+  .hero canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .hero-shade{position:absolute;inset:0;background:
+      linear-gradient(90deg, rgba(4,6,8,.86) 0%, rgba(4,6,8,.55) 32%, rgba(4,6,8,0) 58%),
+      radial-gradient(ellipse at 62% 72%, transparent 30%, rgba(0,0,0,.55) 100%);pointer-events:none}
+  .shutter{position:absolute;left:0;right:0;background:#000;z-index:5}
+  .shutter.top{top:0;height:var(--bar);animation:shutTop 2.4s cubic-bezier(.7,0,.2,1) both}
+  .shutter.bottom{bottom:0;height:var(--bar);animation:shutBot 2.4s cubic-bezier(.7,0,.2,1) both;display:flex;align-items:center;justify-content:space-between;padding:0 56px}
+  @keyframes shutTop{0%,25%{height:50%}100%{height:var(--bar)}}
+  @keyframes shutBot{0%,25%{height:50%}100%{height:var(--bar)}}
+  .shutter.bottom > *{opacity:0;animation:fadeIn 1.2s 2.2s forwards}
+  @keyframes fadeIn{to{opacity:1}}
+  .rec{display:flex;align-items:center;gap:10px}
+  .rec i{width:7px;height:7px;border-radius:50%;background:#c2412e;box-shadow:0 0 10px #c2412e;animation:blink 1.6s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  .scroll-cue{display:flex;align-items:center;gap:12px}
+  .scroll-cue span{display:block;width:1px;height:26px;background:linear-gradient(var(--haze),transparent);animation:cue 2.2s infinite}
+  @keyframes cue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  .hero-content{position:absolute;left:88px;bottom:calc(var(--bar) + 84px);z-index:4;max-width:640px}
+  .hero-content > *{opacity:0;transform:translateY(20px);animation:rise 1.6s cubic-bezier(.2,.7,.2,1) forwards}
+  .hero-content .mono{animation-delay:1.9s}
+  .hero-content h1{animation-delay:2.1s;font-size:124px;margin:26px 0 30px}
+  .hero-content p{animation-delay:2.35s;max-width:520px}
+  .hero-content .ctas{animation-delay:2.6s;display:flex;gap:36px;align-items:center;margin-top:42px}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  /* ---------- Marquee of customers ---------- */
+  .credits{padding:58px 88px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:64px;background:var(--ink)}
+  .credits .mono{white-space:nowrap}
+  .credits ul{list-style:none;display:flex;justify-content:space-between;flex:1;align-items:center}
+  .credits li{font-family:var(--serif);font-size:22px;color:#6f736f;letter-spacing:.04em;transition:color .5s}
+  .credits li:hover{color:var(--bone)}
+  .credits li.sc{font-variant:small-caps;letter-spacing:.14em;font-size:21px}
+  .credits li.it{font-style:italic}
+  .credits li.sans{font-family:var(--sans);font-size:14px;letter-spacing:.32em;text-transform:uppercase;font-weight:500}
+
+  /* ---------- Prologue ---------- */
+  .prologue{position:relative;min-height:980px;overflow:hidden;background:#040506;display:flex;align-items:center}
+  .window{position:absolute;top:70px;left:9%;width:170px;height:240px;background:linear-gradient(#fbe2b8,#e9a860);box-shadow:0 0 120px 40px rgba(240,170,95,.25);filter:blur(.6px)}
+  .window::before,.window::after{content:"";position:absolute;background:#040506}
+  .window::before{left:50%;top:0;bottom:0;width:6px;transform:translateX(-50%)}
+  .window::after{top:44%;left:0;right:0;height:6px}
+  .beam{position:absolute;top:120px;left:4%;width:360px;height:1500px;transform-origin:top center;transform:rotate(-30deg);background:linear-gradient(180deg,rgba(242,184,112,.28),rgba(242,184,112,.08) 60%,transparent);filter:blur(26px);clip-path:polygon(18% 0,82% 0,100% 100%,0 100%)}
+  .floor-pool{position:absolute;bottom:40px;left:52%;width:640px;height:120px;background:radial-gradient(ellipse,rgba(240,170,95,.18),transparent 70%);filter:blur(10px)}
+  .prologue canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .prologue-inner{position:relative;z-index:2;margin-left:44%;max-width:720px;padding-right:88px}
+  .prologue h2{font-size:68px;margin:34px 0 44px}
+  .prologue p.lede{max-width:560px}
+  .prologue .signoff{margin-top:36px;font-family:var(--serif);font-style:italic;font-size:30px;color:var(--haze)}
+
+  /* ---------- Chapters ---------- */
+  .chapters{padding:170px 88px 90px;background:linear-gradient(#040506,var(--ink) 20%)}
+  .chapters-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:130px;gap:80px}
+  .chapters-head h2{max-width:720px}
+  .chapters-head p{max-width:400px;color:#a8a194;font-weight:300}
+  .chapter{display:grid;grid-template-columns:7fr 5fr;gap:96px;align-items:center;margin-bottom:170px}
+  .chapter.flip{grid-template-columns:5fr 7fr}
+  .chapter.flip .still{order:2}
+  .still{position:relative}
+  .still .frame{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000;filter:brightness(.25) saturate(.6);transition:filter 2.6s cubic-bezier(.3,.6,.2,1)}
+  .still.lit .frame{filter:brightness(1) saturate(1)}
+  .still svg{display:block;width:100%;height:100%}
+  .still .frame::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.6));pointer-events:none}
+  .still figcaption{display:flex;justify-content:space-between;margin-top:18px}
+  .chapter-num{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--haze);display:block;margin-bottom:18px}
+  .chapter h3{margin-bottom:28px}
+  .chapter p{color:#b8b1a3;font-weight:300;font-size:17px;line-height:1.75}
+  .chapter ul{list-style:none;margin-top:36px;border-top:1px solid var(--line)}
+  .chapter li{padding:16px 0;border-bottom:1px solid var(--line);font-size:15px;color:#d4ccbd;display:flex;gap:18px;align-items:baseline}
+  .chapter li::before{content:attr(data-n);font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:.15em}
+
+  /* ---------- Control room ---------- */
+  .control{position:relative;padding:150px 88px 170px;background:radial-gradient(ellipse 60% 55% at 50% 58%,rgba(40,86,86,.22),transparent 70%),#050707;overflow:hidden}
+  .control-head{text-align:center;max-width:820px;margin:0 auto 90px}
+  .control-head .eyebrow{justify-content:center}
+  .control-head .eyebrow::after{content:"";width:36px;height:1px;background:var(--amber);opacity:.8}
+  .control-head h2{margin:30px 0 26px}
+  .control-head p{color:#a8a194;font-weight:300;font-size:18px}
+  .monitor{position:relative;max-width:1180px;margin:0 auto;border:1px solid rgba(160,200,195,.14);background:#0a1112;box-shadow:0 0 0 1px #000,0 40px 140px rgba(62,130,125,.22),0 0 300px rgba(239,181,108,.06);border-radius:6px;overflow:hidden}
+  .monitor::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.035),transparent 35%);pointer-events:none}
+  .desk-glow{max-width:1100px;height:120px;margin:0 auto;background:radial-gradient(ellipse at top,rgba(70,140,135,.2),transparent 70%);filter:blur(6px)}
+  .dash-top{display:flex;justify-content:space-between;align-items:center;padding:18px 26px;border-bottom:1px solid rgba(160,200,195,.1)}
+  .dash-top .crumbs{font-size:13px;color:#8ea5a2;display:flex;gap:10px;align-items:center}
+  .dash-top .crumbs b{color:#e2ddd2;font-weight:500}
+  .dash-top .chips{display:flex;gap:8px}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:6px 11px;border:1px solid rgba(160,200,195,.16);color:#8ea5a2;border-radius:2px}
+  .chip.on{border-color:rgba(239,181,108,.5);color:var(--haze)}
+  .dash-body{display:grid;grid-template-columns:1fr 330px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(160,200,195,.1)}
+  .kpi{padding:22px 26px;border-right:1px solid rgba(160,200,195,.1)}
+  .kpi:last-child{border-right:none}
+  .kpi .v{font-family:var(--serif);font-size:42px;line-height:1;color:#ede6d8;margin-top:10px}
+  .kpi .v.warn{color:var(--haze)}
+  .kpi .d{font-size:11px;color:#6f8a86;margin-top:6px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{font-family:var(--mono);font-weight:300;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#5f7875;text-align:left;padding:14px 26px 12px}
+  td{padding:15px 26px;border-top:1px solid rgba(160,200,195,.07);color:#c6c2b8;white-space:nowrap}
+  td .sub{display:block;font-size:11px;color:#6b817e;margin-top:2px}
+  td.id{font-family:var(--mono);font-size:11px;color:#8ea5a2}
+  tr.risk td{background:rgba(239,181,108,.045)}
+  tr.risk td:first-child{box-shadow:inset 2px 0 var(--haze)}
+  .status{display:inline-flex;align-items:center;gap:8px;font-size:12px}
+  .status i{width:6px;height:6px;border-radius:50%}
+  .s-risk i{background:var(--haze);box-shadow:0 0 8px var(--haze)} .s-risk{color:var(--haze)}
+  .s-transit i{background:#6fb3ab}
+  .s-prod i{background:#8b8fa0}
+  .s-done i{background:#4f6b58} .s-done{color:#7f978a}
+  .panel{border-left:1px solid rgba(160,200,195,.1);padding:24px 26px;background:linear-gradient(rgba(239,181,108,.05),transparent 60%)}
+  .panel h4{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.1;margin:12px 0 14px;color:#f0e9dc}
+  .panel p{font-size:13px;color:#a9aaa2;line-height:1.6}
+  .timeline{margin:22px 0;border-left:1px solid rgba(160,200,195,.15);padding-left:18px}
+  .timeline div{position:relative;font-size:12px;color:#8ea5a2;padding:6px 0}
+  .timeline div::before{content:"";position:absolute;left:-22px;top:12px;width:7px;height:7px;border-radius:50%;background:#2f4745}
+  .timeline div.hot::before{background:var(--haze);box-shadow:0 0 8px var(--haze)}
+  .timeline div.hot{color:#e8c28d}
+  .suggest{border:1px solid rgba(239,181,108,.28);padding:16px;margin-top:6px}
+  .suggest .mono{font-size:9.5px;color:var(--haze)}
+  .suggest p{margin:8px 0 14px;color:#dcd5c7}
+  .suggest .acts{display:flex;gap:8px}
+  .suggest button{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.08em;padding:9px 12px;border:none;cursor:pointer}
+  .suggest .ok{background:var(--haze);color:#1a1108}
+  .suggest .no{background:transparent;color:#a9aaa2;border:1px solid rgba(160,200,195,.2)}
+
+  /* ---------- Results ---------- */
+  .results{padding:160px 88px;border-top:1px solid var(--line);background:var(--ink)}
+  .results-head{display:grid;grid-template-columns:1fr 1fr;gap:96px;margin-bottom:100px;align-items:end}
+  .results-head p{color:#a8a194;font-weight:300;max-width:440px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+  .stat{padding:44px 32px 0 0;border-right:1px solid var(--line);margin-right:32px}
+  .stat:last-child{border-right:none;margin-right:0}
+  .stat .n{font-family:var(--serif);font-weight:300;font-size:108px;line-height:.9;color:var(--bone);display:flex;align-items:flex-start}
+  .stat .n small{font-size:44px;color:var(--haze);margin-top:10px;margin-left:4px}
+  .stat p{margin-top:22px;color:#a8a194;font-size:15px;max-width:230px;font-weight:300}
+  .footnote{margin-top:64px;font-size:12px;color:var(--dim)}
+
+  /* ---------- Testimonial ---------- */
+  .testimony{position:relative;height:820px;overflow:hidden;background:#0a1416}
+  .wall{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 40%,#15282a,#070c0d 75%)}
+  .blinds{position:absolute;top:-20%;left:18%;width:95%;height:140%;background:repeating-linear-gradient(180deg,rgba(242,176,104,.55) 0 16px,transparent 16px 34px);transform:rotate(-14deg) skewX(-22deg);-webkit-mask-image:radial-gradient(ellipse 55% 45% at 50% 50%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse 55% 45% at 50% 50%,#000 20%,transparent 75%);filter:blur(2.5px);opacity:.75}
+  .smoke{position:absolute;inset:0;background:radial-gradient(ellipse 40% 30% at 60% 45%,rgba(240,180,110,.12),transparent 70%);animation:breathe 9s ease-in-out infinite}
+  @keyframes breathe{50%{opacity:.5;transform:translateX(20px)}}
+  .silhouette{position:absolute;left:6%;bottom:0;height:88%;z-index:2}
+  .quote{position:absolute;right:88px;top:50%;transform:translateY(-50%);max-width:700px;z-index:3}
+  .quote blockquote{font-family:var(--serif);font-weight:300;font-size:46px;line-height:1.18;letter-spacing:-.01em;margin:30px 0 44px;text-shadow:0 2px 40px rgba(0,0,0,.6)}
+  .quote blockquote::before{content:"\201C";color:var(--haze);margin-left:-.45em}
+  .quote cite{font-style:normal;display:flex;gap:18px;align-items:center}
+  .quote cite b{font-weight:500;font-size:15px}
+  .quote cite span{color:#a8a194;font-size:14px}
+  .quote cite::before{content:"";width:36px;height:1px;background:var(--haze)}
+
+  /* ---------- CTA ---------- */
+  .cta{position:relative;min-height:980px;overflow:hidden;display:flex;align-items:center;padding:140px 88px}
+  .cta-scene{position:absolute;inset:0;width:100%;height:100%}
+  .cta-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,8,10,.85),rgba(5,8,10,.35) 55%,rgba(5,8,10,.15))}
+  .cta-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr 480px;gap:110px;width:100%;align-items:center}
+  .cta h2{font-size:92px;margin:30px 0 32px}
+  .expect{list-style:none;margin-top:48px;display:grid;gap:0;max-width:520px;border-top:1px solid var(--line)}
+  .expect li{display:grid;grid-template-columns:80px 1fr;padding:18px 0;border-bottom:1px solid var(--line);font-size:15px;color:#d0c8b9;font-weight:300}
+  .expect li span{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--haze);padding-top:4px}
+  form{background:rgba(8,11,13,.72);backdrop-filter:blur(14px);border:1px solid rgba(236,228,214,.1);padding:48px 44px 44px}
+  form h4{font-family:var(--serif);font-weight:400;font-size:34px;margin-bottom:8px}
+  form > p{color:#a8a194;font-size:14px;margin-bottom:30px}
+  .field{margin-bottom:22px}
+  .field label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#80847f;margin-bottom:8px}
+  .field input,.field select{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(236,228,214,.22);color:var(--bone);font-family:var(--sans);font-size:16px;padding:8px 0 12px;outline:none;transition:border-color .4s;border-radius:0;-webkit-appearance:none;appearance:none}
+  .field select{cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,#8d918d 50%),linear-gradient(135deg,#8d918d 50%,transparent 50%);background-position:calc(100% - 10px) 16px,calc(100% - 5px) 16px;background-size:5px 5px;background-repeat:no-repeat}
+  .field select option{background:#0b0f11;color:var(--bone)}
+  .field input:focus,.field select:focus{border-color:var(--haze)}
+  .field input::placeholder{color:#4e524f}
+  .field.err input{border-color:#c2573e}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  form .btn{width:100%;justify-content:center;margin-top:14px}
+  .fine{font-size:12px;color:#6c706c;margin-top:18px;text-align:center}
+  .thanks{display:none;text-align:left}
+  .thanks h4{color:var(--haze)}
+  form.sent .form-fields{display:none}
+  form.sent .thanks{display:block}
+
+  /* ---------- Footer ---------- */
+  footer{padding:70px 88px 56px;border-top:1px solid var(--line);display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:60px;background:#040506}
+  footer p{color:#6f736f;font-size:14px;margin-top:18px;max-width:320px;font-weight:300}
+  footer h5{font-family:var(--mono);font-weight:300;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#6f736f;margin-bottom:18px}
+  footer ul{list-style:none;display:grid;gap:10px}
+  footer li a{font-size:14px;color:#b0a99c;transition:color .3s}
+  footer li a:hover{color:var(--haze)}
+  .legal{grid-column:1/-1;display:flex;justify-content:space-between;padding-top:40px;margin-top:20px;border-top:1px solid var(--line)}
+
+  /* ---------- Reveal ---------- */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity 1.4s cubic-bezier(.2,.7,.2,1),transform 1.4s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .d1{transition-delay:.15s}.d2{transition-delay:.3s}.d3{transition-delay:.45s}
+
+  .drift{animation:drift 14s ease-in-out infinite}
+  .drift2{animation:drift 18s ease-in-out infinite reverse}
+  @keyframes drift{50%{transform:translate(26px,-14px)}}
+</style>
+</head>
+<body>
+
+<div class="grain" id="grain"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="logo" aria-label="Acme home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#efb56c" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>
+    ACME
+  </a>
+  <div class="nav-links">
+    <a href="#platform">Platform</a>
+    <a href="#control">Product</a>
+    <a href="#results">Results</a>
+    <a href="#customers">Customers</a>
+    <a href="#demo" class="btn btn-primary">Book a demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <svg class="hero-scene" viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="hSky" x1="0" y1="0" x2="0" y2="600" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#030608"/>
+        <stop offset=".34" stop-color="#0a1417"/>
+        <stop offset=".58" stop-color="#262624"/>
+        <stop offset=".78" stop-color="#7d4a2c"/>
+        <stop offset=".92" stop-color="#d28543"/>
+        <stop offset="1" stop-color="#f3b66c"/>
+      </linearGradient>
+      <radialGradient id="hSun" cx="905" cy="582" r="620" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#ffe0a8" stop-opacity=".95"/>
+        <stop offset=".08" stop-color="#f5ad5e" stop-opacity=".6"/>
+        <stop offset=".35" stop-color="#b8612a" stop-opacity=".18"/>
+        <stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="hGround" x1="0" y1="592" x2="0" y2="800" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#1a110b"/>
+        <stop offset=".25" stop-color="#0a0807"/>
+        <stop offset="1" stop-color="#020303"/>
+      </linearGradient>
+      <linearGradient id="hRoad" x1="0" y1="592" x2="0" y2="800" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#6b4127" stop-opacity=".9"/>
+        <stop offset=".3" stop-color="#1f140e"/>
+        <stop offset="1" stop-color="#060505"/>
+      </linearGradient>
+      <linearGradient id="hHaze" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f0a860" stop-opacity="0"/>
+        <stop offset=".6" stop-color="#f0a860" stop-opacity=".2"/>
+        <stop offset="1" stop-color="#f0a860" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="b2"><feGaussianBlur stdDeviation="2"/></filter>
+      <filter id="b8"><feGaussianBlur stdDeviation="8"/></filter>
+      <filter id="b24"><feGaussianBlur stdDeviation="24"/></filter>
+    </defs>
+
+    <g id="lFar">
+      <rect width="1440" height="600" fill="url(#hSky)"/>
+      <rect width="1440" height="800" fill="url(#hSun)"/>
+      <circle cx="905" cy="584" r="80" fill="#ffd9a0" opacity=".45" filter="url(#b24)"/>
+      <circle cx="905" cy="586" r="24" fill="#fff4da" filter="url(#b2)"/>
+      <!-- distant hazy plants -->
+      <path d="M0 594V572H40V566H95V574H150V560H168V546H176V560H230V570H300V563H360V575H420V556H470V568H540V571H600V562H612V538H618V562H660V574H720V568H760V576H800V594Z" fill="#8a5634" opacity=".55"/>
+      <path d="M1180 594V566H1240V552H1290V570H1360V560H1440V594Z" fill="#8a5634" opacity=".4"/>
+    </g>
+
+    <g id="lMid">
+      <!-- smoke -->
+      <g opacity=".5" filter="url(#b8)">
+        <ellipse class="drift" cx="1320" cy="280" rx="60" ry="22" fill="#7a5238"/>
+        <ellipse class="drift2" cx="1380" cy="245" rx="90" ry="26" fill="#5e412e"/>
+        <ellipse class="drift" cx="1290" cy="310" rx="40" ry="16" fill="#8f623f"/>
+      </g>
+      <!-- factory complex -->
+      <g fill="#120c09">
+        <path d="M990 594V520L1020 500V520L1050 500V520L1080 500V520L1110 500V520L1140 500V520H1230V594Z"/>
+        <rect x="1230" y="468" width="92" height="126"/>
+        <rect x="1255" y="330" width="14" height="140"/>
+        <rect x="1252" y="330" width="20" height="6"/>
+        <rect x="1288" y="298" width="18" height="172"/>
+        <rect x="1285" y="298" width="24" height="7"/>
+        <rect x="1160" y="400" width="10" height="122"/>
+        <path d="M1335 594V528Q1365 512 1395 528V594Z"/>
+        <path d="M1398 594V536Q1425 522 1452 536V594Z"/>
+        <path d="M1318 482L1430 440" stroke="#120c09" stroke-width="6"/>
+        <path d="M1350 474V594M1400 456V594" stroke="#120c09" stroke-width="3"/>
+      </g>
+      <!-- a few window lights -->
+      <g fill="#f2b56c">
+        <rect x="1244" y="500" width="6" height="4" opacity=".7"/>
+        <rect x="1262" y="500" width="6" height="4" opacity=".4"/>
+        <rect x="1298" y="530" width="6" height="4" opacity=".6"/>
+        <rect x="1060" y="548" width="5" height="3" opacity=".5"/>
+      </g>
+      <rect x="0" y="470" width="1440" height="170" fill="url(#hHaze)"/>
+    </g>
+
+    <g id="lNear">
+      <path d="M0 592H1440V800H0Z" fill="url(#hGround)"/>
+      <path d="M876 592H890L1250 800H560Z" fill="url(#hRoad)"/>
+      <path d="M883 596L888 596L905 800L862 800Z" fill="#f2b56c" opacity=".08" filter="url(#b8)"/>
+      <!-- power poles receding -->
+      <g stroke="#050607" fill="none" stroke-linecap="round">
+        <path d="M800 612V548M790 552H810" stroke-width="2"/>
+        <path d="M730 630V512M716 518H744" stroke-width="3"/>
+        <path d="M615 668V452M592 462H638" stroke-width="5"/>
+        <path d="M800 552Q765 540 730 518M730 518Q672 500 615 462M615 462Q420 420 -20 360" stroke-width="1"/>
+        <path d="M810 552Q777 543 744 518M744 518Q690 505 638 462M638 462Q440 440 -20 390" stroke-width="1"/>
+      </g>
+      <!-- lone figure -->
+      <path d="M852 652L860 652L960 800L905 800Z" fill="#000" opacity=".45"/>
+      <g fill="#030303">
+        <circle cx="856" cy="585" r="6"/>
+        <path d="M849 593Q856 589 863 593L866 622L862 622L861 652L857 652L856 628L855 652L851 652L850 622L846 622Z"/>
+      </g>
+    </g>
+  </svg>
+  <canvas id="heroDust"></canvas>
+  <div class="hero-shade"></div>
+
+  <div class="shutter top"></div>
+
+  <div class="hero-content">
+    <div class="mono eyebrow">Widget operations for mid-sized manufacturers</div>
+    <h1>Every widget,<br><em>accounted for.</em></h1>
+    <p class="lede">Acme gives operations teams one place to configure custom widgets, place them with the right suppliers, and follow every unit from the production run to your plant floor.</p>
+    <div class="ctas">
+      <a href="#demo" class="btn btn-primary">Book a demo <span class="arrow">→</span></a>
+      <a href="#platform" class="btn btn-ghost">See how it works</a>
+    </div>
+  </div>
+
+  <div class="shutter bottom">
+    <span class="mono">Fig. 01 · Dayton, Ohio · End of second shift</span>
+    <span class="mono scroll-cue"><span></span>Scroll</span>
+    <span class="mono rec"><i></i><b id="tc" style="font-weight:300">00:00:00:00</b></span>
+  </div>
+</header>
+
+<!-- CREDITS -->
+<section class="credits" id="customers">
+  <span class="mono">Running the floor at</span>
+  <ul>
+    <li class="sc">Halvorsen Castings</li>
+    <li class="it">Brightwater Fluid Systems</li>
+    <li class="sans">Keel &amp; Mast</li>
+    <li class="sc">Oriel Precision</li>
+    <li class="it">Tamsin Industrial</li>
+    <li class="sans">Northgate Motion</li>
+  </ul>
+</section>
+
+<!-- PROLOGUE -->
+<section class="prologue">
+  <div class="window"></div>
+  <div class="beam"></div>
+  <div class="floor-pool"></div>
+  <canvas id="beamDust"></canvas>
+  <div class="prologue-inner">
+    <div class="mono eyebrow reveal">The problem</div>
+    <h2 class="reveal d1">Somewhere between the purchase order and the loading dock, <em>your widgets go dark.</em></h2>
+    <p class="lede reveal d2">Specs live in one spreadsheet, supplier confirmations in someone's inbox, shipment updates in a carrier portal nobody checks. A tolerance change never reaches the vendor. A heat-treat delay surfaces the morning the line needs the part.</p>
+    <p class="lede reveal d2" style="margin-top:22px">Most operations teams find out an order is late when production stops. It doesn't have to work that way.</p>
+    <p class="signoff reveal d3">Acme turns the lights on.</p>
+  </div>
+</section>
+
+<!-- CHAPTERS -->
+<section class="chapters" id="platform">
+  <div class="chapters-head">
+    <div>
+      <div class="mono eyebrow reveal">The platform</div>
+      <h2 class="reveal d1" style="margin-top:30px">Three movements.<br><em>One continuous shot.</em></h2>
+    </div>
+    <p class="reveal d2">From the moment an engineer defines a widget to the moment receiving signs for it, Acme keeps the entire order in frame: one record, one owner, no cuts.</p>
+  </div>
+
+  <!-- I. Configure -->
+  <article class="chapter">
+    <figure class="still">
+      <div class="frame">
+        <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <radialGradient id="cWall" cx="400" cy="120" r="420" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#2a2016"/><stop offset=".5" stop-color="#0d0c0b"/><stop offset="1" stop-color="#050606"/>
+            </radialGradient>
+            <linearGradient id="cCone" x1="0" y1="100" x2="0" y2="370" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#ffd7a0" stop-opacity=".42"/><stop offset="1" stop-color="#ffd7a0" stop-opacity=".04"/>
+            </linearGradient>
+            <radialGradient id="cPool" cx="400" cy="372" r="240" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 .13 0 323)">
+              <stop offset="0" stop-color="#f1b670" stop-opacity=".55"/><stop offset="1" stop-color="#f1b670" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="cb"><feGaussianBlur stdDeviation="6"/></filter>
+          </defs>
+          <rect width="800" height="450" fill="url(#cWall)"/>
+          <path d="M400 0V72" stroke="#1d1a17" stroke-width="2"/>
+          <path d="M355 100L445 100L660 368L140 368Z" fill="url(#cCone)" filter="url(#cb)"/>
+          <path d="M372 72H428L452 102H348Z" fill="#0e0d0c"/>
+          <path d="M348 102H452" stroke="#6b5234" stroke-width="1"/>
+          <ellipse cx="400" cy="103" rx="38" ry="5" fill="#fff0d0"/>
+          <ellipse cx="400" cy="106" rx="70" ry="10" fill="#ffd89e" opacity=".35" filter="url(#cb)"/>
+          <path d="M40 366H760L800 450H0Z" fill="#0b0a09"/>
+          <ellipse cx="400" cy="372" rx="240" ry="30" fill="url(#cPool)"/>
+          <!-- widget: flanged coupling -->
+          <ellipse cx="400" cy="378" rx="98" ry="10" fill="#000" opacity=".7" filter="url(#cb)"/>
+          <rect x="310" y="346" width="180" height="18" fill="#110f0d"/>
+          <ellipse cx="400" cy="364" rx="90" ry="16" fill="#110f0d"/>
+          <ellipse cx="400" cy="346" rx="90" ry="16" fill="#2c2217" stroke="#c98c4c" stroke-width=".8" stroke-opacity=".7"/>
+          <g fill="#070605"><ellipse cx="330" cy="348" rx="6" ry="2.2"/><ellipse cx="470" cy="348" rx="6" ry="2.2"/><ellipse cx="365" cy="358" rx="6" ry="2.2"/><ellipse cx="435" cy="358" rx="6" ry="2.2"/><ellipse cx="365" cy="336" rx="5" ry="1.8"/><ellipse cx="435" cy="336" rx="5" ry="1.8"/></g>
+          <rect x="355" y="290" width="90" height="56" fill="#100e0c"/>
+          <rect x="355" y="290" width="14" height="56" fill="#3a2a1a" opacity=".55"/>
+          <ellipse cx="400" cy="346" rx="45" ry="8" fill="#100e0c"/>
+          <ellipse cx="400" cy="290" rx="45" ry="9" fill="#6a4a2b" stroke="#f2c083" stroke-width=".9"/>
+          <ellipse cx="400" cy="290" rx="19" ry="4" fill="#060505"/>
+          <!-- dimension lines -->
+          <g stroke="#5e8a8a" stroke-width=".8" fill="none" opacity=".75">
+            <path d="M310 400H490M310 394V406M490 394V406"/>
+            <path d="M540 290V346M534 290H546M534 346H546"/>
+            <path d="M445 290H536M490 346H536" stroke-dasharray="2 3"/>
+          </g>
+          <g font-family="JetBrains Mono, monospace" font-size="10" fill="#7fa8a6" letter-spacing="1">
+            <text x="400" y="420" text-anchor="middle">Ø 180.00 ±0.05</text>
+            <text x="552" y="322">56.0</text>
+            <text x="40" y="40" fill="#5e6a68">WX-4471 · REV C</text>
+            <text x="40" y="56" fill="#5e6a68">316L · PASSIVATED · M24×2</text>
+          </g>
+          <g fill="#ffe2b5"><circle cx="380" cy="170" r="1"/><circle cx="430" cy="210" r=".8"/><circle cx="360" cy="250" r="1.1"/><circle cx="455" cy="150" r=".7"/><circle cx="410" cy="240" r=".9"/></g>
+        </svg>
+      </div>
+      <figcaption><span class="mono">Still 02 · Engineering, Plant 1</span><span class="mono">f/1.4 · 1/48</span></figcaption>
+    </figure>
+    <div class="reveal">
+      <span class="chapter-num">I. Configure</span>
+      <h3>Specify it once.<br><em>Exactly.</em></h3>
+      <p>Build custom widgets from your approved parameters: material, tolerance, finish, thread pitch, packaging. Acme checks every configuration against what each supplier can actually make before it leaves your desk, so engineering intent survives the trip to the vendor.</p>
+      <ul>
+        <li data-n="01">Versioned specs with complete revision history</li>
+        <li data-n="02">Automatic supplier capability matching</li>
+        <li data-n="03">Approval routing for engineering and quality</li>
+      </ul>
+    </div>
+  </article>
+
+  <!-- II. Order -->
+  <article class="chapter flip">
+    <figure class="still">
+      <div class="frame">
+        <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="oWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#07090a"/><stop offset="1" stop-color="#101314"/></linearGradient>
+            <linearGradient id="oDoor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe0b0"/><stop offset=".6" stop-color="#f0a95e"/><stop offset="1" stop-color="#c47632"/></linearGradient>
+            <linearGradient id="oSpill" x1="0" y1="300" x2="0" y2="450" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f0a95e" stop-opacity=".55"/><stop offset="1" stop-color="#f0a95e" stop-opacity="0"/></linearGradient>
+            <filter id="ob"><feGaussianBlur stdDeviation="10"/></filter>
+            <filter id="ob2"><feGaussianBlur stdDeviation="1.5"/></filter>
+          </defs>
+          <rect width="800" height="450" fill="url(#oWall)"/>
+          <rect x="0" y="300" width="800" height="150" fill="#060707"/>
+          <!-- closed doors -->
+          <g>
+            <rect x="80" y="98" width="170" height="202" fill="#0f1213"/>
+            <rect x="550" y="98" width="170" height="202" fill="#0f1213"/>
+            <g stroke="#1a1f20" stroke-width="1">
+              <path d="M80 118H250M80 138H250M80 158H250M80 178H250M80 198H250M80 218H250M80 238H250M80 258H250M80 278H250"/>
+              <path d="M550 118H720M550 138H720M550 158H720M550 178H720M550 198H720M550 218H720M550 238H720M550 258H720M550 278H720"/>
+            </g>
+          </g>
+          <!-- open door -->
+          <rect x="315" y="98" width="170" height="202" fill="url(#oDoor)"/>
+          <rect x="300" y="84" width="200" height="230" fill="#f0a95e" opacity=".22" filter="url(#ob)"/>
+          <path d="M315 300H485L660 450H140Z" fill="url(#oSpill)"/>
+          <rect x="315" y="98" width="170" height="16" fill="#1a1512"/>
+          <!-- silhouettes in doorway -->
+          <g fill="#050404" filter="url(#ob2)">
+            <circle cx="372" cy="208" r="9"/>
+            <path d="M360 220Q372 214 384 220L388 262L382 262L381 300L375 300L372 270L369 300L363 300L362 262L356 262Z"/>
+            <rect x="420" y="232" width="52" height="30"/>
+            <rect x="424" y="262" width="46" height="30"/>
+            <rect x="418" y="292" width="58" height="8"/>
+          </g>
+          <path d="M362 300L382 300L330 450L270 450Z" fill="#000" opacity=".55"/>
+          <path d="M418 300L476 300L600 450L470 450Z" fill="#000" opacity=".45"/>
+          <!-- bumpers & numbers -->
+          <g fill="#050606"><rect x="70" y="286" width="10" height="18"/><rect x="250" y="286" width="10" height="18"/><rect x="305" y="286" width="10" height="18"/><rect x="485" y="286" width="10" height="18"/><rect x="540" y="286" width="10" height="18"/><rect x="720" y="286" width="10" height="18"/></g>
+          <g font-family="JetBrains Mono, monospace" font-size="13" letter-spacing="3" text-anchor="middle">
+            <text x="165" y="80" fill="#3a3f40">07</text>
+            <text x="400" y="80" fill="#f2c083">08</text>
+            <text x="635" y="80" fill="#3a3f40">09</text>
+          </g>
+          <circle cx="400" cy="60" r="3" fill="#ffcf8f"/>
+          <circle cx="400" cy="60" r="14" fill="#ffcf8f" opacity=".3" filter="url(#ob)"/>
+        </svg>
+      </div>
+      <figcaption><span class="mono">Still 03 · Receiving, Dock 08</span><span class="mono">f/2 · 1/48</span></figcaption>
+    </figure>
+    <div class="reveal">
+      <span class="chapter-num">II. Order</span>
+      <h3>The right supplier.<br><em>The right terms.</em></h3>
+      <p>Send a configured widget to one supplier or split it across several. Acme compares lead times, price breaks, and each vendor's real on-time history, then routes the purchase order through your approval chain in minutes instead of days.</p>
+      <ul>
+        <li data-n="01">Multi-supplier splits and blanket orders</li>
+        <li data-n="02">Lead-time and landed-cost comparison side by side</li>
+        <li data-n="03">Two-way sync with SAP, NetSuite, Epicor, and Dynamics</li>
+      </ul>
+    </div>
+  </article>
+
+  <!-- III. Track -->
+  <article class="chapter">
+    <figure class="still">
+      <div class="frame">
+        <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="tSky" x1="0" y1="0" x2="0" y2="235" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#050b12"/><stop offset=".6" stop-color="#0e2129"/><stop offset=".92" stop-color="#244245"/><stop offset="1" stop-color="#6b5a40"/></linearGradient>
+            <radialGradient id="tLamp"><stop offset="0" stop-color="#ffc27a" stop-opacity=".9"/><stop offset="1" stop-color="#ff9d45" stop-opacity="0"/></radialGradient>
+            <radialGradient id="tHead"><stop offset="0" stop-color="#fffaf0"/><stop offset=".3" stop-color="#ffe9c4" stop-opacity=".7"/><stop offset="1" stop-color="#ffe9c4" stop-opacity="0"/></radialGradient>
+            <linearGradient id="tBeam" x1="0" y1="300" x2="0" y2="450" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff1d6" stop-opacity=".35"/><stop offset="1" stop-color="#fff1d6" stop-opacity="0"/></linearGradient>
+            <filter id="tb"><feGaussianBlur stdDeviation="3"/></filter>
+            <filter id="tb2"><feGaussianBlur stdDeviation="1.2"/></filter>
+          </defs>
+          <rect width="800" height="450" fill="url(#tSky)"/>
+          <rect x="0" y="222" width="800" height="18" fill="#c98a4c" opacity=".18" filter="url(#tb)"/>
+          <path d="M0 236L60 228H90V220H120V230H200L240 224H300V232H520L560 222H600V214H612V226H700L760 230H800V240H0Z" fill="#0a1214"/>
+          <rect x="0" y="236" width="800" height="214" fill="#040607"/>
+          <path d="M392 236H408L700 450H100Z" fill="#0b0d0e"/>
+          <!-- lane dashes -->
+          <g fill="#6b6454" opacity=".6"><path d="M399 250H401L402 258H398Z"/><path d="M398 272H402L404 286H396Z"/><path d="M396 306H404L407 330H393Z"/><path d="M392 360H408L413 400H387Z"/></g>
+          <!-- streetlights right side -->
+          <g stroke="#030405" fill="none">
+            <path d="M430 240V226H424" stroke-width="1"/>
+            <path d="M470 262V214H458" stroke-width="1.5"/>
+            <path d="M540 302V184H516" stroke-width="2.5"/>
+            <path d="M680 380V110H630" stroke-width="4"/>
+          </g>
+          <g>
+            <circle cx="424" cy="227" r="10" fill="url(#tLamp)"/>
+            <circle cx="458" cy="215" r="16" fill="url(#tLamp)"/>
+            <circle cx="516" cy="186" r="28" fill="url(#tLamp)"/>
+            <circle cx="630" cy="113" r="48" fill="url(#tLamp)"/>
+            <ellipse cx="440" cy="252" rx="30" ry="4" fill="#ff9d45" opacity=".25" filter="url(#tb)"/>
+            <ellipse cx="480" cy="280" rx="60" ry="8" fill="#ff9d45" opacity=".22" filter="url(#tb)"/>
+            <ellipse cx="560" cy="340" rx="120" ry="16" fill="#ff9d45" opacity=".18" filter="url(#tb)"/>
+          </g>
+          <!-- taillight streaks -->
+          <g stroke="#e0402c" fill="none" filter="url(#tb2)" opacity=".85">
+            <path d="M404 242L470 290L560 360" stroke-width="1.2"/>
+            <path d="M406 242L480 290L585 362" stroke-width="1"/>
+            <path d="M403 240L440 262" stroke-width="2"/>
+          </g>
+          <!-- oncoming truck -->
+          <path d="M338 336H372L420 450H240Z" fill="url(#tBeam)"/>
+          <g fill="#020303">
+            <rect x="318" y="264" width="72" height="52"/>
+            <rect x="326" y="300" width="56" height="30"/>
+            <rect x="332" y="330" width="10" height="8"/><rect x="366" y="330" width="10" height="8"/>
+          </g>
+          <circle cx="334" cy="322" r="18" fill="url(#tHead)"/>
+          <circle cx="374" cy="322" r="18" fill="url(#tHead)"/>
+          <g fill="#ffb14a"><rect x="318" y="262" width="3" height="2"/><rect x="387" y="262" width="3" height="2"/></g>
+          <g font-family="JetBrains Mono, monospace" font-size="10" fill="#6f9994" letter-spacing="1">
+            <text x="40" y="40">I-75 N · MILE 61 · 02:14</text>
+            <text x="40" y="56" fill="#4e6664">WX-4468 · 12,500 UNITS · ON TIME</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption><span class="mono">Still 04 · In transit, Interstate 75</span><span class="mono">f/1.8 · 1/24</span></figcaption>
+    </figure>
+    <div class="reveal">
+      <span class="chapter-num">III. Track</span>
+      <h3>Know where every unit is.<br><em>Before anyone asks.</em></h3>
+      <p>Follow widgets from production run to receiving dock across every plant you operate. Acme pulls status from suppliers and carriers, scores delay risk against your production schedule, and tells you which line will feel it while there's still time to act.</p>
+      <ul>
+        <li data-n="01">Live status across suppliers, carriers, and plants</li>
+        <li data-n="02">Delay risk scored against your production schedule</li>
+        <li data-n="03">Receiving and quality checkpoints at every dock</li>
+      </ul>
+    </div>
+  </article>
+</section>
+
+<!-- CONTROL ROOM -->
+<section class="control" id="control">
+  <div class="control-head">
+    <div class="mono eyebrow reveal">The control room</div>
+    <h2 class="reveal d1">One screen.<br><em>The whole floor.</em></h2>
+    <p class="reveal d2">Every open widget order across every supplier and plant, ranked by what matters most right now. When something slips, Acme shows you the impact and the way out.</p>
+  </div>
+
+  <div class="monitor reveal d2">
+    <div class="dash-top">
+      <div class="crumbs"><span>Acme</span><span>/</span><span>Orders</span><span>/</span><b>In motion</b></div>
+      <div class="chips"><span class="chip on">All plants</span><span class="chip">Toledo</span><span class="chip">Dayton</span><span class="chip">Fort Wayne</span><span class="chip">Next 14 days</span></div>
+    </div>
+    <div class="dash-body">
+      <div>
+        <div class="kpis">
+          <div class="kpi"><div class="mono" style="font-size:9.5px">Open orders</div><div class="v">214</div><div class="d">38 suppliers · 3 plants</div></div>
+          <div class="kpi"><div class="mono" style="font-size:9.5px">In transit</div><div class="v">86</div><div class="d">412,300 units moving</div></div>
+          <div class="kpi"><div class="mono" style="font-size:9.5px">At risk</div><div class="v warn">7</div><div class="d">2 affect active lines</div></div>
+          <div class="kpi"><div class="mono" style="font-size:9.5px">On-time, 30d</div><div class="v">96.4%</div><div class="d">↑ 2.1 pts vs. last month</div></div>
+        </div>
+        <table>
+          <thead><tr><th>Order</th><th>Widget</th><th>Supplier</th><th>Qty</th><th>Destination</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr class="risk"><td class="id">WX-4471</td><td>Stainless hex coupling<span class="sub">316L · M24×2 · Rev C</span></td><td>Brennan Machining</td><td>6,000</td><td>Toledo · Line 4</td><td><span class="status s-risk"><i></i>At risk · +3d</span></td></tr>
+            <tr><td class="id">WX-4468</td><td>Nylon cable gland<span class="sub">PA66 · IP68 · M20</span></td><td>Corvell Plastics</td><td>12,500</td><td>Dayton · Line 1</td><td><span class="status s-transit"><i></i>In transit · Thu</span></td></tr>
+            <tr><td class="id">WX-4460</td><td>Anodized mounting bracket<span class="sub">6061-T6 · Black Type II</span></td><td>Sauer &amp; Lind</td><td>3,200</td><td>Fort Wayne · Line 2</td><td><span class="status s-prod"><i></i>In production</span></td></tr>
+            <tr><td class="id">WX-4455</td><td>Zinc-plated shim pack<span class="sub">0.1–1.0 mm · 12 pc</span></td><td>Meridian Stamping</td><td>20,000</td><td>Toledo · Line 2</td><td><span class="status s-transit"><i></i>In transit · Fri</span></td></tr>
+            <tr><td class="id">WX-4452</td><td>Brass flow restrictor<span class="sub">C360 · 1.2 mm orifice</span></td><td>Oakridge Brass</td><td>8,000</td><td>Dayton · Line 3</td><td><span class="status s-done"><i></i>Received · QC passed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <aside class="panel">
+        <div class="mono" style="font-size:9.5px;color:var(--haze)">Needs a decision</div>
+        <h4>WX-4471 will miss Line 4 by two days.</h4>
+        <p>Brennan Machining reported a heat-treat furnace outage. Toledo Line 4 begins consuming this coupling on Nov 19.</p>
+        <div class="timeline">
+          <div>Nov 04 · PO confirmed by supplier</div>
+          <div>Nov 11 · Machining complete</div>
+          <div class="hot">Nov 13 · Heat-treat delay reported</div>
+          <div>Nov 19 · Line 4 needs first 1,500 units</div>
+        </div>
+        <div class="suggest">
+          <div class="mono">Suggested action</div>
+          <p>Split 2,000 units to Halden Precision. Qualified on Rev C, 4-day lead time, +$0.18 per unit.</p>
+          <div class="acts"><button class="ok" type="button">Approve split</button><button class="no" type="button">Notify planner</button></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="desk-glow"></div>
+</section>
+
+<!-- RESULTS -->
+<section class="results" id="results">
+  <div class="results-head">
+    <div>
+      <div class="mono eyebrow reveal">Results</div>
+      <h2 class="reveal d1" style="margin-top:30px">Ninety days later,<br><em>the floor is quieter.</em></h2>
+    </div>
+    <p class="reveal d2">Fewer emergency air shipments. Fewer calls to suppliers asking where things are. Planners who spend their mornings planning. Here's what a typical first quarter on Acme looks like.</p>
+  </div>
+  <div class="stats">
+    <div class="stat reveal"><div class="n" data-count="41">0<small>%</small></div><p>fewer expedited shipments in the first quarter</p></div>
+    <div class="stat reveal d1"><div class="n" data-count="6.2" data-dec="1">0<small>days</small></div><p>shorter average cycle from spec approval to receipt</p></div>
+    <div class="stat reveal d2"><div class="n" data-count="96">0<small>%</small></div><p>of widget orders received on or before the need date</p></div>
+    <div class="stat reveal d3"><div class="n" data-count="11">0<small>hrs</small></div><p>returned to each planner, every week, from status chasing</p></div>
+  </div>
+  <p class="footnote">Median outcomes across Acme customers with two or more plants, measured 90 days after go-live against the prior quarter.</p>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testimony">
+  <div class="wall"></div>
+  <div class="blinds"></div>
+  <div class="smoke"></div>
+  <svg class="silhouette" viewBox="0 0 300 400" aria-hidden="true">
+    <path d="M30 400C36 330 78 300 130 290C118 275 110 255 108 235C104 230 100 222 104 214C102 190 105 160 125 140C145 120 185 118 205 135C222 150 228 172 226 190C232 198 238 206 236 212C234 216 228 216 226 218C228 226 224 234 220 236C222 244 218 252 210 254C204 262 194 266 186 266L184 288C230 298 262 330 272 400Z" fill="#030505"/>
+    <path d="M226 190C232 198 238 206 236 212C234 216 228 216 226 218C228 226 224 234 220 236C222 244 218 252 210 254" fill="none" stroke="#e8a45e" stroke-width="1.2" opacity=".55"/>
+  </svg>
+  <div class="quote">
+    <div class="mono eyebrow reveal">From the floor</div>
+    <blockquote class="reveal d1">We used to run our widget program out of three spreadsheets and a lot of phone calls. Now I walk into the morning meeting already knowing which orders will be late, and what we're doing about it.</blockquote>
+    <cite class="reveal d2"><b>Dana Whitlock</b><span>VP of Operations, Halvorsen Castings · 4 plants</span></cite>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="demo">
+  <svg class="cta-scene" viewBox="0 0 1440 980" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="dSky" x1="0" y1="0" x2="0" y2="720" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#05090c"/><stop offset=".5" stop-color="#0f2226"/><stop offset=".78" stop-color="#2f4340"/><stop offset=".92" stop-color="#a9703f"/><stop offset="1" stop-color="#eaa55e"/>
+      </linearGradient>
+      <radialGradient id="dGlow" cx="1180" cy="720" r="560" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#ffd49a" stop-opacity=".8"/><stop offset=".2" stop-color="#e8964c" stop-opacity=".3"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="db"><feGaussianBlur stdDeviation="14"/></filter>
+    </defs>
+    <rect width="1440" height="980" fill="url(#dSky)"/>
+    <rect width="1440" height="980" fill="url(#dGlow)"/>
+    <ellipse cx="1180" cy="722" rx="120" ry="14" fill="#fff0d0" opacity=".6" filter="url(#db)"/>
+    <path d="M0 728V712H60V704H130V716H220V698H236V684H244V698H300V710H420V718H1440V728Z" fill="#6d4a33" opacity=".45"/>
+    <path d="M0 732Q360 710 720 722T1440 716V980H0Z" fill="#040506"/>
+    <g stroke="#040506" fill="none" stroke-linecap="round">
+      <path d="M1180 720C1179 690 1182 672 1178 648" stroke-width="9"/>
+      <path d="M1178 648C1170 628 1160 613 1140 600" stroke-width="5"/>
+      <path d="M1178 648C1186 626 1198 608 1220 594" stroke-width="5"/>
+      <path d="M1179 662C1195 658 1210 650 1232 638" stroke-width="3"/>
+      <path d="M1140 600C1130 590 1122 584 1108 578" stroke-width="2.5"/>
+      <path d="M1140 600C1142 586 1138 576 1132 564" stroke-width="2"/>
+      <path d="M1220 594C1232 582 1240 574 1256 568" stroke-width="2"/>
+      <path d="M1220 594C1218 578 1222 568 1226 556" stroke-width="2"/>
+      <path d="M1178 648C1178 623 1176 603 1180 578" stroke-width="4"/>
+      <path d="M1180 578C1172 564 1166 554 1156 544" stroke-width="2"/>
+      <path d="M1180 578C1190 563 1196 554 1206 546" stroke-width="2"/>
+      <path d="M1170 628C1158 624 1148 620 1134 620" stroke-width="2"/>
+    </g>
+  </svg>
+  <div class="cta-shade"></div>
+  <div class="cta-inner">
+    <div>
+      <div class="mono eyebrow reveal">Book a demo</div>
+      <h2 class="reveal d1">See your supply chain <em>in a better light.</em></h2>
+      <p class="lede reveal d2" style="max-width:540px">Thirty minutes with a product specialist who has worked a plant floor. We'll walk through your widget program, your suppliers, and exactly where Acme fits. No slideware.</p>
+      <ul class="expect reveal d3">
+        <li><span>00:05</span>Your current process, in your words</li>
+        <li><span>00:15</span>A live walkthrough using widgets like yours</li>
+        <li><span>00:25</span>Rollout plan, ERP integration, and pricing</li>
+      </ul>
+    </div>
+    <form id="demoForm" class="reveal d2" novalidate>
+      <div class="form-fields">
+        <h4>Request your demo</h4>
+        <p>We'll reply within one business day.</p>
+        <div class="field"><label for="name">Full name</label><input id="name" name="name" placeholder="Dana Whitlock" autocomplete="name" required></div>
+        <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" placeholder="dana@halvorsen.com" autocomplete="email" required></div>
+        <div class="row2">
+          <div class="field"><label for="company">Company</label><input id="company" name="company" placeholder="Halvorsen Castings" autocomplete="organization" required></div>
+          <div class="field"><label for="plants">Plants</label>
+            <select id="plants" name="plants">
+              <option>1–2</option><option selected>3–5</option><option>6–10</option><option>11+</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label for="role">Your role</label>
+          <select id="role" name="role">
+            <option>VP / Director of Operations</option><option>Supply Chain Manager</option><option>Procurement / Purchasing</option><option>Production Planning</option><option>Engineering</option><option>Other</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Book my demo <span class="arrow">→</span></button>
+        <p class="fine">No commitment. We never share your details.</p>
+      </div>
+      <div class="thanks">
+        <div class="mono" style="color:var(--haze)">Request received</div>
+        <h4 style="margin-top:14px" id="thanksTitle">Thank you.</h4>
+        <p style="color:#c9c2b5;margin-top:12px;font-size:15px;line-height:1.7" id="thanksBody">A product specialist will be in touch within one business day to find a time that works.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <a href="#" class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#efb56c" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>
+      ACME
+    </a>
+    <p>Widget operations software for the people who keep the lines running.</p>
+  </div>
+  <div><h5>Platform</h5><ul><li><a href="#platform">Configure</a></li><li><a href="#platform">Order</a></li><li><a href="#platform">Track</a></li><li><a href="#control">Integrations</a></li></ul></div>
+  <div><h5>Company</h5><ul><li><a href="#customers">Customers</a></li><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Security</a></li></ul></div>
+  <div><h5>Talk to us</h5><ul><li><a href="#demo">Book a demo</a></li><li><a href="#">hello@acme.com</a></li><li><a href="#">(937) 555-0142</a></li></ul></div>
+  <div class="legal"><span class="mono">© 2025 Acme Widget Systems, Inc. · Dayton, Ohio</span><span class="mono">Privacy · Terms · SOC 2 Type II</span></div>
+</footer>
+
+<script>
+(function(){
+  /* Film grain tile */
+  const g = document.createElement('canvas'); g.width = g.height = 200;
+  const gx = g.getContext('2d'); const id = gx.createImageData(200,200);
+  for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255;}
+  gx.putImageData(id,0,0);
+  document.getElementById('grain').style.backgroundImage = 'url('+g.toDataURL()+')';
+
+  /* Timecode */
+  const tc = document.getElementById('tc'); const t0 = performance.now();
+  const pad = n => String(n).padStart(2,'0');
+  (function tick(){
+    const f = Math.floor((performance.now()-t0)/1000*24);
+    tc.textContent = `${pad(Math.floor(f/86400))}:${pad(Math.floor(f/1440)%60)}:${pad(Math.floor(f/24)%60)}:${pad(f%24)}`;
+    requestAnimationFrame(tick);
+  })();
+
+  /* Dust */
+  function dust(canvas, opts){
+    const ctx = canvas.getContext('2d'); let w,h,parts=[];
+    const dpr = Math.min(window.devicePixelRatio||1,2);
+    function size(){
+      w = canvas.offsetWidth; h = canvas.offsetHeight;
+      canvas.width = w*dpr; canvas.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+      parts = Array.from({length:opts.count},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.4+.3,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.12-.04,p:Math.random()*6.28}));
+    }
+    size(); addEventListener('resize',size);
+    let visible = true;
+    new IntersectionObserver(e=>visible=e[0].isIntersecting).observe(canvas);
+    (function loop(){
+      if(visible){
+        ctx.clearRect(0,0,w,h);
+        for(const p of parts){
+          p.x+=p.vx; p.y+=p.vy; p.p+=.01;
+          if(p.x<0)p.x=w; if(p.x>w)p.x=0; if(p.y<0)p.y=h; if(p.y>h)p.y=0;
+          const a = opts.alpha(p.x,p.y,w,h) * (.6+.4*Math.sin(p.p));
+          if(a<=0.01) continue;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.283);
+          ctx.fillStyle = `rgba(255,218,168,${a})`; ctx.fill();
+        }
+      }
+      requestAnimationFrame(loop);
+    })();
+  }
+  dust(document.getElementById('heroDust'),{count:120,alpha:(x,y,w,h)=>{
+    const dx=(x-w*.63)/(w*.45), dy=(y-h*.73)/(h*.35);
+    return Math.max(0,.7-Math.sqrt(dx*dx+dy*dy)*.7);
+  }});
+  dust(document.getElementById('beamDust'),{count:260,alpha:(x,y,w,h)=>{
+    const x1=w*.09+85, y1=190, ang=-30*Math.PI/180;
+    const dxl=-Math.sin(ang), dyl=Math.cos(ang);
+    const px=x-x1, py=y-y1; const along=px*dxl+py*dyl;
+    if(along<0) return 0;
+    const perp=Math.abs(px*dyl-py*dxl); const half=110+along*.12;
+    return Math.max(0,(1-perp/half))*.85*Math.max(.2,1-along/1400);
+  }});
+
+  /* Nav + parallax */
+  const nav = document.getElementById('nav');
+  const lFar=document.getElementById('lFar'), lMid=document.getElementById('lMid'), lNear=document.getElementById('lNear');
+  const heroContent=document.querySelector('.hero-content');
+  function onScroll(){
+    const y=scrollY;
+    nav.classList.toggle('scrolled', y > innerHeight - 80);
+    if(y<innerHeight*1.2){
+      lFar.style.transform=`translateY(${y*.12}px)`;
+      lMid.style.transform=`translateY(${y*.2}px)`;
+      lNear.style.transform=`translateY(${y*.05}px)`;
+      heroContent.style.transform=`translateY(${y*-.15}px)`;
+      heroContent.style.opacity=Math.max(0,1-y/(innerHeight*.7));
+    }
+  }
+  addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  /* Reveals, lights-up, counters */
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(!e.isIntersecting) return;
+      e.target.classList.add('in','lit');
+      const n = e.target.querySelector && e.target.querySelector('[data-count]');
+      if(n) count(n);
+      io.unobserve(e.target);
+    });
+  },{threshold:.25});
+  document.querySelectorAll('.reveal,.still').forEach(el=>io.observe(el));
+
+  function count(el){
+    const target=parseFloat(el.dataset.count), dec=+(el.dataset.dec||0);
+    const small=el.querySelector('small').outerHTML; const start=performance.now(), dur=2200;
+    (function step(now){
+      const t=Math.min(1,(now-start)/dur), e=1-Math.pow(1-t,4);
+      el.innerHTML=(target*e).toFixed(dec)+small;
+      if(t<1) requestAnimationFrame(step);
+    })(start);
+  }
+
+  /* Dashboard buttons */
+  document.querySelector('.suggest .ok').addEventListener('click',function(){
+    this.textContent='Split approved ✓'; this.style.background='#6fb3ab';
+    const row=document.querySelector('tr.risk .status');
+    row.className='status s-transit'; row.innerHTML='<i></i>Recovered · on time';
+  });
+  document.querySelector('.suggest .no').addEventListener('click',function(){this.textContent='Planner notified';});
+
+  /* Form */
+  const form=document.getElementById('demoForm');
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    let ok=true;
+    ['name','email','company'].forEach(id=>{
+      const el=document.getElementById(id); const f=el.parentElement;
+      const valid = id==='email' ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()) : el.value.trim().length>1;
+      f.classList.toggle('err',!valid); if(!valid) ok=false;
+    });
+    if(!ok) return;
+    const first=document.getElementById('name').value.trim().split(' ')[0];
+    const co=document.getElementById('company').value.trim();
+    document.getElementById('thanksTitle').textContent=`Thank you, ${first}.`;
+    document.getElementById('thanksBody').textContent=`A product specialist will reach out within one business day to schedule thirty minutes on ${co}'s widget program. Bring your hardest supplier problem.`;
+    form.classList.add('sent');
+  });
+})();
+</script>
+</body>
+</html>

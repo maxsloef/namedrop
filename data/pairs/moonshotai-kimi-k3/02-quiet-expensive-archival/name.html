@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — The Widget Bureau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f3ee;
+    --paper-deep:#efeae2;
+    --ink:#22201c;
+    --ink-soft:#5c574f;
+    --line:#d8d2c7;
+    --accent:#8a6f4d;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent);color:var(--paper);}
+
+  h1,h2,h3,.serif{font-family:'Cormorant Garamond',serif;font-weight:400;}
+
+  /* ---------- header ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:28px 56px;
+    transition:background .4s ease, padding .4s ease, border-color .4s ease;
+    border-bottom:1px solid transparent;
+  }
+  header.scrolled{
+    background:rgba(246,243,238,.92);
+    backdrop-filter:blur(10px);
+    padding:18px 56px;
+    border-color:var(--line);
+  }
+  .wordmark{
+    font-family:'Cormorant Garamond',serif;
+    font-size:26px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink);text-decoration:none;
+  }
+  .wordmark span{color:var(--accent);font-style:italic;letter-spacing:0;text-transform:none;}
+  nav{display:flex;gap:44px;align-items:center;}
+  nav a{
+    font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ink-soft);text-decoration:none;transition:color .3s;
+  }
+  nav a:hover{color:var(--ink);}
+  .nav-cta{
+    border:1px solid var(--ink);padding:10px 22px;color:var(--ink)!important;
+    transition:background .3s,color .3s;
+  }
+  .nav-cta:hover{background:var(--ink);color:var(--paper)!important;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;
+    display:grid;grid-template-columns:1.1fr .9fr;align-items:center;
+    padding:0 56px;gap:40px;
+  }
+  .hero-copy{padding-top:60px;max-width:620px;}
+  .kicker{
+    font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:36px;
+    display:flex;align-items:center;gap:16px;
+  }
+  .kicker::before{content:'';width:44px;height:1px;background:var(--accent);display:inline-block;}
+  .hero h1{
+    font-size:clamp(56px,5.2vw,86px);
+    line-height:1.02;font-weight:300;letter-spacing:-.01em;
+  }
+  .hero h1 em{font-style:italic;color:var(--accent);}
+  .hero p{
+    margin-top:36px;font-size:16px;line-height:1.9;color:var(--ink-soft);max-width:460px;
+  }
+  .hero-actions{margin-top:48px;display:flex;gap:32px;align-items:center;}
+  .btn-primary{
+    font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);border:1px solid var(--ink);
+    padding:18px 38px;cursor:pointer;text-decoration:none;
+    transition:background .35s,color .35s;
+  }
+  .btn-primary:hover{background:transparent;color:var(--ink);}
+  .btn-ghost{
+    font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);
+    padding-bottom:6px;transition:border-color .3s;
+  }
+  .btn-ghost:hover{border-color:var(--ink);}
+
+  /* hero illustration — archival widget plate */
+  .hero-plate{
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;transform:translateY(24px);
+  }
+  .plate-frame{
+    border:1px solid var(--line);
+    padding:28px;
+    background:var(--paper-deep);
+    position:relative;
+  }
+  .plate-frame::after{
+    content:'FIG. 01 — THE ORDERED WIDGET';
+    position:absolute;bottom:-30px;left:0;
+    font-size:10px;letter-spacing:.28em;color:var(--ink-soft);
+  }
+  .plate-inner{
+    border:1px solid var(--line);background:var(--paper);
+    padding:52px;display:flex;align-items:center;justify-content:center;
+  }
+
+  /* ---------- ticker / clients ---------- */
+  .clients{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:34px 56px;display:flex;justify-content:space-between;align-items:center;gap:32px;
+  }
+  .clients .label{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap;}
+  .clients .names{
+    display:flex;gap:56px;flex-wrap:wrap;
+    font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--ink-soft);
+  }
+
+  /* ---------- sections ---------- */
+  section{padding:140px 56px;}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:80px;border-bottom:1px solid var(--line);padding-bottom:32px;
+  }
+  .section-head h2{font-size:clamp(38px,3.4vw,56px);line-height:1.05;font-weight:300;max-width:560px;}
+  .section-head h2 em{font-style:italic;color:var(--accent);}
+  .section-head .num{
+    font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.2em;color:var(--ink-soft);
+  }
+
+  /* principles */
+  .principles{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+  .principle{background:var(--paper);padding:56px 44px;transition:background .4s;}
+  .principle:hover{background:var(--paper-deep);}
+  .principle .roman{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--accent);}
+  .principle h3{font-size:30px;margin:22px 0 18px;font-weight:400;}
+  .principle p{font-size:14px;line-height:1.9;color:var(--ink-soft);}
+
+  /* numbers */
+  .numbers{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;gap:40px;}
+  .numbers .stat .value{font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:300;line-height:1;}
+  .numbers .stat .value sup{font-size:32px;color:var(--accent);}
+  .numbers .stat .caption{margin-top:14px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);}
+
+  /* how it works — editorial list */
+  .steps{max-width:900px;margin:0 auto;}
+  .step{
+    display:grid;grid-template-columns:100px 1fr 1.2fr;gap:48px;align-items:baseline;
+    padding:52px 0;border-bottom:1px solid var(--line);
+  }
+  .step:first-child{border-top:1px solid var(--line);}
+  .step .no{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:44px;color:var(--accent);line-height:1;}
+  .step h3{font-size:32px;font-weight:400;}
+  .step p{font-size:14px;line-height:1.9;color:var(--ink-soft);}
+
+  /* quote */
+  .quote-block{background:var(--paper-deep);text-align:center;padding:160px 56px;}
+  .quote-block blockquote{
+    font-family:'Cormorant Garamond',serif;font-size:clamp(30px,2.8vw,44px);
+    font-weight:300;font-style:italic;line-height:1.35;max-width:900px;margin:0 auto;
+  }
+  .quote-block cite{
+    display:block;margin-top:44px;font-family:'Inter',sans-serif;font-style:normal;
+    font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-soft);
+  }
+  .quote-mark{font-size:80px;color:var(--accent);line-height:0;display:block;margin-bottom:40px;font-family:'Cormorant Garamond',serif;}
+
+  /* demo form */
+  .demo{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:start;}
+  .demo h2{font-size:clamp(40px,3.6vw,58px);line-height:1.06;font-weight:300;}
+  .demo h2 em{font-style:italic;color:var(--accent);}
+  .demo .lede{margin-top:28px;font-size:15px;line-height:1.9;color:var(--ink-soft);max-width:440px;}
+  .demo .assurance{
+    margin-top:48px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);
+    border-top:1px solid var(--line);padding-top:24px;display:flex;gap:40px;
+  }
+  form .row{display:grid;grid-template-columns:1fr 1fr;gap:32px;}
+  form label{
+    display:block;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:10px;margin-top:32px;
+  }
+  form input,form select{
+    width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);
+    padding:12px 0;font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--ink);
+    outline:none;transition:border-color .3s;border-radius:0;appearance:none;
+  }
+  form input:focus,form select:focus{border-color:var(--ink);}
+  form input::placeholder{color:#b8b1a5;font-style:italic;}
+  form .btn-primary{margin-top:48px;width:100%;padding:20px;}
+  .form-note{margin-top:20px;font-size:12px;color:var(--ink-soft);text-align:center;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:15px;}
+  .form-success{
+    display:none;border:1px solid var(--line);background:var(--paper-deep);
+    padding:80px 48px;text-align:center;
+  }
+  .form-success h3{font-size:36px;margin-bottom:18px;font-weight:300;}
+  .form-success h3 em{font-style:italic;color:var(--accent);}
+  .form-success p{font-size:14px;line-height:1.9;color:var(--ink-soft);}
+
+  /* footer */
+  footer{
+    border-top:1px solid var(--line);padding:80px 56px 48px;
+    display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:56px;
+  }
+  footer .foot-mark{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.12em;text-transform:uppercase;}
+  footer .foot-mark span{color:var(--accent);font-style:italic;text-transform:none;letter-spacing:0;}
+  footer p.tag{margin-top:16px;font-size:13px;line-height:1.9;color:var(--ink-soft);max-width:280px;}
+  footer h4{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:24px;font-weight:400;}
+  footer ul{list-style:none;}
+  footer ul li{margin-bottom:14px;}
+  footer ul a{color:var(--ink-soft);text-decoration:none;font-size:13px;transition:color .3s;}
+  footer ul a:hover{color:var(--ink);}
+  .colophon{
+    padding:0 56px 40px;display:flex;justify-content:space-between;
+    font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);
+  }
+
+  /* reveal animation */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 1s ease,transform 1s ease;}
+  .reveal.visible{opacity:1;transform:none;}
+
+  @media (max-width:1000px){
+    .hero,.demo{grid-template-columns:1fr;}
+    .principles,.numbers{grid-template-columns:1fr 1fr;}
+    .step{grid-template-columns:60px 1fr;}
+    .step p{grid-column:2;}
+    footer{grid-template-columns:1fr 1fr;}
+    nav a:not(.nav-cta){display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header id="header">
+  <a class="wordmark" href="#">Acme<span>.</span></a>
+  <nav>
+    <a href="#principles">Principles</a>
+    <a href="#how">Method</a>
+    <a href="#voices">Voices</a>
+    <a class="nav-cta" href="#demo">Book a Demo</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-copy">
+    <div class="kicker reveal">The Widget Bureau — Est. for Operations</div>
+    <h1 class="reveal">Order, in its <em>quietest</em> form.</h1>
+    <p class="reveal">Acme is the platform where operations teams at mid-sized manufacturers configure, order, and follow custom widgets through the supply chain — without a single spreadsheet, and without a single raised voice.</p>
+    <div class="hero-actions reveal">
+      <a class="btn-primary" href="#demo">Book a Demo</a>
+      <a class="btn-ghost" href="#principles">Read Our Principles</a>
+    </div>
+  </div>
+  <div class="hero-plate" id="plate">
+    <div class="plate-frame">
+      <div class="plate-inner">
+        <svg width="360" height="360" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Technical illustration of a widget">
+          <circle cx="180" cy="180" r="130" stroke="#d8d2c7" stroke-width="1"/>
+          <circle cx="180" cy="180" r="96" stroke="#22201c" stroke-width="1.2"/>
+          <circle cx="180" cy="180" r="60" stroke="#8a6f4d" stroke-width="1" stroke-dasharray="3 5"/>
+          <circle cx="180" cy="180" r="22" stroke="#22201c" stroke-width="1.2"/>
+          <circle cx="180" cy="180" r="5" fill="#8a6f4d"/>
+          <line x1="180" y1="20" x2="180" y2="50" stroke="#5c574f" stroke-width="0.8"/>
+          <line x1="180" y1="310" x2="180" y2="340" stroke="#5c574f" stroke-width="0.8"/>
+          <line x1="20" y1="180" x2="50" y2="180" stroke="#5c574f" stroke-width="0.8"/>
+          <line x1="310" y1="180" x2="340" y2="180" stroke="#5c574f" stroke-width="0.8"/>
+          <text x="188" y="34" font-family="Cormorant Garamond, serif" font-size="13" font-style="italic" fill="#5c574f">Ø 84 — tolerance ±0.2</text>
+          <text x="246" y="172" font-family="Cormorant Garamond, serif" font-size="13" font-style="italic" fill="#5c574f">fig. a</text>
+          <line x1="84" y1="276" x2="276" y2="84" stroke="#d8d2c7" stroke-width="0.8"/>
+          <line x1="84" y1="84" x2="276" y2="276" stroke="#d8d2c7" stroke-width="0.8"/>
+          <circle cx="180" cy="84" r="3" fill="#22201c"/>
+          <circle cx="276" cy="180" r="3" fill="#22201c"/>
+          <circle cx="180" cy="276" r="3" fill="#22201c"/>
+          <circle cx="84" cy="180" r="3" fill="#22201c"/>
+          <text x="30" y="352" font-family="Inter, sans-serif" font-size="8" letter-spacing="3" fill="#5c574f">ACME BUREAU · PLATE Nº 114 · SCALE 1:1</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<div class="clients reveal">
+  <span class="label">In service to</span>
+  <div class="names">
+    <span>Hartmann &amp; Sons</span>
+    <span>Meridian Castings</span>
+    <span>The Lowell Works</span>
+    <span>Aalto Fabrication</span>
+    <span>Bureau Veritas Mfg.</span>
+  </div>
+</div>
+
+<!-- PRINCIPLES -->
+<section id="principles">
+  <div class="section-head reveal">
+    <h2>Three principles, kept <em>religiously.</em></h2>
+    <span class="num">Nº 01 — Principles</span>
+  </div>
+  <div class="principles reveal">
+    <div class="principle">
+      <span class="roman">I.</span>
+      <h3>Configure without counsel</h3>
+      <p>Every widget begins as a quiet conversation between your specifications and our catalogue. Dimensions, tolerances, finishes, and quantities are set in minutes — pricing resolves instantly, with no calls and no quotes lost in inboxes.</p>
+    </div>
+    <div class="principle">
+      <span class="roman">II.</span>
+      <h3>One ledger of record</h3>
+      <p>Purchase orders, confirmations, and revisions live in a single archival ledger your whole team can read. What was ordered, by whom, and when — settled permanently, like entries in a well-kept diary.</p>
+    </div>
+    <div class="principle">
+      <span class="roman">III.</span>
+      <h3>Follow every parcel</h3>
+      <p>From foundry to loading dock, each widget carries its own thread of provenance. Milestones arrive as they happen, so your supply chain is something you observe — never something you chase.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section style="background:var(--paper-deep);padding-top:120px;padding-bottom:120px;">
+  <div class="numbers reveal">
+    <div class="stat"><div class="value" data-count="12400">0</div><div class="caption">Widgets in transit today</div></div>
+    <div class="stat"><div class="value" data-count="98" data-suffix=".4"><sup>%</sup></div><div class="caption">On-time arrival</div></div>
+    <div class="stat"><div class="value" data-count="11" data-suffix=" min">0</div><div class="caption">Median time to first order</div></div>
+    <div class="stat"><div class="value" data-count="340">0</div><div class="caption">Manufacturers served</div></div>
+  </div>
+</section>
+
+<!-- METHOD -->
+<section id="how">
+  <div class="section-head reveal">
+    <h2>The method, from drawing <em>to dock.</em></h2>
+    <span class="num">Nº 02 — Method</span>
+  </div>
+  <div class="steps reveal">
+    <div class="step">
+      <span class="no">01</span>
+      <h3>Specify</h3>
+      <p>Open the configurator and describe the widget as you would to a master machinist — material, geometry, finish, lot size. Feasibility and price settle in real time.</p>
+    </div>
+    <div class="step">
+      <span class="no">02</span>
+      <h3>Commit</h3>
+      <p>Route the order through your own approval chain inside Acme. Finance sees cost, operations sees lead time, and nothing leaves the building unsigned.</p>
+    </div>
+    <div class="step">
+      <span class="no">03</span>
+      <h3>Follow</h3>
+      <p>Watch production, quality inspection, and freight unfold on a single timeline. Delays announce themselves early, with remedies attached.</p>
+    </div>
+    <div class="step">
+      <span class="no">04</span>
+      <h3>Archive</h3>
+      <p>Every completed order is bound into your permanent record — reorderable in one touch, auditable forever. Institutional memory, kept for you.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote-block reveal" id="voices">
+  <span class="quote-mark">“</span>
+  <blockquote>We stopped managing widgets and started simply receiving them. Acme gave our operations floor back its afternoons.</blockquote>
+  <cite>Elena Marsh — Director of Operations, Meridian Castings</cite>
+</div>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="demo">
+    <div class="reveal">
+      <div class="kicker">Nº 03 — An Invitation</div>
+      <h2>Sit with us for <em>thirty minutes.</em></h2>
+      <p class="lede">A member of our bureau will walk you through the platform using your own widget specifications — not a canned tour. Bring a drawing, a part number, or just a recurring headache.</p>
+      <div class="assurance">
+        <span>No obligation</span>
+        <span>Same-week scheduling</span>
+        <span>Your data, your demo</span>
+      </div>
+    </div>
+    <div class="reveal">
+      <form id="demoForm" novalidate>
+        <div class="row">
+          <div>
+            <label for="name">Full Name</label>
+            <input id="name" type="text" placeholder="Margaret Hale" required>
+          </div>
+          <div>
+            <label for="company">Company</label>
+            <input id="company" type="text" placeholder="Hale Fabrication Co." required>
+          </div>
+        </div>
+        <label for="email">Work Email</label>
+        <input id="email" type="email" placeholder="m.hale@halefab.com" required>
+        <div class="row">
+          <div>
+            <label for="size">Company Size</label>
+            <select id="size" required>
+              <option value="" disabled selected>Select…</option>
+              <option>50 – 200 employees</option>
+              <option>200 – 500 employees</option>
+              <option>500 – 2,000 employees</option>
+              <option>2,000+ employees</option>
+            </select>
+          </div>
+          <div>
+            <label for="interest">Primary Interest</label>
+            <select id="interest">
+              <option value="" disabled selected>Select…</option>
+              <option>Widget configuration</option>
+              <option>Order tracking</option>
+              <option>Supply-chain visibility</option>
+              <option>Full platform</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" type="submit">Request the Demo</button>
+        <p class="form-note">We reply within one business day — often within the hour.</p>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <h3>Consider it <em>arranged.</em></h3>
+        <p>Thank you. A member of the bureau will write to you shortly to settle on a time. Until then, your specifications are safe with us.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="foot-mark">Acme<span>.</span></div>
+    <p class="tag">The widget bureau for operations teams who prefer their supply chains silent, certain, and well documented.</p>
+  </div>
+  <div>
+    <h4>Platform</h4>
+    <ul>
+      <li><a href="#principles">Principles</a></li>
+      <li><a href="#how">Method</a></li>
+      <li><a href="#demo">Book a Demo</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4>Bureau</h4>
+    <ul>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Press Kit</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4>Correspondence</h4>
+    <ul>
+      <li><a href="mailto:bureau@acme.example">bureau@acme.example</a></li>
+      <li><a href="#">Security &amp; Trust</a></li>
+      <li><a href="#">Privacy</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="colophon">
+  <span>© MMXXV Acme Bureau of Widgets</span>
+  <span>Set in Cormorant Garamond &amp; Inter</span>
+</div>
+
+<script>
+  // Header scroll state
+  const header = document.getElementById('header');
+  addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', scrollY > 40);
+  }, { passive: true });
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Hero plate entrance
+  setTimeout(() => {
+    const p = document.getElementById('plate');
+    p.style.transition = 'opacity 1.4s ease .3s, transform 1.4s ease .3s';
+    p.style.opacity = 1; p.style.transform = 'none';
+  }, 100);
+
+  // Counter animation
+  const fmt = n => n.toLocaleString('en-US');
+  const counterIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      counterIO.unobserve(e.target);
+      const el = e.target.querySelector('.value');
+      const target = +el.dataset.count;
+      const suffix = el.dataset.suffix || '';
+      const sup = el.querySelector('sup');
+      const supHTML = sup ? sup.outerHTML : '';
+      const start = performance.now(), dur = 1800;
+      (function tick(now) {
+        const t = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.innerHTML = fmt(Math.round(target * eased)) + suffix + supHTML;
+        if (t < 1) requestAnimationFrame(tick);
+      })(start);
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.numbers .stat').forEach(s => counterIO.observe(s));
+
+  // Form handling
+  document.getElementById('demoForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target;
+    let valid = true;
+    f.querySelectorAll('[required]').forEach(el => {
+      const bad = !el.value.trim() || (el.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(el.value));
+      el.style.borderColor = bad ? '#a4442e' : '';
+      if (bad) valid = false;
+    });
+    if (!valid) return;
+    f.style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  });
+</script>
+</body>
+</html>

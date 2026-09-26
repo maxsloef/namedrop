@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom widgets, without the chaos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300;9..144,400;9..144,500,100&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#3b3352;
+    --ink-soft:#6e6790;
+    --lavender:#b9a8f2;
+    --peach:#ffd9c4;
+    --sky:#c3e0f7;
+    --mint:#c9ecdd;
+    --cream:#fdfaf6;
+    --white:#ffffff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',sans-serif;
+    font-weight:300;
+    color:var(--ink);
+    background:linear-gradient(175deg,#fdfaf6 0%,#f6f1fb 34%,#eef4fc 68%,#f3f0fa 100%);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{font-family:'Fraunces',serif;font-weight:400}
+
+  /* ---------- ambient canvas & grain ---------- */
+  #aurora{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .grain{
+    position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.35;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    animation:grain 9s steps(6) infinite;
+  }
+  @keyframes grain{
+    0%,100%{transform:translate(0,0)}20%{transform:translate(-2%,3%)}
+    40%{transform:translate(3%,-2%)}60%{transform:translate(-3%,-3%)}80%{transform:translate(2%,2%)}
+  }
+
+  main{position:relative;z-index:2}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:26px 64px;transition:background .5s,backdrop-filter .5s,padding .5s,box-shadow .5s;
+  }
+  nav.scrolled{
+    background:rgba(253,250,246,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    padding:16px 64px;box-shadow:0 1px 0 rgba(185,168,242,.18);
+  }
+  .logo{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+  .logo-mark{
+    width:34px;height:34px;border-radius:12px;position:relative;overflow:hidden;
+    background:linear-gradient(135deg,var(--lavender),var(--sky) 55%,var(--peach));
+    box-shadow:0 4px 18px rgba(185,168,242,.45), inset 0 0 0 1px rgba(255,255,255,.5);
+  }
+  .logo-mark::after{
+    content:'';position:absolute;width:14px;height:14px;border-radius:50%;
+    background:rgba(255,255,255,.85);top:7px;left:8px;filter:blur(1px);
+  }
+  .logo span{font-family:'Fraunces',serif;font-size:22px;letter-spacing:.02em}
+  .nav-links{display:flex;gap:38px;align-items:center}
+  .nav-links a{
+    text-decoration:none;color:var(--ink-soft);font-size:14px;letter-spacing:.03em;
+    transition:color .3s;position:relative;
+  }
+  .nav-links a:hover{color:var(--ink)}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--ink);color:#fdfaf6;text-decoration:none;
+    font-size:14px;font-weight:400;letter-spacing:.04em;
+    padding:13px 26px;border-radius:999px;border:none;cursor:pointer;
+    transition:transform .35s cubic-bezier(.2,.9,.3,1.4),box-shadow .35s,background .35s;
+    box-shadow:0 8px 24px rgba(59,51,82,.22);
+  }
+  .btn:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 14px 34px rgba(59,51,82,.3);background:#4a4166}
+  .btn.small{padding:10px 22px;font-size:13px}
+  .btn .arr{transition:transform .35s}
+  .btn:hover .arr{transform:translateX(4px)}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:170px 64px 90px;max-width:1440px;margin:0 auto;position:relative;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;font-size:12.5px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--ink-soft);margin-bottom:34px;
+  }
+  .eyebrow::before{
+    content:'';width:34px;height:1px;
+    background:linear-gradient(90deg,var(--lavender),transparent);
+  }
+  .hero h1{
+    font-size:clamp(56px,6.4vw,92px);line-height:1.04;letter-spacing:-.015em;
+    max-width:1000px;font-weight:300;
+  }
+  .hero h1 .dream{
+    font-variation-settings:'SOFT' 100;font-weight:500;font-style:italic;
+    background:linear-gradient(100deg,#8f7ae0 5%,#5f9fd8 50%,#e8a37e 95%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero-sub{
+    max-width:560px;font-size:18.5px;line-height:1.7;color:var(--ink-soft);margin-top:34px;
+  }
+  .hero-cta{display:flex;gap:20px;align-items:center;margin-top:48px}
+  .ghost-link{
+    font-size:14.5px;color:var(--ink);text-decoration:none;letter-spacing:.03em;
+    border-bottom:1px solid rgba(185,168,242,.6);padding-bottom:3px;transition:border-color .3s,color .3s;
+  }
+  .ghost-link:hover{border-color:var(--ink)}
+
+  .reveal{opacity:0;transform:translateY(34px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:translateY(0)}
+  .d1{transition-delay:.1s}.d2{transition-delay:.22s}.d3{transition-delay:.34s}.d4{transition-delay:.46s}.d5{transition-delay:.58s}
+
+  /* floating hero orbs */
+  .orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(2px)}
+  .orb-a{
+    width:340px;height:340px;top:14%;right:4%;
+    background:radial-gradient(circle at 32% 30%,rgba(255,255,255,.9),rgba(185,168,242,.35) 45%,rgba(185,168,242,0) 72%);
+    animation:drift 11s ease-in-out infinite;
+  }
+  .orb-b{
+    width:200px;height:200px;top:56%;right:22%;
+    background:radial-gradient(circle at 35% 32%,rgba(255,255,255,.85),rgba(255,217,196,.4) 50%,rgba(255,217,196,0) 75%);
+    animation:drift 14s ease-in-out infinite reverse;
+  }
+  .orb-c{
+    width:130px;height:130px;top:30%;right:33%;
+    background:radial-gradient(circle at 35% 32%,rgba(255,255,255,.9),rgba(195,224,247,.45) 50%,rgba(195,224,247,0) 75%);
+    animation:drift 9s ease-in-out infinite;
+  }
+  @keyframes drift{
+    0%,100%{transform:translate(0,0) scale(1)}
+    50%{transform:translate(-26px,22px) scale(1.06)}
+  }
+
+  /* soft ticker */
+  .ticker-wrap{margin:10px 0 0;overflow:hidden;padding:34px 0;position:relative}
+  .ticker{display:flex;gap:70px;width:max-content;animation:tick 34s linear infinite}
+  .ticker span{
+    font-family:'Fraunces',serif;font-style:italic;font-size:19px;color:var(--ink-soft);
+    white-space:nowrap;display:flex;align-items:center;gap:70px;
+  }
+  .ticker em{font-style:normal;font-size:11px;letter-spacing:.25em;color:var(--lavender)}
+  @keyframes tick{to{transform:translateX(-50%)}}
+
+  section{max-width:1440px;margin:0 auto;padding:120px 64px}
+  .section-eyebrow{
+    font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--lavender);margin-bottom:22px;
+  }
+  .section-title{font-size:clamp(38px,3.6vw,54px);line-height:1.12;letter-spacing:-.01em;max-width:700px;font-weight:300}
+  .section-title i{font-variation-settings:'SOFT' 100;font-weight:500;color:#8f7ae0}
+
+  /* ---------- feature cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:70px}
+  .card{
+    background:rgba(255,255,255,.62);backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.9);border-radius:28px;
+    padding:44px 38px 42px;position:relative;overflow:hidden;
+    box-shadow:0 18px 50px -22px rgba(110,103,144,.28);
+    transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s;
+  }
+  .card:hover{transform:translateY(-8px);box-shadow:0 30px 70px -24px rgba(143,122,224,.4)}
+  .card::before{
+    content:'';position:absolute;top:-70px;right:-70px;width:190px;height:190px;border-radius:50%;
+    background:radial-gradient(circle,var(--glow,rgba(185,168,242,.28)),transparent 70%);
+    transition:transform .6s;
+  }
+  .card:hover::before{transform:scale(1.5)}
+  .card:nth-child(2){--glow:rgba(195,224,247,.4)}
+  .card:nth-child(3){--glow:rgba(255,217,196,.4)}
+  .card-icon{
+    width:54px;height:54px;border-radius:18px;display:grid;place-items:center;margin-bottom:28px;
+    background:linear-gradient(140deg,rgba(185,168,242,.22),rgba(195,224,247,.3));
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);
+  }
+  .card h3{font-size:23px;margin-bottom:14px;letter-spacing:-.005em}
+  .card p{font-size:15px;line-height:1.75;color:var(--ink-soft)}
+  .card .num{
+    position:absolute;top:32px;right:34px;font-family:'Fraunces',serif;font-style:italic;
+    font-size:15px;color:rgba(143,122,224,.55);
+  }
+
+  /* ---------- how it works ---------- */
+  .how{background:linear-gradient(180deg,transparent,rgba(255,255,255,.5) 20%,rgba(255,255,255,.5) 80%,transparent)}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:60px;margin-top:80px;position:relative}
+  .steps::before{
+    content:'';position:absolute;top:26px;left:8%;right:8%;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(185,168,242,.5),rgba(195,224,247,.5),rgba(255,217,196,.5),transparent);
+  }
+  .step{text-align:center;position:relative}
+  .step-dot{
+    width:52px;height:52px;border-radius:50%;margin:0 auto 26px;
+    background:radial-gradient(circle at 34% 30%,#fff,var(--tint,#e4dbfa) 75%);
+    box-shadow:0 8px 24px rgba(143,122,224,.28),inset 0 0 0 1px rgba(255,255,255,.8);
+    display:grid;place-items:center;font-family:'Fraunces',serif;font-style:italic;font-size:19px;color:#8f7ae0;
+    position:relative;z-index:1;
+  }
+  .step:nth-child(2){--tint:#d8ecfa}
+  .step:nth-child(3){--tint:#ffe8db}
+  .step h3{font-size:21px;margin-bottom:12px}
+  .step p{font-size:14.5px;line-height:1.75;color:var(--ink-soft);max-width:320px;margin:0 auto}
+
+  /* ---------- quote ---------- */
+  .quote-block{text-align:center;max-width:860px;margin:0 auto}
+  .quote-mark{
+    font-family:'Fraunces',serif;font-size:90px;line-height:.5;display:block;
+    background:linear-gradient(120deg,var(--lavender),var(--sky));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:30px;
+  }
+  .quote-block blockquote{
+    font-family:'Fraunces',serif;font-size:clamp(26px,2.6vw,36px);line-height:1.45;font-weight:300;
+    letter-spacing:-.005em;
+  }
+  .quote-block blockquote i{font-variation-settings:'SOFT' 100;font-weight:500;color:#8f7ae0}
+  .quote-attr{margin-top:36px;font-size:13.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+  .quote-attr b{font-weight:500;color:var(--ink);display:block;margin-bottom:5px;letter-spacing:.1em}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:90px;text-align:center}
+  .stat{
+    padding:40px 20px;border-radius:24px;
+    background:linear-gradient(160deg,rgba(255,255,255,.55),rgba(255,255,255,.15));
+    border:1px solid rgba(255,255,255,.8);
+  }
+  .stat .n{
+    font-family:'Fraunces',serif;font-size:48px;font-weight:300;
+    background:linear-gradient(110deg,#8f7ae0,#5f9fd8);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .stat .l{font-size:13.5px;letter-spacing:.08em;color:var(--ink-soft);margin-top:8px}
+
+  /* ---------- CTA ---------- */
+  .cta-section{padding-bottom:60px}
+  .cta-box{
+    border-radius:40px;padding:96px 60px;text-align:center;position:relative;overflow:hidden;
+    background:linear-gradient(140deg,#efe7fc 0%,#e2eefb 48%,#fdeee4 100%);
+    box-shadow:0 34px 90px -30px rgba(143,122,224,.4), inset 0 0 0 1px rgba(255,255,255,.75);
+  }
+  .cta-box::before,.cta-box::after{
+    content:'';position:absolute;border-radius:50%;pointer-events:none;
+  }
+  .cta-box::before{
+    width:420px;height:420px;top:-190px;left:-120px;
+    background:radial-gradient(circle,rgba(255,255,255,.75),transparent 65%);
+  }
+  .cta-box::after{
+    width:360px;height:360px;bottom:-170px;right:-100px;
+    background:radial-gradient(circle,rgba(255,255,255,.6),transparent 65%);
+  }
+  .cta-box h2{font-size:clamp(38px,3.8vw,56px);line-height:1.12;font-weight:300;position:relative}
+  .cta-box h2 i{font-variation-settings:'SOFT' 100;font-weight:500;color:#8f7ae0}
+  .cta-box p{
+    max-width:520px;margin:24px auto 44px;font-size:17px;line-height:1.7;color:var(--ink-soft);position:relative;
+  }
+  .cta-form{
+    display:flex;gap:12px;justify-content:center;max-width:520px;margin:0 auto;position:relative;flex-wrap:wrap;
+  }
+  .cta-form input{
+    flex:1;min-width:260px;padding:15px 24px;border-radius:999px;font-size:15px;
+    border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.75);
+    color:var(--ink);outline:none;font-family:'Inter',sans-serif;font-weight:300;
+    transition:box-shadow .3s,background .3s;
+  }
+  .cta-form input::placeholder{color:#a79fbf}
+  .cta-form input:focus{background:#fff;box-shadow:0 0 0 4px rgba(185,168,242,.25)}
+  .cta-note{margin-top:22px;font-size:12.5px;letter-spacing:.06em;color:var(--ink-soft);position:relative}
+
+  footer{
+    max-width:1440px;margin:0 auto;padding:50px 64px 60px;display:flex;justify-content:space-between;
+    align-items:center;font-size:13px;color:var(--ink-soft);
+  }
+  footer .links{display:flex;gap:28px}
+  footer a{color:var(--ink-soft);text-decoration:none;transition:color .3s}
+  footer a:hover{color:var(--ink)}
+
+  @media (max-width:900px){
+    nav{padding:20px 28px}.nav-links a:not(.btn){display:none}
+    .hero,section{padding-left:28px;padding-right:28px}
+    .cards,.steps,.stats{grid-template-columns:1fr}
+    .steps::before{display:none}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="aurora"></canvas>
+<div class="grain"></div>
+
+<nav id="nav">
+  <a class="logo" href="#"><div class="logo-mark"></div><span>Acme</span></a>
+  <div class="nav-links">
+    <a href="#platform">Platform</a>
+    <a href="#how">How it works</a>
+    <a href="#customers">Customers</a>
+    <a href="#demo" class="btn small">Book a demo</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
+    <div class="eyebrow reveal d1">Widget operations, softened</div>
+    <h1 class="reveal d2">Custom widgets, ordered and tracked <span class="dream">without the chaos.</span></h1>
+    <p class="hero-sub reveal d3">Acme gives operations teams at mid-sized manufacturers one calm place to configure, order, and follow every custom widget through the supply chain — from spec sheet to loading dock.</p>
+    <div class="hero-cta reveal d4">
+      <a href="#demo" class="btn">Book a demo <span class="arr">→</span></a>
+      <a href="#platform" class="ghost-link">See how it feels</a>
+    </div>
+  </header>
+
+  <div class="ticker-wrap reveal d5">
+    <div class="ticker" id="ticker">
+      <span>Precision fits <em>◦</em> On-time deliveries <em>◦</em> Fewer spreadsheets <em>◦</em> Clearer lead times <em>◦</em> Happier line managers <em>◦</em></span>
+      <span>Precision fits <em>◦</em> On-time deliveries <em>◦</em> Fewer spreadsheets <em>◦</em> Clearer lead times <em>◦</em> Happier line managers <em>◦</em></span>
+    </div>
+  </div>
+
+  <!-- PLATFORM -->
+  <section id="platform">
+    <div class="section-eyebrow reveal">The platform</div>
+    <h2 class="section-title reveal d1">Everything your widgets need, <i>gently in one place.</i></h2>
+    <div class="cards">
+      <div class="card reveal d1">
+        <span class="num">01</span>
+        <div class="card-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8f7ae0" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg>
+        </div>
+        <h3>Configure in minutes</h3>
+        <p>Guided spec sheets translate engineering requirements into supplier-ready orders. Tolerances, finishes, materials, and quantities — captured once, never retyped.</p>
+      </div>
+      <div class="card reveal d2">
+        <span class="num">02</span>
+        <div class="card-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5f9fd8" stroke-width="1.5" stroke-linecap="round"><path d="M3 16c2.5-1.5 4-4.5 6.5-6s5-1 7 .5 3.5 4 4.5 5.5"/><circle cx="5" cy="15" r="1.6"/><circle cx="12" cy="9" r="1.6"/><circle cx="19" cy="13" r="1.6"/></svg>
+        </div>
+        <h3>Order with confidence</h3>
+        <p>Live pricing and honest lead times from vetted fabricators. Place repeat orders in two clicks, and let approvals route themselves to the right desk.</p>
+      </div>
+      <div class="card reveal d3">
+        <span class="num">03</span>
+        <div class="card-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8a37e" stroke-width="1.5" stroke-linecap="round"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"/><path d="M9 12l2 2 4-4.5"/></svg>
+        </div>
+        <h3>Track every unit</h3>
+        <p>A luminous timeline follows each batch from machining to your dock. Delays surface early, quietly, with a suggested fix — never a 4 a.m. surprise.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section id="how" class="how">
+    <div class="section-eyebrow reveal">How it works</div>
+    <h2 class="section-title reveal d1">From spec to dock in <i>three soft steps.</i></h2>
+    <div class="steps">
+      <div class="step reveal d1">
+        <div class="step-dot">1</div>
+        <h3>Sketch the widget</h3>
+        <p>Drop in a drawing or answer a few questions. Acme builds a complete, supplier-validated specification in under five minutes.</p>
+      </div>
+      <div class="step reveal d2">
+        <div class="step-dot">2</div>
+        <h3>Approve & order</h3>
+        <p>Compare transparent quotes, route approvals automatically, and place the order. Your ERP gets the paperwork before you finish your coffee.</p>
+      </div>
+      <div class="step reveal d3">
+        <div class="step-dot">3</div>
+        <h3>Watch it arrive</h3>
+        <p>Milestones glow along a single timeline. Quality checks, shipping events, and delivery windows — all visible, all calm.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUSTOMERS -->
+  <section id="customers">
+    <div class="quote-block reveal">
+      <span class="quote-mark">“</span>
+      <blockquote>We used to chase widget orders through four inboxes and a spreadsheet nobody trusted. Now the whole plant sees the same gentle timeline — and our on-time rate went from <i>81% to 97%</i> in two quarters.</blockquote>
+      <div class="quote-attr"><b>Mara Ellison</b>Director of Operations, Holloway Precision</div>
+    </div>
+    <div class="stats">
+      <div class="stat reveal d1"><div class="n" data-count="340" data-suffix="+">0</div><div class="l">Manufacturers running on Acme</div></div>
+      <div class="stat reveal d2"><div class="n" data-count="42" data-suffix="%">0</div><div class="l">Less time spent on order admin</div></div>
+      <div class="stat reveal d3"><div class="n" data-count="97" data-suffix="%">0</div><div class="l">Average on-time delivery rate</div></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="demo">
+    <div class="cta-box reveal">
+      <h2>Let your supply chain <i>exhale.</i></h2>
+      <p>Book a 30-minute demo. We'll walk your team through a real widget order — configured, quoted, and tracked — using your own specs.</p>
+      <form class="cta-form" id="demoForm">
+        <input type="email" id="email" placeholder="Your work email" required>
+        <button type="submit" class="btn">Book a demo <span class="arr">→</span></button>
+      </form>
+      <div class="cta-note" id="formNote">No commitment. No sales theatre. Just a calm walkthrough.</div>
+    </div>
+  </section>
+
+  <footer>
+    <div>© 2025 Acme Widget Systems, Inc.</div>
+    <div class="links"><a href="#platform">Platform</a><a href="#how">How it works</a><a href="#demo">Book a demo</a></div>
+  </footer>
+
+</main>
+
+<script>
+/* ---------- aurora canvas ---------- */
+const c = document.getElementById('aurora'), ctx = c.getContext('2d');
+let W, H;
+function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; }
+resize(); addEventListener('resize', resize);
+
+const blobs = [
+  {x:.18,y:.24,r:.42,hue:'185,168,242',sp:.00016,ph:0},
+  {x:.82,y:.18,r:.38,hue:'195,224,247',sp:.00021,ph:2.1},
+  {x:.70,y:.78,r:.45,hue:'255,217,196',sp:.00013,ph:4.2},
+  {x:.22,y:.85,r:.40,hue:'201,236,221',sp:.00019,ph:1.2}
+];
+
+let mouse = {x:.5,y:.4}, target = {x:.5,y:.4};
+addEventListener('mousemove', e => {
+  target.x = e.clientX / W; target.y = e.clientY / H;
+});
+
+function frame(t){
+  mouse.x += (target.x - mouse.x) * .03;
+  mouse.y += (target.y - mouse.y) * .03;
+  ctx.clearRect(0,0,W,H);
+  blobs.forEach((b,i) => {
+    const bx = (b.x + Math.sin(t*b.sp + b.ph) * .06 + (mouse.x - .5) * .05 * (i%2?1:-1)) * W;
+    const by = (b.y + Math.cos(t*b.sp*1.3 + b.ph) * .07 + (mouse.y - .5) * .05) * H;
+    const br = b.r * Math.min(W,H) * (1 + Math.sin(t*b.sp*2 + b.ph) * .08);
+    const g = ctx.createRadialGradient(bx,by,0,bx,by,br);
+    g.addColorStop(0, `rgba(${b.hue},0.30)`);
+    g.addColorStop(.55, `rgba(${b.hue},0.12)`);
+    g.addColorStop(1, `rgba(${b.hue},0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(bx,by,br,0,Math.PI*2); ctx.fill();
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------- nav scroll state ---------- */
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', scrollY > 40);
+}, {passive:true});
+
+/* ---------- scroll reveal ---------- */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold:.15});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ---------- stat counters ---------- */
+const statIO = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target, end = +el.dataset.count, suf = el.dataset.suffix || '';
+    const t0 = performance.now(), dur = 1600;
+    (function step(t){
+      const p = Math.min((t - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(end * eased) + suf;
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+    statIO.unobserve(el);
+  });
+}, {threshold:.6});
+document.querySelectorAll('.stat .n').forEach(el => statIO.observe(el));
+
+/* ---------- demo form ---------- */
+document.getElementById('demoForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const note = document.getElementById('formNote');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){
+    note.textContent = 'Hmm — that email looks a little cloudy. Mind checking it?';
+    note.style.color = '#c97b5a';
+    return;
+  }
+  note.textContent = 'Lovely. We’ll reach out within one business day to schedule your walkthrough.';
+  note.style.color = '#6fa287';
+  document.getElementById('email').value = '';
+});
+</script>
+</body>
+</html>

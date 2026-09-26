@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8f6ef">
+  <meta name="description" content="Configure, order, and track custom widgets in one place. Acme helps manufacturing operations teams keep every moving part moving.">
+  <title>Acme — Custom widgets. No chaos.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f8f6ef;
+      --ink: #181b20;
+      --blue: #3343e8;
+      --lime: #d9fc57;
+      --peach: #ffb796;
+      --lavender: #dcd8ff;
+      --line: #24272b;
+      --mono: "DM Mono", monospace;
+      --body: "Space Grotesk", sans-serif;
+      --display: "Archivo Black", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); }
+    button, input { font: inherit; }
+    a { color: inherit; }
+    ::selection { background: var(--lime); color: var(--ink); }
+
+    .container { width: min(1280px, calc(100% - 96px)); margin-inline: auto; }
+    .eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: .07em; text-transform: uppercase; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 18px;
+      min-height: 54px; padding: 0 22px; border: 2px solid var(--ink);
+      background: var(--lime); color: var(--ink); text-decoration: none;
+      font-size: 15px; font-weight: 700; white-space: nowrap;
+      box-shadow: 5px 5px 0 var(--ink); cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .button:hover { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); background: #e7ff91; }
+    .button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #fa7c51; outline-offset: 4px; }
+    .button .arrow { font-size: 23px; line-height: 1; font-weight: 400; }
+    .button-dark { background: var(--ink); color: white; box-shadow: 5px 5px 0 var(--blue); }
+    .button-dark:hover { background: #363940; box-shadow: 2px 2px 0 var(--blue); }
+
+    /* Navigation */
+    .site-header { border-bottom: 2px solid var(--ink); }
+    .nav { height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 36px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--display); font-size: 29px; letter-spacing: -.075em; }
+    .brand-mark { width: 31px; height: 31px; fill: var(--blue); flex: none; }
+    .nav-links { display: flex; align-items: center; gap: 36px; margin-left: auto; }
+    .nav-links a { font-size: 14px; font-weight: 700; text-decoration: none; }
+    .nav-links a:hover { color: var(--blue); }
+    .nav .button { min-height: 45px; padding-inline: 16px; font-size: 13px; box-shadow: 4px 4px 0 var(--ink); }
+
+    /* Hero */
+    .hero { overflow: hidden; }
+    .hero-inner { display: grid; grid-template-columns: 1.04fr .96fr; align-items: center; gap: 45px; padding-top: 68px; padding-bottom: 82px; }
+    .hero-copy { position: relative; z-index: 1; }
+    .hero .eyebrow { display: flex; align-items: center; gap: 11px; margin-bottom: 24px; }
+    .eyebrow-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 4px #dce0ff; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      margin-bottom: 26px; font-family: var(--display); font-size: clamp(62px, 6.65vw, 96px);
+      line-height: .99; letter-spacing: -.07em; text-transform: uppercase;
+    }
+    h1 .blue { color: var(--blue); }
+    .hero-description { max-width: 510px; margin-bottom: 30px; font-size: 20px; line-height: 1.48; letter-spacing: -.025em; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 22px; }
+    .hero-note { font: 500 12px/1.4 var(--mono); color: #51545a; }
+    .hero-note span { color: var(--blue); font-size: 18px; vertical-align: -2px; }
+
+    .hero-art {
+      height: 552px; position: relative; isolation: isolate; overflow: hidden;
+      border: 2px solid var(--ink); background: var(--blue);
+      box-shadow: 10px 10px 0 var(--ink);
+    }
+    .hero-art::before {
+      content: ""; position: absolute; inset: 0; opacity: .24;
+      background-image: linear-gradient(#a8b0ff 1px, transparent 1px), linear-gradient(90deg, #a8b0ff 1px, transparent 1px);
+      background-size: 34px 34px; transform: rotate(-12deg) scale(1.35);
+    }
+    .hero-art::after {
+      content: ""; position: absolute; width: 410px; height: 410px; border: 2px dashed rgba(255,255,255,.55);
+      border-radius: 50%; left: 50%; top: 48%; transform: translate(-50%, -50%); pointer-events: none;
+    }
+    .art-topline { position: absolute; top: 21px; left: 23px; right: 23px; z-index: 3; display: flex; justify-content: space-between; color: white; font: 500 11px var(--mono); letter-spacing: .06em; }
+    .widget-svg { position: absolute; z-index: 1; width: 100%; height: 100%; inset: 0; filter: drop-shadow(0 21px 0 rgba(12,18,80,.25)); }
+    .art-card {
+      position: absolute; z-index: 3; display: flex; gap: 10px; align-items: center;
+      padding: 12px 14px; background: var(--paper); border: 2px solid var(--ink);
+      box-shadow: 5px 5px 0 var(--ink); font: 500 11px/1.35 var(--mono);
+    }
+    .art-card strong { display: block; font-family: var(--body); font-size: 15px; line-height: 1.2; }
+    .art-card small { color: #65666a; font-size: 10px; }
+    .card-spec { top: 104px; left: 22px; transform: rotate(-7deg); }
+    .card-track { right: 17px; top: 153px; transform: rotate(6deg); }
+    .card-order { bottom: 62px; left: 30px; transform: rotate(5deg); }
+    .card-icon { display: grid; place-items: center; width: 32px; height: 32px; flex: none; background: var(--lime); border: 1.5px solid var(--ink); font-size: 19px; }
+    .card-track .card-icon { background: var(--peach); }
+    .card-order .card-icon { background: var(--lavender); }
+    .art-sticker {
+      position: absolute; z-index: 4; right: 25px; bottom: 26px; width: 115px; height: 115px;
+      display: grid; place-items: center; text-align: center; border-radius: 50%;
+      border: 2px solid var(--ink); background: var(--lime); transform: rotate(14deg);
+      font: 500 12px/1.25 var(--mono); box-shadow: 5px 5px 0 var(--ink);
+    }
+    .art-sticker b { font-family: var(--display); font-size: 18px; letter-spacing: -.05em; }
+
+    /* Marquee */
+    .ticker { overflow: hidden; background: var(--ink); color: var(--lime); border-block: 2px solid var(--ink); }
+    .ticker-track { width: max-content; display: flex; align-items: center; gap: 34px; min-height: 66px; animation: drift 32s linear infinite; }
+    .ticker-track span { font-family: var(--display); font-size: 20px; letter-spacing: -.035em; white-space: nowrap; }
+    .ticker-track i { font-style: normal; font-size: 24px; color: var(--peach); }
+    @keyframes drift { to { transform: translateX(-50%); } }
+
+    /* Features */
+    .features { padding: 112px 0 120px; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 40px; }
+    .section-heading h2, .platform-copy h2, .steps h2, .final-cta h2 {
+      font-family: var(--display); font-size: clamp(44px, 5vw, 68px); line-height: 1.04;
+      letter-spacing: -.065em; text-transform: uppercase;
+    }
+    .section-heading h2 { max-width: 870px; margin: 16px 0 0; }
+    .section-heading h2 em { color: var(--blue); font-style: normal; }
+    .section-aside { max-width: 245px; margin: 0 0 5px; font-size: 15px; line-height: 1.5; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .feature-card { min-height: 343px; padding: 25px 27px 29px; border: 2px solid var(--ink); display: flex; flex-direction: column; }
+    .feature-card:nth-child(1) { background: var(--lavender); }
+    .feature-card:nth-child(2) { background: var(--lime); }
+    .feature-card:nth-child(3) { background: var(--peach); }
+    .feature-top { display: flex; justify-content: space-between; align-items: start; font: 500 12px var(--mono); }
+    .feature-illustration { height: 127px; display: grid; place-items: center; }
+    .feature-illustration svg { width: 135px; height: 115px; overflow: visible; }
+    .feature-card h3 { margin: auto 0 9px; font-family: var(--display); font-size: 23px; line-height: 1.15; letter-spacing: -.055em; text-transform: uppercase; }
+    .feature-card p { margin: 0; max-width: 340px; font-size: 15px; line-height: 1.5; }
+
+    /* Platform */
+    .platform { background: #eae9e1; border-block: 2px solid var(--ink); overflow: hidden; }
+    .platform-inner { display: grid; grid-template-columns: .78fr 1.22fr; gap: 72px; align-items: center; padding-block: 110px; }
+    .platform-copy h2 { margin: 17px 0 23px; }
+    .platform-copy h2 span { color: var(--blue); }
+    .platform-copy > p { max-width: 390px; font-size: 18px; line-height: 1.5; }
+    .check-list { list-style: none; padding: 0; margin: 28px 0 36px; }
+    .check-list li { display: flex; align-items: center; gap: 12px; margin: 13px 0; font-size: 15px; font-weight: 700; }
+    .check-list li::before { content: "✓"; display: grid; place-items: center; width: 23px; height: 23px; flex: none; border-radius: 50%; background: var(--lime); border: 1.5px solid var(--ink); font-size: 14px; }
+    .app-wrap { position: relative; padding: 25px 14px 14px 0; }
+    .app-wrap::before { content: ""; position: absolute; inset: 42px 0 0 24px; background: var(--blue); border: 2px solid var(--ink); transform: rotate(3deg); }
+    .app-window { position: relative; border: 2px solid var(--ink); background: #fff; box-shadow: 8px 8px 0 var(--ink); }
+    .app-bar { height: 43px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; background: var(--ink); color: white; font: 11px var(--mono); }
+    .window-dots { display: flex; gap: 6px; }
+    .window-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--peach); }
+    .window-dots i:nth-child(2) { background: var(--lime); }
+    .window-dots i:nth-child(3) { background: var(--lavender); }
+    .app-body { display: grid; grid-template-columns: 142px 1fr; min-height: 360px; }
+    .app-sidebar { padding: 23px 12px; background: #f3f2ec; border-right: 1.5px solid var(--ink); }
+    .app-logo { font-family: var(--display); font-size: 18px; letter-spacing: -.06em; margin: 0 0 29px 8px; }
+    .app-link { padding: 9px 10px; margin-bottom: 5px; font-size: 11px; font-weight: 700; }
+    .app-link.active { background: var(--lime); border: 1.5px solid var(--ink); }
+    .app-content { padding: 24px 23px; min-width: 0; }
+    .app-content-header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+    .app-content h3 { margin: 2px 0 5px; font-family: var(--display); font-size: 24px; letter-spacing: -.05em; }
+    .app-content-header p { font: 10px var(--mono); color: #686b6d; }
+    .app-add { padding: 9px 12px; border: 1.5px solid var(--ink); background: var(--lime); font: 700 10px var(--body); white-space: nowrap; }
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 20px 0; }
+    .stat { padding: 12px; border: 1.5px solid var(--ink); background: #f8f6ef; }
+    .stat span { display: block; font: 9px var(--mono); text-transform: uppercase; }
+    .stat strong { display: block; margin-top: 5px; font-family: var(--display); font-size: 25px; letter-spacing: -.05em; }
+    .stat:nth-child(2) { background: #e9f8ae; }
+    .table-head, .table-row { display: grid; grid-template-columns: 1.3fr .75fr .9fr; align-items: center; gap: 8px; }
+    .table-head { padding: 9px 10px; background: var(--ink); color: white; font: 9px var(--mono); text-transform: uppercase; }
+    .table-row { min-height: 42px; padding: 8px 10px; border-bottom: 1px solid #dededb; font-size: 10px; font-weight: 700; }
+    .table-row > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pill { width: fit-content; padding: 4px 6px; background: #dce8fe; font: 9px var(--mono); white-space: nowrap; }
+    .pill.green { background: #dff3af; }
+    .pill.orange { background: #ffe3cb; }
+    .app-callout { position: absolute; right: -21px; bottom: -26px; padding: 11px 15px; background: var(--peach); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); font: 700 13px var(--body); transform: rotate(-5deg); }
+
+    /* Steps */
+    .steps { padding: 112px 0 125px; }
+    .steps h2 { max-width: 880px; margin: 18px 0 50px; }
+    .steps h2 span { color: var(--blue); }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid var(--ink); }
+    .step { padding: 30px 32px 35px; min-height: 236px; }
+    .step + .step { border-left: 2px solid var(--ink); }
+    .step-number { display: flex; justify-content: space-between; align-items: start; margin-bottom: 36px; font: 500 13px var(--mono); }
+    .step-number strong { font: 56px/.8 var(--display); color: var(--blue); letter-spacing: -.09em; }
+    .step h3 { margin-bottom: 9px; font-family: var(--display); font-size: 22px; letter-spacing: -.055em; text-transform: uppercase; }
+    .step p { max-width: 310px; margin: 0; font-size: 15px; line-height: 1.5; }
+
+    /* CTA and footer */
+    .final-cta { position: relative; overflow: hidden; background: var(--lime); border-block: 2px solid var(--ink); }
+    .final-cta::after { content: "✳"; position: absolute; right: -45px; top: -94px; font: 390px/1 var(--display); color: rgba(51,67,232,.13); transform: rotate(-15deg); pointer-events: none; }
+    .cta-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr .8fr; align-items: center; gap: 85px; padding-block: 92px; }
+    .final-cta h2 { max-width: 700px; margin: 17px 0 18px; }
+    .final-cta h2 span { color: var(--blue); }
+    .final-cta p { max-width: 480px; margin-bottom: 0; font-size: 18px; line-height: 1.5; }
+    .demo-form { padding: 27px; background: var(--paper); border: 2px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); }
+    .demo-form label { display: block; margin-bottom: 10px; font: 500 12px var(--mono); text-transform: uppercase; }
+    .demo-form input { width: 100%; height: 54px; padding: 0 15px; border: 2px solid var(--ink); border-radius: 0; background: white; font-size: 16px; }
+    .demo-form input::placeholder { color: #8a8c8c; }
+    .demo-form .button { width: 100%; margin-top: 13px; background: var(--blue); color: white; }
+    .demo-form .button:hover { background: #2533bf; }
+    .form-note { margin-top: 16px !important; font: 11px/1.5 var(--mono) !important; color: #5d5f61; }
+    .form-status { min-height: 0; margin-top: 8px; font-size: 12px; font-weight: 700; }
+    .footer { background: var(--ink); color: white; }
+    .footer-inner { min-height: 100px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .footer .brand { font-size: 25px; }
+    .footer .brand-mark { fill: var(--lime); width: 26px; height: 26px; }
+    .footer p { margin: 0; color: #b9b9b5; font: 11px var(--mono); }
+    .footer a:not(.brand) { color: var(--lime); font: 11px var(--mono); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 1100px) {
+      .container { width: min(100% - 56px, 1280px); }
+      .hero-inner { gap: 24px; }
+      h1 { font-size: clamp(58px, 6.4vw, 86px); }
+      .hero-art { height: 500px; }
+      .platform-inner { gap: 38px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: calc(100% - 36px); }
+      .nav { height: 72px; }
+      .nav-links { display: none; }
+      .nav .button { min-height: 42px; }
+      .hero-inner, .platform-inner, .cta-inner { grid-template-columns: 1fr; }
+      .hero-inner { padding: 55px 0 65px; gap: 52px; }
+      h1 { font-size: clamp(55px, 11vw, 86px); }
+      .hero-description { font-size: 18px; }
+      .hero-art { height: min(520px, 105vw); }
+      .section-heading { display: block; }
+      .section-heading h2, .platform-copy h2, .steps h2, .final-cta h2 { font-size: clamp(39px, 9vw, 60px); }
+      .section-aside { margin-top: 17px; }
+      .features, .steps { padding-block: 75px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 290px; }
+      .platform-inner { padding-block: 75px; }
+      .app-wrap { max-width: 650px; width: calc(100% - 15px); }
+      .steps-grid { grid-template-columns: 1fr; }
+      .step { min-height: 195px; }
+      .step + .step { border-left: 0; border-top: 2px solid var(--ink); }
+      .step-number { margin-bottom: 25px; }
+      .cta-inner { gap: 35px; padding-block: 72px; }
+    }
+    @media (max-width: 430px) {
+      .brand { font-size: 25px; }
+      .nav .button { font-size: 12px; padding-inline: 10px; }
+      h1 { font-size: clamp(49px, 11.7vw, 60px); }
+      .hero-art { height: 400px; }
+      .art-card { padding: 7px; }
+      .art-card strong { font-size: 11px; }
+      .art-card small { font-size: 8px; }
+      .card-icon { width: 25px; height: 25px; font-size: 15px; }
+      .card-spec { top: 76px; left: 8px; }
+      .card-track { top: 116px; right: 7px; }
+      .card-order { bottom: 48px; left: 9px; }
+      .art-sticker { width: 80px; height: 80px; right: 12px; bottom: 13px; font-size: 9px; }
+      .art-sticker b { font-size: 13px; }
+      .app-body { grid-template-columns: 83px 1fr; }
+      .app-sidebar { padding: 16px 5px; }
+      .app-logo { margin-left: 4px; font-size: 13px; }
+      .app-link { padding: 7px 3px; font-size: 8px; }
+      .app-content { padding: 16px 9px; }
+      .app-content h3 { font-size: 18px; }
+      .app-add { display: none; }
+      .stat { padding: 7px; }
+      .stat span, .table-head, .pill { font-size: 7px; }
+      .stat strong { font-size: 18px; }
+      .table-row { font-size: 8px; padding-inline: 5px; }
+      .app-callout { right: -12px; font-size: 10px; }
+      .footer-inner { padding-block: 25px; flex-wrap: wrap; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .ticker-track { animation: none; }
+      .button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 0 25.1 14.9 40 20l-14.9 5.1L20 40l-5.1-14.9L0 20l14.9-5.1z"/></svg>
+        acme
+      </a>
+      <div class="nav-links">
+        <a href="#why-acme">Why Acme</a>
+        <a href="#platform">The platform</a>
+        <a href="#how-it-works">How it works</a>
+      </div>
+      <a class="button" href="#book-demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner container">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> For the people who keep production moving</div>
+          <h1 id="hero-title">Custom<br><span class="blue">widgets.</span><br>No chaos.</h1>
+          <p class="hero-description">Configure, order, and track every custom widget in one place. Less spreadsheet archaeology. More things actually getting made.</p>
+          <div class="hero-actions">
+            <a class="button" href="#book-demo">Book your demo <span class="arrow" aria-hidden="true">↗</span></a>
+            <span class="hero-note"><span aria-hidden="true">✳</span> Your supply chain can exhale.</span>
+          </div>
+        </div>
+
+        <div class="hero-art" role="img" aria-label="Illustration of a custom widget surrounded by approved specifications, an order, and a tracking update">
+          <div class="art-topline"><span>ACME / WIDGET CONTROL</span><span>FIG. 01 — THE GOOD STUFF</span></div>
+          <svg class="widget-svg" viewBox="0 0 590 550" aria-hidden="true">
+            <defs>
+              <pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#171b20" opacity=".28"/></pattern>
+            </defs>
+            <circle cx="310" cy="272" r="174" fill="#6978fa" opacity=".42"/>
+            <path d="M102 284c-28 20-40 43-35 73m410-220c33 11 51 26 66 50" fill="none" stroke="#d9fc57" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 12"/>
+            <path d="m83 358 4-18 15 10m431-162-19 2 10-16" fill="none" stroke="#d9fc57" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Lower metal plate -->
+            <path d="M301 204 472 298 301 393 130 298Z" fill="#111a88" stroke="#181b20" stroke-width="5"/>
+            <path d="M130 298v39l171 95v-39Z" fill="#252a69" stroke="#181b20" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M472 298v39l-171 95v-39Z" fill="#171b45" stroke="#181b20" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M301 229 446 310 301 391 156 310Z" fill="#bdc5ff" stroke="#181b20" stroke-width="5"/>
+            <path d="M301 229 446 310 301 391 156 310Z" fill="url(#dots)" opacity=".35"/>
+            <!-- Raised widget body -->
+            <path d="M301 120 412 184 412 267 301 332 190 267 190 184Z" fill="#a4ca39" stroke="#181b20" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M190 184 301 248v84l-111-65Z" fill="#8da931" stroke="#181b20" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M412 184 301 248v84l111-65Z" fill="#b2dd42" stroke="#181b20" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M301 120 412 184 301 248 190 184Z" fill="#d9fc57" stroke="#181b20" stroke-width="6" stroke-linejoin="round"/>
+            <!-- Top opening -->
+            <path d="M301 151 356 183 301 215 246 183Z" fill="#181b20" stroke="#181b20" stroke-width="5"/>
+            <path d="M246 183v24l55 32v-24Zm110 0v24l-55 32v-24Z" fill="#293582" stroke="#181b20" stroke-width="4"/>
+            <path d="M301 170 332 188 301 206 270 188Z" fill="#7684ef"/>
+            <!-- Fixture points -->
+            <g fill="#f8f6ef" stroke="#181b20" stroke-width="4">
+              <circle cx="207" cy="185" r="8"/><circle cx="393" cy="185" r="8"/>
+              <circle cx="301" cy="230" r="7"/><circle cx="301" cy="136" r="7"/>
+            </g>
+            <path d="m211 277 19 11m-19 3 19 11m142-14 19-11m-19 25 19-11" stroke="#181b20" stroke-width="4" stroke-linecap="round"/>
+            <!-- Little flying hardware -->
+            <g stroke="#181b20" stroke-width="4" stroke-linejoin="round">
+              <path d="m112 163 22 13-22 13-22-13Z" fill="#ffb796"/><path d="M90 176v15l22 13v-15Zm44 0v15l-22 13v-15Z" fill="#e48e71"/>
+              <path d="m475 363 20 11-20 12-20-12Z" fill="#ffb796"/><path d="M455 374v13l20 12v-13Zm40 0v13l-20 12v-13Z" fill="#df8d70"/>
+            </g>
+            <path d="m462 96 8-21 8 21 21 8-21 8-8 21-8-21-21-8Z" fill="#d9fc57" stroke="#181b20" stroke-width="3"/>
+          </svg>
+          <div class="art-card card-spec"><span class="card-icon" aria-hidden="true">✓</span><span><strong>Spec approved</strong><small>Rev 3.2 · Ready to go</small></span></div>
+          <div class="art-card card-track"><span class="card-icon" aria-hidden="true">↗</span><span><strong>On track</strong><small>ETA: right on time</small></span></div>
+          <div class="art-card card-order"><span class="card-icon" aria-hidden="true">◈</span><span><strong>Order #0482</strong><small>Production underway</small></span></div>
+          <div class="art-sticker"><span>THAT'S A<br><b>YES.</b><br>↗ ↗ ↗</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>LESS CHASING</span><i>✳</i><span>MORE MAKING</span><i>✳</i><span>WIDGETS WITHOUT THE WILD GOOSE CHASE</span><i>✳</i>
+        <span>LESS CHASING</span><i>✳</i><span>MORE MAKING</span><i>✳</i><span>WIDGETS WITHOUT THE WILD GOOSE CHASE</span><i>✳</i>
+      </div>
+    </div>
+
+    <section class="features" id="why-acme" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">01 / The problem, solved</div>
+            <h2 id="features-title">Supply chain spaghetti? <em>Consider it untangled.</em></h2>
+          </div>
+          <p class="section-aside">Your widgets have enough moving parts. Managing them shouldn't add more.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-top"><span>01 / CONFIGURE</span><span aria-hidden="true">↗</span></div>
+            <div class="feature-illustration">
+              <svg viewBox="0 0 135 115" aria-hidden="true">
+                <rect x="19" y="19" width="81" height="73" fill="#f8f6ef" stroke="#181b20" stroke-width="3" transform="rotate(-8 59 55)"/>
+                <rect x="33" y="11" width="81" height="73" fill="#fff" stroke="#181b20" stroke-width="3" transform="rotate(5 73 47)"/>
+                <path d="M54 33h39M52 47h26M50 61h34" stroke="#181b20" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="104" cy="79" r="20" fill="#3343e8" stroke="#181b20" stroke-width="3"/>
+                <path d="m95 79 6 6 12-14" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Specs that stick</h3>
+            <p>Build the exact widget you need and keep its approved specs in one place. No more “which version is final?”</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-top"><span>02 / ORDER</span><span aria-hidden="true">↗</span></div>
+            <div class="feature-illustration">
+              <svg viewBox="0 0 135 115" aria-hidden="true">
+                <path d="M28 30 68 9l40 21v52l-40 22-40-22Z" fill="#f8f6ef" stroke="#181b20" stroke-width="3" stroke-linejoin="round"/>
+                <path d="m28 30 40 22 40-22M68 52v52" fill="none" stroke="#181b20" stroke-width="3"/>
+                <path d="m45 21 41 22v17l-12-6V37" fill="#ffb796" stroke="#181b20" stroke-width="3" stroke-linejoin="round"/>
+                <path d="m77 74 8 8 14-17" fill="none" stroke="#3343e8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Orders without oops</h3>
+            <p>Turn approved configurations into orders your team can actually follow, with the details already attached.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-top"><span>03 / TRACK</span><span aria-hidden="true">↗</span></div>
+            <div class="feature-illustration">
+              <svg viewBox="0 0 135 115" aria-hidden="true">
+                <path d="M22 81h91" stroke="#181b20" stroke-width="3" stroke-linecap="round"/>
+                <path d="M27 69 53 55l19 9 34-36" fill="none" stroke="#181b20" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M27 69 53 55l19 9 34-36" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="27" cy="69" r="8" fill="#d9fc57" stroke="#181b20" stroke-width="3"/>
+                <circle cx="53" cy="55" r="8" fill="#d9fc57" stroke="#181b20" stroke-width="3"/>
+                <circle cx="72" cy="64" r="8" fill="#d9fc57" stroke="#181b20" stroke-width="3"/>
+                <path d="m93 27 15-2-2 15" fill="none" stroke="#181b20" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Visibility, not vibes</h3>
+            <p>See where each order stands across your supply chain. Get the answer before someone has to ask.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="platform" id="platform" aria-labelledby="platform-title">
+      <div class="platform-inner container">
+        <div class="platform-copy">
+          <div class="eyebrow">02 / Your new command center</div>
+          <h2 id="platform-title">One place.<br>Every widget.<br><span>Every moving part.</span></h2>
+          <p>Acme connects the work between “we need this” and “it's here.” Your team gets a clear view from first configuration to final delivery.</p>
+          <ul class="check-list">
+            <li>Configurations everyone can find</li>
+            <li>Orders with the right details, every time</li>
+            <li>Progress you don't have to chase</li>
+          </ul>
+          <a class="button button-dark" href="#book-demo">See Acme in action <span class="arrow" aria-hidden="true">↗</span></a>
+        </div>
+        <div class="app-wrap" aria-label="Illustrative preview of the Acme order dashboard">
+          <div class="app-window">
+            <div class="app-bar"><div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div><span>THE ACME PLATFORM</span><span>↗</span></div>
+            <div class="app-body">
+              <div class="app-sidebar">
+                <div class="app-logo">✳ acme</div>
+                <div class="app-link">Overview</div>
+                <div class="app-link">Configurations</div>
+                <div class="app-link active">Orders ↗</div>
+                <div class="app-link">Suppliers</div>
+              </div>
+              <div class="app-content">
+                <div class="app-content-header">
+                  <div><h3>Orders</h3><p>Everything's moving. Here's where.</p></div>
+                  <span class="app-add">+ New order</span>
+                </div>
+                <div class="stat-row">
+                  <div class="stat"><span>Active orders</span><strong>24</strong></div>
+                  <div class="stat"><span>On track</span><strong>21</strong></div>
+                  <div class="stat"><span>Need a look</span><strong>03</strong></div>
+                </div>
+                <div class="table-head"><span>Widget / order</span><span>Qty</span><span>Status</span></div>
+                <div class="table-row"><span>Housing A-12 · #0482</span><span>1,200</span><span class="pill green">In production</span></div>
+                <div class="table-row"><span>Coupler C-07 · #0481</span><span>800</span><span class="pill">In transit</span></div>
+                <div class="table-row"><span>Bracket B-04 · #0480</span><span>2,400</span><span class="pill orange">Review needed</span></div>
+                <div class="table-row"><span>Mount M-21 · #0479</span><span>600</span><span class="pill green">In production</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="app-callout">Ah. There's the answer. ↗</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="steps" id="how-it-works" aria-labelledby="steps-title">
+      <div class="container">
+        <div class="eyebrow">03 / Beautifully straightforward</div>
+        <h2 id="steps-title">From “we need a widget” to <span>“we've got this.”</span></h2>
+        <div class="steps-grid">
+          <article class="step">
+            <div class="step-number"><span>FIRST UP</span><strong>01</strong></div>
+            <h3>Make it yours</h3>
+            <p>Configure your widget to the specs your operation actually needs.</p>
+          </article>
+          <article class="step">
+            <div class="step-number"><span>THEN</span><strong>02</strong></div>
+            <h3>Get it moving</h3>
+            <p>Place an order with the right configuration and details already in tow.</p>
+          </article>
+          <article class="step">
+            <div class="step-number"><span>ALL THE WAY HOME</span><strong>03</strong></div>
+            <h3>Know what's next</h3>
+            <p>Follow progress across your supply chain without playing inbox detective.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" id="book-demo" aria-labelledby="cta-title">
+      <div class="cta-inner container">
+        <div>
+          <div class="eyebrow">Ready when you are ↗</div>
+          <h2 id="cta-title">Let's make widgets <span>less weird.</span></h2>
+          <p>See how Acme can bring a little order to your widget operations. Tell us where to reach you and let's talk.</p>
+        </div>
+        <form class="demo-form" id="demo-form">
+          <label for="email">Your work email</label>
+          <input id="email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required>
+          <button class="button" type="submit">Let's book a demo <span class="arrow" aria-hidden="true">↗</span></button>
+          <p class="form-note">No mystery pitch. Just a conversation about your operation.</p>
+          <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner container">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 0 25.1 14.9 40 20l-14.9 5.1L20 40l-5.1-14.9L0 20l14.9-5.1z"/></svg>
+        acme
+      </a>
+      <p>Custom widgets. No chaos. © <span id="year">2026</span> Acme.</p>
+      <a href="mailto:hello@acme.com">Say hello ↗</a>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('demo-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const email = document.getElementById('email');
+      if (!email.reportValidity()) return;
+      const subject = encodeURIComponent('Let’s book an Acme demo');
+      const body = encodeURIComponent('Hi Acme,\n\nI’d like to book a demo. You can reach me at ' + email.value.trim() + '.\n\nThanks!');
+      document.getElementById('form-status').textContent = 'Opening your email app to send your demo request…';
+      window.location.href = 'mailto:hello@acme.com?subject=' + subject + '&body=' + body;
+    });
+  </script>
+</body>
+</html>

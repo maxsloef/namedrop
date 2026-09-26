@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eef1f0">
+  <meta name="description" content="Acme brings custom widget configuration, ordering, and supply-chain tracking into one connected workspace.">
+  <title>Acme — Every widget, under control.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #eef1f0;
+      --white: #fbfcfa;
+      --ink: #101c22;
+      --muted: #59666b;
+      --line: #cbd2d0;
+      --blue: #2048ed;
+      --blue-dark: #1539ce;
+      --cyan: #a9efff;
+      --mono: "DM Mono", monospace;
+      --sans: "Space Grotesk", Arial, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    body.modal-open { overflow: hidden; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--cyan); color: var(--ink); }
+    .shell { width: min(100% - 112px, 1328px); margin-inline: auto; }
+    .mono { font-family: var(--mono); font-size: 11px; font-weight: 400; letter-spacing: .065em; text-transform: uppercase; }
+    .section-index { color: var(--blue); }
+    .arrow { display: inline-block; transition: transform .2s ease; }
+    a:hover .arrow, button:hover .arrow { transform: translate(3px, -3px); }
+
+    /* Navigation */
+    .site-header { height: 80px; border-bottom: 1px solid var(--line); background: var(--paper); }
+    .nav-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; }
+    .brand-mark { width: 29px; height: 29px; display: block; }
+    .brand-word { font-weight: 700; font-size: 25px; line-height: 1; letter-spacing: -.085em; }
+    .nav-right { display: flex; align-items: center; gap: 51px; height: 100%; }
+    .nav-links { display: flex; gap: 34px; align-items: center; }
+    .nav-links a { font-size: 13px; font-weight: 600; transition: color .2s; }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-cta { height: 41px; border: 1px solid var(--ink); background: var(--ink); color: white; padding: 0 18px; display: inline-flex; align-items: center; gap: 34px; font-size: 12px; font-weight: 600; transition: background .2s, border-color .2s; }
+    .nav-cta:hover { background: var(--blue); border-color: var(--blue); }
+
+    /* Hero */
+    .hero { padding-top: 27px; }
+    .hero-eyebrow { display: flex; justify-content: space-between; align-items: center; padding-bottom: 23px; border-bottom: 1px solid var(--line); color: var(--muted); }
+    .hero-eyebrow span:first-child { color: var(--blue); }
+    .hero-main { display: grid; grid-template-columns: minmax(0, 1.19fr) minmax(0, .81fr); min-height: 618px; }
+    .hero-copy { padding: 51px 38px 42px 0; display: flex; flex-direction: column; align-items: flex-start; }
+    .hero-kicker { display: flex; gap: 11px; align-items: center; color: var(--blue); }
+    .kicker-square { width: 8px; height: 8px; background: var(--blue); }
+    h1 { margin: 37px 0 0; font-size: clamp(60px, 5.55vw, 82px); line-height: .98; letter-spacing: -.088em; font-weight: 600; text-transform: uppercase; }
+    h1 span { display: block; white-space: nowrap; }
+    h1 .outline { color: transparent; -webkit-text-stroke: 1.7px var(--ink); }
+    .hero-bottom { margin-top: auto; width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; }
+    .hero-description { max-width: 398px; font-size: 17px; line-height: 1.47; letter-spacing: -.025em; margin: 0 0 23px; }
+    .primary-btn { border: 0; background: var(--blue); color: white; min-height: 54px; padding: 0 18px 0 22px; display: inline-flex; align-items: center; justify-content: space-between; gap: 48px; font-size: 13px; font-weight: 600; transition: background .2s, transform .2s; }
+    .primary-btn:hover { background: var(--blue-dark); transform: translateY(-2px); }
+    .hero-side-note { writing-mode: vertical-rl; transform: rotate(180deg); color: var(--muted); padding-bottom: 3px; }
+
+    .blueprint { min-height: 618px; background: var(--blue); color: white; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .blueprint::before { content: ""; position: absolute; inset: 0; opacity: .17; pointer-events: none; background-image: linear-gradient(#c8e8ff 1px, transparent 1px), linear-gradient(90deg, #c8e8ff 1px, transparent 1px); background-size: 32px 32px; background-position: 12px 10px; }
+    .blueprint::after { content: ""; position: absolute; inset: 0; opacity: .14; pointer-events: none; background-image: linear-gradient(#e0f2ff 1px, transparent 1px), linear-gradient(90deg, #e0f2ff 1px, transparent 1px); background-size: 128px 128px; background-position: 12px 10px; }
+    .bp-top, .bp-bottom { z-index: 1; position: relative; display: flex; justify-content: space-between; align-items: center; }
+    .bp-top { margin: 25px 27px 0; }
+    .bp-code { border: 1px solid rgba(255,255,255,.66); padding: 7px 9px; }
+    .bp-visual { position: relative; flex: 1; min-height: 0; display: grid; place-items: center; z-index: 1; }
+    .bp-visual svg { width: 100%; max-width: 555px; height: auto; display: block; filter: drop-shadow(0 14px 21px rgba(0, 17, 94, .16)); }
+    .bp-bottom { margin: 0 27px 27px; border-top: 1px solid rgba(255,255,255,.55); padding-top: 16px; }
+    .bp-bottom-right { display: flex; gap: 26px; }
+    .bp-watermark { position: absolute; bottom: 51px; left: 24px; font-size: 107px; letter-spacing: -.12em; font-weight: 700; line-height: .8; color: rgba(255,255,255,.09); z-index: 0; pointer-events: none; }
+
+    .proof { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1.12fr repeat(3, 1fr); min-height: 117px; }
+    .proof-label, .proof-item { padding: 24px 25px; display: flex; flex-direction: column; justify-content: space-between; }
+    .proof-label { padding-left: 0; color: var(--muted); }
+    .proof-item { border-left: 1px solid var(--line); }
+    .proof-item strong { font-size: 23px; font-weight: 500; line-height: 1; letter-spacing: -.055em; }
+    .proof-item span { color: var(--muted); }
+
+    /* Platform */
+    .platform { padding: 121px 0 125px; }
+    .section-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 45px; align-items: end; margin-bottom: 56px; }
+    .section-heading h2, .workflow-heading h2, .final-cta h2 { margin: 19px 0 0; font-size: clamp(43px, 4.15vw, 61px); line-height: 1.04; letter-spacing: -.072em; font-weight: 600; text-transform: uppercase; }
+    .section-heading p { max-width: 405px; justify-self: end; margin: 0 0 4px; font-size: 17px; line-height: 1.55; letter-spacing: -.025em; color: #3f4d51; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line); }
+    .feature { min-height: 395px; padding: 23px 29px 30px 0; display: flex; flex-direction: column; }
+    .feature + .feature { border-left: 1px solid var(--line); padding-left: 29px; }
+    .feature-top { display: flex; justify-content: space-between; align-items: center; }
+    .feature-icon { height: 122px; display: flex; align-items: center; margin: 28px 0 10px; }
+    .feature-icon svg { width: 118px; height: 118px; }
+    .feature h3 { margin: auto 0 10px; font-size: 26px; letter-spacing: -.055em; font-weight: 600; }
+    .feature p { margin: 0; max-width: 310px; line-height: 1.52; font-size: 14px; color: #526064; }
+
+    /* Workflow */
+    .workflow { background: var(--ink); color: var(--white); padding: 98px 0 106px; }
+    .workflow .section-index { color: var(--cyan); }
+    .workflow-heading { display: flex; justify-content: space-between; align-items: end; margin-bottom: 50px; }
+    .workflow-heading h2 { max-width: 750px; }
+    .workflow-heading p { width: 235px; color: #a8b6b8; font-size: 14px; line-height: 1.55; margin: 0 0 5px; }
+    .workflow-body { display: grid; grid-template-columns: .75fr 1.25fr; border-top: 1px solid #546166; border-bottom: 1px solid #546166; }
+    .steps { display: flex; flex-direction: column; }
+    .step { flex: 1; width: 100%; text-align: left; display: grid; grid-template-columns: 50px 1fr 20px; align-items: center; gap: 12px; padding: 22px 24px 22px 0; background: transparent; border: 0; border-bottom: 1px solid #465358; color: #91a0a4; transition: color .2s, padding-left .2s; }
+    .step:last-child { border-bottom: 0; }
+    .step.active, .step:hover { color: white; }
+    .step.active { padding-left: 11px; }
+    .step.active .step-num { color: var(--cyan); }
+    .step-title { display: block; font-size: 25px; font-weight: 500; letter-spacing: -.05em; line-height: 1.15; }
+    .step-caption { display: block; margin-top: 8px; font-size: 12px; line-height: 1.45; color: #a6b3b6; max-width: 290px; }
+    .step-arrow { color: var(--cyan); font-size: 19px; opacity: 0; }
+    .step.active .step-arrow { opacity: 1; }
+    .dashboard { min-height: 440px; background: #e8eeed; color: var(--ink); margin: 26px 0 26px 35px; box-shadow: 15px 15px 0 rgba(255,255,255,.045); }
+    .dash-header { height: 48px; border-bottom: 1px solid #c6d0ce; display: flex; justify-content: space-between; align-items: center; padding: 0 19px; }
+    .dash-brand { font-weight: 700; font-size: 18px; letter-spacing: -.09em; }
+    .dash-brand span { color: var(--blue); }
+    .dash-content { padding: 23px 26px 26px; }
+    .dash-overline { color: var(--muted); display: flex; justify-content: space-between; }
+    .dash-content h3 { font-size: 26px; letter-spacing: -.055em; font-weight: 600; margin: 10px 0 22px; }
+    .dash-panels { display: grid; grid-template-columns: 1.03fr .97fr; gap: 13px; }
+    .dash-drawing { height: 217px; background: #dce6e4; border: 1px solid #c8d3d0; position: relative; display: grid; place-items: center; background-image: linear-gradient(#cddad7 1px, transparent 1px), linear-gradient(90deg, #cddad7 1px, transparent 1px); background-size: 20px 20px; }
+    .dash-drawing svg { width: 75%; max-height: 185px; }
+    .dash-drawing .drawing-label { position: absolute; bottom: 12px; left: 12px; color: var(--muted); }
+    .dash-details { border: 1px solid #c8d3d0; background: #f3f6f4; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; }
+    .detail-row { border-bottom: 1px solid #d2dcd9; padding: 0 0 9px; margin-bottom: 9px; display: flex; justify-content: space-between; gap: 8px; }
+    .detail-row:last-of-type { border-bottom: 0; }
+    .detail-row span:first-child { color: #657277; }
+    .detail-row span:last-child { text-align: right; }
+    .status { color: #1257be; }
+    .dash-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+    .progress { width: 44%; height: 4px; background: #c5d2cf; }
+    .progress i { display: block; width: 68%; height: 100%; background: var(--blue); transition: width .3s ease; }
+
+    /* CTA + footer */
+    .final-cta { padding: 102px 0 104px; background: var(--blue); color: white; position: relative; overflow: hidden; }
+    .final-cta::after { content: "+"; position: absolute; right: 48px; top: -155px; font-family: var(--sans); font-size: 520px; line-height: 1; font-weight: 400; color: rgba(255,255,255,.065); pointer-events: none; }
+    .cta-inner { position: relative; z-index: 1; }
+    .final-cta .mono { color: #d1dcff; }
+    .final-cta h2 { font-size: clamp(54px, 6vw, 86px); max-width: 900px; margin: 22px 0 37px; }
+    .cta-lower { display: flex; justify-content: space-between; align-items: end; gap: 30px; }
+    .cta-lower p { font-size: 17px; line-height: 1.5; max-width: 370px; margin: 0; }
+    .white-btn { border: 0; background: white; color: var(--ink); min-width: 223px; min-height: 57px; display: inline-flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 13px; font-weight: 700; transition: transform .2s, background .2s; }
+    .white-btn:hover { background: var(--cyan); transform: translateY(-2px); }
+    .site-footer { background: var(--paper); padding: 42px 0 25px; }
+    .footer-top { display: flex; justify-content: space-between; align-items: start; padding-bottom: 60px; }
+    .footer-note { max-width: 230px; font-size: 13px; line-height: 1.5; color: var(--muted); margin: 20px 0 0; }
+    .footer-links { display: flex; gap: 75px; }
+    .footer-links > div { display: flex; flex-direction: column; gap: 12px; }
+    .footer-links .mono { color: var(--muted); margin-bottom: 5px; }
+    .footer-links a { font-size: 13px; }
+    .footer-links a:hover { color: var(--blue); }
+    .footer-bottom { border-top: 1px solid var(--line); padding-top: 18px; display: flex; justify-content: space-between; color: var(--muted); }
+
+    /* Demo dialog */
+    .modal-backdrop { position: fixed; inset: 0; z-index: 20; background: rgba(8, 20, 27, .75); display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(100%, 520px); background: var(--paper); padding: 32px; position: relative; box-shadow: 18px 18px 0 rgba(32,72,237,.45); }
+    .modal-head { display: flex; justify-content: space-between; align-items: start; }
+    .modal-close { border: 1px solid var(--line); background: transparent; width: 34px; height: 34px; font-size: 21px; line-height: 1; }
+    .modal h2 { font-size: 40px; line-height: 1.05; letter-spacing: -.07em; text-transform: uppercase; margin: 28px 0 10px; }
+    .modal p { margin: 0 0 26px; font-size: 14px; line-height: 1.55; color: var(--muted); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 17px; }
+    .field label { font-size: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    .field input, .field select { width: 100%; height: 44px; background: var(--white); border: 1px solid #b7c1bf; border-radius: 0; padding: 0 12px; color: var(--ink); outline: none; font-size: 13px; }
+    .field input:focus, .field select:focus { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
+    .form-submit { width: 100%; margin-top: 7px; }
+    .form-success { display: none; padding: 35px 0 12px; }
+    .form-success .success-icon { width: 50px; height: 50px; background: var(--blue); color: white; display: grid; place-items: center; font-size: 27px; margin-bottom: 23px; }
+    .form-success h2 { margin-top: 0; }
+
+    @media (max-width: 1050px) {
+      .shell { width: min(100% - 64px, 1328px); }
+      .hero-main { grid-template-columns: 1fr .85fr; }
+      h1 { font-size: clamp(53px, 6vw, 76px); }
+      .hero-copy { padding-right: 20px; }
+      .blueprint, .hero-main { min-height: 565px; }
+      .proof { grid-template-columns: repeat(4, 1fr); }
+      .workflow-body { grid-template-columns: .85fr 1.15fr; }
+    }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 36px, 1328px); }
+      .site-header { height: 68px; }
+      .nav-links { display: none; }
+      .nav-right { gap: 0; }
+      .nav-cta { gap: 13px; padding: 0 12px; }
+      .hero { padding-top: 17px; }
+      .hero-eyebrow span:last-child { display: none; }
+      .hero-main { display: flex; flex-direction: column; }
+      .hero-copy { min-height: 530px; padding: 38px 0 36px; }
+      h1 { font-size: clamp(49px, 10vw, 78px); margin-top: 36px; }
+      .hero-bottom { margin-top: 48px; }
+      .hero-description { font-size: 16px; }
+      .hero-side-note { display: none; }
+      .blueprint { min-height: 480px; }
+      .bp-visual svg { max-width: 470px; }
+      .proof { grid-template-columns: repeat(2, 1fr); }
+      .proof-label, .proof-item { min-height: 100px; padding: 20px 12px; }
+      .proof-label { padding-left: 0; }
+      .proof-item:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
+      .proof-item:nth-child(4) { border-top: 1px solid var(--line); }
+      .platform { padding: 80px 0; }
+      .section-heading { grid-template-columns: 1fr; gap: 20px; margin-bottom: 38px; }
+      .section-heading p { justify-self: start; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature { min-height: 290px; padding: 22px 0 26px; }
+      .feature + .feature { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
+      .feature-icon { height: 100px; margin: 17px 0; }
+      .feature-icon svg { height: 100px; width: 100px; }
+      .workflow { padding: 75px 0; }
+      .workflow-heading { display: block; }
+      .workflow-heading p { margin-top: 22px; }
+      .workflow-body { grid-template-columns: 1fr; }
+      .step { min-height: 100px; }
+      .dashboard { margin: 25px 0; }
+      .final-cta { padding: 77px 0; }
+      .final-cta h2 { font-size: clamp(50px, 9vw, 75px); }
+      .cta-lower { align-items: start; flex-direction: column; }
+      .footer-top { gap: 48px; flex-direction: column; }
+      .footer-links { gap: 50px; }
+    }
+    @media (max-width: 430px) {
+      h1 { font-size: 10.3vw; }
+      .hero-copy { min-height: 480px; }
+      .blueprint { min-height: 380px; }
+      .bp-watermark { font-size: 75px; }
+      .bp-bottom-right { gap: 10px; }
+      .dash-content { padding: 17px 13px; }
+      .dash-panels { grid-template-columns: 1fr; }
+      .dash-drawing { height: 135px; }
+      .dash-drawing svg { max-height: 120px; }
+      .dash-details { gap: 8px; }
+      .dashboard { min-height: auto; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .modal { padding: 23px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell nav-inner">
+      <a class="brand" href="#top" aria-label="Acme, back to top">
+        <svg class="brand-mark" viewBox="0 0 30 30" aria-hidden="true"><path fill="#2048ed" d="M0 30 10 0h10l10 30H19.7l-1.6-5H11l-1.6 5H0Zm13.1-13h3.8L15 10.8 13.1 17Z"/><path fill="#eef1f0" d="M11 20h8v3h-8z"/></svg>
+        <span class="brand-word">acme</span>
+      </a>
+      <div class="nav-right">
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#platform">Platform</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#about">About</a>
+        </nav>
+        <button class="nav-cta" type="button" data-open-demo>Book a demo <span class="arrow" aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-eyebrow mono">
+        <span>ACME / SUPPLY CHAIN OPERATING SYSTEM</span>
+        <span>BUILT FOR WHAT'S NEXT&nbsp; — &nbsp;EST. 2024</span>
+      </div>
+      <div class="hero-main">
+        <div class="hero-copy">
+          <div class="hero-kicker mono"><span class="kicker-square"></span> ONE SYSTEM. EVERY WIDGET.</div>
+          <h1 id="hero-title"><span>Make every</span><span class="outline">component</span><span>count.</span></h1>
+          <div class="hero-bottom">
+            <div>
+              <p class="hero-description">Configure custom widgets, place orders, and track every handoff—without losing the thread between teams, suppliers, and shipments.</p>
+              <button class="primary-btn" type="button" data-open-demo>See Acme in action <span class="arrow" aria-hidden="true">↗</span></button>
+            </div>
+            <span class="hero-side-note mono">PRECISION IN EVERY PROCESS / 001</span>
+          </div>
+        </div>
+
+        <div class="blueprint" aria-label="Technical illustration of a configurable industrial widget">
+          <div class="bp-top mono"><span>FIG. 01 / CONFIGURABLE WIDGET</span><span class="bp-code">AC—001</span></div>
+          <div class="bp-visual">
+            <svg viewBox="0 0 550 480" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Blueprint drawing of a precision widget">
+              <g stroke="#B7D8FF" stroke-opacity=".36" stroke-width="1">
+                <path d="M275 20v440M26 236h498M81 60l388 353M467 60 81 413" stroke-dasharray="4 7"/>
+                <circle cx="275" cy="236" r="192" stroke-dasharray="3 8"/>
+                <circle cx="275" cy="236" r="154" stroke-dasharray="3 8"/>
+                <path d="M78 88h80M78 88v54M471 88h-80M471 88v54M78 384h80M78 384v-54M471 384h-80M471 384v-54"/>
+              </g>
+              <g stroke="#C7E9FF" stroke-width="1.3" stroke-opacity=".85">
+                <path d="M111 90V55m328 35V55M111 68h328"/>
+                <path d="m111 68 6-4m-6 4 6 4m322-4-6-4m6 4-6 4"/>
+                <path d="M82 113H53m29 246H53M65 113v246"/>
+                <path d="m65 113-4 6m4-6 4 6m-4 240-4-6m4 6 4-6"/>
+              </g>
+              <g fill="#D9F2FF" font-family="monospace" font-size="10" letter-spacing="1.5">
+                <text x="239" y="60">328.00 MM</text>
+                <text x="37" y="263" transform="rotate(-90 37 263)">246.00 MM</text>
+                <text x="386" y="385">Ø 112.0</text>
+                <text x="83" y="411">A—A / FRONT ELEVATION</text>
+              </g>
+              <!-- Outer mounting plate -->
+              <path d="M150 114h250l38 38v168l-38 38H150l-38-38V152l38-38Z" fill="#2048ED" stroke="#E7F7FF" stroke-width="2.2"/>
+              <path d="M150 128h250l24 24v168l-24 24H150l-24-24V152l24-24Z" stroke="#AFDEFF" stroke-width="1" opacity=".8"/>
+              <path d="M150 114v-19h250v19M438 152h19v168h-19M400 358v19H150v-19M112 320H93V152h19" stroke="#B5E5FF" stroke-width="1.3"/>
+              <!-- Machined detail and fasteners -->
+              <g stroke="#E0F5FF" stroke-width="1.5">
+                <circle cx="160" cy="162" r="13"/><circle cx="390" cy="162" r="13"/>
+                <circle cx="160" cy="310" r="13"/><circle cx="390" cy="310" r="13"/>
+                <path d="M153 162h14m-7-7v14m223-7h14m-7-7v14M153 310h14m-7-7v14m223-7h14m-7-7v14"/>
+                <path d="M192 139h166M192 333h166M137 196v80M413 196v80" opacity=".55"/>
+              </g>
+              <!-- Central machined assembly -->
+              <circle cx="275" cy="236" r="112" fill="#1740DF" stroke="#DFF5FF" stroke-width="2"/>
+              <circle cx="275" cy="236" r="99" stroke="#9ADFFF" stroke-width="1" stroke-dasharray="4 5"/>
+              <circle cx="275" cy="236" r="81" fill="#2957F1" stroke="#EAF8FF" stroke-width="2"/>
+              <circle cx="275" cy="236" r="68" stroke="#A9EFFF" stroke-width="1.2"/>
+              <circle cx="275" cy="236" r="51" fill="#173CCB" stroke="#EAF8FF" stroke-width="2"/>
+              <circle cx="275" cy="236" r="36" stroke="#A9EFFF" stroke-width="1.5"/>
+              <circle cx="275" cy="236" r="9" fill="#DDF8FF"/>
+              <g fill="#B7E9FF">
+                <circle cx="275" cy="147" r="3"/><circle cx="364" cy="236" r="3"/>
+                <circle cx="275" cy="325" r="3"/><circle cx="186" cy="236" r="3"/>
+                <circle cx="212" cy="173" r="3"/><circle cx="338" cy="173" r="3"/>
+                <circle cx="212" cy="299" r="3"/><circle cx="338" cy="299" r="3"/>
+              </g>
+              <g stroke="#C6F3FF" stroke-width="1.3">
+                <path d="M271 124v-19h8v19M271 348v19h8v-19M163 232h-19v8h19M387 232h19v8h-19"/>
+                <path d="M234 190h82v92h-82z" stroke-opacity=".65" stroke-dasharray="3 5"/>
+              </g>
+              <!-- callouts -->
+              <g stroke="#DDF4FF" stroke-width="1.1">
+                <path d="M342 170l48-48h49M207 285l-52 51H98"/>
+                <circle cx="342" cy="170" r="2.5" fill="#DDF4FF"/>
+                <circle cx="207" cy="285" r="2.5" fill="#DDF4FF"/>
+              </g>
+              <g fill="#E6F7FF" font-family="monospace" font-size="9" letter-spacing="1">
+                <text x="395" y="118">MOUNT 04</text>
+                <text x="99" y="349">CORE 01</text>
+              </g>
+            </svg>
+          </div>
+          <div class="bp-watermark" aria-hidden="true">W/01</div>
+          <div class="bp-bottom mono"><span>ENGINEERED TO YOUR SPEC</span><span class="bp-bottom-right"><span>REV. 03</span><span>01 / 03</span></span></div>
+        </div>
+      </div>
+
+      <div class="proof" aria-label="Platform benefits">
+        <div class="proof-label"><span class="mono section-index">THE ACME ADVANTAGE</span><span class="mono">CLARITY, BUILT IN.</span></div>
+        <div class="proof-item"><strong>01 /</strong><span class="mono">ONE SOURCE OF TRUTH</span></div>
+        <div class="proof-item"><strong>02 /</strong><span class="mono">FEWER MANUAL HANDOFFS</span></div>
+        <div class="proof-item"><strong>03 /</strong><span class="mono">VISIBILITY END TO END</span></div>
+      </div>
+    </section>
+
+    <section class="platform shell" id="platform" aria-labelledby="platform-title">
+      <div class="section-heading">
+        <div><span class="mono section-index">01 / THE PLATFORM</span><h2 id="platform-title">Complexity in.<br>Clarity out.</h2></div>
+        <p>Custom parts shouldn't require custom workarounds. Acme connects the decisions, orders, and updates that keep production moving.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature">
+          <div class="feature-top mono"><span>01 — SPECIFY</span><span>↗</span></div>
+          <div class="feature-icon">
+            <svg viewBox="0 0 120 120" fill="none" aria-hidden="true">
+              <rect x="18" y="18" width="72" height="72" stroke="#2048ed" stroke-width="2"/>
+              <rect x="31" y="31" width="72" height="72" stroke="#2048ed" stroke-width="2"/>
+              <circle cx="67" cy="67" r="21" stroke="#2048ed" stroke-width="2"/>
+              <path d="M67 37v60M37 67h60M18 103h8M94 18h9" stroke="#2048ed" stroke-width="1"/>
+              <circle cx="67" cy="67" r="5" fill="#2048ed"/>
+            </svg>
+          </div>
+          <h3>Configure with confidence.</h3>
+          <p>Turn requirements into production-ready widget specifications with options, revisions, and approvals in one place.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-top mono"><span>02 — ORDER</span><span>↗</span></div>
+          <div class="feature-icon">
+            <svg viewBox="0 0 120 120" fill="none" aria-hidden="true">
+              <rect x="19" y="22" width="82" height="76" stroke="#2048ed" stroke-width="2"/>
+              <path d="M19 43h82M31 57h38M31 68h57M31 79h29" stroke="#2048ed" stroke-width="2"/>
+              <rect x="76" y="53" width="12" height="12" fill="#2048ed"/>
+              <path d="M39 22V12m42 10V12M39 98v10m42-10v10" stroke="#2048ed" stroke-width="1"/>
+            </svg>
+          </div>
+          <h3>Order without the back-and-forth.</h3>
+          <p>Move approved specs into orders your teams and suppliers can act on—without chasing the latest attachment.</p>
+        </article>
+        <article class="feature">
+          <div class="feature-top mono"><span>03 — TRACK</span><span>↗</span></div>
+          <div class="feature-icon">
+            <svg viewBox="0 0 120 120" fill="none" aria-hidden="true">
+              <path d="M17 90h88M22 75l24-26 20 13 32-38" stroke="#2048ed" stroke-width="2"/>
+              <circle cx="22" cy="75" r="5" fill="#eef1f0" stroke="#2048ed" stroke-width="2"/>
+              <circle cx="46" cy="49" r="5" fill="#eef1f0" stroke="#2048ed" stroke-width="2"/>
+              <circle cx="66" cy="62" r="5" fill="#eef1f0" stroke="#2048ed" stroke-width="2"/>
+              <circle cx="98" cy="24" r="5" fill="#2048ed"/>
+              <path d="M22 90v8M46 90v8M66 90v8M98 90v8" stroke="#2048ed"/>
+            </svg>
+          </div>
+          <h3>Know what's happening next.</h3>
+          <p>See the status of every order and shipment, so a supply-chain surprise doesn't become a production delay.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="workflow" id="how-it-works" aria-labelledby="workflow-title">
+      <div class="shell">
+        <div class="workflow-heading">
+          <div><span class="mono section-index">02 / HOW IT WORKS</span><h2 id="workflow-title">One continuous line<br>from idea to arrival.</h2></div>
+          <p>Less switching between systems. More certainty at every stage.</p>
+        </div>
+        <div class="workflow-body">
+          <div class="steps" role="tablist" aria-label="Explore the Acme workflow">
+            <button class="step active" id="tab-configure" role="tab" aria-selected="true" aria-controls="workflow-panel" type="button" data-step="0">
+              <span class="step-num mono">01</span><span><span class="step-title">Configure</span><span class="step-caption">Capture the exact part your operation needs.</span></span><span class="step-arrow">↗</span>
+            </button>
+            <button class="step" id="tab-order" role="tab" aria-selected="false" aria-controls="workflow-panel" type="button" data-step="1">
+              <span class="step-num mono">02</span><span><span class="step-title">Order</span><span class="step-caption">Keep the approved specification attached.</span></span><span class="step-arrow">↗</span>
+            </button>
+            <button class="step" id="tab-track" role="tab" aria-selected="false" aria-controls="workflow-panel" type="button" data-step="2">
+              <span class="step-num mono">03</span><span><span class="step-title">Track</span><span class="step-caption">Follow progress from supplier to site.</span></span><span class="step-arrow">↗</span>
+            </button>
+          </div>
+          <div class="dashboard" id="workflow-panel" role="tabpanel" aria-labelledby="tab-configure">
+            <div class="dash-header"><div class="dash-brand"><span>△</span> acme <span style="font-size:11px;letter-spacing:0;font-weight:400;color:#637074;margin-left:10px;">/ WORKSPACE</span></div><span class="mono">OPS / OVERVIEW &nbsp; ●</span></div>
+            <div class="dash-content">
+              <div class="dash-overline mono"><span id="dash-path">WIDGETS / CONFIGURATION</span><span>AC—001 / REV. 03</span></div>
+              <h3 id="dash-title">Precision mount assembly</h3>
+              <div class="dash-panels">
+                <div class="dash-drawing">
+                  <svg viewBox="0 0 200 160" fill="none" aria-label="Widget specification drawing">
+                    <rect x="34" y="16" width="132" height="128" stroke="#2048ed" stroke-width="2"/>
+                    <rect x="43" y="25" width="114" height="110" stroke="#2048ed"/>
+                    <circle cx="100" cy="80" r="47" stroke="#2048ed" stroke-width="2"/>
+                    <circle cx="100" cy="80" r="35" stroke="#2048ed"/>
+                    <circle cx="100" cy="80" r="24" stroke="#2048ed" stroke-width="2"/>
+                    <circle cx="100" cy="80" r="10" fill="#2048ed"/>
+                    <g fill="#2048ed"><circle cx="51" cy="33" r="3"/><circle cx="149" cy="33" r="3"/><circle cx="51" cy="127" r="3"/><circle cx="149" cy="127" r="3"/></g>
+                    <path d="M100 4v152M23 80h154" stroke="#2048ed" stroke-opacity=".35" stroke-dasharray="3 3"/>
+                  </svg>
+                  <span class="drawing-label mono">FIG 01 / FRONT VIEW</span>
+                </div>
+                <div class="dash-details mono">
+                  <div class="detail-row"><span id="detail-label-1">MATERIAL</span><span id="detail-value-1">ALUMINUM 6061</span></div>
+                  <div class="detail-row"><span id="detail-label-2">FINISH</span><span id="detail-value-2">CLEAR ANODIZED</span></div>
+                  <div class="detail-row"><span id="detail-label-3">QUANTITY</span><span id="detail-value-3">250 UNITS</span></div>
+                  <div class="detail-row"><span>STATUS</span><span class="status" id="detail-status">● READY TO APPROVE</span></div>
+                </div>
+              </div>
+              <div class="dash-footer mono"><span id="dash-footer-label">SPECIFICATION COMPLETENESS</span><div class="progress"><i id="dash-progress"></i></div><span id="dash-percent">68%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" id="about" aria-labelledby="cta-title">
+      <div class="shell cta-inner">
+        <span class="mono">03 / GET STARTED &nbsp;—&nbsp; YOUR NEXT MOVE</span>
+        <h2 id="cta-title">Better control starts with a conversation.</h2>
+        <div class="cta-lower">
+          <p>See how Acme can bring your custom widget workflow into focus. We'll show you the platform, not a slide deck.</p>
+          <button class="white-btn" type="button" data-open-demo>Book your demo <span class="arrow" aria-hidden="true">↗</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-top">
+        <div>
+          <a class="brand" href="#top" aria-label="Acme, back to top">
+            <svg class="brand-mark" viewBox="0 0 30 30" aria-hidden="true"><path fill="#2048ed" d="M0 30 10 0h10l10 30H19.7l-1.6-5H11l-1.6 5H0Zm13.1-13h3.8L15 10.8 13.1 17Z"/><path fill="#eef1f0" d="M11 20h8v3h-8z"/></svg>
+            <span class="brand-word">acme</span>
+          </a>
+          <p class="footer-note">A clearer way to make, move, and manage what matters.</p>
+        </div>
+        <div class="footer-links">
+          <div><span class="mono">EXPLORE</span><a href="#platform">Platform</a><a href="#how-it-works">How it works</a><a href="#about">About</a></div>
+          <div><span class="mono">CONNECT</span><a href="mailto:hello@acme.example">Get in touch ↗</a><a href="#top">Back to top ↑</a></div>
+        </div>
+      </div>
+      <div class="footer-bottom mono"><span>© 2026 ACME. BUILT FOR PRECISION.</span><span>CONFIGURE / ORDER / TRACK</span></div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="demo-modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head"><span class="mono section-index">ACME / DEMO REQUEST</span><button class="modal-close" id="close-modal" type="button" aria-label="Close dialog">×</button></div>
+      <div id="form-content">
+        <h2 id="modal-title">Let's make it clear.</h2>
+        <p>Tell us a little about your operation. We'll follow up to arrange a walkthrough tailored to your workflow.</p>
+        <form id="demo-form">
+          <div class="form-row">
+            <div class="field"><label for="first-name">First name</label><input id="first-name" name="firstName" autocomplete="given-name" required></div>
+            <div class="field"><label for="last-name">Last name</label><input id="last-name" name="lastName" autocomplete="family-name" required></div>
+          </div>
+          <div class="field"><label for="work-email">Work email</label><input id="work-email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="company">Company</label><input id="company" name="company" autocomplete="organization" required></div>
+          <div class="field"><label for="role">What best describes your role?</label><select id="role" name="role" required><option value="" selected disabled>Select your role</option><option>Operations</option><option>Procurement</option><option>Supply chain</option><option>Engineering</option><option>Other</option></select></div>
+          <button class="primary-btn form-submit" type="submit">Request a walkthrough <span class="arrow" aria-hidden="true">↗</span></button>
+        </form>
+      </div>
+      <div class="form-success" id="form-success" role="status">
+        <div class="success-icon" aria-hidden="true">✓</div>
+        <h2>Request noted.</h2>
+        <p>Thanks for your interest in Acme. Your demo request has been entered in this preview.</p>
+        <button class="primary-btn" type="button" id="success-close">Back to the site <span class="arrow" aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const modal = document.getElementById('demo-modal');
+      const closeButton = document.getElementById('close-modal');
+      let previousFocus;
+
+      function openModal() {
+        previousFocus = document.activeElement;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+        closeButton.focus();
+      }
+      function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+        if (previousFocus) previousFocus.focus();
+      }
+      document.querySelectorAll('[data-open-demo]').forEach(button => button.addEventListener('click', openModal));
+      closeButton.addEventListener('click', closeModal);
+      document.getElementById('success-close').addEventListener('click', closeModal);
+      modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+      document.addEventListener('keydown', event => {
+        if (!modal.classList.contains('open')) return;
+        if (event.key === 'Escape') closeModal();
+        if (event.key === 'Tab') {
+          const focusable = [...modal.querySelectorAll('button, input, select')].filter(el => el.offsetParent !== null);
+          const first = focusable[0], last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+      document.getElementById('demo-form').addEventListener('submit', event => {
+        event.preventDefault();
+        document.getElementById('form-content').style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+        document.getElementById('success-close').focus();
+      });
+
+      const views = [
+        { path: 'WIDGETS / CONFIGURATION', title: 'Precision mount assembly', labels: ['MATERIAL', 'FINISH', 'QUANTITY'], values: ['ALUMINUM 6061', 'CLEAR ANODIZED', '250 UNITS'], status: '● READY TO APPROVE', footer: 'SPECIFICATION COMPLETENESS', percent: '68%' },
+        { path: 'ORDERS / PURCHASE ORDER', title: 'Order AC–2048', labels: ['WIDGET', 'ORDER SIZE', 'SUPPLIER'], values: ['PRECISION MOUNT', '250 UNITS', 'NORTHLINE MFG.'], status: '● ORDER CONFIRMED', footer: 'ORDER PROGRESS', percent: '42%' },
+        { path: 'SHIPMENTS / LIVE STATUS', title: 'On its way to production', labels: ['ORDER', 'DESTINATION', 'EXPECTED'], values: ['AC–2048', 'PLANT 02', 'OCT 14'], status: '● IN TRANSIT', footer: 'DELIVERY PROGRESS', percent: '84%' }
+      ];
+      const tabs = [...document.querySelectorAll('.step')];
+      const panel = document.getElementById('workflow-panel');
+      function activateStep(index) {
+        const view = views[index];
+        tabs.forEach((tab, i) => {
+          tab.classList.toggle('active', i === index);
+          tab.setAttribute('aria-selected', String(i === index));
+          tab.tabIndex = i === index ? 0 : -1;
+        });
+        panel.setAttribute('aria-labelledby', tabs[index].id);
+        document.getElementById('dash-path').textContent = view.path;
+        document.getElementById('dash-title').textContent = view.title;
+        for (let i = 0; i < 3; i++) {
+          document.getElementById('detail-label-' + (i + 1)).textContent = view.labels[i];
+          document.getElementById('detail-value-' + (i + 1)).textContent = view.values[i];
+        }
+        document.getElementById('detail-status').textContent = view.status;
+        document.getElementById('dash-footer-label').textContent = view.footer;
+        document.getElementById('dash-percent').textContent = view.percent;
+        document.getElementById('dash-progress').style.width = view.percent;
+      }
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activateStep(index));
+        tab.addEventListener('keydown', event => {
+          if (event.key === 'ArrowDown' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+            event.preventDefault();
+            const direction = event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1;
+            const next = (index + direction + tabs.length) % tabs.length;
+            activateStep(next);
+            tabs[next].focus();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

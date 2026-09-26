@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme: The system of record for custom widgets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#efe9dd;
+    --paper-2:#e8e1d2;
+    --paper-3:#e1d9c8;
+    --ink:#1d1c19;
+    --ink-2:#45413a;
+    --muted:#857d6e;
+    --rule:#cbc1ad;
+    --rule-soft:#d9d0bf;
+    --accent:#6b2a1f;
+    --display:"Cormorant Garamond", Georgia, serif;
+    --text:"EB Garamond", Georgia, serif;
+    --mono:"IBM Plex Mono", ui-monospace, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background-color:var(--paper);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35  0 0 0 0 0.3  0 0 0 0 0.22  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    color:var(--ink);
+    font-family:var(--text);
+    font-size:19px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:inherit}
+  ::selection{background:var(--accent);color:var(--paper)}
+
+  .wrap{max-width:1200px;margin:0 auto;padding:0 40px}
+  .label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .rule{border:0;border-top:1px solid var(--rule)}
+
+  /* Header */
+  header{
+    position:sticky;top:0;z-index:20;
+    background:rgba(239,233,221,.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--rule-soft);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{display:flex;align-items:baseline;gap:14px;text-decoration:none}
+  .brand-mark{font-family:var(--display);font-size:30px;font-weight:500;letter-spacing:.02em}
+  .brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .nav ul{display:flex;gap:40px;list-style:none}
+  .nav ul a{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    text-decoration:none;color:var(--ink-2);transition:color .3s;
+  }
+  .nav ul a:hover{color:var(--accent)}
+  .nav-cta{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    text-decoration:none;border:1px solid var(--ink);padding:11px 20px;transition:all .35s;
+  }
+  .nav-cta:hover{background:var(--ink);color:var(--paper)}
+
+  /* Hero */
+  .hero{padding:96px 0 72px}
+  .hero-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:80px;align-items:start}
+  .hero .label{display:flex;gap:18px;align-items:center;margin-bottom:44px}
+  .hero .label span.line{display:inline-block;width:48px;border-top:1px solid var(--muted)}
+  h1{
+    font-family:var(--display);
+    font-weight:300;
+    font-size:104px;
+    line-height:.96;
+    letter-spacing:-.015em;
+    margin-bottom:40px;
+  }
+  h1 em{font-style:italic;font-weight:300;color:var(--accent)}
+  .lede{font-size:22px;line-height:1.55;color:var(--ink-2);max-width:560px;margin-bottom:48px}
+  .actions{display:flex;gap:32px;align-items:center}
+  .btn{
+    display:inline-flex;align-items:center;gap:14px;
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    text-decoration:none;background:var(--ink);color:var(--paper);
+    padding:18px 30px;border:1px solid var(--ink);cursor:pointer;transition:all .35s;
+  }
+  .btn:hover{background:var(--accent);border-color:var(--accent)}
+  .btn .arr{transition:transform .35s}
+  .btn:hover .arr{transform:translateX(4px)}
+  .link{
+    font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:4px;transition:border-color .3s;
+  }
+  .link:hover{border-color:var(--ink)}
+
+  .plate{
+    border:1px solid var(--rule);
+    background:rgba(255,252,244,.35);
+    padding:22px 22px 18px;
+    position:relative;
+  }
+  .plate::before{
+    content:"";position:absolute;inset:6px;border:1px solid var(--rule-soft);pointer-events:none;
+  }
+  .plate-head{display:flex;justify-content:space-between;margin-bottom:6px;position:relative}
+  .plate svg{display:block;width:100%;height:auto}
+  .plate figcaption{
+    position:relative;border-top:1px solid var(--rule-soft);margin-top:8px;padding-top:14px;
+    display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  }
+  .plate figcaption i{font-family:var(--display);font-size:20px;color:var(--ink-2)}
+
+  .ledger-meta{
+    margin-top:88px;display:grid;grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--ink);border-bottom:1px solid var(--rule);
+  }
+  .ledger-meta div{padding:20px 0 22px;border-right:1px solid var(--rule-soft);padding-left:24px}
+  .ledger-meta div:first-child{padding-left:0}
+  .ledger-meta div:last-child{border-right:0}
+  .ledger-meta b{display:block;font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;margin-top:6px}
+
+  /* Clients */
+  .clients{padding:56px 0 24px}
+  .clients-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:22px;flex-wrap:wrap;gap:20px}
+  .clients-row span{font-family:var(--display);font-size:25px;font-style:italic;color:var(--ink-2);letter-spacing:.01em}
+  .clients-row span.dot{font-style:normal;color:var(--rule)}
+
+  /* Sections */
+  section.block{padding:128px 0}
+  .sec-head{display:grid;grid-template-columns:200px 1fr;gap:40px;margin-bottom:80px}
+  .sec-head .num{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;padding-top:14px;border-top:1px solid var(--ink)}
+  .sec-head h2{
+    font-family:var(--display);font-weight:300;font-size:68px;line-height:1.02;letter-spacing:-.01em;max-width:820px;
+  }
+  .sec-head h2 em{font-style:italic;color:var(--accent)}
+  .sec-head p{margin-top:28px;font-size:21px;color:var(--ink-2);max-width:640px}
+
+  /* Method */
+  .entries{border-top:1px solid var(--rule)}
+  .entry{
+    display:grid;grid-template-columns:200px 1.1fr 1fr 260px;gap:40px;
+    padding:52px 0;border-bottom:1px solid var(--rule);align-items:start;
+  }
+  .entry .roman{font-family:var(--display);font-size:64px;font-weight:300;line-height:.9;color:var(--accent)}
+  .entry h3{font-family:var(--display);font-weight:400;font-size:40px;line-height:1.05;margin-bottom:18px}
+  .entry p{color:var(--ink-2)}
+  .entry ul{list-style:none;border-top:1px solid var(--rule-soft)}
+  .entry li{
+    font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink-2);
+    padding:12px 0;border-bottom:1px solid var(--rule-soft);display:flex;gap:14px;
+  }
+  .entry li::before{content:attr(data-n);color:var(--muted)}
+  .entry .mini{border:1px solid var(--rule-soft);padding:14px;background:rgba(255,252,244,.3)}
+  .entry .mini svg{display:block;width:100%;height:auto}
+  .entry .mini .label{display:block;margin-top:10px;font-size:10px}
+
+  /* Provenance */
+  .prov{background:var(--paper-2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .prov-grid{display:grid;grid-template-columns:1fr 1.35fr;gap:80px;align-items:start}
+  .prov-intro h2{font-family:var(--display);font-weight:300;font-size:64px;line-height:1.02;margin:22px 0 28px}
+  .prov-intro h2 em{font-style:italic;color:var(--accent)}
+  .prov-intro p{color:var(--ink-2);margin-bottom:22px}
+  .tabs{margin-top:40px;border-top:1px solid var(--rule)}
+  .tab{
+    display:flex;justify-content:space-between;width:100%;text-align:left;background:none;border:0;
+    border-bottom:1px solid var(--rule);padding:18px 0;cursor:pointer;color:var(--ink-2);
+    font-family:var(--text);font-size:19px;transition:color .3s, padding .35s;
+  }
+  .tab .label{transition:color .3s}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--ink);padding-left:14px;box-shadow:inset 2px 0 0 var(--accent)}
+  .tab.active .label{color:var(--accent)}
+
+  .card{
+    background:#f6f2e8;border:1px solid var(--rule);
+    box-shadow:0 1px 0 var(--rule-soft), 0 30px 60px -40px rgba(40,30,15,.35);
+    padding:44px 48px 40px;position:relative;
+    transition:opacity .35s ease;
+  }
+  .card.fading{opacity:0}
+  .card::after{
+    content:"";position:absolute;top:0;right:48px;width:1px;height:100%;
+    background:repeating-linear-gradient(to bottom,transparent 0 4px,var(--rule-soft) 4px 8px);
+    opacity:.0;
+  }
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--ink);padding-bottom:20px;margin-bottom:24px}
+  .card-top h3{font-family:var(--display);font-weight:400;font-size:38px;line-height:1.05;margin-top:8px}
+  .stamp{
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    border:1px solid currentColor;padding:8px 12px;transform:rotate(-2deg);margin-top:6px;white-space:nowrap;
+  }
+  .stamp.ok{color:#3f5a3a}
+  .stamp.transit{color:var(--ink-2)}
+  .stamp.late{color:var(--accent)}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-bottom:30px}
+  .fields div{padding:12px 0;border-bottom:1px solid var(--rule-soft)}
+  .fields dt{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .fields dd{font-size:18px;margin-top:2px}
+  .events{list-style:none;position:relative}
+  .events li{display:grid;grid-template-columns:110px 18px 1fr;gap:16px;padding:10px 0;align-items:baseline}
+  .events time{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+  .events .pip{width:9px;height:9px;border:1px solid var(--ink);border-radius:50%;background:#f6f2e8;position:relative;top:1px}
+  .events li.done .pip{background:var(--ink)}
+  .events li.flag .pip{border-color:var(--accent);background:var(--accent)}
+  .events li.pending{color:var(--muted)}
+  .events li.pending .pip{border-style:dashed;border-color:var(--muted)}
+  .events b{font-weight:500}
+  .events span.note{color:var(--ink-2)}
+  .events li.flag span.note{color:var(--accent)}
+  .card-foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--rule-soft);display:flex;justify-content:space-between}
+
+  /* Figures */
+  .figs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink)}
+  .fig{padding:36px 32px 10px 0;border-right:1px solid var(--rule-soft);margin-right:32px}
+  .fig:last-child{border-right:0;margin-right:0}
+  .fig .n{font-family:var(--display);font-weight:300;font-size:92px;line-height:1;letter-spacing:-.02em}
+  .fig .n sup{font-size:.4em;vertical-align:top;position:relative;top:.35em;margin-left:4px;color:var(--accent)}
+  .fig p{color:var(--ink-2);margin-top:18px;font-size:18px;max-width:220px}
+  .footnote{margin-top:44px;font-style:italic;color:var(--muted);font-size:16px}
+
+  /* Quote */
+  .quote{padding:40px 0 140px}
+  .quote blockquote{
+    font-family:var(--display);font-weight:300;font-style:italic;font-size:54px;line-height:1.18;
+    max-width:1000px;margin:0 auto;text-align:center;letter-spacing:-.005em;
+  }
+  .quote blockquote::before{content:"“";display:block;font-size:120px;line-height:.6;color:var(--accent);margin-bottom:24px;font-style:normal}
+  .quote cite{display:block;text-align:center;margin-top:40px;font-style:normal}
+  .quote cite b{display:block;font-family:var(--text);font-weight:400;font-size:20px;margin-bottom:6px}
+
+  /* Spec */
+  .spec{display:grid;grid-template-columns:200px 1fr;gap:40px}
+  .spec dl{border-top:1px solid var(--ink)}
+  .spec .row{display:grid;grid-template-columns:260px 1fr;gap:40px;padding:24px 0;border-bottom:1px solid var(--rule)}
+  .spec dt{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-top:5px}
+  .spec dd{font-size:20px;color:var(--ink)}
+  .spec dd small{display:block;font-size:16px;color:var(--muted);font-style:italic;margin-top:4px}
+
+  /* Demo */
+  .demo{background:var(--ink);color:var(--paper);padding:128px 0;position:relative}
+  .demo .label{color:#9c9382}
+  .demo-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:96px}
+  .demo h2{font-family:var(--display);font-weight:300;font-size:76px;line-height:1;margin:24px 0 30px}
+  .demo h2 em{font-style:italic;color:#c9a58f}
+  .demo p{color:#cfc7b6;font-size:20px;max-width:460px}
+  .expect{list-style:none;margin-top:48px;border-top:1px solid #3a3731;max-width:460px}
+  .expect li{display:grid;grid-template-columns:60px 1fr;padding:16px 0;border-bottom:1px solid #3a3731;color:#d9d2c3}
+  .expect li span{font-family:var(--mono);font-size:11px;color:#8e8676;padding-top:5px;letter-spacing:.1em}
+
+  form{border:1px solid #3a3731;padding:48px;position:relative}
+  form::before{content:"";position:absolute;inset:6px;border:1px solid #2c2a25;pointer-events:none}
+  .form-head{display:flex;justify-content:space-between;margin-bottom:34px;position:relative}
+  .f-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px 32px;position:relative}
+  .field{display:flex;flex-direction:column}
+  .field.full{grid-column:1/-1}
+  .field label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#9c9382;margin-bottom:8px}
+  .field input,.field select,.field textarea{
+    background:transparent;border:0;border-bottom:1px solid #4a463e;color:var(--paper);
+    font-family:var(--text);font-size:20px;padding:6px 0 10px;outline:none;transition:border-color .3s;border-radius:0;
+  }
+  .field select{appearance:none;-webkit-appearance:none;cursor:pointer;
+    background-image:linear-gradient(45deg,transparent 50%,#9c9382 50%),linear-gradient(135deg,#9c9382 50%,transparent 50%);
+    background-position:calc(100% - 12px) 55%,calc(100% - 6px) 55%;background-size:6px 6px;background-repeat:no-repeat}
+  .field select option{background:var(--ink);color:var(--paper)}
+  .field textarea{resize:none;height:84px}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#c9a58f}
+  .field.err input,.field.err select{border-color:#c77b66}
+  .field .msg{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#c77b66;margin-top:6px;height:12px}
+  .form-foot{display:flex;justify-content:space-between;align-items:center;margin-top:40px;position:relative}
+  .form-foot small{font-style:italic;color:#8e8676;font-size:15px;max-width:260px;line-height:1.4}
+  .btn.light{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+  .btn.light:hover{background:#c9a58f;border-color:#c9a58f}
+  .confirm{display:none;position:relative;padding:20px 0}
+  .confirm h3{font-family:var(--display);font-weight:300;font-size:52px;line-height:1.05;margin:18px 0 20px}
+  .confirm h3 em{color:#c9a58f}
+  .confirm p{color:#cfc7b6}
+  .confirm .ref{margin-top:34px;padding-top:18px;border-top:1px solid #3a3731;display:flex;justify-content:space-between}
+
+  /* Footer */
+  footer{padding:72px 0 56px;background:var(--ink);color:#9c9382;border-top:1px solid #2c2a25}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}
+  .foot-grid .brand-mark{color:var(--paper)}
+  .foot-grid p{font-size:16px;margin-top:14px;font-style:italic;max-width:300px;line-height:1.5}
+  .foot-grid h4{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:400;margin-bottom:16px;color:#6f685b}
+  .foot-grid ul{list-style:none}
+  .foot-grid li{margin-bottom:8px;font-size:17px}
+  .foot-grid a{text-decoration:none;color:#cfc7b6;transition:color .3s}
+  .foot-grid a:hover{color:var(--paper)}
+  .colophon{margin-top:64px;padding-top:22px;border-top:1px solid #2c2a25;display:flex;justify-content:space-between}
+  .colophon .label{color:#6f685b}
+
+  /* Reveal */
+  .js .reveal{opacity:0;transform:translateY(14px);transition:opacity 1.1s ease, transform 1.1s ease}
+  .js .reveal.in{opacity:1;transform:none}
+
+  .draw path,.draw circle,.draw line,.draw polygon,.draw rect{vector-effect:non-scaling-stroke}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#top" class="brand">
+      <span class="brand-mark">Acme</span>
+      <span class="brand-sub">Widget Systems · Est. 2016</span>
+    </a>
+    <ul>
+      <li><a href="#method">Method</a></li>
+      <li><a href="#record">The Record</a></li>
+      <li><a href="#figures">Figures</a></li>
+      <li><a href="#specification">Specification</a></li>
+    </ul>
+    <a href="#demo" class="nav-cta">Book a demo</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="reveal">
+          <div class="label"><span>Catalogue No. 01</span><span class="line"></span><span>Widget operations for manufacturers</span></div>
+          <h1>Every widget,<br><em>accounted for.</em></h1>
+          <p class="lede">Acme is the system of record for custom widgets. Operations teams at mid-sized manufacturers use it to configure parts to specification, place orders with qualified suppliers, and follow every unit from foundry floor to production line, in one complete and orderly ledger.</p>
+          <div class="actions">
+            <a href="#demo" class="btn">Book a demo <span class="arr">→</span></a>
+            <a href="#method" class="link">Read the method</a>
+          </div>
+        </div>
+
+        <figure class="plate reveal" aria-label="Technical drawing of a flanged coupling widget">
+          <div class="plate-head">
+            <span class="label">Plate I</span>
+            <span class="label">Scale 1 : 2</span>
+          </div>
+          <svg class="draw" viewBox="0 0 480 540" fill="none" stroke="#1d1c19" stroke-width="1">
+            <defs>
+              <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,1 L9,5 L0,9" fill="none" stroke="#1d1c19" stroke-width="1"/>
+              </marker>
+            </defs>
+            <!-- centerlines -->
+            <g stroke="#857d6e" stroke-width=".7" stroke-dasharray="14 4 2 4">
+              <line x1="80" y1="200" x2="400" y2="200"/>
+              <line x1="240" y1="40" x2="240" y2="360"/>
+              <line x1="240" y1="380" x2="240" y2="480"/>
+            </g>
+            <!-- top view -->
+            <circle cx="240" cy="200" r="130" stroke-width="1.3"/>
+            <circle cx="240" cy="200" r="100"/>
+            <circle cx="240" cy="200" r="115" stroke="#857d6e" stroke-width=".6" stroke-dasharray="3 4"/>
+            <polygon points="282,200 261,236.4 219,236.4 198,200 219,163.6 261,163.6" stroke-width="1.3"/>
+            <circle cx="240" cy="200" r="30" stroke="#857d6e" stroke-width=".6"/>
+            <g>
+              <circle cx="339.6" cy="257.5" r="7"/>
+              <circle cx="240" cy="315" r="7"/>
+              <circle cx="140.4" cy="257.5" r="7"/>
+              <circle cx="140.4" cy="142.5" r="7"/>
+              <circle cx="240" cy="85" r="7"/>
+              <circle cx="339.6" cy="142.5" r="7"/>
+            </g>
+            <!-- hatching on hub ring -->
+            <g stroke="#b8ad97" stroke-width=".5">
+              <path d="M305 124 L322 107 M312 132 L331 113 M318 141 L338 121"/>
+            </g>
+            <!-- leaders -->
+            <g stroke-width=".7">
+              <path d="M339.6 142.5 L392 92 L440 92"/>
+              <path d="M261 163.6 L300 60 L440 60"/>
+            </g>
+            <g font-family="IBM Plex Mono, monospace" font-size="10" fill="#45413a" stroke="none" letter-spacing=".08em">
+              <text x="396" y="86">A</text>
+              <text x="396" y="54">B</text>
+            </g>
+            <!-- side elevation -->
+            <rect x="170" y="400" width="140" height="40" stroke-width="1.3"/>
+            <rect x="110" y="440" width="260" height="24" stroke-width="1.3"/>
+            <g stroke="#857d6e" stroke-width=".7" stroke-dasharray="4 3">
+              <line x1="198" y1="400" x2="198" y2="464"/>
+              <line x1="282" y1="400" x2="282" y2="464"/>
+              <line x1="133" y1="440" x2="133" y2="464"/>
+              <line x1="147" y1="440" x2="147" y2="464"/>
+              <line x1="333" y1="440" x2="333" y2="464"/>
+              <line x1="347" y1="440" x2="347" y2="464"/>
+            </g>
+            <!-- dimensions -->
+            <g stroke-width=".7">
+              <line x1="110" y1="470" x2="110" y2="500"/>
+              <line x1="370" y1="470" x2="370" y2="500"/>
+              <line x1="112" y1="494" x2="368" y2="494" marker-start="url(#ar)" marker-end="url(#ar)"/>
+              <line x1="316" y1="400" x2="408" y2="400"/>
+              <line x1="376" y1="464" x2="408" y2="464"/>
+              <line x1="400" y1="402" x2="400" y2="462" marker-start="url(#ar)" marker-end="url(#ar)"/>
+            </g>
+            <g font-family="IBM Plex Mono, monospace" font-size="10" fill="#1d1c19" stroke="none" letter-spacing=".06em">
+              <rect x="210" y="486" width="60" height="16" fill="#f3eee3"/>
+              <text x="240" y="498" text-anchor="middle">Ø 260</text>
+              <text x="412" y="436">64</text>
+              <text x="80" y="30" fill="#857d6e">PLAN</text>
+              <text x="80" y="392" fill="#857d6e">ELEVATION</text>
+              <text x="80" y="528" fill="#857d6e">DIMENSIONS IN MM · REV. C</text>
+            </g>
+          </svg>
+          <figcaption>
+            <i>Flanged coupling, Model AC-114</i>
+            <span class="label">A · 6× Ø14 on Ø230 PCD &nbsp; B · 42 A/F hex bore</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="ledger-meta reveal">
+        <div><span class="label">Manufacturers on record</span><b>212</b></div>
+        <div><span class="label">Widgets catalogued</span><b>4.1 million</b></div>
+        <div><span class="label">Qualified suppliers</span><b>1,860</b></div>
+        <div><span class="label">Offices</span><b>Pittsburgh &amp; Rotterdam</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLIENTS -->
+  <section class="clients">
+    <div class="wrap reveal">
+      <span class="label">Kept in the records of</span>
+      <div class="clients-row">
+        <span>Halvorsen Pump Works</span><span class="dot">·</span>
+        <span>Ternbury Castings</span><span class="dot">·</span>
+        <span>Marrow &amp; Finch</span><span class="dot">·</span>
+        <span>Oduya Fluid Systems</span><span class="dot">·</span>
+        <span>Kestrel Valve Co.</span><span class="dot">·</span>
+        <span>Brandt-Lowe Assemblies</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD -->
+  <section class="block" id="method">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="num">§ 1 · Method</div>
+        <div>
+          <h2>A method, not a marketplace. <em>Three movements,</em> kept in one place.</h2>
+          <p>Most widget programmes live in a drawing folder, an ERP, a supplier inbox and somebody's spreadsheet. Acme replaces the gaps between them with a single, continuous record.</p>
+        </div>
+      </div>
+
+      <div class="entries">
+        <article class="entry reveal">
+          <div class="roman">I.</div>
+          <div>
+            <h3>Configure</h3>
+            <p>Define a widget once, precisely. Material, geometry, tolerances, finish and compliance are held as structured specifications, with every revision signed, dated and preserved. Engineering approves; operations orders. Nobody works from an outdated drawing again.</p>
+          </div>
+          <ul>
+            <li data-n="01">Parametric families, not one-off PDFs</li>
+            <li data-n="02">Revision history with named approvers</li>
+            <li data-n="03">Material certificates attached at source</li>
+            <li data-n="04">RoHS, REACH and PPAP fields built in</li>
+          </ul>
+          <figure class="mini">
+            <svg class="draw" viewBox="0 0 220 150" fill="none" stroke="#1d1c19" stroke-width="1">
+              <g>
+                <circle cx="45" cy="62" r="28"/><circle cx="45" cy="62" r="10"/>
+                <circle cx="110" cy="62" r="28"/><polygon points="120,62 115,70.7 105,70.7 100,62 105,53.3 115,53.3"/>
+                <circle cx="175" cy="62" r="28"/><rect x="167" y="54" width="16" height="16"/>
+              </g>
+              <g stroke="#857d6e" stroke-width=".6" stroke-dasharray="3 3">
+                <line x1="10" y1="62" x2="210" y2="62"/>
+              </g>
+              <g font-family="IBM Plex Mono, monospace" font-size="8" fill="#857d6e" stroke="none" text-anchor="middle" letter-spacing=".06em">
+                <text x="45" y="112">REV. A</text><text x="110" y="112">REV. B</text><text x="175" y="112">REV. C</text>
+              </g>
+              <line x1="20" y1="124" x2="200" y2="124" stroke="#cbc1ad"/>
+              <path d="M165 118 l6 6 l12 -12" stroke="#6b2a1f" stroke-width="1.2"/>
+            </svg>
+            <span class="label">Fig. 1a · Specification family</span>
+          </figure>
+        </article>
+
+        <article class="entry reveal">
+          <div class="roman">II.</div>
+          <div>
+            <h3>Order</h3>
+            <p>Issue purchase orders directly from an approved specification to suppliers you have already qualified. Quotes, lead times and pricing arrive in the same record, so the comparison is honest and the decision is documented.</p>
+          </div>
+          <ul>
+            <li data-n="01">Request quotes from up to twelve suppliers</li>
+            <li data-n="02">POs written back to SAP, NetSuite or Epicor</li>
+            <li data-n="03">Blanket orders and scheduled releases</li>
+            <li data-n="04">Approval thresholds by plant and value</li>
+          </ul>
+          <figure class="mini">
+            <svg class="draw" viewBox="0 0 220 150" fill="none" stroke="#1d1c19" stroke-width="1">
+              <rect x="58" y="22" width="110" height="96" fill="#efe9dd" stroke="#cbc1ad"/>
+              <rect x="50" y="28" width="110" height="96" fill="#efe9dd" stroke="#a79d88"/>
+              <rect x="42" y="34" width="110" height="96" fill="#f6f2e8"/>
+              <g stroke="#857d6e" stroke-width=".6">
+                <line x1="54" y1="54" x2="140" y2="54"/><line x1="54" y1="66" x2="140" y2="66"/>
+                <line x1="54" y1="78" x2="120" y2="78"/><line x1="54" y1="90" x2="140" y2="90"/>
+                <line x1="54" y1="102" x2="110" y2="102"/>
+              </g>
+              <text x="54" y="47" font-family="IBM Plex Mono, monospace" font-size="7" fill="#1d1c19" stroke="none" letter-spacing=".1em">PO 20931</text>
+              <circle cx="128" cy="112" r="11" stroke="#6b2a1f"/>
+              <text x="128" y="115" font-family="IBM Plex Mono, monospace" font-size="6" fill="#6b2a1f" stroke="none" text-anchor="middle">APPR</text>
+            </svg>
+            <span class="label">Fig. 2a · Purchase order, approved</span>
+          </figure>
+        </article>
+
+        <article class="entry reveal">
+          <div class="roman">III.</div>
+          <div>
+            <h3>Track</h3>
+            <p>Follow each lot through casting, machining, inspection, freight and goods-in. When a supplier slips, Acme tells you what it affects on your line, how many days you have, and which alternate source can still make the date.</p>
+          </div>
+          <ul>
+            <li data-n="01">Milestones confirmed by suppliers, not guessed</li>
+            <li data-n="02">Line-impact forecasting, 21 days ahead</li>
+            <li data-n="03">Lot and heat-number traceability</li>
+            <li data-n="04">Nonconformance logged against the unit</li>
+          </ul>
+          <figure class="mini">
+            <svg class="draw" viewBox="0 0 220 150" fill="none" stroke="#1d1c19" stroke-width="1">
+              <path d="M20 110 C 60 110, 60 50, 100 50 S 150 100, 200 40" stroke="#a79d88" stroke-dasharray="2 3"/>
+              <path d="M20 110 C 60 110, 60 50, 100 50 S 132 82, 140 76"/>
+              <g fill="#1d1c19"><circle cx="20" cy="110" r="3.5"/><circle cx="62" cy="80" r="3.5"/><circle cx="100" cy="50" r="3.5"/></g>
+              <circle cx="140" cy="76" r="5" fill="#f6f2e8" stroke="#6b2a1f" stroke-width="1.3"/>
+              <circle cx="200" cy="40" r="3.5" fill="#f6f2e8"/>
+              <g font-family="IBM Plex Mono, monospace" font-size="7" fill="#857d6e" stroke="none" letter-spacing=".08em">
+                <text x="12" y="128">CAST</text><text x="88" y="38">INSPECT</text><text x="150" y="92" fill="#6b2a1f">IN TRANSIT</text><text x="178" y="28">LINE 3</text>
+              </g>
+            </svg>
+            <span class="label">Fig. 3a · Lot movement, live</span>
+          </figure>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROVENANCE -->
+  <section class="block prov" id="record">
+    <div class="wrap prov-grid">
+      <div class="prov-intro reveal">
+        <span class="label">§ 2 · The Record</span>
+        <h2>The provenance of a <em>single widget.</em></h2>
+        <p>Every part in Acme carries its own history: who specified it, who made it, what it was made from, where it has been, and what happened along the way. Nothing is overwritten. Nothing is lost when someone leaves.</p>
+        <p>Select a record below. Each is drawn, lightly anonymised, from a customer's working ledger.</p>
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-i="0" role="tab">Flanged coupling, AC-114 <span class="label">Received</span></button>
+          <button class="tab" data-i="1" role="tab">Threaded spacer, AC-208 <span class="label">In transit</span></button>
+          <button class="tab" data-i="2" role="tab">Keyed hub, AC-330 <span class="label">Revised</span></button>
+        </div>
+      </div>
+
+      <article class="card reveal" id="card" aria-live="polite"></article>
+    </div>
+  </section>
+
+  <!-- FIGURES -->
+  <section class="block" id="figures">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="num">§ 3 · Figures</div>
+        <div>
+          <h2>What changes, <em>measured plainly.</em></h2>
+        </div>
+      </div>
+      <div class="figs reveal">
+        <div class="fig"><div class="n">38<sup>%</sup></div><p>fewer expedited shipments in the first year of use.</p></div>
+        <div class="fig"><div class="n">11<sup>d</sup></div><p>shorter median lead time on custom widget orders.</p></div>
+        <div class="fig"><div class="n">21<sup>d</sup></div><p>of advance warning, on average, before a late part reaches the line.</p></div>
+        <div class="fig"><div class="n">6<sup>wk</sup></div><p>from signed agreement to first order placed through Acme.</p></div>
+      </div>
+      <p class="footnote reveal">Medians across 64 customers with at least twelve months on the platform, fiscal year 2024. Methodology available on request.</p>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote">
+    <div class="wrap reveal">
+      <blockquote>We used to learn a part was late when the line stopped. Now we know three weeks earlier, and we know exactly why.</blockquote>
+      <cite>
+        <b>Ingrid Halvorsen</b>
+        <span class="label">Vice President, Operations · Halvorsen Pump Works · Four plants</span>
+      </cite>
+    </div>
+  </section>
+
+  <hr class="rule wrap" style="max-width:1120px">
+
+  <!-- SPECIFICATION -->
+  <section class="block" id="specification">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div class="num">§ 4 · Specification</div>
+        <div>
+          <h2>Built to sit quietly <em>inside</em> the systems you already run.</h2>
+        </div>
+      </div>
+      <div class="spec reveal">
+        <div></div>
+        <dl>
+          <div class="row"><dt>ERP integration</dt><dd>SAP S/4HANA, Oracle NetSuite, Epicor Kinetic, Infor CloudSuite, Microsoft Dynamics 365<small>Bidirectional. Part masters, POs and receipts stay in sync.</small></dd></div>
+          <div class="row"><dt>Supplier access</dt><dd>Free supplier portal, EDI 850/855/856, or email-in confirmations<small>Suppliers never need to buy a licence to participate.</small></dd></div>
+          <div class="row"><dt>Security</dt><dd>SOC 2 Type II, ISO 27001, SAML single sign-on, SCIM provisioning<small>Hosted in AWS us-east-1 or eu-central-1, at your choosing.</small></dd></div>
+          <div class="row"><dt>Retention</dt><dd>Records are kept indefinitely and are always yours<small>Export at any time as CSV, JSON or archival PDF/A.</small></dd></div>
+          <div class="row"><dt>Onboarding</dt><dd>A named operations lead, part-master migration and supplier enrolment included<small>Six weeks, median, from signature to first order.</small></dd></div>
+          <div class="row"><dt>Pricing</dt><dd>Annual, per plant. No per-seat charges, no per-order fees<small>Quoted after a demo, once we understand your volume.</small></dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section class="demo" id="demo">
+    <div class="wrap demo-grid">
+      <div class="reveal">
+        <span class="label">§ 5 · By appointment</span>
+        <h2>Book a demo, <em>with your own parts.</em></h2>
+        <p>A forty-minute working session with a member of our operations staff. Bring two or three part numbers you find difficult; we'll build their records together. No slides.</p>
+        <ul class="expect">
+          <li><span>00′</span>Your current process, in your words</li>
+          <li><span>10′</span>Configuring one of your widgets from its drawing</li>
+          <li><span>25′</span>Ordering and tracking it through a live supplier</li>
+          <li><span>35′</span>Integration, timeline and a written proposal</li>
+        </ul>
+      </div>
+
+      <form id="demoForm" class="reveal" novalidate>
+        <div class="form-head">
+          <span class="label">Request form · A-01</span>
+          <span class="label" id="today"></span>
+        </div>
+        <div id="formBody">
+          <div class="f-grid">
+            <div class="field"><label for="name">Full name</label><input id="name" name="name" autocomplete="name"><span class="msg"></span></div>
+            <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" autocomplete="email"><span class="msg"></span></div>
+            <div class="field"><label for="company">Company</label><input id="company" name="company" autocomplete="organization"><span class="msg"></span></div>
+            <div class="field"><label for="plants">Number of plants</label>
+              <select id="plants" name="plants">
+                <option value="">Select</option>
+                <option>1</option><option>2 – 4</option><option>5 – 10</option><option>More than 10</option>
+              </select><span class="msg"></span></div>
+            <div class="field full"><label for="note">Which widgets give you the most trouble? (optional)</label><textarea id="note" name="note"></textarea></div>
+          </div>
+          <div class="form-foot">
+            <small>We reply within one working day. Your details are never shared.</small>
+            <button type="submit" class="btn light">Request a demo <span class="arr">→</span></button>
+          </div>
+        </div>
+        <div class="confirm" id="confirm">
+          <span class="label">Entered into the record</span>
+          <h3>Thank you. <em>Your request is received.</em></h3>
+          <p id="confirmText"></p>
+          <div class="ref"><span class="label">Reference</span><span class="label" id="refNo"></span></div>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <span class="brand-mark">Acme</span>
+        <p>The system of record for custom widgets, for operations teams at manufacturers who would rather not lose track.</p>
+      </div>
+      <div><h4>Platform</h4><ul><li><a href="#method">Configure</a></li><li><a href="#method">Order</a></li><li><a href="#method">Track</a></li><li><a href="#specification">Integrations</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#top">About</a></li><li><a href="#top">Customers</a></li><li><a href="#top">Careers</a></li><li><a href="#specification">Security</a></li></ul></div>
+      <div><h4>Correspondence</h4><ul><li><a href="#demo">Book a demo</a></li><li><a href="#top">hello@acme-widgets.com</a></li><li><a href="#top">412 Penn Avenue, Pittsburgh</a></li><li><a href="#top">Wilhelminakade 91, Rotterdam</a></li></ul></div>
+    </div>
+    <div class="colophon">
+      <span class="label">© <span id="yr"></span> Acme Widget Systems, Inc.</span>
+      <span class="label">Set in Cormorant, EB Garamond &amp; Plex Mono</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.documentElement.classList.add('js');
+
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.12, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // Dates
+  const now = new Date();
+  document.getElementById('yr').textContent = now.getFullYear();
+  document.getElementById('today').textContent = now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+
+  // Provenance records
+  const records = [
+    {
+      name:'Flanged coupling', model:'AC-114', item:'Item 4471-B', status:['Received','ok'],
+      fields:[['Specification','316 stainless, 6-bolt, 42 A/F bore, Rev. C'],['Quantity','1,200 units'],['Supplier','Ternbury Castings, Sheffield'],['Destination','Line 3, Stavanger plant']],
+      events:[
+        ['03 Feb 2025','done','Configured','Rev. C approved by M. Okafor, Engineering'],
+        ['05 Feb 2025','done','Ordered','PO 20931 issued; written back to SAP'],
+        ['19 Feb 2025','done','Cast','Heat no. T-8812; material certificate attached'],
+        ['26 Feb 2025','done','Inspected','First article passed, 14 of 14 dimensions'],
+        ['04 Mar 2025','done','Shipped','Three pallets, consolidated at Immingham'],
+        ['11 Mar 2025','done','Received','Goods-in, 1,200 of 1,200. Two days early']
+      ],
+      foot:'Lead time 36 days · Quoted 38'
+    },
+    {
+      name:'Threaded spacer', model:'AC-208', item:'Item 5102-A', status:['In transit','transit'],
+      fields:[['Specification','6061-T6 aluminium, M12 × 1.75, clear anodise'],['Quantity','8,000 units, 4 releases'],['Supplier','Oduya Fluid Systems, Lagos'],['Destination','Assembly, Dayton plant']],
+      events:[
+        ['14 Feb 2025','done','Configured','Derived from family AC-200, Rev. A'],
+        ['17 Feb 2025','done','Ordered','Blanket PO 21007, release 2 of 4'],
+        ['07 Mar 2025','done','Machined','Lot 2207; CMM report attached'],
+        ['12 Mar 2025','done','Shipped','Ocean freight, vessel Maersk Kalmar'],
+        ['29 Mar 2025','pending','Arrival','Port of Baltimore, forecast'],
+        ['02 Apr 2025','pending','Received','Required on line 04 Apr; two days float']
+      ],
+      foot:'On schedule · Supplier confirmed 12 Mar'
+    },
+    {
+      name:'Keyed hub', model:'AC-330', item:'Item 5218-C', status:['Date revised','late'],
+      fields:[['Specification','4140 steel, 8 mm keyway, black oxide'],['Quantity','450 units'],['Supplier','Brandt-Lowe Assemblies, Graz'],['Destination','Line 1, Tilburg plant']],
+      events:[
+        ['20 Feb 2025','done','Configured','Keyway tolerance tightened to H9, Rev. B'],
+        ['21 Feb 2025','done','Ordered','PO 21044 issued; written back to NetSuite'],
+        ['10 Mar 2025','flag','Revised','Heat-treat backlog; supplier moved date by six days'],
+        ['10 Mar 2025','flag','Impact','Line 1 short on 02 Apr unless resourced'],
+        ['11 Mar 2025','done','Alternate','Kestrel Valve Co. quoted 200 units for 28 Mar'],
+        ['—','pending','Decision','Awaiting approval from J. de Vries, Operations']
+      ],
+      foot:'Flagged 23 days before line impact'
+    }
+  ];
+
+  const card = document.getElementById('card');
+  function render(i){
+    const r = records[i];
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <span class="label">${r.item} · Model ${r.model}</span>
+          <h3>${r.name}</h3>
+        </div>
+        <span class="stamp ${r.status[1]}">${r.status[0]}</span>
+      </div>
+      <dl class="fields">${r.fields.map(f=>`<div><dt>${f[0]}</dt><dd>${f[1]}</dd></div>`).join('')}</dl>
+      <span class="label" style="display:block;margin-bottom:10px">Provenance</span>
+      <ol class="events">${r.events.map(e=>`
+        <li class="${e[1]}"><time>${e[0]}</time><span class="pip"></span><span><b>${e[2]}.</b> <span class="note">${e[3]}</span></span></li>`).join('')}
+      </ol>
+      <div class="card-foot"><span class="label">${r.foot}</span><span class="label">Acme Record</span></div>`;
+  }
+  render(0);
+
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      if(t.classList.contains('active')) return;
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      card.classList.add('fading');
+      setTimeout(()=>{ render(+t.dataset.i); card.classList.remove('fading'); }, 320);
+    });
+  });
+
+  // Demo form
+  const form = document.getElementById('demoForm');
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    let ok = true;
+    const check = (id, test, msg)=>{
+      const el = document.getElementById(id), f = el.closest('.field');
+      const pass = test(el.value.trim());
+      f.classList.toggle('err', !pass);
+      f.querySelector('.msg').textContent = pass ? '' : msg;
+      if(!pass) ok = false;
+    };
+    check('name', v=>v.length>1, 'Please enter your name');
+    check('email', v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), 'A valid work email, please');
+    check('company', v=>v.length>1, 'Please enter your company');
+    check('plants', v=>v!=='', 'Please select one');
+    if(!ok) return;
+
+    const name = document.getElementById('name').value.trim().split(' ')[0];
+    const email = document.getElementById('email').value.trim();
+    const company = document.getElementById('company').value.trim();
+    document.getElementById('confirmText').textContent =
+      `${name}, a member of our operations staff will write to ${email} within one working day to arrange a time. If you can, have two or three of ${company}'s more difficult part numbers to hand.`;
+    document.getElementById('refNo').textContent = 'AC-' + now.getFullYear() + '-' + String(Math.floor(1000 + Math.random()*9000));
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('confirm').style.display = 'block';
+  });
+  form.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('input',()=>{ const f=el.closest('.field'); f.classList.remove('err'); f.querySelector('.msg').textContent=''; });
+  });
+</script>
+</body>
+</html>

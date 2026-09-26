@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom Widgets, Delivered on Rhythm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#101014;
+    --paper:#FFF6E9;
+    --yellow:#FFD319;
+    --coral:#FF5C39;
+    --blue:#2E5BFF;
+    --mint:#3DDC97;
+    --violet:#7B61FF;
+    --belt:#1a1a20;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Space Grotesk',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:'Archivo',sans-serif}
+  ::selection{background:var(--yellow);color:var(--ink)}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:.chevron:nth-child(2){animation-delay:.12s}
+.chevron:nth-child(3){animation-delay:.24s}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ---------- HERO ---------- */
+.hero{
+  min-height:100vh;
+  padding:150px 48px 0;
+  position:relative;
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+.hero-bg-dots{
+  position:absolute;inset:0;
+  background-image:radial-gradient(rgba(16,16,20,.12) 1.5px, transparent 1.5px);
+  background-size:28px 28px;
+  pointer-events:none;
+}
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  font-weight:600;font-size:14px;letter-spacing:.14em;text-transform:uppercase;
+  margin-bottom:22px;
+}
+.hero-kicker .dot{
+  width:12px;height:12px;border-radius:50%;background:var(--coral);
+  animation:blink 1.2s steps(2) infinite;
+}
+@keyframes blink{50%{opacity:.25}}
+.hero h1{
+  font-size:clamp(56px,7.2vw,108px);
+  font-weight:900;line-height:.95;letter-spacing:-.02em;
+  text-transform:uppercase;
+  max-width:1200px;
+}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line span{display:inline-block;transform:translateY(110%);animation:rise .9s cubic-bezier(.2,.9,.2,1) forwards}
+.hero h1 .line:nth-child(2) span{animation-delay:.12s}
+.hero h1 .line:nth-child(3) span{animation-delay:.24s}
+@keyframes rise{to{transform:translateY(0)}}
+.hero h1 .hl{
+  background:var(--yellow);
+  padding:0 18px;
+  display:inline-block;
+  transform:rotate(-1.5deg);
+  box-shadow:6px 6px 0 var(--ink);
+}
+.hero h1 .outline{
+  color:transparent;
+  -webkit-text-stroke:2.5px var(--ink);
+}
+.hero-sub{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:40px;margin:44px 0 56px;flex-wrap:wrap;
+}
+.hero-sub p{
+  max-width:520px;font-size:19px;line-height:1.55;font-weight:500;
+}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap}
+.btn{
+  font-family:'Archivo',sans-serif;font-weight:800;font-size:17px;
+  text-transform:uppercase;letter-spacing:.04em;
+  padding:18px 34px;border:3px solid var(--ink);
+  cursor:pointer;text-decoration:none;display:inline-block;
+  transition:transform .15s, box-shadow .15s;
+  position:relative;
+}
+.btn-primary{background:var(--coral);color:#fff;box-shadow:6px 6px 0 var(--ink)}
+.btn-primary:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--ink)}
+.btn-primary:active{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--ink)}
+.btn-ghost{background:transparent;color:var(--ink);box-shadow:6px 6px 0 rgba(16,16,20,.15)}
+.btn-ghost:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 rgba(16,16,20,.2)}
+
+/* ---------- CONVEYOR ---------- */
+.conveyor-wrap{
+  position:relative;margin:0 -48px;
+  border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);
+  background:var(--belt);
+  height:230px;overflow:hidden;
+}
+.conveyor-wrap::before{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:34px;
+  background:repeating-linear-gradient(90deg,#2a2a33 0 30px,#22222a 30px 60px);
+  border-top:3px solid #000;
+}
+#beltCanvas{display:block;width:100%;height:100%}
+.belt-label{
+  position:absolute;top:14px;left:24px;z-index:2;
+  color:#fff;font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  background:var(--blue);padding:6px 14px;border:2px solid #fff;
+  font-weight:600;
+}
+.belt-label.right{left:auto;right:24px;background:var(--mint);color:var(--ink);border-color:var(--ink)}
+
+/* ---------- MARQUEE ---------- */
+.marquee{
+  background:var(--yellow);border-bottom:4px solid var(--ink);
+  overflow:hidden;padding:16px 0;white-space:nowrap;
+}
+.marquee-track{display:inline-flex;gap:0;animation:scroll 22s linear infinite}
+.marquee-track span{
+  font-family:'Archivo',sans-serif;font-weight:800;font-size:20px;
+  text-transform:uppercase;letter-spacing:.06em;padding:0 28px;
+  display:inline-flex;align-items:center;gap:28px;
+}
+.marquee-track .star{font-size:22px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- SECTIONS ---------- */
+section{padding:110px 48px}
+.section-head{margin-bottom:64px;display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.section-head h2{
+  font-size:clamp(40px,4.5vw,64px);font-weight:900;line-height:1;
+  text-transform:uppercase;letter-spacing:-.01em;max-width:760px;
+}
+.section-head h2 em{font-style:italic;color:var(--blue)}
+.tag{
+  font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;
+  letter-spacing:.18em;text-transform:uppercase;
+  background:var(--ink);color:var(--paper);padding:8px 16px;
+  display:inline-block;margin-bottom:18px;transform:rotate(-1deg);
+}
+
+/* ---------- STEPS ---------- */
+.steps{background:var(--paper)}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.step{
+  border:3px solid var(--ink);background:#fff;padding:36px 30px 30px;
+  position:relative;box-shadow:8px 8px 0 var(--ink);
+  transition:transform .2s;
+}
+.step:hover{transform:translateY(-8px) rotate(-.5deg)}
+.step .num{
+  font-family:'Archivo',sans-serif;font-weight:900;font-size:80px;line-height:1;
+  color:transparent;-webkit-text-stroke:2.5px var(--ink);
+  position:absolute;top:-30px;right:20px;
+}
+.step h3{font-size:26px;font-weight:800;margin:18px 0 12px;text-transform:uppercase}
+.step p{font-size:16px;line-height:1.6;color:#3a3a42}
+.step .icon{width:64px;height:64px}
+.step:nth-child(1){background:var(--yellow)}
+.step:nth-child(2){background:#fff}
+.step:nth-child(3){background:var(--mint)}
+.step:nth-child(2) .num{-webkit-text-stroke-color:var(--coral)}
+
+/* ---------- STATS ---------- */
+.stats{
+  background:var(--blue);color:#fff;
+  border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);
+  position:relative;overflow:hidden;
+}
+.stats::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.14) 1.5px,transparent 1.5px);
+  background-size:26px 26px;
+}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative}
+.stat{text-align:center;padding:20px 10px}
+.stat .value{
+  font-family:'Archivo',sans-serif;font-weight:900;
+  font-size:clamp(48px,4.6vw,72px);line-height:1;
+}
+.stat .value .suffix{color:var(--yellow)}
+.stat .label{margin-top:12px;font-size:15px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;opacity:.9}
+.stat:nth-child(2) .value .suffix{color:var(--mint)}
+.stat:nth-child(3) .value .suffix{color:var(--coral)}
+.stat:nth-child(4) .value .suffix{color:#fff}
+
+/* ---------- FEATURES ---------- */
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+.feature{
+  border:3px solid var(--ink);padding:40px 36px;background:#fff;
+  display:flex;gap:28px;align-items:flex-start;
+  box-shadow:8px 8px 0 rgba(16,16,20,.12);
+  transition:box-shadow .2s, transform .2s;
+}
+.feature:hover{box-shadow:12px 12px 0 var(--ink);transform:translate(-4px,-4px)}
+.feature .badge{
+  min-width:72px;height:72px;border:3px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Archivo',sans-serif;font-weight:900;font-size:15px;
+}
+.feature:nth-child(1) .badge{background:var(--coral);color:#fff}
+.feature:nth-child(2) .badge{background:var(--yellow)}
+.feature:nth-child(3) .badge{background:var(--violet);color:#fff}
+.feature:nth-child(4) .badge{background:var(--mint)}
+.feature h3{font-size:24px;font-weight:800;text-transform:uppercase;margin-bottom:10px}
+.feature p{font-size:16px;line-height:1.6;color:#3a3a42}
+
+/* ---------- QUOTE ---------- */
+.quote-section{background:var(--ink);color:var(--paper);border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);position:relative;overflow:hidden}
+.quote-mark{font-family:'Archivo',sans-serif;font-weight:900;font-size:160px;line-height:.6;color:var(--yellow);margin-bottom:24px}
+blockquote{
+  font-family:'Archivo',sans-serif;font-weight:700;
+  font-size:clamp(28px,3vw,44px);line-height:1.25;max-width:1000px;
+}
+blockquote em{font-style:italic;color:var(--mint)}
+.quote-attr{margin-top:36px;display:flex;align-items:center;gap:18px}
+.quote-attr .avatar{
+  width:60px;height:60px;border-radius:50%;background:var(--coral);
+  border:3px solid var(--paper);display:flex;align-items:center;justify-content:center;
+  font-family:'Archivo',sans-serif;font-weight:900;font-size:20px;color:#fff;
+}
+.quote-attr .who{font-size:16px}
+.quote-attr .who strong{display:block;font-size:18px}
+.quote-attr .who span{opacity:.7}
+.orbit{
+  position:absolute;right:-80px;top:50%;transform:translateY(-50%);
+  width:420px;height:420px;pointer-events:none;opacity:.9;
+}
+.orbit svg{animation:spin 24s linear infinite;width:100%;height:100%}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- DEMO / FORM ---------- */
+.demo{padding:120px 48px;position:relative}
+.demo-inner{
+  max-width:1180px;margin:0 auto;border:4px solid var(--ink);
+  background:var(--yellow);box-shadow:14px 14px 0 var(--ink);
+  display:grid;grid-template-columns:1.1fr 1fr;
+}
+.demo-left{padding:64px 56px;border-right:4px solid var(--ink)}
+.demo-left h2{font-size:clamp(38px,3.6vw,56px);font-weight:900;text-transform:uppercase;line-height:1;margin-bottom:24px}
+.demo-left p{font-size:18px;line-height:1.6;font-weight:500;max-width:440px}
+.demo-perks{margin-top:36px;display:flex;flex-direction:column;gap:14px}
+.demo-perks li{
+  list-style:none;display:flex;align-items:center;gap:14px;
+  font-weight:600;font-size:16px;
+}
+.demo-perks .check{
+  width:28px;height:28px;background:var(--ink);color:var(--yellow);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:15px;flex-shrink:0;
+}
+.demo-form{padding:64px 56px;background:#fff}
+.demo-form label{
+  display:block;font-family:'Archivo',sans-serif;font-weight:700;
+  font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin:22px 0 8px;
+}
+.demo-form label:first-child{margin-top:0}
+.demo-form input,.demo-form select{
+  width:100%;padding:15px 16px;border:3px solid var(--ink);
+  font-family:'Space Grotesk',sans-serif;font-size:16px;background:var(--paper);
+  outline:none;transition:box-shadow .15s;
+}
+.demo-form input:focus,.demo-form select:focus{box-shadow:4px 4px 0 var(--blue)}
+.demo-form .btn{width:100%;margin-top:30px;font-size:18px}
+.form-note{margin-top:16px;font-size:13px;color:#6a6a72;text-align:center}
+.form-success{
+  display:none;text-align:center;padding:40px 0;
+}
+.form-success .big{font-family:'Archivo',sans-serif;font-weight:900;font-size:34px;text-transform:uppercase;margin:18px 0 12px}
+.form-success p{font-size:16px;color:#3a3a42;line-height:1.6}
+
+/* ---------- FOOTER ---------- */
+footer{
+  background:var(--ink);color:var(--paper);padding:56px 48px 40px;
+}
+.footer-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;margin-bottom:40px}
+.footer-logo{font-family:'Archivo',sans-serif;font-weight:900;font-size:32px;letter-spacing:.02em}
+.footer-logo span{color:var(--yellow)}
+.footer-links{display:flex;gap:32px}
+.footer-links a{color:var(--paper);text-decoration:none;font-size:15px;font-weight:500;opacity:.8;transition:opacity .15s}
+.footer-links a:hover{opacity:1;color:var(--yellow)}
+.footer-bottom{border-top:1px solid rgba(255,246,233,.2);padding-top:24px;font-size:13px;opacity:.6;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+/* ---------- REVEAL ---------- */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s cubic-bezier(.2,.9,.2,1),transform .7s cubic-bezier(.2,.9,.2,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal:nth-child(2){transition-delay:.1s}
+.reveal:nth-child(3){transition-delay:.2s}
+.reveal:nth-child(4){transition-delay:.3s}
+
+@media (max-width:960px){
+  .steps-grid,.stats-grid{grid-template-columns:1fr 1fr}
+  .features-grid,.demo-inner{grid-template-columns:1fr}
+  .demo-left{border-right:none;border-bottom:4px solid var(--ink)}
+  section,.hero{padding-left:24px;padding-right:24px}
+  .conveyor-wrap{margin:0 -24px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#top">ACME<span>.</span></a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#platform">Platform</a>
+    <a href="#results">Results</a>
+  </div>
+  <a class="btn btn-primary" style="padding:12px 24px;font-size:14px" href="#demo">Book a demo</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-bg-dots"></div>
+  <div class="hero-kicker"><span class="dot"></span> Widget operations, in motion</div>
+  <h1>
+    <span class="line"><span>Your supply chain,</span></span>
+    <span class="line"><span><span class="hl">on the beat.</span></span></span>
+    <span class="line"><span class="outline">Every widget. Every time.</span></span>
+  </h1>
+  <div class="hero-sub">
+    <p>Acme is the operations platform for mid-sized manufacturers. Configure custom widgets, place orders across your supplier network, and track every unit from spec sheet to loading dock — in one rhythmic, real-time flow.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#demo">Book a demo →</a>
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+    </div>
+  </div>
+
+  <!-- CONVEYOR BELT -->
+  <div class="conveyor-wrap">
+    <div class="belt-label">Line 04 — Live</div>
+    <div class="belt-label right">Throughput 98.2%</div>
+    <canvas id="beltCanvas"></canvas>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="marqueeTrack">
+    <span>Configure <i class="star">✦</i></span>
+    <span>Order <i class="star">✦</i></span>
+    <span>Track <i class="star">✦</i></span>
+    <span>Repeat <i class="star">✦</i></span>
+    <span>Zero spreadsheets <i class="star">✦</i></span>
+    <span>4.2M widgets shipped <i class="star">✦</i></span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="steps" id="how">
+  <div class="section-head">
+    <div>
+      <span class="tag">The rhythm</span>
+      <h2>Three beats to a <em>shipped</em> widget</h2>
+    </div>
+  </div>
+  <div class="steps-grid">
+    <div class="step reveal">
+      <div class="num">01</div>
+      <svg class="icon" viewBox="0 0 64 64" fill="none">
+        <rect x="8" y="8" width="48" height="48" rx="6" stroke="#101014" stroke-width="4"/>
+        <circle cx="32" cy="32" r="10" stroke="#101014" stroke-width="4"/>
+        <path d="M32 8v10M32 46v10M8 32h10M46 32h10" stroke="#101014" stroke-width="4"/>
+      </svg>
+      <h3>Configure</h3>
+      <p>Build your widget spec in minutes — dimensions, tolerances, materials, coatings. Acme validates every configuration against live supplier capability, so what you spec is what gets made.</p>
+    </div>
+    <div class="step reveal">
+      <div class="num">02</div>
+      <svg class="icon" viewBox="0 0 64 64" fill="none">
+        <path d="M8 20h40l6 12v20H8V20z" stroke="#FF5C39" stroke-width="4" fill="none"/>
+        <circle cx="20" cy="52" r="5" fill="#FF5C39"/>
+        <circle cx="44" cy="52" r="5" fill="#FF5C39"/>
+        <path d="M8 20l6-10h26" stroke="#FF5C39" stroke-width="4"/>
+      </svg>
+      <h3>Order</h3>
+      <p>One purchase order fans out across your approved supplier network with negotiated pricing baked in. Acme sequences production windows so nothing queues behind anything else.</p>
+    </div>
+    <div class="step reveal">
+      <div class="num">03</div>
+      <svg class="icon" viewBox="0 0 64 64" fill="none">
+        <circle cx="32" cy="32" r="24" stroke="#101014" stroke-width="4"/>
+        <path d="M32 18v14l10 6" stroke="#101014" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <h3>Track</h3>
+      <p>Watch every unit move — machining, finishing, QA, freight — on a single live timeline. Exceptions surface the moment they happen, not at the weekly status meeting.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats" id="results">
+  <div class="stats-grid">
+    <div class="stat reveal"><div class="value"><span data-count="98.2" data-decimals="1">0</span><span class="suffix">%</span></div><div class="label">On-time delivery</div></div>
+    <div class="stat reveal"><div class="value"><span data-count="4.2" data-decimals="1">0</span><span class="suffix">M</span></div><div class="label">Widgets shipped</div></div>
+    <div class="stat reveal"><div class="value"><span data-count="37">0</span><span class="suffix">%</span></div><div class="label">Lower expedite costs</div></div>
+    <div class="stat reveal"><div class="value"><span data-count="11">0</span><span class="suffix"> days</span></div><div class="label">Avg. spec-to-dock</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="platform">
+  <div class="section-head">
+    <div>
+      <span class="tag">The platform</span>
+      <h2>Built for the floor, <em>not</em> the file cabinet</h2>
+    </div>
+  </div>
+  <div class="features-grid">
+    <div class="feature reveal">
+      <div class="badge">SPEC</div>
+      <div>
+        <h3>Spec Studio</h3>
+        <p>A visual configurator your whole team can use. Save approved widget templates, lock tolerances, and stop re-answering the same engineering questions on every reorder.</p>
+      </div>
+    </div>
+    <div class="feature reveal">
+      <div class="badge">NET</div>
+      <div>
+        <h3>Supplier Network</h3>
+        <p>Route orders to 240+ vetted widget fabricators, or plug in your own. Capacity, pricing, and lead times update continuously — no more quoting by phone tag.</p>
+      </div>
+    </div>
+    <div class="feature reveal">
+      <div class="badge">PING</div>
+      <div>
+        <h3>Pulse Tracking</h3>
+        <p>Unit-level visibility from raw stock to dock door. Barcode and IoT checkpoints feed a live timeline, with ETA recalculation the instant anything slips.</p>
+      </div>
+    </div>
+    <div class="feature reveal">
+      <div class="badge">SYNC</div>
+      <div>
+        <h3>ERP Sync</h3>
+        <p>Two-way integrations with NetSuite, SAP Business One, and Epicor. Orders, receipts, and invoices reconcile themselves — your planners get their afternoons back.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section">
+  <div class="orbit" aria-hidden="true">
+    <svg viewBox="0 0 200 200" fill="none">
+      <circle cx="100" cy="100" r="90" stroke="#FFD319" stroke-width="2" stroke-dasharray="6 10"/>
+      <circle cx="100" cy="100" r="60" stroke="#3DDC97" stroke-width="2" stroke-dasharray="4 8"/>
+      <circle cx="190" cy="100" r="10" fill="#FF5C39"/>
+      <circle cx="100" cy="40" r="7" fill="#2E5BFF"/>
+      <circle cx="100" cy="100" r="16" fill="#FFD319"/>
+    </svg>
+  </div>
+  <div class="quote-mark">“</div>
+  <blockquote class="reveal visible">We used to lose two days a week chasing widget status over email. With Acme, the whole line just <em>keeps time</em> — our on-time rate went from 81% to 97% in one quarter.</blockquote>
+  <div class="quote-attr">
+    <div class="avatar">MK</div>
+    <div class="who">
+      <strong>Marta Kowalski</strong>
+      <span>Director of Operations, Halvard Precision Components</span>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="demo-inner">
+    <div class="demo-left">
+      <span class="tag">Get moving</span>
+      <h2>See your line on the beat</h2>
+      <p>Book a 30-minute working session. We'll load one of your real widget specs and show you the full configure → order → track flow, live.</p>
+      <ul class="demo-perks">
+        <li><span class="check">✓</span> Your spec, configured on the call</li>
+        <li><span class="check">✓</span> Live supplier pricing &amp; lead times</li>
+        <li><span class="check">✓</span> A tracking timeline you can keep</li>
+        <li><span class="check">✓</span> No 47-slide deck. Promise.</li>
+      </ul>
+    </div>
+    <div class="demo-form">
+      <form id="demoForm" novalidate>
+        <label for="name">Full name</label>
+        <input id="name" type="text" placeholder="Jordan Reyes" required>
+        <label for="email">Work email</label>
+        <input id="email" type="email" placeholder="jordan@yourcompany.com" required>
+        <label for="company">Company</label>
+        <input id="company" type="text" placeholder="Halvard Precision Components" required>
+        <label for="volume">Monthly widget volume</label>
+        <select id="volume" required>
+          <option value="">Select a range…</option>
+          <option>Under 5,000 units</option>
+          <option>5,000 – 25,000 units</option>
+          <option>25,000 – 100,000 units</option>
+          <option>100,000+ units</option>
+        </select>
+        <button class="btn btn-primary" type="submit">Book my demo →</button>
+        <div class="form-note">We reply within one business day. No spam, ever.</div>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" style="margin:0 auto">
+          <circle cx="36" cy="36" r="32" stroke="#3DDC97" stroke-width="5"/>
+          <path d="M22 37l10 10 18-20" stroke="#3DDC97" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="big">You're on the line.</div>
+        <p>Thanks — we'll reach out within one business day to lock in your session. Keep an eye on your inbox.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-logo">ACME<span>.</span></div>
+    <div class="footer-links">
+      <a href="#how">How it works</a>
+      <a href="#platform">Platform</a>
+      <a href="#results">Results</a>
+      <a href="#demo">Book a demo</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Acme Widget Systems, Inc. All rights reserved.</span>
+    <span>Made with rhythm in Dayton, OH</span>
+  </div>
+</footer>
+
+<script>
+/* ============ CONVEYOR BELT CANVAS ============ */
+(function(){
+  const canvas = document.getElementById('beltCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr;
+
+  function resize(){
+    dpr = window.devicePixelRatio || 1;
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COLORS = ['#FFD319','#FF5C39','#2E5BFF','#3DDC97','#7B61FF'];
+  const widgets = [];
+  const GAP = 190;
+  const count = Math.ceil(1600 / GAP) + 3;
+
+  for(let i=0;i<count;i++){
+    widgets.push({
+      x: i * GAP - 100,
+      type: i % 3,               // 0 gear, 1 hex, 2 block
+      color: COLORS[i % COLORS.length],
+      rot: Math.random()*Math.PI*2,
+      spin: (i%2===0?1:-1) * 0.012,
+      bob: Math.random()*Math.PI*2,
+      size: 26 + (i%4)*4
+    });
+  }
+
+  const SPEED = 2.4;
+  let t = 0;
+
+  function drawGear(x,y,r,rot,color){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot);
+    ctx.fillStyle = color;
+    const teeth = 8;
+    ctx.beginPath();
+    for(let i=0;i<teeth;i++){
+      const a = (i/teeth)*Math.PI*2;
+      const a2 = a + Math.PI/teeth*0.5;
+      const a3 = a + Math.PI/teeth;
+      ctx.lineTo(Math.cos(a)*r*1.25, Math.sin(a)*r*1.25);
+      ctx.lineTo(Math.cos(a2)*r*1.25, Math.sin(a2)*r*1.25);
+      ctx.lineTo(Math.cos(a2)*r, Math.sin(a2)*r);
+      ctx.lineTo(Math.cos(a3)*r, Math.sin(a3)*r);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#1a1a20';
+    ctx.beginPath(); ctx.arc(0,0,r*0.38,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawHex(x,y,r,rot,color){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    for(let i=0;i<6;i++){
+      const a = (i/6)*Math.PI*2;
+      ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#101014'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.fillStyle = '#101014';
+    ctx.beginPath(); ctx.arc(0,0,r*0.28,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawBlock(x,y,r,rot,color){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot);
+    ctx.fillStyle = color;
+    ctx.fillRect(-r,-r*0.7,r*2,r*1.4);
+    ctx.strokeStyle = '#101014'; ctx.lineWidth = 3;
+    ctx.strokeRect(-r,-r*0.7,r*2,r*1.4);
+    ctx.fillStyle = '#101014';
+    ctx.fillRect(-r*0.5,-r*0.25,r,r*0.5);
+    ctx.restore();
+  }
+
+  function frame(){
+    t++;
+    ctx.clearRect(0,0,W,H);
+
+    // belt speed lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.lineWidth = 2;
+    for(let i=0;i<8;i++){
+      const lx = ((i*260 - t*SPEED*1.6) % (W+260) + W+260) % (W+260) - 130;
+      ctx.beginPath(); ctx.moveTo(lx, 20); ctx.lineTo(lx-40, 20); ctx.stroke();
+    }
+
+    const beltY = H - 34;
+    widgets.forEach(w=>{
+      w.x += SPEED;
+      if(w.x > W + 120) w.x -= (count)*GAP;
+      w.rot += w.spin;
+      const y = beltY - w.size - 14 + Math.sin(t*0.05 + w.bob)*3;
+      if(w.type===0) drawGear(w.x, y, w.size*0.8, w.rot, w.color);
+      else if(w.type===1) drawHex(w.x, y, w.size*0.85, w.rot, w.color);
+      else drawBlock(w.x, y, w.size*0.9, Math.sin(t*0.03+w.bob)*0.08, w.color);
+    });
+
+    // belt rollers
+    ctx.fillStyle = '#0d0d12';
+    for(let x = 30 - (t*SPEED % 60); x < W+60; x += 60){
+      ctx.beginPath(); ctx.arc(x, beltY+17, 10, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#3a3a46';
+      ctx.beginPath(); ctx.arc(x, beltY+17, 3.5, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#0d0d12';
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ============ MARQUEE DUPLICATE ============ */
+(function(){
+  const track = document.getElementById('marqueeTrack');
+  track.innerHTML += track.innerHTML;
+})();
+
+/* ============ SCROLL REVEAL ============ */
+(function(){
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target);} });
+  },{threshold:0.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+
+/* ============ COUNT-UP STATS ============ */
+(function(){
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting) return;
+      const el = entry.target;
+      io.unobserve(el);
+      const target = parseFloat(el.dataset.count);
+      const decimals = parseInt(el.dataset.decimals||'0');
+      const dur = 1600, start = performance.now();
+      function tick(now){
+        const p = Math.min((now-start)/dur, 1);
+        const eased = 1 - Math.pow(1-p, 3);
+        el.textContent = (target*eased).toFixed(decimals);
+        if(p<1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+  },{threshold:0.5});
+  document.querySelectorAll('[data-count]').forEach(el=>io.observe(el));
+})();
+
+/* ============ FORM ============ */
+(function(){
+  const form = document.getElementById('demoForm');
+  const success = document.getElementById('formSuccess');
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    let valid = true;
+    form.querySelectorAll('input,select').forEach(f=>{
+      if(!f.value || (f.type==='email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value))){
+        valid = false;
+        f.style.boxShadow = '4px 4px 0 #FF5C39';
+        f.addEventListener('input', ()=>f.style.boxShadow='', {once:true});
+      }
+    });
+    if(!valid) return;
+    form.style.display = 'none';
+    success.style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme | Custom widget operations for manufacturers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f1efea;
+    --panel:#e7e4dd;
+    --paper:#faf9f6;
+    --ink:#1d1d1b;
+    --text:#3b3b38;
+    --muted:#85847f;
+    --rule:#d3d0c8;
+    --orange:#e2601b;
+    --orange-dark:#c24f12;
+    --green:#5d8a3f;
+    --screen:#1f201e;
+    --sans:"Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    font-size:18px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 40px}
+  .label{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  h1,h2,h3{color:var(--ink);font-weight:500;letter-spacing:-.02em}
+  h2{font-size:44px;line-height:1.1}
+  h3{font-size:22px;line-height:1.25;letter-spacing:-.01em}
+
+  /* Buttons */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:var(--sans);font-size:16px;font-weight:500;
+    padding:15px 24px;border-radius:999px;border:0;cursor:pointer;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .btn-primary{background:var(--orange);color:#fff}
+  .btn-primary:hover{background:var(--orange-dark)}
+  .btn-primary:active{transform:translateY(1px)}
+  .btn-ghost{color:var(--ink);padding-left:4px}
+  .btn-ghost span{transition:transform .2s ease;display:inline-block}
+  .btn-ghost:hover span{transform:translateX(4px)}
+  .btn:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, .mode-btn:focus-visible{
+    outline:2px solid var(--orange);outline-offset:3px;
+  }
+
+  /* Nav */
+  header{
+    position:sticky;top:0;z-index:10;
+    background:rgba(241,239,234,.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--rule);
+  }
+  nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:20px;color:var(--ink);letter-spacing:-.01em}
+  .logo-mark{width:22px;height:22px;border-radius:50%;border:2px solid var(--ink);position:relative}
+  .logo-mark::after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:var(--orange);top:50%;left:50%;transform:translate(-50%,-50%)}
+  .nav-links{display:flex;gap:36px;font-size:15px}
+  .nav-links a{color:var(--text);transition:color .2s}
+  .nav-links a:hover{color:var(--ink)}
+  nav .btn{padding:11px 20px;font-size:15px}
+
+  /* Hero */
+  .hero{padding:96px 0 104px}
+  .hero-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center}
+  .hero-copy{grid-column:1 / span 6}
+  .hero-copy h1{font-size:64px;line-height:1.04;margin:20px 0 28px}
+  .hero-copy p.lede{font-size:20px;max-width:520px;color:var(--text)}
+  .hero-actions{display:flex;align-items:center;gap:20px;margin-top:40px}
+  .hero-note{margin-top:22px;font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}
+
+  /* Device */
+  .hero-device{grid-column:7 / span 6;display:flex;justify-content:flex-end}
+  .device{
+    width:560px;height:380px;
+    background:linear-gradient(180deg,#ebe8e1 0%,#e2dfd7 100%);
+    border-radius:22px;
+    box-shadow:0 1px 0 #fff inset, 0 30px 60px -30px rgba(40,35,25,.35), 0 2px 6px rgba(40,35,25,.08);
+    padding:32px;
+    display:grid;grid-template-columns:200px 1fr;gap:32px;
+    position:relative;
+  }
+  .grille{
+    border-radius:12px;
+    background-image:radial-gradient(circle, #3a3935 2.3px, transparent 2.8px);
+    background-size:14px 14px;
+    background-position:center;
+    opacity:.85;
+  }
+  .controls{display:flex;flex-direction:column;justify-content:space-between}
+  .screen{
+    background:var(--screen);border-radius:10px;padding:18px 20px;
+    color:#e9e6de;box-shadow:inset 0 2px 6px rgba(0,0,0,.4);
+    height:150px;display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .screen .s-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:#8f8d86;display:flex;justify-content:space-between}
+  .screen .s-main{font-size:24px;font-weight:500;letter-spacing:-.01em;color:#f4f1ea;transition:opacity .25s}
+  .screen .s-sub{font-family:var(--mono);font-size:11px;color:#b4b1a8;transition:opacity .25s}
+  .stages{display:flex;gap:6px}
+  .stages i{flex:1;height:4px;border-radius:2px;background:#3d3e3a;transition:background .35s}
+  .stages i.on{background:#e9e6de}
+  .stages i.now{background:var(--orange)}
+  .fade{opacity:0}
+  .dial-row{display:flex;align-items:center;justify-content:space-between}
+  .dial{width:84px;height:84px}
+  .dial-knob{transition:transform .6s cubic-bezier(.4,.1,.2,1);transform-origin:50px 50px}
+  .modes{display:flex;gap:18px}
+  .mode{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .mode-btn{
+    width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;
+    background:#d6d3cb;box-shadow:0 2px 0 #bfbbb2, inset 0 1px 0 #f3f1ec;
+    transition:transform .1s, background .2s;
+  }
+  .mode-btn:active{transform:translateY(2px);box-shadow:0 0 0 #bfbbb2}
+  .mode-btn.active{background:var(--orange);box-shadow:0 2px 0 #a8440e, inset 0 1px 0 #f39a67}
+  .mode span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .device-foot{position:absolute;left:32px;bottom:14px;right:32px;display:flex;justify-content:space-between;align-items:center}
+  .device-foot .brand{font-size:11px;font-weight:600;letter-spacing:.2em;color:#9b988f}
+  .led{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(93,138,63,.7)}
+
+  /* Logos */
+  .logos{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:36px 0}
+  .logos-inner{display:flex;align-items:center;justify-content:space-between;gap:32px}
+  .logos .label{white-space:nowrap}
+  .logo-list{display:flex;gap:44px;flex-wrap:nowrap}
+  .logo-list span{font-size:16px;font-weight:500;color:#76756f;letter-spacing:-.005em;white-space:nowrap}
+
+  /* Problem statement */
+  .statement{padding:128px 0 96px}
+  .statement-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .statement .label{grid-column:1 / span 3;padding-top:12px}
+  .statement p.big{grid-column:4 / span 9;font-size:38px;line-height:1.25;color:var(--ink);letter-spacing:-.015em;font-weight:400}
+  .statement p.big em{font-style:normal;color:var(--muted)}
+
+  /* Features */
+  .features{padding:0 0 128px}
+  .feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .feature{border-top:2px solid var(--ink);padding-top:28px}
+  .feature-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px}
+  .feature-icon{width:56px;height:56px}
+  .feature h3{margin-bottom:14px}
+  .feature p{font-size:17px}
+  .feature ul{list-style:none;margin-top:24px;border-top:1px solid var(--rule)}
+  .feature li{font-size:15px;padding:11px 0;border-bottom:1px solid var(--rule);display:flex;gap:12px;align-items:center}
+  .feature li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ink);flex:none}
+
+  /* Tracking view */
+  .tracking{padding:120px 0;background:var(--panel)}
+  .tracking-head{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-bottom:56px;align-items:end}
+  .tracking-head .h{grid-column:1 / span 6}
+  .tracking-head .h h2{margin-top:16px}
+  .tracking-head p{grid-column:8 / span 5;font-size:18px}
+  .app{
+    background:var(--paper);border-radius:16px;
+    box-shadow:0 24px 50px -30px rgba(40,35,25,.35), 0 1px 3px rgba(40,35,25,.06);
+    overflow:hidden;
+  }
+  .app-bar{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid #e6e3dc}
+  .app-bar .title{font-weight:500;color:var(--ink);font-size:16px}
+  .tabs{display:flex;gap:6px;font-size:13px}
+  .tabs span{padding:6px 12px;border-radius:999px;color:var(--muted)}
+  .tabs span.on{background:var(--ink);color:#fff}
+  .app-body{display:grid;grid-template-columns:1fr 300px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:400;text-align:left;padding:14px 20px;border-bottom:1px solid #e6e3dc}
+  td{padding:17px 20px;border-bottom:1px solid #eeebe5;color:var(--text);white-space:nowrap}
+  td:first-child,th:first-child{padding-left:28px}
+  tr:last-child td{border-bottom:0}
+  td.po{font-family:var(--mono);font-size:13px;color:var(--ink)}
+  td .sub{display:block;font-size:12px;color:var(--muted)}
+  .pips{display:flex;gap:5px}
+  .pips i{width:9px;height:9px;border-radius:50%;border:1.5px solid #c9c5bc}
+  .pips i.f{background:var(--ink);border-color:var(--ink)}
+  .pips i.w{background:var(--orange);border-color:var(--orange)}
+  .status{display:inline-flex;align-items:center;gap:8px;font-size:13px}
+  .status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green)}
+  .status.late::before{background:var(--orange)}
+  .status.done::before{background:var(--ink)}
+  .status.wait::before{background:#c9c5bc}
+  tr.flag{background:#fdf3ec}
+  .aside{border-left:1px solid #e6e3dc;padding:24px;display:flex;flex-direction:column;gap:16px}
+  .note{border-radius:10px;padding:18px;background:#fff;border:1px solid #ebe8e1}
+  .note .label{margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .note p{font-size:14px;line-height:1.5;color:var(--ink)}
+  .note.alert{border-color:#f2c9ae}
+  .note.alert .label::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--orange)}
+  .note small{display:block;margin-top:10px;font-size:12px;color:var(--muted)}
+
+  /* Principles */
+  .principles{padding:128px 0}
+  .principles-head{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-bottom:64px}
+  .principles-head .label{grid-column:1 / span 3;padding-top:14px}
+  .principles-head h2{grid-column:4 / span 8}
+  .p-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px}
+  .p-grid .p-list{grid-column:4 / span 9;display:grid;grid-template-columns:repeat(3,1fr);gap:48px 24px}
+  .p-item .num{font-family:var(--mono);font-size:12px;color:var(--orange);margin-bottom:12px;display:block}
+  .p-item h3{font-size:20px;margin-bottom:8px}
+  .p-item p{font-size:16px;color:var(--text)}
+
+  /* Numbers */
+  .numbers{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .num-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+  .num-cell{padding:56px 40px 48px 0}
+  .num-cell + .num-cell{border-left:1px solid var(--rule);padding-left:40px}
+  .num-cell .figure{font-size:72px;font-weight:400;color:var(--ink);letter-spacing:-.03em;line-height:1}
+  .num-cell .figure sup{font-size:32px;vertical-align:top;position:relative;top:8px;margin-left:2px;color:var(--muted)}
+  .num-cell p{margin-top:16px;font-size:16px;max-width:280px}
+  .num-foot{padding:18px 0;font-size:13px;color:var(--muted)}
+
+  /* Testimonial */
+  .quote{padding:128px 0}
+  .quote-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .quote-mark{grid-column:1 / span 3}
+  .quote-mark svg{width:56px;height:56px}
+  blockquote{grid-column:4 / span 8}
+  blockquote p{font-size:34px;line-height:1.3;color:var(--ink);letter-spacing:-.015em}
+  .cite{display:flex;align-items:center;gap:16px;margin-top:40px}
+  .avatar{width:52px;height:52px;border-radius:50%;background:var(--panel);display:grid;place-items:center;font-weight:500;color:var(--ink);font-size:16px;border:1px solid var(--rule)}
+  .cite strong{display:block;color:var(--ink);font-weight:500;font-size:16px}
+  .cite span{font-size:15px;color:var(--muted)}
+
+  /* Demo */
+  .demo{background:var(--ink);color:#cfccc4;padding:120px 0}
+  .demo-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .demo-copy{grid-column:1 / span 5}
+  .demo-copy .label{color:#8f8d86}
+  .demo-copy h2{color:#f4f1ea;margin:16px 0 24px}
+  .demo-copy > p{font-size:18px;max-width:440px}
+  .steps{list-style:none;margin-top:48px;border-top:1px solid #3a3a37}
+  .steps li{display:grid;grid-template-columns:72px 1fr;padding:22px 0;border-bottom:1px solid #3a3a37}
+  .steps .t{font-family:var(--mono);font-size:13px;color:var(--orange);padding-top:3px}
+  .steps strong{display:block;color:#f4f1ea;font-weight:500;font-size:17px;margin-bottom:4px}
+  .steps p{font-size:15px;color:#a9a69e}
+  .host{display:flex;align-items:center;gap:14px;margin-top:36px;font-size:15px}
+  .host .avatar{background:#2e2e2b;border-color:#444;color:#f4f1ea}
+
+  .form-card{grid-column:7 / span 6;background:var(--paper);border-radius:20px;padding:48px;color:var(--text);align-self:start}
+  .form-card h3{font-size:26px;margin-bottom:8px}
+  .form-card > p{font-size:16px;color:var(--muted);margin-bottom:32px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .field{margin-bottom:22px;display:flex;flex-direction:column;gap:8px}
+  .field label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .field input,.field select{
+    font-family:var(--sans);font-size:16px;color:var(--ink);
+    padding:14px 16px;border:1px solid #d9d6ce;border-radius:10px;background:#fff;
+    transition:border-color .2s;appearance:none;-webkit-appearance:none;
+  }
+  .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2385847f' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
+  .field input:hover,.field select:hover{border-color:#bdb9b0}
+  .field input:focus,.field select:focus{border-color:var(--ink);outline:none}
+  .field.error input{border-color:var(--orange)}
+  .err{font-size:13px;color:var(--orange-dark);display:none}
+  .field.error .err{display:block}
+  .chips{display:flex;gap:10px}
+  .chips input{position:absolute;opacity:0;pointer-events:none}
+  .chips label.chip{
+    font-family:var(--sans);text-transform:none;letter-spacing:0;font-size:15px;color:var(--text);
+    padding:10px 18px;border:1px solid #d9d6ce;border-radius:999px;cursor:pointer;background:#fff;transition:all .2s;
+  }
+  .chips input:checked + label.chip{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chips input:focus-visible + label.chip{outline:2px solid var(--orange);outline-offset:2px}
+  .form-card .btn{width:100%;justify-content:center;margin-top:10px;padding:17px}
+  .fine{font-size:13px;color:var(--muted);margin-top:16px;text-align:center}
+  .success{display:none;text-align:left}
+  .success .check{width:56px;height:56px;border-radius:50%;background:var(--green);display:grid;place-items:center;margin-bottom:28px}
+  .success h3{margin-bottom:12px}
+  .success p{font-size:16px;margin-bottom:12px}
+
+  /* FAQ */
+  .faq{padding:120px 0}
+  .faq-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .faq-grid .h{grid-column:1 / span 4}
+  .faq-grid .h h2{margin-top:16px;font-size:36px}
+  .faq-list{grid-column:6 / span 7;border-top:1px solid var(--rule)}
+  details{border-bottom:1px solid var(--rule)}
+  summary{list-style:none;cursor:pointer;padding:24px 0;display:flex;justify-content:space-between;align-items:center;font-size:19px;color:var(--ink);font-weight:500}
+  summary::-webkit-details-marker{display:none}
+  summary .pm{width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);position:relative;flex:none;transition:transform .25s, background .2s}
+  summary .pm::before,summary .pm::after{content:"";position:absolute;background:var(--ink);top:50%;left:50%;transform:translate(-50%,-50%)}
+  summary .pm::before{width:9px;height:1.5px}
+  summary .pm::after{width:1.5px;height:9px;transition:opacity .2s}
+  details[open] summary .pm::after{opacity:0}
+  details[open] summary .pm{background:#fff}
+  details p{padding:0 60px 26px 0;font-size:17px}
+
+  /* Footer */
+  footer{border-top:1px solid var(--rule);padding:48px 0 56px;font-size:14px;color:var(--muted)}
+  .foot{display:flex;justify-content:space-between;align-items:flex-start}
+  .foot-cols{display:flex;gap:72px}
+  .foot-cols div{display:flex;flex-direction:column;gap:10px}
+  .foot-cols a:hover{color:var(--ink)}
+  .foot .copy{margin-top:18px}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;scroll-behavior:auto !important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav aria-label="Main">
+      <a href="#" class="logo" aria-label="Acme home"><span class="logo-mark"></span>Acme</a>
+      <div class="nav-links">
+        <a href="#platform">Platform</a>
+        <a href="#tracking">Tracking</a>
+        <a href="#principles">Approach</a>
+        <a href="#faq">Questions</a>
+      </div>
+      <a href="#demo" class="btn btn-primary">Book a demo</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="label">Widget operations for manufacturers</span>
+        <h1>Custom widgets, ordered with less friction.</h1>
+        <p class="lede">Acme gives operations teams one calm place to configure widgets, place orders with suppliers, and see exactly where every part is, from spec sheet to receiving dock.</p>
+        <div class="hero-actions">
+          <a href="#demo" class="btn btn-primary">Book a 30-minute demo</a>
+          <a href="#platform" class="btn btn-ghost">See how it works <span>→</span></a>
+        </div>
+        <p class="hero-note"><span class="dot"></span>You'll talk with a person who has worked in manufacturing. No script, no pressure.</p>
+      </div>
+
+      <div class="hero-device">
+        <div class="device" role="img" aria-label="Illustration of the Acme platform as a simple device showing an order's status">
+          <div class="grille"></div>
+          <div class="controls">
+            <div class="screen" aria-live="polite">
+              <div class="s-label"><span id="sLabel">PO 4471</span><span id="sStep">04/05</span></div>
+              <div>
+                <div class="s-main" id="sMain">In transit</div>
+                <div class="s-sub" id="sSub">Brightwater Plastics · ETA Thu 14 Nov</div>
+              </div>
+              <div class="stages" id="stages"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="dial-row">
+              <svg class="dial" viewBox="0 0 100 100" aria-hidden="true">
+                <g stroke="#8f8c84" stroke-width="1.5">
+                  <line x1="50" y1="4" x2="50" y2="11"/>
+                  <line x1="50" y1="4" x2="50" y2="11" transform="rotate(-60 50 50)"/>
+                  <line x1="50" y1="4" x2="50" y2="11" transform="rotate(60 50 50)"/>
+                  <line x1="50" y1="6" x2="50" y2="10" transform="rotate(-30 50 50)"/>
+                  <line x1="50" y1="6" x2="50" y2="10" transform="rotate(30 50 50)"/>
+                </g>
+                <circle cx="50" cy="50" r="34" fill="#d9d6ce"/>
+                <circle cx="50" cy="50" r="30" fill="#e7e4dd" stroke="#cdc9c0" stroke-width="1"/>
+                <g class="dial-knob" id="knob">
+                  <line x1="50" y1="26" x2="50" y2="38" stroke="#1d1d1b" stroke-width="3" stroke-linecap="round"/>
+                </g>
+              </svg>
+              <div class="modes">
+                <div class="mode"><button class="mode-btn" data-mode="configure" aria-label="Show configure step"></button><span>Configure</span></div>
+                <div class="mode"><button class="mode-btn" data-mode="order" aria-label="Show order step"></button><span>Order</span></div>
+                <div class="mode"><button class="mode-btn active" data-mode="track" aria-label="Show track step"></button><span>Track</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="device-foot"><span class="brand">ACME</span><span class="led"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logos -->
+  <section class="logos" aria-label="Customers">
+    <div class="wrap logos-inner">
+      <span class="label">Used by 240+ manufacturers</span>
+      <div class="logo-list">
+        <span>Halvorsen Tool &amp; Die</span>
+        <span>Brightwater Plastics</span>
+        <span>Kestrel Motion</span>
+        <span>Ridgeline Fabrication</span>
+        <span>Norvik Hydraulics</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Statement -->
+  <section class="statement">
+    <div class="wrap statement-grid">
+      <span class="label">The problem</span>
+      <p class="big">Most custom widget orders still live in email threads, spreadsheets and one person's memory. <em>Acme replaces the chasing with a clear, shared record, so your team spends its time on the work instead of looking for it.</em></p>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="platform">
+    <div class="wrap feature-grid">
+      <article class="feature">
+        <div class="feature-head">
+          <span class="label">01 · Configure</span>
+          <svg class="feature-icon" viewBox="0 0 56 56" fill="none" stroke="#1d1d1b" stroke-width="1.5" aria-hidden="true">
+            <line x1="10" y1="16" x2="46" y2="16"/><circle cx="22" cy="16" r="4" fill="#f1efea"/>
+            <line x1="10" y1="28" x2="46" y2="28"/><circle cx="36" cy="28" r="4" fill="#e2601b" stroke="#e2601b"/>
+            <line x1="10" y1="40" x2="46" y2="40"/><circle cx="28" cy="40" r="4" fill="#f1efea"/>
+          </svg>
+        </div>
+        <h3>Build the spec once.</h3>
+        <p>Set dimensions, materials, tolerances and finishes in a guided configurator that catches conflicts before a supplier ever sees them.</p>
+        <ul>
+          <li>Reusable, approved templates</li>
+          <li>Tolerance and material checks</li>
+          <li>Drawings attached to every revision</li>
+        </ul>
+      </article>
+      <article class="feature">
+        <div class="feature-head">
+          <span class="label">02 · Order</span>
+          <svg class="feature-icon" viewBox="0 0 56 56" fill="none" stroke="#1d1d1b" stroke-width="1.5" aria-hidden="true">
+            <rect x="10" y="12" width="36" height="32" rx="4"/>
+            <line x1="10" y1="22" x2="46" y2="22"/>
+            <line x1="17" y1="30" x2="32" y2="30"/><line x1="17" y1="36" x2="27" y2="36"/>
+            <circle cx="39" cy="35" r="3.5" fill="#e2601b" stroke="#e2601b"/>
+          </svg>
+        </div>
+        <h3>Send it to the right supplier.</h3>
+        <p>Route orders to approved suppliers, compare quotes side by side, and collect sign-off from engineering and finance without leaving the page.</p>
+        <ul>
+          <li>Side-by-side quote comparison</li>
+          <li>Approval rules by cost and category</li>
+          <li>Suppliers reply by email, no login needed</li>
+        </ul>
+      </article>
+      <article class="feature">
+        <div class="feature-head">
+          <span class="label">03 · Track</span>
+          <svg class="feature-icon" viewBox="0 0 56 56" fill="none" stroke="#1d1d1b" stroke-width="1.5" aria-hidden="true">
+            <line x1="8" y1="28" x2="48" y2="28"/>
+            <circle cx="10" cy="28" r="3" fill="#1d1d1b"/><circle cx="20" cy="28" r="3" fill="#1d1d1b"/>
+            <circle cx="30" cy="28" r="3" fill="#1d1d1b"/><circle cx="40" cy="28" r="4" fill="#e2601b" stroke="#e2601b"/>
+            <circle cx="48" cy="28" r="3" fill="#f1efea"/>
+          </svg>
+        </div>
+        <h3>Know where everything is.</h3>
+        <p>Every order moves through the same five stages. Supplier updates, shipping events and delays appear in plain language, well before they become a line-down problem.</p>
+        <ul>
+          <li>Five stages, one shared view</li>
+          <li>Delay alerts matched to stock levels</li>
+          <li>Full history for audits and reviews</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- Tracking view -->
+  <section class="tracking" id="tracking">
+    <div class="wrap">
+      <div class="tracking-head">
+        <div class="h">
+          <span class="label">Open orders</span>
+          <h2>One view of every order in flight.</h2>
+        </div>
+        <p>No dashboards to decode. Each order shows where it is, when it will arrive, and whether you need to do anything about it. Most days, you won't.</p>
+      </div>
+
+      <div class="app" role="img" aria-label="Example of the Acme open orders screen">
+        <div class="app-bar">
+          <span class="title">Open orders · Plant 2, Dayton</span>
+          <div class="tabs"><span class="on">All 42</span><span>Needs attention 1</span><span>Arriving this week 9</span></div>
+        </div>
+        <div class="app-body">
+          <table>
+            <thead>
+              <tr><th>Order</th><th>Widget</th><th>Supplier</th><th>Stage</th><th>Arrives</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="po">PO-4471</td>
+                <td>Housing WG-220<span class="sub">Aluminium 6061 · 1,200 pcs</span></td>
+                <td>Brightwater Plastics</td>
+                <td><div class="pips"><i class="f"></i><i class="f"></i><i class="f"></i><i class="w"></i><i></i></div></td>
+                <td>Thu 14 Nov</td>
+                <td><span class="status">On time</span></td>
+              </tr>
+              <tr class="flag">
+                <td class="po">PO-4463</td>
+                <td>Seal SL-08<span class="sub">EPDM · 5,000 pcs</span></td>
+                <td>Norvik Hydraulics</td>
+                <td><div class="pips"><i class="f"></i><i class="f"></i><i class="w"></i><i></i><i></i></div></td>
+                <td>Tue 19 Nov</td>
+                <td><span class="status late">2 days late</span></td>
+              </tr>
+              <tr>
+                <td class="po">PO-4468</td>
+                <td>Bracket BR-15<span class="sub">Steel, zinc plated · 800 pcs</span></td>
+                <td>Halvorsen Tool &amp; Die</td>
+                <td><div class="pips"><i class="f"></i><i class="w"></i><i></i><i></i><i></i></div></td>
+                <td>Mon 18 Nov</td>
+                <td><span class="status">On time</span></td>
+              </tr>
+              <tr>
+                <td class="po">PO-4459</td>
+                <td>Gear GR-40<span class="sub">Nylon 66 · 2,400 pcs</span></td>
+                <td>Ridgeline Fabrication</td>
+                <td><div class="pips"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></div></td>
+                <td>Received 8 Nov</td>
+                <td><span class="status done">Complete</span></td>
+              </tr>
+              <tr>
+                <td class="po">PO-4457</td>
+                <td>Mount CM-3<span class="sub">Custom · 150 pcs</span></td>
+                <td>Oakmont Components</td>
+                <td><div class="pips"><i class="w"></i><i></i><i></i><i></i><i></i></div></td>
+                <td>After spec sign-off</td>
+                <td><span class="status wait">Awaiting spec</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="aside">
+            <div class="note alert">
+              <div class="label">Needs a look</div>
+              <p>Norvik moved SL-08 by two days. Line 3 holds six days of stock, so production isn't at risk.</p>
+              <small>Updated by Norvik via email · 9:42 am</small>
+            </div>
+            <div class="note">
+              <div class="label">Waiting on you</div>
+              <p>CM-3 needs engineering sign-off on the revised drawing before Oakmont can quote.</p>
+              <small>Assigned to Priya Raman</small>
+            </div>
+            <div class="note">
+              <div class="label">This week</div>
+              <p>9 deliveries expected. Receiving has been notified for Thursday.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Principles -->
+  <section class="principles" id="principles">
+    <div class="wrap">
+      <div class="principles-head">
+        <span class="label">Our approach</span>
+        <h2>We build software the way good tools are built: to be useful, then to get out of the way.</h2>
+      </div>
+      <div class="p-grid">
+        <div class="p-list">
+          <div class="p-item"><span class="num">01</span><h3>Useful</h3><p>Every screen answers a question your team actually asks: what's late, what's next, who's waiting.</p></div>
+          <div class="p-item"><span class="num">02</span><h3>Understandable</h3><p>New buyers are placing orders on day one. No certification course required.</p></div>
+          <div class="p-item"><span class="num">03</span><h3>Unobtrusive</h3><p>Alerts only when something needs you. The rest of the time, Acme stays quiet.</p></div>
+          <div class="p-item"><span class="num">04</span><h3>Honest</h3><p>Transparent pricing per site. We show real delivery dates, even when they're not good news.</p></div>
+          <div class="p-item"><span class="num">05</span><h3>Thorough</h3><p>Every revision, approval and supplier message is kept, so audits take minutes, not weeks.</p></div>
+          <div class="p-item"><span class="num">06</span><h3>As little as possible</h3><p>We say no to most feature requests, so the ones we ship work properly.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Numbers -->
+  <section class="numbers" aria-label="Results">
+    <div class="wrap">
+      <div class="num-grid">
+        <div class="num-cell"><div class="figure">31<sup>%</sup></div><p>fewer expedited shipments, because delays surface while there's still time to plan around them.</p></div>
+        <div class="num-cell"><div class="figure">4.2<sup>h</sup></div><p>saved per buyer each week that used to go to status calls and inbox searches.</p></div>
+        <div class="num-cell"><div class="figure">6<sup>wk</sup></div><p>typical time from signed agreement to your whole team working in Acme.</p></div>
+      </div>
+      <p class="num-foot">Median results reported by customers after twelve months. Acme customer survey, 2024 (n = 112).</p>
+    </div>
+  </section>
+
+  <!-- Testimonial -->
+  <section class="quote">
+    <div class="wrap quote-grid">
+      <div class="quote-mark">
+        <svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="16" cy="28" r="8" fill="#e2601b"/><circle cx="40" cy="28" r="8" fill="#1d1d1b"/></svg>
+      </div>
+      <blockquote>
+        <p>“I used to start every Monday by calling six suppliers to find out what was late. Now I open one screen and I already know. It's the first piece of software my team has asked to keep.”</p>
+        <div class="cite">
+          <div class="avatar" aria-hidden="true">MO</div>
+          <div><strong>Maren Oduya</strong><span>Director of Operations, Kestrel Motion</span></div>
+        </div>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section class="demo" id="demo">
+    <div class="wrap demo-grid">
+      <div class="demo-copy">
+        <span class="label">Book a demo</span>
+        <h2>Thirty minutes. Your widgets, your suppliers.</h2>
+        <p>We'll set the demo up around a real order from your plant, so you can judge Acme on your own work instead of ours.</p>
+        <ol class="steps">
+          <li><span class="t">10 min</span><div><strong>We listen</strong><p>How your team orders and tracks widgets today, and where it hurts.</p></div></li>
+          <li><span class="t">15 min</span><div><strong>We show your workflow</strong><p>One of your orders, configured, routed and tracked in Acme.</p></div></li>
+          <li><span class="t">5 min</span><div><strong>You ask anything</strong><p>Pricing, integrations, rollout. Straight answers, no follow-up barrage.</p></div></li>
+        </ol>
+        <div class="host">
+          <div class="avatar" aria-hidden="true">DK</div>
+          <span>Demos are led by specialists like Daniel Kerr, who ran procurement at a Tier 2 auto supplier for nine years.</span>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <form id="demoForm" novalidate>
+          <h3>Request a time</h3>
+          <p>We'll reply within one business day with times that suit you.</p>
+          <div class="row">
+            <div class="field" id="f-name">
+              <label for="name">Full name</label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="Jordan Ellis">
+              <span class="err">Please tell us your name.</span>
+            </div>
+            <div class="field" id="f-company">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" autocomplete="organization" placeholder="Ellis Manufacturing">
+              <span class="err">Please add your company.</span>
+            </div>
+          </div>
+          <div class="field" id="f-email">
+            <label for="email">Work email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="jordan@ellismfg.com">
+            <span class="err">Please enter a valid work email.</span>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="size">Operations team size</label>
+              <select id="size" name="size">
+                <option>1–5 people</option>
+                <option selected>6–20 people</option>
+                <option>21–50 people</option>
+                <option>More than 50</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sites">Plants or sites</label>
+              <select id="sites" name="sites">
+                <option selected>1 site</option>
+                <option>2–4 sites</option>
+                <option>5 or more</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label id="time-label">Preferred time</label>
+            <div class="chips" role="radiogroup" aria-labelledby="time-label">
+              <input type="radio" name="time" id="t1" value="Morning" checked><label class="chip" for="t1">Morning</label>
+              <input type="radio" name="time" id="t2" value="Midday"><label class="chip" for="t2">Midday</label>
+              <input type="radio" name="time" id="t3" value="Afternoon"><label class="chip" for="t3">Afternoon</label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Book my demo</button>
+          <p class="fine">We use your details only to arrange the demo. No mailing lists.</p>
+        </form>
+
+        <div class="success" id="success" role="status" aria-live="polite">
+          <div class="check"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+          <h3 id="successTitle">Thank you.</h3>
+          <p id="successText">We'll email you within one business day with a few times to choose from.</p>
+          <p>If it helps, have one recent widget order in mind. We'll build the demo around it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="wrap faq-grid">
+      <div class="h">
+        <span class="label">Questions</span>
+        <h2>What operations teams usually ask us first.</h2>
+      </div>
+      <div class="faq-list">
+        <details>
+          <summary>How long does it take to get running? <span class="pm"></span></summary>
+          <p>Most teams are fully live in four to six weeks. We import your existing specs and supplier list, run one plant as a pilot, then roll out. You'll have a named onboarding lead throughout.</p>
+        </details>
+        <details>
+          <summary>Do our suppliers need to use Acme? <span class="pm"></span></summary>
+          <p>No. Suppliers can confirm orders, share quotes and post shipping updates by replying to an email. Acme reads those replies and updates the order. Larger suppliers can connect directly if they prefer.</p>
+        </details>
+        <details>
+          <summary>Does it work with our ERP? <span class="pm"></span></summary>
+          <p>Yes. Acme connects with the ERP systems most mid-sized manufacturers run, and syncs purchase orders, receipts and part numbers in both directions. We'll confirm your setup during the demo.</p>
+        </details>
+        <details>
+          <summary>How is pricing structured? <span class="pm"></span></summary>
+          <p>A flat annual fee per site, with unlimited users. No per-seat charges, no fees on order volume. We'll share exact figures on the call. They're the same numbers on our price sheet.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <a href="#" class="logo"><span class="logo-mark"></span>Acme</a>
+      <p class="copy">© 2025 Acme Inc. · Dayton, Ohio</p>
+    </div>
+    <div class="foot-cols">
+      <div><a href="#platform">Platform</a><a href="#tracking">Tracking</a><a href="#principles">Approach</a></div>
+      <div><a href="#faq">Questions</a><a href="#demo">Book a demo</a><a href="mailto:hello@acme.example">hello@acme.example</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Hero device
+  const modes = {
+    configure:{label:"CONFIG WG-220", main:"Spec validated", sub:"Aluminium 6061 · ±0.05 mm · Anodised", step:1, angle:-60},
+    order:{label:"PO 4471", main:"Approved", sub:"Brightwater Plastics · $12,480", step:3, angle:0},
+    track:{label:"PO 4471", main:"In transit", sub:"Brightwater Plastics · ETA Thu 14 Nov", step:4, angle:60}
+  };
+  const order = ["configure","order","track"];
+  const el = id => document.getElementById(id);
+  const pips = el("stages").children;
+  const btns = document.querySelectorAll(".mode-btn");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let current = "track", timer = null;
+
+  function setMode(m){
+    current = m;
+    const d = modes[m];
+    btns.forEach(b => b.classList.toggle("active", b.dataset.mode === m));
+    el("knob").style.transform = "rotate(" + d.angle + "deg)";
+    const main = el("sMain"), sub = el("sSub");
+    main.classList.add("fade"); sub.classList.add("fade");
+    setTimeout(() => {
+      el("sLabel").textContent = d.label;
+      el("sStep").textContent = "0" + d.step + "/05";
+      main.textContent = d.main; sub.textContent = d.sub;
+      main.classList.remove("fade"); sub.classList.remove("fade");
+    }, reduce ? 0 : 200);
+    for (let i = 0; i < pips.length; i++){
+      pips[i].className = i < d.step - 1 ? "on" : (i === d.step - 1 ? "now" : "");
+    }
+  }
+  btns.forEach(b => b.addEventListener("click", () => {
+    clearInterval(timer); timer = null;
+    setMode(b.dataset.mode);
+  }));
+  setMode("configure");
+  if (!reduce){
+    timer = setInterval(() => {
+      setMode(order[(order.indexOf(current) + 1) % order.length]);
+    }, 3600);
+  }
+
+  // Demo form
+  const form = el("demoForm");
+  function check(fieldId, valid){
+    el(fieldId).classList.toggle("error", !valid);
+    return valid;
+  }
+  ["name","company","email"].forEach(id => {
+    el(id).addEventListener("input", () => el("f-" + id).classList.remove("error"));
+  });
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const name = el("name").value.trim();
+    const company = el("company").value.trim();
+    const email = el("email").value.trim();
+    const ok = [
+      check("f-name", name.length > 1),
+      check("f-company", company.length > 1),
+      check("f-email", /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))
+    ].every(Boolean);
+    if (!ok){
+      const firstErr = form.querySelector(".field.error input");
+      if (firstErr) firstErr.focus();
+      return;
+    }
+    const first = name.split(" ")[0];
+    const time = form.querySelector("input[name=time]:checked").value.toLowerCase();
+    el("successTitle").textContent = "Thank you, " + first + ".";
+    el("successText").textContent = "We'll email " + email + " within one business day with a few " + time + " slots to choose from.";
+    form.style.display = "none";
+    el("success").style.display = "block";
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, configured.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16130e;
+    --paper:#faf9f6;
+    --line:#d8d4cb;
+    --accent:#e8571a;
+    --muted:#6b655b;
+    --mono:'IBM Plex Mono',monospace;
+    --sans:'Libre Franklin',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:0 48px;}
+  ::selection{background:var(--accent);color:#fff;}
+
+  /* ---------- header ---------- */
+  header{
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:var(--paper);z-index:50;
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .logo{font-weight:700;font-size:18px;letter-spacing:-0.02em;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:10px;}
+  .logo .dot{width:10px;height:10px;background:var(--accent);border-radius:50%;}
+  .nav-links{display:flex;gap:32px;align-items:center;}
+  .nav-links a{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);text-decoration:none;}
+  .nav-links a:hover{color:var(--ink);}
+  .btn{
+    display:inline-block;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:0.08em;
+    padding:12px 22px;border:1px solid var(--ink);background:var(--ink);color:#fff;text-decoration:none;cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .btn:hover{background:var(--accent);border-color:var(--accent);}
+  .btn.ghost{background:transparent;color:var(--ink);}
+  .btn.ghost:hover{background:var(--ink);color:#fff;}
+
+  /* ---------- hero ---------- */
+  .hero{padding:88px 0 72px;border-bottom:1px solid var(--line);}
+  .kicker{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:24px;}
+  h1{font-size:76px;line-height:1.02;letter-spacing:-0.035em;font-weight:600;max-width:820px;}
+  h1 em{font-style:italic;font-weight:400;}
+  .hero-sub{max-width:520px;margin-top:28px;font-size:18px;color:var(--muted);font-weight:300;}
+  .hero-cta{margin-top:36px;display:flex;gap:16px;align-items:center;}
+  .hero-cta .note{font-family:var(--mono);font-size:11px;color:var(--muted);}
+  .hero-grid{display:grid;grid-template-columns:1fr 460px;gap:64px;align-items:start;}
+
+  /* ---------- configurator ---------- */
+  .widget-box{border:1px solid var(--ink);background:#fff;}
+  .widget-head{border-bottom:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);}
+  .widget-head .live{color:var(--accent);}
+  .widget-canvas{padding:32px;display:flex;justify-content:center;border-bottom:1px solid var(--line);}
+  .widget-opts{padding:16px;display:grid;gap:14px;border-bottom:1px solid var(--line);}
+  .opt-row{display:flex;align-items:center;gap:10px;}
+  .opt-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);width:78px;flex-shrink:0;}
+  .chip{font-family:var(--mono);font-size:11px;padding:6px 12px;border:1px solid var(--line);background:transparent;cursor:pointer;color:var(--ink);transition:all .12s;}
+  .chip:hover{border-color:var(--ink);}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .widget-spec{padding:14px 16px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;}
+  .widget-spec b{font-weight:500;}
+  .widget-spec .price{color:var(--accent);}
+
+  /* ---------- sections ---------- */
+  section{padding:88px 0;border-bottom:1px solid var(--line);}
+  .sec-label{font-family:var(--mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:20px;display:flex;gap:12px;align-items:baseline;}
+  .sec-label .num{color:var(--accent);}
+  h2{font-size:44px;letter-spacing:-0.03em;font-weight:600;line-height:1.08;max-width:640px;}
+  h2 em{font-style:italic;font-weight:400;}
+
+  /* logos */
+  .logos{padding:40px 0;border-bottom:1px solid var(--line);}
+  .logos-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;}
+  .logos span{font-family:var(--mono);font-size:13px;letter-spacing:0.06em;color:var(--muted);text-transform:uppercase;}
+  .logos .tag{font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;}
+
+  /* features */
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:56px;border:1px solid var(--line);}
+  .feature{padding:32px;border-right:1px solid var(--line);}
+  .feature:last-child{border-right:none;}
+  .feature .fnum{font-family:var(--mono);font-size:11px;color:var(--accent);margin-bottom:40px;display:block;}
+  .feature h3{font-size:20px;font-weight:600;letter-spacing:-0.01em;margin-bottom:12px;}
+  .feature p{font-size:14px;color:var(--muted);font-weight:300;}
+
+  /* steps */
+  .steps{margin-top:56px;}
+  .step{display:grid;grid-template-columns:80px 280px 1fr;gap:32px;padding:28px 0;border-top:1px solid var(--line);align-items:baseline;}
+  .step:last-child{border-bottom:1px solid var(--line);}
+  .step .snum{font-family:var(--mono);font-size:12px;color:var(--accent);}
+  .step h3{font-size:22px;font-weight:600;}
+  .step p{color:var(--muted);font-weight:300;font-size:15px;max-width:480px;}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);margin-top:56px;}
+  .stat{padding:32px;border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat .big{font-size:52px;font-weight:600;letter-spacing:-0.03em;line-height:1;}
+  .stat .big sup{font-size:20px;color:var(--accent);}
+  .stat .lbl{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-top:12px;}
+
+  /* quote */
+  .quote-block{max-width:760px;}
+  blockquote{font-size:30px;line-height:1.35;font-weight:300;letter-spacing:-0.01em;margin-top:32px;}
+  blockquote em{font-style:italic;}
+  .attribution{margin-top:28px;font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .attribution b{color:var(--ink);font-weight:500;}
+
+  /* form */
+  .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;}
+  .demo-copy p{color:var(--muted);font-weight:300;margin-top:24px;max-width:420px;font-size:16px;}
+  .demo-copy ul{list-style:none;margin-top:28px;}
+  .demo-copy li{font-family:var(--mono);font-size:12px;padding:10px 0;border-top:1px solid var(--line);color:var(--muted);}
+  .demo-copy li::before{content:"→ ";color:var(--accent);}
+  form{border:1px solid var(--ink);background:#fff;padding:32px;}
+  .field{margin-bottom:20px;}
+  label{display:block;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:8px;}
+  input,select{
+    width:100%;padding:12px 14px;border:1px solid var(--line);background:var(--paper);
+    font-family:var(--sans);font-size:15px;color:var(--ink);outline:none;transition:border-color .12s;
+    border-radius:0;-webkit-appearance:none;appearance:none;
+  }
+  input:focus,select:focus{border-color:var(--ink);}
+  input.err,select.err{border-color:var(--accent);}
+  .form-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+  .form-foot .fine{font-family:var(--mono);font-size:10px;color:var(--muted);max-width:220px;}
+  .form-ok{display:none;padding:48px 24px;text-align:center;}
+  .form-ok h3{font-size:26px;font-weight:600;letter-spacing:-0.02em;margin-bottom:12px;}
+  .form-ok p{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.8;}
+  .form-ok .ref{color:var(--accent);}
+
+  /* footer */
+  footer{padding:48px 0 40px;}
+  .foot-grid{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;}
+  .foot-fine{font-family:var(--mono);font-size:10px;color:var(--muted);max-width:560px;line-height:1.9;}
+  sup.fnote{color:var(--accent);font-family:var(--mono);font-size:9px;}
+
+  @media (max-width:1000px){
+    .hero-grid,.demo-grid{grid-template-columns:1fr;}
+    .features{grid-template-columns:1fr;}
+    .feature{border-right:none;border-bottom:1px solid var(--line);}
+    .stats{grid-template-columns:1fr 1fr;}
+    h1{font-size:52px;}
+    .step{grid-template-columns:60px 1fr;}
+    .step p{grid-column:2;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#"><span class="dot"></span>Acme</a>
+    <nav class="nav-links">
+      <a href="#product">Product</a>
+      <a href="#how">How it works</a>
+      <a href="#numbers">Numbers</a>
+      <a href="#demo" class="btn">Book a demo</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">Acme Widget Platform · Est. reliability, since now</p>
+    <div class="hero-grid">
+      <div>
+        <h1>Widgets, <em>configured.</em><br>Ordered. Tracked.<br>Done.</h1>
+        <p class="hero-sub">Acme is the platform operations teams at mid-sized manufacturers use to specify custom widgets, place orders, and follow them across the supply chain — without a single spreadsheet named <span style="font-family:var(--mono);font-size:15px;">FINAL_v7.xlsx</span>.</p>
+        <div class="hero-cta">
+          <a class="btn" href="#demo">Book a demo</a>
+          <a class="btn ghost" href="#product">Kick the tires</a>
+          <span class="note">30 min. No “quick question” follow-ups.<sup class="fnote">1</sup></span>
+        </div>
+      </div>
+
+      <!-- Interactive configurator -->
+      <div class="widget-box" id="product">
+        <div class="widget-head">
+          <span>Widget Configurator</span>
+          <span class="live">● Live demo</span>
+        </div>
+        <div class="widget-canvas">
+          <svg id="gearSvg" width="220" height="220" viewBox="0 0 220 220">
+            <g id="gearGroup" transform="translate(110,110)"></g>
+            <circle cx="110" cy="110" r="14" fill="#faf9f6" stroke="#16130e" stroke-width="1.5"/>
+            <circle cx="110" cy="110" r="4" fill="#16130e"/>
+          </svg>
+        </div>
+        <div class="widget-opts">
+          <div class="opt-row">
+            <span class="opt-label">Material</span>
+            <button class="chip on" data-group="material" data-val="steel">Steel</button>
+            <button class="chip" data-group="material" data-val="brass">Brass</button>
+            <button class="chip" data-group="material" data-val="polymer">Polymer</button>
+          </div>
+          <div class="opt-row">
+            <span class="opt-label">Teeth</span>
+            <button class="chip on" data-group="teeth" data-val="8">8</button>
+            <button class="chip" data-group="teeth" data-val="12">12</button>
+            <button class="chip" data-group="teeth" data-val="16">16</button>
+          </div>
+          <div class="opt-row">
+            <span class="opt-label">Finish</span>
+            <button class="chip on" data-group="finish" data-val="matte">Matte</button>
+            <button class="chip" data-group="finish" data-val="zinc">Zinc</button>
+            <button class="chip" data-group="finish" data-val="orange">Safety orange</button>
+          </div>
+        </div>
+        <div class="widget-spec">
+          <span>SKU <b id="specSku">WG-STL-08-M</b></span>
+          <span>Lead <b id="specLead">9 days</b></span>
+          <span class="price"><b id="specPrice">$4.10</b>/unit</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="logos">
+  <div class="wrap logos-inner">
+    <span class="tag">Trusted by operations teams at</span>
+    <span>Halloway Mfg.</span>
+    <span>Berger &amp; Sons</span>
+    <span>Northfield Casting</span>
+    <span>Pelham Industrial</span>
+    <span>Oka Precision</span>
+    <span>Dunmore Works</span>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <p class="sec-label"><span class="num">01</span> What it does</p>
+    <h2>Three jobs. Done <em>quietly.</em></h2>
+    <div class="features">
+      <div class="feature">
+        <span class="fnum">/ 01</span>
+        <h3>Configure</h3>
+        <p>Spec material, geometry, tolerances, and finish against live manufacturability rules. If it can't be made, Acme says so now — not in an email three weeks from Tuesday.</p>
+      </div>
+      <div class="feature">
+        <span class="fnum">/ 02</span>
+        <h3>Order</h3>
+        <p>Quotes in seconds, purchase orders in one click, approvals routed to whoever in your organization enjoys approving things. Pricing is contractual, not conversational.</p>
+      </div>
+      <div class="feature">
+        <span class="fnum">/ 03</span>
+        <h3>Track</h3>
+        <p>Every order, every lot, every pallet — from foundry to your loading dock. When something slips, you find out from us. Radical, we know.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <p class="sec-label"><span class="num">02</span> How it works</p>
+    <h2>From “we need widgets” to widgets, in <em>three steps.</em></h2>
+    <div class="steps">
+      <div class="step">
+        <span class="snum">Step 01</span>
+        <h3>Connect your catalog</h3>
+        <p>Import existing specs or start from our widget library. Most teams finish before their first coffee gets cold. Average setup: one afternoon.</p>
+      </div>
+      <div class="step">
+        <span class="snum">Step 02</span>
+        <h3>Configure &amp; order</h3>
+        <p>Build widgets to spec, see the price and lead time update in real time, and place the order. No quote-request limbo. No rep “checking with the team.”</p>
+      </div>
+      <div class="step">
+        <span class="snum">Step 03</span>
+        <h3>Watch it move</h3>
+        <p>Milestones flow into your dashboard and, if you insist, your ERP. Exceptions surface early, while they're still cheap to fix.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="numbers">
+  <div class="wrap">
+    <p class="sec-label"><span class="num">03</span> The numbers</p>
+    <h2>Modest claims, <em>audited.</em><sup class="fnote" style="font-size:14px;">2</sup></h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="big">38<sup>%</sup></div>
+        <div class="lbl">Fewer expedite fees</div>
+      </div>
+      <div class="stat">
+        <div class="big">11<sup>days</sup></div>
+        <div class="lbl">Median lead-time reduction</div>
+      </div>
+      <div class="stat">
+        <div class="big">1.2<sup>M</sup></div>
+        <div class="lbl">Widgets tracked last year</div>
+      </div>
+      <div class="stat">
+        <div class="big">0</div>
+        <div class="lbl">Spreadsheets harmed in the process</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap quote-block">
+    <p class="sec-label"><span class="num">04</span> Word of mouth</p>
+    <blockquote>“I used to spend Friday afternoons chasing order confirmations. Now I spend them doing my actual job. <em>It's disorienting.</em>”</blockquote>
+    <p class="attribution"><b>Marta Kowalczyk</b> — Director of Operations, Northfield Casting<br>Customer since 2023. Renewed twice. Voluntarily.</p>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap demo-grid">
+    <div class="demo-copy">
+      <p class="sec-label"><span class="num">05</span> The ask</p>
+      <h2>Book a <em>demo.</em></h2>
+      <p>Thirty minutes, screenshared, tailored to your product line. We'll configure a real widget — yours, ideally — and show you what its journey looks like.</p>
+      <ul>
+        <li>No 40-slide deck</li>
+        <li>No “circling back”</li>
+        <li>Pricing discussed out loud, like adults</li>
+        <li>Follow-up email: exactly one</li>
+      </ul>
+    </div>
+    <form id="demoForm" novalidate>
+      <div id="formFields">
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" type="text" placeholder="Ada Lovelace" autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="email">Work email</label>
+          <input id="email" type="email" placeholder="ada@northfield.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="company">Company</label>
+          <input id="company" type="text" placeholder="Northfield Casting" autocomplete="organization">
+        </div>
+        <div class="field">
+          <label for="volume">Widgets per quarter, roughly</label>
+          <select id="volume">
+            <option value="">Select a range…</option>
+            <option>Under 1,000</option>
+            <option>1,000 – 10,000</option>
+            <option>10,000 – 50,000</option>
+            <option>50,000+</option>
+            <option>We'd rather not say (it's a lot)</option>
+          </select>
+        </div>
+        <div class="form-foot">
+          <p class="fine">We email once to schedule, once to confirm. Then we stop.</p>
+          <button class="btn" type="submit">Book it</button>
+        </div>
+      </div>
+      <div class="form-ok" id="formOk">
+        <h3>Booked. Well, requested.</h3>
+        <p>A human — not a sequence — will reply within one business day.<br>
+        Confirmation <span class="ref" id="refCode">ACM-0000</span><br>
+        Screenshot this if you like. We won't check.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <a class="logo" href="#"><span class="dot"></span>Acme</a>
+      <p class="foot-fine">
+        <sup class="fnote">1</sup> There may be one follow-up. It's a good one.<br>
+        <sup class="fnote">2</sup> Audited by our customers, who are operations people and therefore notice everything.<br>
+        © 2025 Acme Widget Systems, Inc. No cartoon coyotes were involved in the making of this software.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Widget configurator ---------- */
+  var state = { material:'steel', teeth:8, finish:'matte' };
+  var gearGroup = document.getElementById('gearGroup');
+
+  var MATERIALS = {
+    steel:  { code:'STL', base:4.10, lead:9,  fill:'#c9c4bb' },
+    brass:  { code:'BRS', base:5.60, lead:12, fill:'#d9b34a' },
+    polymer:{ code:'PLY', base:2.30, lead:6,  fill:'#9aa4ad' }
+  };
+  var FINISHES = {
+    matte:  { code:'M', mult:1.00, leadAdd:0, stroke:'#16130e' },
+    zinc:   { code:'Z', mult:1.15, leadAdd:2, stroke:'#5c6670' },
+    orange: { code:'O', mult:1.08, leadAdd:1, stroke:'#e8571a' }
+  };
+
+  function drawGear(){
+    var teeth = state.teeth;
+    var R = 78, rRoot = 60, rHole = 0;
+    var toothW = (Math.PI*2/teeth)*0.42;
+    var d = '';
+    for(var i=0;i<teeth;i++){
+      var a = (i/teeth)*Math.PI*2;
+      var a1 = a - toothW/2, a2 = a + toothW/2;
+      var b1 = a - (Math.PI*2/teeth)/2, b2 = a + (Math.PI*2/teeth)/2;
+      var p = function(ang,rad){return (Math.cos(ang)*rad).toFixed(2)+','+(Math.sin(ang)*rad).toFixed(2);};
+      if(i===0) d += 'M'+p(b1,rRoot);
+      d += ' L'+p(a1,rRoot)+' L'+p(a1*0.98+a2*0.02,R)+' L'+p(a2*0.98+a1*0.02,R)+' L'+p(a2,rRoot)+' L'+p(b2,rRoot);
+    }
+    d += ' Z';
+    var mat = MATERIALS[state.material], fin = FINISHES[state.finish];
+    gearGroup.innerHTML =
+      '<path d="'+d+'" fill="'+mat.fill+'" stroke="'+fin.stroke+'" stroke-width="2" stroke-linejoin="round"/>'+
+      '<circle r="30" fill="none" stroke="'+fin.stroke+'" stroke-width="1" stroke-dasharray="3 4" opacity="0.6"/>';
+  }
+
+  function updateSpec(){
+    var mat = MATERIALS[state.material], fin = FINISHES[state.finish];
+    var teethCost = 1 + (state.teeth - 8)*0.02;
+    var price = (mat.base * fin.mult * teethCost).toFixed(2);
+    var lead = mat.lead + fin.leadAdd + Math.floor(state.teeth/8);
+    document.getElementById('specSku').textContent =
+      'WG-'+mat.code+'-'+(state.teeth<10?'0':'')+state.teeth+'-'+fin.code;
+    document.getElementById('specLead').textContent = lead+' days';
+    document.getElementById('specPrice').textContent = '$'+price;
+  }
+
+  document.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var g = chip.getAttribute('data-group');
+      document.querySelectorAll('.chip[data-group="'+g+'"]').forEach(function(c){c.classList.remove('on');});
+      chip.classList.add('on');
+      state[g] = (g==='teeth') ? parseInt(chip.getAttribute('data-val'),10) : chip.getAttribute('data-val');
+      drawGear(); updateSpec();
+    });
+  });
+
+  drawGear(); updateSpec();
+
+  /* Gentle rotation on scroll into view */
+  var rot = 0, spinning = true;
+  function spin(){
+    if(spinning){
+      rot += 0.15;
+      gearGroup.setAttribute('transform','rotate('+rot+')');
+    }
+    requestAnimationFrame(spin);
+  }
+  spin();
+  var box = document.querySelector('.widget-box');
+  box.addEventListener('mouseenter', function(){ spinning = false; });
+  box.addEventListener('mouseleave', function(){ spinning = true; });
+
+  /* ---------- Demo form ---------- */
+  var form = document.getElementById('demoForm');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var ok = true;
+    var name = document.getElementById('name'),
+        email = document.getElementById('email'),
+        company = document.getElementById('company'),
+        volume = document.getElementById('volume');
+    [name,email,company,volume].forEach(function(f){ f.classList.remove('err'); });
+    if(!name.value.trim()){ name.classList.add('err'); ok = false; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){ email.classList.add('err'); ok = false; }
+    if(!company.value.trim()){ company.classList.add('err'); ok = false; }
+    if(!volume.value){ volume.classList.add('err'); ok = false; }
+    if(!ok) return;
+    document.getElementById('refCode').textContent =
+      'ACM-' + Math.floor(1000 + Math.random()*9000);
+    document.getElementById('formFields').style.display = 'none';
+    document.getElementById('formOk').style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>

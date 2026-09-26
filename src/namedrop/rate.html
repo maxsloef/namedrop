@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Namedrop Rating</title>
+<style>
+  :root { --bg: #262626; --panel: #1c1c1c; --line: #3a3a3a; --fg: #ececec; --muted: #9a9a9a; --pick: #f2c14e; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, -apple-system, sans-serif;
+         display: grid; grid-template-rows: auto 1fr auto; }
+  header, footer { background: var(--panel); padding: 12px 20px; display: flex; align-items: center; gap: 24px; border-color: var(--line); }
+  header { border-bottom: 1px solid var(--line); }
+  footer { border-top: 1px solid var(--line); justify-content: center; flex-wrap: wrap; }
+  .brief { flex: 1; }
+  .brief small { display: block; color: var(--muted); font-size: 12px; }
+  .brief b { font-size: 22px; font-weight: 600; }
+  .muted { color: var(--muted); font-variant-numeric: tabular-nums; }
+  main { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 14px; align-content: center; }
+  figure { margin: 0; display: grid; gap: 6px; border: 2px solid transparent; border-radius: 6px; padding: 2px; }
+  figure.picked { border-color: var(--pick); }
+  figcaption { color: var(--muted); font-size: 13px; }
+  img { display: block; width: 100%; height: auto; border-radius: 4px; background: #000; }
+  button { font: inherit; color: var(--fg); background: #333; border: 1px solid var(--line); border-radius: 6px; padding: 8px 14px; cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--pick); outline-offset: 2px; }
+  kbd { font: 11px ui-monospace, monospace; padding: 1px 5px; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); }
+  .done { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 60px; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="brief"><small>The client wants the page to feel</small><b id="adj">…</b></div>
+  <div class="muted">Which page would you ship?</div>
+  <div class="muted" id="count"></div>
+</header>
+<main id="main">
+  <figure id="left"><img alt="Page A"><figcaption><kbd>←</kbd> Page A</figcaption></figure>
+  <figure id="right"><img alt="Page B"><figcaption><kbd>→</kbd> Page B</figcaption></figure>
+</main>
+<footer>
+  <button data-choice="left"><kbd>←</kbd> A is better</button>
+  <button data-choice="skip">Can’t decide <kbd>↓</kbd></button>
+  <button data-choice="right">B is better <kbd>→</kbd></button>
+  <button data-choice="undo">Undo <kbd>U</kbd></button>
+</footer>
+<script>
+let items = [], rated = new Set(), current = -1, history = [], busy = false;
+const $ = (id) => document.getElementById(id);
+
+function next(from) {
+  for (let k = 0; k < items.length; k++) { const i = (from + k) % items.length; if (!rated.has(i)) return i; }
+  return -1;
+}
+function render() {
+  $("count").textContent = `${rated.size} / ${items.length}`;
+  for (const side of ["left", "right"]) $(side).classList.remove("picked");
+  if (current < 0) {
+    $("adj").textContent = "All pairs rated";
+    $("main").innerHTML = '<p class="done">That’s every pair. Your picks are in data/ratings.jsonl.</p>';
+    return;
+  }
+  $("adj").textContent = items[current].adjectives;
+  for (const side of ["left", "right"]) $(side).querySelector("img").src = `/img/${current}/${side}.jpg`;
+  const n = next(current + 1);
+  if (n >= 0) for (const side of ["left", "right"]) new Image().src = `/img/${n}/${side}.jpg`;
+}
+async function post(item, choice) {
+  await fetch("/api/rate", { method: "POST", body: JSON.stringify({ item, choice }) });
+}
+async function rate(choice) {
+  if (busy || current < 0) return;
+  busy = true;
+  if (choice !== "skip") $(choice).classList.add("picked");
+  await post(current, choice);
+  rated.add(current); history.push(current);
+  setTimeout(() => { current = next(current + 1); busy = false; render(); }, choice === "skip" ? 0 : 150);
+}
+async function undo() {
+  if (busy || !history.length) return;
+  const i = history.pop();
+  await post(i, "undo");
+  rated.delete(i); current = i;
+  if (!$("left")) return location.reload();
+  render();
+}
+document.addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const act = { ArrowLeft: () => rate("left"), ArrowRight: () => rate("right"), ArrowDown: () => rate("skip"), u: undo, Backspace: undo }[e.key];
+  if (act) { e.preventDefault(); act(); }
+});
+document.querySelectorAll("footer button").forEach((b) =>
+  b.addEventListener("click", () => (b.dataset.choice === "undo" ? undo() : rate(b.dataset.choice))));
+fetch("/api/state").then((r) => r.json()).then((s) => {
+  items = s.items; rated = new Set(s.rated); current = next(0); render();
+});
+</script>
+</body>
+</html>

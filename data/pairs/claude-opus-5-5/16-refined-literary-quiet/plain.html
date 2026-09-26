@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme — Every widget, accounted for</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3efe6;
+    --paper-2:#ebe5d8;
+    --ink:#1f1d1a;
+    --ink-soft:#4a4640;
+    --muted:#8a8378;
+    --rule:#d3cbbb;
+    --accent:#7a2e22;
+    --serif:"Newsreader", Georgia, "Times New Roman", serif;
+    --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:19px;
+    line-height:1.6;
+    font-weight:300;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.35;
+    background-image:radial-gradient(rgba(60,50,30,.07) 1px, transparent 1px);
+    background-size:3px 3px;
+  }
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 60px}
+  .label{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:400;
+  }
+  .numeral{font-style:italic;color:var(--accent);font-weight:400}
+  hr.rule{border:0;border-top:1px solid var(--rule)}
+
+  /* Nav */
+  nav{padding:34px 0 0}
+  nav .wrap{display:flex;align-items:baseline;justify-content:space-between}
+  .mark{font-size:27px;font-weight:400;letter-spacing:.01em;text-decoration:none}
+  .mark em{font-style:italic;color:var(--accent)}
+  .links{display:flex;gap:44px;align-items:baseline}
+  .links a{text-decoration:none;font-size:16.5px;color:var(--ink-soft);transition:color .3s}
+  .links a:hover{color:var(--ink)}
+  .links a.cta-link{color:var(--ink);border-bottom:1px solid var(--ink);padding-bottom:2px}
+
+  /* Hero */
+  .hero{padding:120px 0 110px}
+  .hero .wrap{display:grid;grid-template-columns:1.08fr .92fr;gap:70px;align-items:center}
+  .hero h1{
+    font-size:84px;line-height:1.02;font-weight:300;letter-spacing:-.022em;margin:26px 0 34px;
+  }
+  .hero h1 em{font-style:italic;font-weight:300}
+  .lede{font-size:22px;line-height:1.55;color:var(--ink-soft);max-width:520px}
+  .actions{display:flex;gap:36px;align-items:center;margin-top:48px}
+  .btn{
+    display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;
+    font-family:var(--serif);font-size:17px;font-weight:400;padding:17px 32px;border:1px solid var(--ink);
+    letter-spacing:.01em;transition:background .35s,color .35s;cursor:pointer;
+  }
+  .btn:hover{background:transparent;color:var(--ink)}
+  .quiet-link{font-style:italic;text-decoration:none;color:var(--ink-soft);border-bottom:1px solid var(--rule);padding-bottom:2px;transition:border-color .3s}
+  .quiet-link:hover{border-color:var(--ink-soft)}
+  .plate{position:relative;border:1px solid var(--rule);background:linear-gradient(var(--paper),var(--paper-2));padding:28px}
+  .plate svg{display:block;width:100%;height:auto}
+  .plate figcaption{display:flex;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid var(--rule)}
+  .plate figcaption span:last-child{font-style:italic;font-family:var(--serif);font-size:15px;letter-spacing:0;text-transform:none;color:var(--ink-soft)}
+  .draw{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 3.2s ease forwards}
+  .draw.d2{animation-delay:.6s}.draw.d3{animation-delay:1.2s}
+  .fade{opacity:0;animation:fade 1.6s ease forwards 2s}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes fade{to{opacity:1}}
+
+  /* Epigraph */
+  .epigraph{padding:40px 0 130px;text-align:center}
+  .epigraph p{font-size:38px;line-height:1.35;font-weight:300;max-width:880px;margin:0 auto;letter-spacing:-.01em}
+  .epigraph p em{color:var(--accent)}
+  .epigraph .fleuron{display:block;font-size:22px;color:var(--muted);margin-bottom:36px}
+
+  /* Chapters */
+  .chapters{border-top:1px solid var(--rule)}
+  .chapter{display:grid;grid-template-columns:120px 1fr 400px;gap:60px;padding:80px 0;border-bottom:1px solid var(--rule);align-items:start}
+  .chapter .numeral{font-size:46px;line-height:1}
+  .chapter h2{font-size:44px;font-weight:300;line-height:1.1;letter-spacing:-.015em;margin:14px 0 22px}
+  .chapter p{color:var(--ink-soft);max-width:520px}
+  .chapter p + p{margin-top:16px}
+  .chapter ul{list-style:none;margin-top:28px;max-width:520px}
+  .chapter li{padding:11px 0;border-top:1px solid var(--rule);font-size:17px;display:flex;gap:16px}
+  .chapter li:last-child{border-bottom:1px solid var(--rule)}
+  .chapter li span{font-family:var(--mono);font-size:11px;color:var(--muted);padding-top:5px;min-width:22px}
+  .chapter svg{width:100%;height:auto}
+
+  /* Ledger */
+  .ledger-section{padding:140px 0 120px}
+  .ledger-head{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:56px}
+  .ledger-head h2{font-size:54px;font-weight:300;line-height:1.08;letter-spacing:-.02em;margin-top:18px}
+  .ledger-head p{color:var(--ink-soft);font-size:20px}
+  .ledger{border:1px solid var(--rule);background:#f7f4ed}
+  .ledger-bar{display:flex;justify-content:space-between;align-items:center;padding:16px 26px;border-bottom:1px solid var(--rule)}
+  .ledger-bar .title{font-style:italic;font-size:17px}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:400;padding:14px 26px;border-bottom:1px solid var(--rule)}
+  td{padding:17px 26px;border-bottom:1px solid #e3dccd;font-size:16.5px;vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  td.mono{font-family:var(--mono);font-size:13.5px;color:var(--ink-soft)}
+  td em{color:var(--muted)}
+  .status{display:inline-flex;align-items:center;gap:10px;font-style:italic}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+  .dot.live{background:var(--accent);animation:pulse 2.8s ease-in-out infinite}
+  .dot.done{background:var(--ink)}
+  .dot.hollow{background:transparent;border:1px solid var(--muted)}
+  @keyframes pulse{50%{opacity:.25}}
+  .progress{width:150px;height:1px;background:var(--rule);position:relative}
+  .progress i{position:absolute;left:0;top:-1px;height:3px;background:var(--ink);transition:width 1.8s cubic-bezier(.2,.7,.2,1)}
+
+  /* Figures */
+  .figures{padding:40px 0 140px}
+  .figures .grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ink)}
+  .fig{padding:34px 40px 0 0}
+  .fig + .fig{padding-left:40px;border-left:1px solid var(--rule)}
+  .fig .n{font-size:76px;font-weight:300;line-height:1;letter-spacing:-.03em}
+  .fig .n sup{font-size:30px;font-style:italic;vertical-align:top;position:relative;top:10px;margin-left:4px;color:var(--accent)}
+  .fig p{margin-top:16px;color:var(--ink-soft);font-size:17px;max-width:280px}
+  .figures .note{margin-top:34px;font-size:14px;font-style:italic;color:var(--muted)}
+
+  /* Testimonial */
+  .testimonial{background:var(--ink);color:var(--paper);padding:140px 0}
+  .testimonial .wrap{display:grid;grid-template-columns:160px 1fr;gap:60px}
+  .testimonial .qmark{font-size:180px;line-height:.7;font-style:italic;color:#a55a4b}
+  blockquote{font-size:40px;line-height:1.32;font-weight:300;letter-spacing:-.012em;max-width:860px}
+  blockquote em{font-style:italic}
+  .cite{margin-top:44px;display:flex;gap:18px;align-items:baseline;color:#b8b0a1}
+  .cite strong{font-weight:400;color:var(--paper);font-size:18px}
+  .cite span{font-style:italic;font-size:17px}
+
+  /* Logos */
+  .kept{padding:70px 0;border-bottom:1px solid var(--rule)}
+  .kept .wrap{display:flex;justify-content:space-between;align-items:center}
+  .kept .names{display:flex;gap:56px;font-size:21px;color:var(--ink-soft)}
+  .kept .names span:nth-child(odd){font-style:italic}
+
+  /* Demo */
+  .demo{padding:140px 0 150px}
+  .demo .wrap{display:grid;grid-template-columns:1fr 1fr;gap:100px}
+  .demo h2{font-size:64px;line-height:1.04;font-weight:300;letter-spacing:-.022em;margin:20px 0 30px}
+  .demo h2 em{font-style:italic}
+  .demo .intro{color:var(--ink-soft);font-size:20px;max-width:460px}
+  .agenda{margin-top:48px;max-width:460px}
+  .agenda div{display:grid;grid-template-columns:80px 1fr;padding:16px 0;border-top:1px solid var(--rule);font-size:17px}
+  .agenda div:last-child{border-bottom:1px solid var(--rule)}
+  .agenda .t{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:4px}
+  form{border:1px solid var(--rule);padding:50px 48px;background:#f7f4ed;position:relative}
+  form .label{display:block;margin-bottom:34px}
+  .field{margin-bottom:28px}
+  .field label{display:block;font-size:15px;font-style:italic;color:var(--ink-soft);margin-bottom:6px}
+  .field input,.field select,.field textarea{
+    width:100%;background:transparent;border:0;border-bottom:1px solid var(--rule);font-family:var(--serif);
+    font-size:20px;font-weight:300;color:var(--ink);padding:6px 0 10px;outline:none;transition:border-color .3s;border-radius:0;
+    -webkit-appearance:none;appearance:none;
+  }
+  .field textarea{resize:none;height:64px}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ink)}
+  .field input::placeholder,.field textarea::placeholder{color:#b3ab9c;font-style:italic}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  form .btn{width:100%;margin-top:12px}
+  .fine{font-size:14px;font-style:italic;color:var(--muted);margin-top:18px;text-align:center}
+  .err{color:var(--accent);font-size:14px;font-style:italic;margin-top:6px;display:none}
+  .field.invalid .err{display:block}
+  .field.invalid input{border-color:var(--accent)}
+  .thanks{display:none;text-align:center;padding:60px 10px}
+  .thanks .numeral{font-size:48px;display:block;margin-bottom:22px}
+  .thanks h3{font-size:36px;font-weight:300;margin-bottom:16px}
+  .thanks p{color:var(--ink-soft)}
+  form.sent .form-body{display:none}
+  form.sent .thanks{display:block}
+
+  /* Footer */
+  footer{border-top:1px solid var(--rule);padding:60px 0 50px}
+  footer .wrap{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}
+  footer p{font-size:16px;color:var(--ink-soft);max-width:300px;margin-top:14px}
+  footer h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:400;margin-bottom:16px}
+  footer ul{list-style:none}
+  footer li{font-size:16px;margin-bottom:8px}
+  footer li a{text-decoration:none;color:var(--ink-soft)}
+  footer li a:hover{color:var(--ink)}
+  .colophon{max-width:1180px;margin:56px auto 0;padding:24px 60px 0;display:flex;justify-content:space-between;font-size:14px;font-style:italic;color:var(--muted)}
+
+  /* Reveal */
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity 1.2s ease,transform 1.2s ease}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="mark">Acme<em>.</em></a>
+    <div class="links">
+      <a href="#method">Method</a>
+      <a href="#ledger">The ledger</a>
+      <a href="#customers">Customers</a>
+      <a href="#demo" class="cta-link">Book a demo</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <span class="label">Widget operations for mid-sized manufacturers</span>
+      <h1>Every widget,<br><em>accounted for.</em></h1>
+      <p class="lede">Acme gives operations teams one calm place to configure custom widgets, place orders with confidence, and follow each part from the supplier’s floor to your own.</p>
+      <div class="actions">
+        <a href="#demo" class="btn">Book a thirty-minute demo</a>
+        <a href="#method" class="quiet-link">Read how it works</a>
+      </div>
+    </div>
+    <figure class="plate">
+      <svg viewBox="0 0 440 380" fill="none" stroke="#1f1d1a" stroke-width="1" aria-label="Technical drawing of a flanged widget">
+        <!-- grid -->
+        <g stroke="#d9d1c1" stroke-width=".5">
+          <line x1="0" y1="190" x2="440" y2="190" stroke-dasharray="6 4"/>
+          <line x1="200" y1="0" x2="200" y2="380" stroke-dasharray="6 4"/>
+        </g>
+        <!-- flange -->
+        <circle class="draw" cx="200" cy="190" r="128"/>
+        <circle class="draw d2" cx="200" cy="190" r="104" stroke-width=".6"/>
+        <circle class="draw d2" cx="200" cy="190" r="54"/>
+        <circle class="draw d3" cx="200" cy="190" r="30" stroke="#7a2e22"/>
+        <!-- bolt holes -->
+        <g class="draw d3">
+          <circle cx="200" cy="74" r="9"/><circle cx="200" cy="306" r="9"/>
+          <circle cx="84" cy="190" r="9"/><circle cx="316" cy="190" r="9"/>
+          <circle cx="118" cy="108" r="9"/><circle cx="282" cy="108" r="9"/>
+          <circle cx="118" cy="272" r="9"/><circle cx="282" cy="272" r="9"/>
+        </g>
+        <!-- keyway -->
+        <path class="draw d3" d="M194 160 L194 152 L206 152 L206 160" stroke="#7a2e22"/>
+        <!-- annotations -->
+        <g class="fade" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#4a4640" stroke="none" letter-spacing="1">
+          <line x1="72" y1="350" x2="328" y2="350" stroke="#4a4640" stroke-width=".6"/>
+          <line x1="72" y1="344" x2="72" y2="356" stroke="#4a4640" stroke-width=".6"/>
+          <line x1="328" y1="344" x2="328" y2="356" stroke="#4a4640" stroke-width=".6"/>
+          <text x="200" y="368" text-anchor="middle">Ø 256.0 mm</text>
+          <line x1="221" y1="169" x2="360" y2="60" stroke="#7a2e22" stroke-width=".6"/>
+          <line x1="360" y1="60" x2="420" y2="60" stroke="#7a2e22" stroke-width=".6"/>
+          <text x="362" y="52" fill="#7a2e22">BORE Ø60 H7</text>
+          <line x1="288" y1="266" x2="360" y2="310" stroke="#4a4640" stroke-width=".6"/>
+          <line x1="360" y1="310" x2="420" y2="310" stroke="#4a4640" stroke-width=".6"/>
+          <text x="362" y="302">8× M16 THRU</text>
+          <text x="14" y="24">FIG. 1</text>
+          <text x="14" y="38" fill="#8a8378">WF-2208 / REV C</text>
+        </g>
+      </svg>
+      <figcaption>
+        <span class="label">Configured in Acme</span>
+        <span>A flanged coupling, as it will be made.</span>
+      </figcaption>
+    </figure>
+  </div>
+</header>
+
+<section class="epigraph reveal">
+  <div class="wrap">
+    <span class="fleuron">❦</span>
+    <p>Somewhere between the spreadsheet, the supplier’s inbox, and the loading dock, <em>a part goes missing.</em> We built Acme so that nothing does.</p>
+  </div>
+</section>
+
+<section class="chapters" id="method">
+  <div class="wrap">
+    <article class="chapter reveal">
+      <div class="numeral">i.</div>
+      <div>
+        <span class="label">Configure</span>
+        <h2>Specify it once,<br>and specify it well.</h2>
+        <p>Build each widget from a library of approved materials, tolerances, and finishes. Acme checks every choice against what your suppliers can actually make, so drawings stop bouncing back with questions.</p>
+        <ul>
+          <li><span>01</span>Parametric templates for your most-ordered parts</li>
+          <li><span>02</span>Revision history that engineering and purchasing both trust</li>
+          <li><span>03</span>Manufacturability checks before a quote is ever requested</li>
+        </ul>
+      </div>
+      <svg viewBox="0 0 400 300" fill="none" stroke="#1f1d1a" stroke-width="1">
+        <rect x="40" y="40" width="320" height="220" stroke="#d3cbbb"/>
+        <g font-family="IBM Plex Mono, monospace" font-size="10" fill="#8a8378" stroke="none" letter-spacing="1">
+          <text x="60" y="72">MATERIAL</text><text x="60" y="122">TOLERANCE</text><text x="60" y="172">FINISH</text><text x="60" y="222">QUANTITY</text>
+        </g>
+        <g font-family="Newsreader, serif" font-size="17" fill="#1f1d1a" stroke="none" font-style="italic">
+          <text x="200" y="74">6061-T6 aluminium</text><text x="200" y="124">± 0.05 mm</text><text x="200" y="174">Clear anodise</text><text x="200" y="224">1,200 units</text>
+        </g>
+        <g stroke="#e3dccd"><line x1="60" y1="92" x2="340" y2="92"/><line x1="60" y1="142" x2="340" y2="142"/><line x1="60" y1="192" x2="340" y2="192"/></g>
+        <path d="M325 118 l5 5 l9 -11" stroke="#7a2e22" stroke-width="1.3"/>
+      </svg>
+    </article>
+
+    <article class="chapter reveal">
+      <div class="numeral">ii.</div>
+      <div>
+        <span class="label">Order</span>
+        <h2>Place orders without<br>the back-and-forth.</h2>
+        <p>Send finished specifications to one supplier or five. Compare quotes side by side, approve within your own purchasing rules, and let Acme draft the purchase order in your ERP’s own format.</p>
+        <p>Your buyers spend their mornings negotiating, not retyping part numbers.</p>
+      </div>
+      <svg viewBox="0 0 400 300" fill="none" stroke="#1f1d1a" stroke-width="1">
+        <circle cx="80" cy="150" r="30"/>
+        <text x="80" y="155" text-anchor="middle" font-family="Newsreader, serif" font-style="italic" font-size="15" fill="#1f1d1a" stroke="none">you</text>
+        <g stroke="#8a8378" stroke-width=".7">
+          <path d="M110 150 C 200 150, 220 70, 300 70"/>
+          <path d="M110 150 L 300 150" stroke="#7a2e22" stroke-width="1.2"/>
+          <path d="M110 150 C 200 150, 220 230, 300 230"/>
+        </g>
+        <g>
+          <rect x="300" y="52" width="70" height="36"/><rect x="300" y="132" width="70" height="36" stroke="#7a2e22"/><rect x="300" y="212" width="70" height="36"/>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#4a4640" stroke="none" text-anchor="middle" letter-spacing="1">
+          <text x="335" y="74">$4.12</text><text x="335" y="154" fill="#7a2e22">$3.86</text><text x="335" y="234">$4.40</text>
+          <text x="210" y="142" fill="#7a2e22">APPROVED</text>
+        </g>
+      </svg>
+    </article>
+
+    <article class="chapter reveal">
+      <div class="numeral">iii.</div>
+      <div>
+        <span class="label">Track</span>
+        <h2>Follow every part<br>to the dock door.</h2>
+        <p>Suppliers update progress directly in Acme — machining, inspection, dispatch — and your team sees it the moment it happens. When something slips, you hear about it days early, while there is still time to act.</p>
+        <ul>
+          <li><span>01</span>Milestones reported by suppliers, not guessed by you</li>
+          <li><span>02</span>Quiet alerts when a delivery date is at risk</li>
+          <li><span>03</span>Inspection records attached to every lot</li>
+        </ul>
+      </div>
+      <svg viewBox="0 0 400 300" fill="none" stroke="#1f1d1a" stroke-width="1">
+        <line x1="40" y1="150" x2="360" y2="150" stroke="#d3cbbb"/>
+        <line x1="40" y1="150" x2="250" y2="150" stroke="#1f1d1a" stroke-width="1.4"/>
+        <g>
+          <circle cx="40" cy="150" r="6" fill="#1f1d1a"/><circle cx="145" cy="150" r="6" fill="#1f1d1a"/>
+          <circle cx="250" cy="150" r="7" fill="#f3efe6" stroke="#7a2e22" stroke-width="1.4"/><circle cx="250" cy="150" r="2.5" fill="#7a2e22" stroke="none"/>
+          <circle cx="360" cy="150" r="6" fill="#f3efe6" stroke="#8a8378"/>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#8a8378" stroke="none" text-anchor="middle" letter-spacing="1">
+          <text x="40" y="122">MACHINED</text><text x="145" y="122">INSPECTED</text><text x="250" y="122" fill="#7a2e22">IN TRANSIT</text><text x="360" y="122">RECEIVED</text>
+        </g>
+        <g font-family="Newsreader, serif" font-style="italic" font-size="14" fill="#4a4640" stroke="none" text-anchor="middle">
+          <text x="40" y="185">Mar 3</text><text x="145" y="185">Mar 6</text><text x="250" y="185">Mar 9</text><text x="360" y="185">Mar 12</text>
+        </g>
+      </svg>
+    </article>
+  </div>
+</section>
+
+<section class="ledger-section" id="ledger">
+  <div class="wrap">
+    <div class="ledger-head reveal">
+      <div>
+        <span class="label">The ledger</span>
+        <h2>One page that tells<br>the whole truth.</h2>
+      </div>
+      <p>Every open order, every supplier, every promised date — kept in a single running record that your plant managers, buyers, and engineers can all read the same way.</p>
+    </div>
+    <div class="ledger reveal">
+      <div class="ledger-bar">
+        <span class="title">Open orders — Dayton plant</span>
+        <span class="label" id="clock">Updated just now</span>
+      </div>
+      <table>
+        <thead><tr><th>Order</th><th>Widget</th><th>Supplier</th><th>Progress</th><th>Status</th><th>Due</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">PO-48213</td><td>Flanged coupling <em>· WF-2208</em></td><td>Halvorsen Machine</td><td><div class="progress"><i data-w="72"></i></div></td><td><span class="status"><span class="dot live"></span>In transit</span></td><td class="mono">Mar 12</td></tr>
+          <tr><td class="mono">PO-48207</td><td>Hinge bracket <em>· HB-0415</em></td><td>Corliss &amp; Daughters</td><td><div class="progress"><i data-w="100"></i></div></td><td><span class="status"><span class="dot done"></span>Received</span></td><td class="mono">Mar 04</td></tr>
+          <tr><td class="mono">PO-48198</td><td>Spindle collar <em>· SC-1130</em></td><td>Northgate Precision</td><td><div class="progress"><i data-w="44"></i></div></td><td><span class="status"><span class="dot"></span>Inspection</span></td><td class="mono">Mar 19</td></tr>
+          <tr><td class="mono">PO-48190</td><td>Mounting plate <em>· MP-0902</em></td><td>Ashby Fabrication</td><td><div class="progress"><i data-w="18"></i></div></td><td><span class="status" style="color:var(--accent)"><span class="dot live"></span>Two days at risk</span></td><td class="mono">Mar 22</td></tr>
+          <tr><td class="mono">PO-48176</td><td>Bearing housing <em>· BH-3301</em></td><td>Halvorsen Machine</td><td><div class="progress"><i data-w="6"></i></div></td><td><span class="status"><span class="dot hollow"></span>Scheduled</span></td><td class="mono">Apr 02</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="figures">
+  <div class="wrap">
+    <div class="grid reveal">
+      <div class="fig"><div class="n">41<sup>%</sup></div><p>fewer late deliveries in the first two quarters on Acme.</p></div>
+      <div class="fig"><div class="n">6<sup>hrs</sup></div><p>returned to each buyer every week, once order entry stops being manual.</p></div>
+      <div class="fig"><div class="n">9<sup>days</sup></div><p>median notice of a slipping delivery, where there used to be none.</p></div>
+    </div>
+    <p class="note">Median results across Acme customers with between two and twelve plants, 2023–2024.</p>
+  </div>
+</section>
+
+<section class="testimonial" id="customers">
+  <div class="wrap reveal">
+    <div class="qmark">“</div>
+    <div>
+      <blockquote>We used to learn a part was late when the line stopped. Now I learn it on a Tuesday, from a supplier who already has a plan. <em>The plant is quieter for it — and so am I.</em></blockquote>
+      <div class="cite"><strong>Marguerite Oyelaran</strong><span>Director of Operations, Brightwater Pump Company</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="kept">
+  <div class="wrap">
+    <span class="label">Trusted on the floor at</span>
+    <div class="names">
+      <span>Brightwater Pump</span><span>Kessler Hydraulics</span><span>Ondine Marine</span><span>Parrish Tool Works</span><span>Lindqvist Motor</span>
+    </div>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="label">Book a demo</span>
+      <h2>Thirty minutes,<br><em>your own parts.</em></h2>
+      <p class="intro">Bring one widget you order often. We’ll configure it with you, send it to a sample supplier, and show you what tracking it looks like — no slides, no pressure.</p>
+      <div class="agenda">
+        <div><span class="t">00—05</span><span>A short conversation about your plants and suppliers</span></div>
+        <div><span class="t">05—20</span><span>Configure and order one of your real widgets, live</span></div>
+        <div><span class="t">20—25</span><span>A walk through the ledger and at-risk alerts</span></div>
+        <div><span class="t">25—30</span><span>Questions, pricing, and what a pilot would involve</span></div>
+      </div>
+    </div>
+    <form id="demo-form" class="reveal" novalidate>
+      <div class="form-body">
+        <span class="label">Request a time</span>
+        <div class="two">
+          <div class="field"><label for="name">Your name</label><input id="name" name="name" placeholder="Ada Whitfield" required><div class="err">Please tell us your name.</div></div>
+          <div class="field"><label for="role">Role</label><input id="role" name="role" placeholder="Operations Manager"></div>
+        </div>
+        <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" placeholder="ada@yourcompany.com" required><div class="err">A valid work email, please.</div></div>
+        <div class="two">
+          <div class="field"><label for="company">Company</label><input id="company" name="company" placeholder="Whitfield Components" required><div class="err">Which company are you with?</div></div>
+          <div class="field"><label for="plants">Number of plants</label>
+            <select id="plants" name="plants"><option>One</option><option selected>Two to five</option><option>Six to twelve</option><option>More than twelve</option></select>
+          </div>
+        </div>
+        <div class="field"><label for="note">A widget you’d like to see (optional)</label><textarea id="note" name="note" placeholder="Stainless hinge bracket, around 3,000 a quarter"></textarea></div>
+        <button type="submit" class="btn">Request my demo</button>
+        <p class="fine">We reply within one working day. We never share your details.</p>
+      </div>
+      <div class="thanks">
+        <span class="numeral">✓</span>
+        <h3>Thank you, <span id="thanks-name">friend</span>.</h3>
+        <p>A member of our team will write to you within one working day with a few times to choose from.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a href="#" class="mark">Acme<em>.</em></a>
+      <p>Widget operations for manufacturers who would rather make things than chase them.</p>
+    </div>
+    <div><h4>Product</h4><ul><li><a href="#method">Configure</a></li><li><a href="#method">Order</a></li><li><a href="#ledger">Track</a></li><li><a href="#demo">Pricing</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#customers">Customers</a></li><li><a href="#">Careers</a></li><li><a href="#">Journal</a></li></ul></div>
+    <div><h4>Contact</h4><ul><li><a href="mailto:hello@acme.example">hello@acme.example</a></li><li><a href="#demo">Book a demo</a></li><li><a href="#">Security</a></li></ul></div>
+  </div>
+  <div class="colophon"><span>© 2025 Acme Widget Systems, Inc.</span><span>Made carefully, in Ohio.</span></div>
+</footer>
+
+<script>
+  // Gentle reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        e.target.querySelectorAll('.progress i').forEach(b => b.style.width = b.dataset.w + '%');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  document.querySelectorAll('.progress i').forEach(b => b.style.width = '0');
+
+  // Ledger clock
+  const clock = document.getElementById('clock');
+  let secs = 0;
+  setInterval(() => {
+    secs += 15;
+    clock.textContent = secs < 60 ? `Updated ${secs} seconds ago` : 'Updated just now';
+    if (secs >= 60) secs = 0;
+  }, 15000);
+
+  // Form
+  const form = document.getElementById('demo-form');
+  form.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    let ok = true;
+    ['name','email','company'].forEach(id => {
+      const input = document.getElementById(id);
+      const field = input.closest('.field');
+      let valid = input.value.trim().length > 0;
+      if (id === 'email') valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+      field.classList.toggle('invalid', !valid);
+      if (!valid) ok = false;
+    });
+    if (!ok) return;
+    const first = document.getElementById('name').value.trim().split(' ')[0];
+    document.getElementById('thanks-name').textContent = first;
+    form.classList.add('sent');
+  });
+  form.querySelectorAll('input').forEach(i => i.addEventListener('input', () => i.closest('.field').classList.remove('invalid')));
+</script>
+</body>
+</html>

@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widget Procurement, Engineered</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16150f;
+  --paper:#f4f2ec;
+  --paper-2:#eceae2;
+  --line:#c9c6ba;
+  --line-dark:#a8a496;
+  --accent:#b3391e;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'Inter Tight',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--ink);color:var(--paper)}
+
+/* ---------- global scaffolding ---------- */
+.frame{
+  width:100%;
+  max-width:1440px;
+  margin:0 auto;
+  border-left:1px solid var(--line);
+  border-right:1px solid var(--line);
+  background:var(--paper);
+  position:relative;
+}
+.cols{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+}
+.rule-top{border-top:1px solid var(--line)}
+.mono{font-family:var(--mono)}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.eyebrow::before{
+  content:"";
+  width:8px;height:8px;
+  background:var(--accent);
+  display:inline-block;
+}
+
+/* ---------- header ---------- */
+header{
+  border-bottom:1px solid var(--line);
+  display:grid;
+  grid-template-columns:220px 1fr auto auto;
+  align-items:stretch;
+  position:sticky;
+  top:0;
+  background:var(--paper);
+  z-index:100;
+}
+.logo{
+  padding:20px 28px;
+  border-right:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+  color:var(--ink);
+}
+.logo-mark{
+  width:22px;height:22px;
+  border:2px solid var(--ink);
+  position:relative;
+  flex:none;
+}
+.logo-mark::after{
+  content:"";
+  position:absolute;
+  inset:4px;
+  background:var(--accent);
+}
+.logo span{font-weight:600;font-size:17px;letter-spacing:.02em}
+nav{
+  display:flex;
+  align-items:stretch;
+}
+nav a{
+  display:flex;align-items:center;
+  padding:0 26px;
+  text-decoration:none;
+  color:var(--ink);
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:.04em;
+  border-right:1px solid var(--line);
+  transition:background .15s ease;
+}
+nav a:hover{background:var(--paper-2)}
+.head-meta{
+  display:flex;align-items:center;
+  padding:0 28px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.12em;
+  color:var(--line-dark);
+  border-right:1px solid var(--line);
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  text-decoration:none;
+  padding:0 30px;
+  border:none;
+  cursor:pointer;
+  transition:background .15s ease;
+}
+.btn:hover{background:var(--accent)}
+.btn .arrow{transition:transform .2s ease}
+.btn:hover .arrow{transform:translateX(4px)}
+
+/* ---------- hero ---------- */
+.hero{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  min-height:640px;
+}
+.hero-copy{
+  grid-column:1/8;
+  padding:80px 64px 72px;
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+h1{
+  font-weight:300;
+  font-size:76px;
+  line-height:1.02;
+  letter-spacing:-.025em;
+  margin:36px 0 40px;
+}
+h1 em{
+  font-style:normal;
+  font-weight:600;
+}
+h1 .accent{color:var(--accent);font-weight:600}
+.hero-sub{
+  font-size:18px;
+  line-height:1.6;
+  max-width:480px;
+  color:#3c3a33;
+  font-weight:400;
+}
+.hero-actions{
+  margin-top:48px;
+  display:flex;
+  gap:0;
+  align-items:center;
+}
+.btn-solid{
+  background:var(--ink);
+  color:var(--paper);
+  height:56px;
+  padding:0 36px;
+}
+.btn-ghost{
+  height:56px;
+  padding:0 36px;
+  border:1px solid var(--ink);
+  background:transparent;
+  color:var(--ink);
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  margin-left:-1px;
+  transition:background .15s ease,color .15s ease;
+}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+.hero-foot{
+  margin-top:64px;
+  padding-top:24px;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.12em;
+  color:var(--line-dark);
+  text-transform:uppercase;
+}
+/* hero schematic */
+.hero-visual{
+  grid-column:8/13;
+  position:relative;
+  background:var(--paper-2);
+  overflow:hidden;
+}
+.hero-visual svg{position:absolute;inset:0;width:100%;height:100%}
+.spec-tag{
+  position:absolute;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.1em;
+  background:var(--paper);
+  border:1px solid var(--line);
+  padding:6px 10px;
+  color:var(--ink);
+}
+
+/* ---------- ticker ---------- */
+.ticker{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  overflow:hidden;
+  background:var(--ink);
+  color:var(--paper);
+  height:44px;
+  display:flex;
+  align-items:center;
+}
+.ticker-track{
+  display:flex;
+  gap:64px;
+  white-space:nowrap;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  animation:tick 40s linear infinite;
+}
+.ticker-track span i{color:var(--accent);font-style:normal;margin-right:64px}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- section scaffolding ---------- */
+section{border-bottom:1px solid var(--line)}
+.sec-head{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  padding:0 0;
+  border-bottom:1px solid var(--line);
+}
+.sec-head .num{
+  grid-column:1/2;
+  padding:28px;
+  border-right:1px solid var(--line);
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--line-dark);
+}
+.sec-head h2{
+  grid-column:2/10;
+  padding:24px 40px;
+  font-size:34px;
+  font-weight:400;
+  letter-spacing:-.01em;
+  display:flex;align-items:center;
+}
+.sec-head .tail{
+  grid-column:10/13;
+  border-left:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:0 40px;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  color:var(--line-dark);
+  text-transform:uppercase;
+}
+
+/* ---------- problem ---------- */
+.problem-body{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+}
+.problem-lede{
+  grid-column:1/6;
+  padding:64px 48px;
+  border-right:1px solid var(--line);
+  font-size:24px;
+  line-height:1.45;
+  font-weight:300;
+  letter-spacing:-.01em;
+}
+.problem-lede strong{font-weight:600}
+.problem-stats{
+  grid-column:6/13;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+.stat{
+  padding:48px 44px;
+  border-bottom:1px solid var(--line);
+  position:relative;
+}
+.stat:nth-child(odd){border-right:1px solid var(--line)}
+.stat:nth-child(3),.stat:nth-child(4){border-bottom:none}
+.stat .big{
+  font-size:56px;
+  font-weight:300;
+  letter-spacing:-.03em;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.stat .big sup{font-size:22px;color:var(--accent);font-weight:500}
+.stat .lbl{
+  margin-top:14px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#5a584f;
+  line-height:1.7;
+}
+
+/* ---------- platform / steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr)}
+.step{
+  padding:56px 44px 64px;
+  border-right:1px solid var(--line);
+  position:relative;
+  min-height:380px;
+  display:flex;flex-direction:column;
+  transition:background .2s ease;
+}
+.step:last-child{border-right:none}
+.step:hover{background:var(--paper-2)}
+.step .idx{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--accent);
+  letter-spacing:.14em;
+  margin-bottom:auto;
+}
+.step h3{
+  font-size:26px;
+  font-weight:500;
+  letter-spacing:-.01em;
+  margin:44px 0 16px;
+}
+.step p{
+  font-size:15px;
+  line-height:1.65;
+  color:#3c3a33;
+  max-width:340px;
+}
+.step svg{
+  margin-top:36px;
+  width:100%;
+  height:64px;
+}
+
+/* ---------- specs table ---------- */
+.spec-grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+}
+.spec-intro{
+  grid-column:1/5;
+  padding:56px 48px;
+  border-right:1px solid var(--line);
+}
+.spec-intro p{
+  font-size:16px;
+  line-height:1.65;
+  color:#3c3a33;
+  margin-top:24px;
+}
+.spec-table{
+  grid-column:5/13;
+}
+.spec-row{
+  display:grid;
+  grid-template-columns:60px 1fr 1.4fr 160px;
+  border-bottom:1px solid var(--line);
+  align-items:stretch;
+  transition:background .15s ease;
+}
+.spec-row:last-child{border-bottom:none}
+.spec-row:hover{background:var(--paper-2)}
+.spec-row>div{padding:22px 28px;font-size:14px;display:flex;align-items:center}
+.spec-row .r-idx{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--line-dark);
+  border-right:1px solid var(--line);
+  padding-left:32px;
+}
+.spec-row .r-name{font-weight:600;border-right:1px solid var(--line)}
+.spec-row .r-desc{color:#3c3a33;line-height:1.5;border-right:1px solid var(--line)}
+.spec-row .r-tag{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+}
+
+/* ---------- quote ---------- */
+.quote-block{
+  padding:96px 64px;
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:0;
+  background:var(--ink);
+  color:var(--paper);
+}
+.quote-block .q-mark{
+  grid-column:1/3;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.16em;
+  color:#8f8b7d;
+  text-transform:uppercase;
+}
+blockquote{
+  grid-column:3/11;
+  font-size:34px;
+  font-weight:300;
+  line-height:1.35;
+  letter-spacing:-.01em;
+}
+blockquote .hl{color:#e2603f}
+.attribution{
+  grid-column:3/11;
+  margin-top:40px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#8f8b7d;
+}
+
+/* ---------- demo form ---------- */
+.demo{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+}
+.demo-left{
+  grid-column:1/6;
+  border-right:1px solid var(--line);
+  padding:72px 48px;
+  display:flex;
+  flex-direction:column;
+}
+.demo-left h2{
+  font-size:44px;
+  font-weight:300;
+  letter-spacing:-.02em;
+  line-height:1.1;
+  margin:28px 0 24px;
+}
+.demo-left h2 strong{font-weight:600}
+.demo-left p{font-size:16px;line-height:1.65;color:#3c3a33;max-width:380px}
+.demo-facts{
+  margin-top:auto;
+  padding-top:48px;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  border-top:1px solid var(--line);
+}
+.demo-facts div{
+  display:flex;
+  justify-content:space-between;
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.demo-facts div span:last-child{color:var(--accent)}
+.demo-form{
+  grid-column:6/13;
+  padding:72px 64px;
+}
+.field{margin-bottom:34px}
+.field label{
+  display:flex;
+  justify-content:space-between;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#5a584f;
+  margin-bottom:10px;
+}
+.field label .req{color:var(--accent)}
+.field input,.field select{
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid var(--line-dark);
+  padding:10px 0 14px;
+  font-family:var(--sans);
+  font-size:18px;
+  color:var(--ink);
+  outline:none;
+  border-radius:0;
+  transition:border-color .15s ease;
+  appearance:none;
+}
+.field input:focus,.field select:focus{border-bottom-color:var(--ink)}
+.field input::placeholder{color:#b3afa2}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.submit-btn{
+  width:100%;
+  height:64px;
+  background:var(--ink);
+  color:var(--paper);
+  border:none;
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 32px;
+  margin-top:16px;
+  transition:background .15s ease;
+}
+.submit-btn:hover{background:var(--accent)}
+.submit-btn .arrow{transition:transform .2s ease}
+.submit-btn:hover .arrow{transform:translateX(6px)}
+.form-note{
+  margin-top:20px;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.1em;
+  color:var(--line-dark);
+  text-transform:uppercase;
+}
+.form-success{
+  display:none;
+  padding:48px 0;
+}
+.form-success .big-check{
+  width:56px;height:56px;
+  border:2px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:28px;
+}
+.form-success h3{font-size:30px;font-weight:400;margin-bottom:14px}
+.form-success p{font-size:15px;color:#3c3a33;line-height:1.6;max-width:420px}
+
+/* ---------- footer ---------- */
+footer{
+  display:grid;
+  grid-template-columns:220px 1fr auto;
+  align-items:stretch;
+}
+.foot-logo{
+  border-right:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:28px;
+  gap:12px;
+  font-weight:600;
+}
+.foot-links{
+  display:flex;
+  align-items:center;
+  gap:40px;
+  padding:0 48px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.foot-links a{color:#5a584f;text-decoration:none}
+.foot-links a:hover{color:var(--ink)}
+.foot-copy{
+  border-left:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:0 32px;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.12em;
+  color:var(--line-dark);
+  text-transform:uppercase;
+}
+
+/* reveal animation */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- HEADER -->
+  <header>
+    <a class="logo" href="#"><span class="logo-mark"></span><span>ACME</span></a>
+    <nav>
+      <a href="#problem">The Problem</a>
+      <a href="#platform">Platform</a>
+      <a href="#capabilities">Capabilities</a>
+    </nav>
+    <div class="head-meta">EST. 2011 / OPS INFRASTRUCTURE</div>
+    <a href="#demo" class="btn">Book a Demo <span class="arrow">&rarr;</span></a>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-copy">
+      <div>
+        <div class="eyebrow">Widget Procurement, Engineered</div>
+        <h1>Custom widgets.<br><em>Zero</em> ambiguity.<br><span class="accent">One system of record.</span></h1>
+        <p class="hero-sub">Acme gives operations teams at mid-sized manufacturers a single platform to configure, order, and track custom widgets across the entire supply chain &mdash; with the rigor your production line demands.</p>
+        <div class="hero-actions">
+          <a href="#demo" class="btn btn-solid">Book a Demo <span class="arrow">&rarr;</span></a>
+          <a href="#platform" class="btn-ghost">See the Platform</a>
+        </div>
+      </div>
+      <div class="hero-foot">
+        <span>14,200+ active configurations</span>
+        <span>99.98% order accuracy</span>
+        <span>ISO 9001 aligned</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <!-- Technical drawing, drawn with SVG -->
+      <svg viewBox="0 0 560 640" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+            <path d="M28 0H0V28" fill="none" stroke="#d6d3c8" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <rect width="560" height="640" fill="url(#grid)"/>
+        <!-- centerlines -->
+        <line x1="280" y1="40" x2="280" y2="600" stroke="#b3391e" stroke-width="1" stroke-dasharray="14 6 2 6"/>
+        <line x1="60" y1="320" x2="500" y2="320" stroke="#b3391e" stroke-width="1" stroke-dasharray="14 6 2 6"/>
+        <!-- widget body -->
+        <g id="wdg">
+          <rect x="170" y="220" width="220" height="200" fill="none" stroke="#16150f" stroke-width="2.5"/>
+          <rect x="170" y="220" width="220" height="34" fill="none" stroke="#16150f" stroke-width="2.5"/>
+          <circle cx="230" cy="320" r="42" fill="none" stroke="#16150f" stroke-width="2.5"/>
+          <circle cx="230" cy="320" r="14" fill="none" stroke="#16150f" stroke-width="2.5"/>
+          <circle cx="330" cy="320" r="42" fill="none" stroke="#16150f" stroke-width="2.5"/>
+          <circle cx="330" cy="320" r="14" fill="#b3391e"/>
+          <line x1="170" y1="180" x2="390" y2="180" stroke="#16150f" stroke-width="1.5"/>
+          <line x1="170" y1="172" x2="170" y2="188" stroke="#16150f" stroke-width="1.5"/>
+          <line x1="390" y1="172" x2="390" y2="188" stroke="#16150f" stroke-width="1.5"/>
+          <text x="268" y="172" font-family="IBM Plex Mono" font-size="11" fill="#16150f">220.00</text>
+          <line x1="430" y1="220" x2="430" y2="420" stroke="#16150f" stroke-width="1.5"/>
+          <line x1="422" y1="220" x2="438" y2="220" stroke="#16150f" stroke-width="1.5"/>
+          <line x1="422" y1="420" x2="438" y2="420" stroke="#16150f" stroke-width="1.5"/>
+          <text x="448" y="324" font-family="IBM Plex Mono" font-size="11" fill="#16150f">200.00</text>
+          <line x1="60" y1="470" x2="170" y2="400" stroke="#16150f" stroke-width="1"/>
+          <circle cx="170" cy="400" r="3" fill="#16150f"/>
+          <text x="60" y="490" font-family="IBM Plex Mono" font-size="10" fill="#5a584f">WALL 6.35 &plusmn;0.05</text>
+        </g>
+        <!-- rotating datum marker -->
+        <g>
+          <circle cx="280" cy="320" r="140" fill="none" stroke="#16150f" stroke-width="1" stroke-dasharray="2 8">
+            <animateTransform attributeName="transform" type="rotate" from="0 280 320" to="360 280 320" dur="60s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+        <text x="60" y="80" font-family="IBM Plex Mono" font-size="10" fill="#5a584f" letter-spacing="2">FIG. 01 &mdash; STANDARD HOUSING, SERIES W-4</text>
+        <text x="60" y="600" font-family="IBM Plex Mono" font-size="10" fill="#5a584f" letter-spacing="2">SCALE 1:1 &nbsp;/&nbsp; TOLERANCE &plusmn;0.05 &nbsp;/&nbsp; REV C</text>
+      </svg>
+      <div class="spec-tag" style="top:96px;right:32px">MATERIAL: 6061-T6</div>
+      <div class="spec-tag" style="bottom:120px;right:32px">LEAD TIME: 9 DAYS</div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="tickerTrack">
+      <span><i>&#9632;</i>CONFIGURE <i>&#9632;</i>ORDER <i>&#9632;</i>TRACK <i>&#9632;</i>REORDER <i>&#9632;</i>AUDIT <i>&#9632;</i>CONFIGURE <i>&#9632;</i>ORDER <i>&#9632;</i>TRACK <i>&#9632;</i>REORDER <i>&#9632;</i>AUDIT </span>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="sec-head">
+      <div class="num">01</div>
+      <h2>The cost of informal procurement</h2>
+      <div class="tail">Problem / Context</div>
+    </div>
+    <div class="problem-body">
+      <div class="problem-lede reveal">
+        <p>Most mid-sized manufacturers still specify custom widgets through <strong>emails, spreadsheets, and tribal knowledge</strong>. Every handoff introduces error. Every error becomes scrap, delay, or a difficult conversation with a customer.</p>
+      </div>
+      <div class="problem-stats">
+        <div class="stat reveal">
+          <div class="big">11.4<sup>%</sup></div>
+          <div class="lbl">Average share of widget orders containing at least one specification error</div>
+        </div>
+        <div class="stat reveal">
+          <div class="big">6.2<sup>wks</sup></div>
+          <div class="lbl">Typical delay when a misconfigured order reaches the production floor</div>
+        </div>
+        <div class="stat reveal">
+          <div class="big">3<sup>&times;</sup></div>
+          <div class="lbl">Higher expediting cost for orders tracked outside a single system of record</div>
+        </div>
+        <div class="stat reveal">
+          <div class="big">0</div>
+          <div class="lbl">Audit trail events captured when configuration lives in an email thread</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM -->
+  <section id="platform">
+    <div class="sec-head">
+      <div class="num">02</div>
+      <h2>One disciplined workflow, end to end</h2>
+      <div class="tail">Platform / Method</div>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="idx">STEP / 01</div>
+        <h3>Configure</h3>
+        <p>Define widget geometry, material, finish, and tolerance through a constrained configurator. Invalid combinations are impossible by design &mdash; the rules of your supply base are encoded, not remembered.</p>
+        <svg viewBox="0 0 300 64" aria-hidden="true">
+          <rect x="10" y="22" width="60" height="20" fill="none" stroke="#16150f" stroke-width="2"/>
+          <rect x="90" y="22" width="60" height="20" fill="none" stroke="#16150f" stroke-width="2"/>
+          <rect x="170" y="22" width="60" height="20" fill="#b3391e"/>
+          <line x1="70" y1="32" x2="90" y2="32" stroke="#16150f" stroke-width="2"/>
+          <line x1="150" y1="32" x2="170" y2="32" stroke="#16150f" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="step reveal">
+        <div class="idx">STEP / 02</div>
+        <h3>Order</h3>
+        <p>Release orders to qualified suppliers with a single instruction set. Pricing, lead time, and capacity are confirmed at submission &mdash; not negotiated afterward in a chain of replies.</p>
+        <svg viewBox="0 0 300 64" aria-hidden="true">
+          <circle cx="40" cy="32" r="16" fill="none" stroke="#16150f" stroke-width="2"/>
+          <circle cx="150" cy="32" r="16" fill="none" stroke="#16150f" stroke-width="2"/>
+          <circle cx="260" cy="32" r="16" fill="#b3391e"/>
+          <line x1="56" y1="32" x2="134" y2="32" stroke="#16150f" stroke-width="2"/>
+          <line x1="166" y1="32" x2="244" y2="32" stroke="#16150f" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="step reveal">
+        <div class="idx">STEP / 03</div>
+        <h3>Track</h3>
+        <p>Follow every order from supplier confirmation to dock receipt, with milestones, exceptions, and full revision history. When something slips, you know before your line does.</p>
+        <svg viewBox="0 0 300 64" aria-hidden="true">
+          <line x1="10" y1="48" x2="290" y2="48" stroke="#16150f" stroke-width="2"/>
+          <rect x="20" y="28" width="14" height="20" fill="#16150f"/>
+          <rect x="80" y="18" width="14" height="30" fill="#16150f"/>
+          <rect x="140" y="34" width="14" height="14" fill="#16150f"/>
+          <rect x="200" y="8" width="14" height="40" fill="#b3391e"/>
+          <rect x="260" y="22" width="14" height="26" fill="#16150f"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPABILITIES -->
+  <section id="capabilities">
+    <div class="sec-head">
+      <div class="num">03</div>
+      <h2>Capabilities, specified precisely</h2>
+      <div class="tail">Index / A&ndash;F</div>
+    </div>
+    <div class="spec-grid">
+      <div class="spec-intro reveal">
+        <div class="eyebrow">Full Specification</div>
+        <p>Every capability in Acme exists to remove a specific failure mode from widget procurement. Nothing decorative. Nothing redundant.</p>
+      </div>
+      <div class="spec-table">
+        <div class="spec-row reveal"><div class="r-idx">A</div><div class="r-name">Constrained Configurator</div><div class="r-desc">Parametric widget definition with rule-based validation against supplier capability envelopes.</div><div class="r-tag">Configure</div></div>
+        <div class="spec-row reveal"><div class="r-idx">B</div><div class="r-name">Revision Control</div><div class="r-desc">Immutable version history on every configuration, with diffing and one-click rollback.</div><div class="r-tag">Govern</div></div>
+        <div class="spec-row reveal"><div class="r-idx">C</div><div class="r-name">Supplier Matching</div><div class="r-desc">Automatic routing to qualified suppliers by material, tolerance class, and live capacity.</div><div class="r-tag">Order</div></div>
+        <div class="spec-row reveal"><div class="r-idx">D</div><div class="r-name">Milestone Tracking</div><div class="r-desc">Confirmed, in-production, quality-released, shipped, received &mdash; timestamped at each event.</div><div class="r-tag">Track</div></div>
+        <div class="spec-row reveal"><div class="r-idx">E</div><div class="r-name">Exception Alerts</div><div class="r-desc">Threshold-based notification when lead time, quantity, or specification drifts from plan.</div><div class="r-tag">Track</div></div>
+        <div class="spec-row reveal"><div class="r-idx">F</div><div class="r-name">ERP Integration</div><div class="r-desc">Bi-directional sync with SAP, NetSuite, and Epicor via certified connectors.</div><div class="r-tag">Connect</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <div class="quote-block">
+    <div class="q-mark">Field Report</div>
+    <blockquote class="reveal">&ldquo;We retired four spreadsheets and roughly two hundred email threads a month. Misconfigured widget orders fell by <span class="hl">94% in the first quarter</span>. It is the most boring software we own, and the most valuable.&rdquo;</blockquote>
+    <div class="attribution">Director of Operations &mdash; Precision Components Manufacturer, 340 employees, Ohio</div>
+  </div>
+
+  <!-- DEMO -->
+  <section id="demo">
+    <div class="demo">
+      <div class="demo-left">
+        <div class="eyebrow">Request a Demonstration</div>
+        <h2>See the system <strong>on your own parts.</strong></h2>
+        <p>A forty-five minute working session. Bring a current widget specification and we will configure it live, route it to a matched supplier, and walk the tracking lifecycle &mdash; end to end, no slides.</p>
+        <div class="demo-facts">
+          <div><span>Session length</span><span>45 min</span></div>
+          <div><span>Format</span><span>Live / Remote</span></div>
+          <div><span>Commitment</span><span>None</span></div>
+          <div><span>Response time</span><span>&lt; 1 business day</span></div>
+        </div>
+      </div>
+      <div class="demo-form">
+        <form id="demoForm" novalidate>
+          <div class="form-row">
+            <div class="field">
+              <label for="fname">Full Name <span class="req">Required</span></label>
+              <input id="fname" type="text" placeholder="Margaret Hale" required>
+            </div>
+            <div class="field">
+              <label for="femail">Work Email <span class="req">Required</span></label>
+              <input id="femail" type="email" placeholder="m.hale@company.com" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="fcompany">Company <span class="req">Required</span></label>
+              <input id="fcompany" type="text" placeholder="Hale Precision Works" required>
+            </div>
+            <div class="field">
+              <label for="fsize">Employees <span class="req">Required</span></label>
+              <select id="fsize" required>
+                <option value="">Select range</option>
+                <option>50 &ndash; 200</option>
+                <option>200 &ndash; 500</option>
+                <option>500 &ndash; 1,000</option>
+                <option>1,000+</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fvolume">Monthly Widget Order Volume</label>
+            <input id="fvolume" type="text" placeholder="e.g. 40 orders / 12,000 units">
+          </div>
+          <button type="submit" class="submit-btn">Book a Demo <span class="arrow">&rarr;</span></button>
+          <p class="form-note">Your information is used only to schedule the demonstration.</p>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <div class="big-check">
+            <svg width="28" height="28" viewBox="0 0 28 28"><path d="M5 15l6 6L23 7" fill="none" stroke="#b3391e" stroke-width="3"/></svg>
+          </div>
+          <h3>Request received.</h3>
+          <p>Thank you. A member of our operations team will contact you within one business day to schedule your working session.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="foot-logo"><span class="logo-mark"></span>ACME</div>
+    <div class="foot-links">
+      <a href="#problem">Problem</a>
+      <a href="#platform">Platform</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#demo">Demo</a>
+      <a href="#">Security</a>
+    </div>
+    <div class="foot-copy">&copy; 2025 Acme Industrial Systems, Inc.</div>
+  </footer>
+
+</div>
+
+<script>
+// Duplicate ticker content for seamless loop
+(function(){
+  var t=document.getElementById('tickerTrack');
+  t.innerHTML+=t.innerHTML;
+})();
+
+// Scroll reveal
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}
+    });
+  },{threshold:0.15});
+  els.forEach(function(el){io.observe(el);});
+})();
+
+// Form handling
+(function(){
+  var form=document.getElementById('demoForm');
+  var success=document.getElementById('formSuccess');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var valid=true;
+    form.querySelectorAll('[required]').forEach(function(f){
+      if(!f.value.trim()){
+        valid=false;
+        f.style.borderBottomColor='#b3391e';
+        f.addEventListener('input',function(){f.style.borderBottomColor='';},{once:true});
+      }
+    });
+    var email=document.getElementById('femail');
+    if(email.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){
+      valid=false;
+      email.style.borderBottomColor='#b3391e';
+    }
+    if(!valid)return;
+    form.style.display='none';
+    success.style.display='block';
+  });
+})();
+</script>
+</body>
+</html>

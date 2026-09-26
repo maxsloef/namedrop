@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACME — WIDGETS. NO LIES. BOOK A DEMO.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;700&family=Permanent+Marker&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111110;
+    --paper:#efe9df;
+    --red:#e8300a;
+    --blue:#1b3fb8;
+    --yellow:#f2c400;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;
+    overflow-x:hidden;
+    cursor:crosshair;
+  }
+  ::selection{background:var(--red);color:var(--paper);}
+
+  /* ---------- grain overlay ---------- */
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 40px;mix-blend-mode:difference;color:#fff;
+  }
+  nav .logo{font-family:'Archivo Black';font-size:26px;letter-spacing:-2px;transform:rotate(-2deg);}
+  nav .logo span{color:var(--red);mix-blend-mode:normal;}
+  nav a{color:#fff;text-decoration:none;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-left:28px;border-bottom:2px solid transparent;transition:border-color .2s;}
+  nav a:hover{border-color:#fff;}
+  nav a.cta{background:var(--red);padding:10px 20px;transform:rotate(2deg);display:inline-block;font-weight:700;mix-blend-mode:normal;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;position:relative;padding:120px 40px 60px;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .hero h1{
+    font-family:'Archivo Black',sans-serif;
+    font-size:clamp(70px,11.5vw,168px);
+    line-height:.82;letter-spacing:-.04em;text-transform:uppercase;
+    position:relative;z-index:2;
+  }
+  .hero h1 .l1{display:block;}
+  .hero h1 .l2{display:block;color:var(--red);transform:translateX(9vw) rotate(-1.5deg);}
+  .hero h1 .l3{display:block;transform:translateX(-2vw);}
+  .hero h1 .strike{position:relative;display:inline-block;}
+  .hero h1 .strike::after{
+    content:'';position:absolute;left:-2%;top:52%;width:104%;height:.09em;
+    background:var(--ink);transform:rotate(-2deg);
+  }
+  .hero .sub{
+    font-family:'Special Elite',monospace;font-size:clamp(15px,1.4vw,20px);
+    max-width:520px;margin-top:50px;transform:rotate(-1deg);
+    position:relative;z-index:2;line-height:1.5;
+  }
+  .hero .sub b{background:var(--yellow);padding:0 6px;}
+  .hero-scribble{position:absolute;z-index:1;pointer-events:none;}
+  .tag-rotate{
+    position:absolute;right:5vw;top:22vh;z-index:3;
+    font-family:'Permanent Marker',cursive;font-size:clamp(18px,2vw,30px);
+    color:var(--blue);transform:rotate(8deg);max-width:240px;line-height:1.2;
+  }
+  .hero-cta-row{margin-top:60px;display:flex;gap:30px;align-items:center;z-index:2;position:relative;flex-wrap:wrap;}
+  .btn-chaos{
+    font-family:'Archivo Black';font-size:clamp(18px,1.8vw,26px);
+    text-transform:uppercase;text-decoration:none;color:var(--paper);
+    background:var(--ink);padding:22px 44px;display:inline-block;
+    transform:rotate(-1.5deg);transition:transform .15s, background .15s;
+    box-shadow:8px 8px 0 var(--red);
+  }
+  .btn-chaos:hover{transform:rotate(1deg) scale(1.04);background:var(--red);box-shadow:8px 8px 0 var(--ink);}
+  .btn-ghost{
+    font-family:'Special Elite';font-size:16px;color:var(--ink);text-decoration:none;
+    border-bottom:3px solid var(--red);padding-bottom:4px;transform:rotate(1deg);
+  }
+  .dead-widget{
+    position:absolute;bottom:6vh;right:8vw;width:180px;height:180px;z-index:1;
+    animation:spin 24s linear infinite;opacity:.9;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ---------- ticker ---------- */
+  .ticker{
+    background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;
+    padding:14px 0;transform:rotate(-1.2deg) scale(1.02);border-top:4px solid var(--red);border-bottom:4px solid var(--red);
+    position:relative;z-index:5;
+  }
+  .ticker-inner{display:inline-block;animation:tick 22s linear infinite;font-family:'Archivo Black';font-size:20px;text-transform:uppercase;letter-spacing:1px;}
+  .ticker-inner em{color:var(--red);font-style:normal;margin:0 20px;}
+  @keyframes tick{to{transform:translateX(-50%);}}
+
+  /* ---------- truth section ---------- */
+  .truth{padding:140px 40px;position:relative;}
+  .truth h2{
+    font-family:'Archivo Black';font-size:clamp(44px,6.5vw,100px);
+    text-transform:uppercase;line-height:.9;letter-spacing:-.03em;max-width:1100px;
+  }
+  .truth h2 .red{color:var(--red);}
+  .truth h2 .blue{color:var(--blue);display:inline-block;transform:rotate(-2deg) translateY(6px);}
+  .truth-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:90px;border:3px solid var(--ink);}
+  .truth-cell{
+    padding:44px 34px;border-right:3px solid var(--ink);position:relative;
+    background:var(--paper);transition:background .2s,color .2s;min-height:300px;
+  }
+  .truth-cell:last-child{border-right:none;}
+  .truth-cell:hover{background:var(--ink);color:var(--paper);}
+  .truth-cell:hover .num{color:var(--red);}
+  .truth-cell .num{font-family:'Archivo Black';font-size:64px;color:var(--ink);opacity:.15;position:absolute;top:14px;right:18px;transition:color .2s;}
+  .truth-cell h3{font-family:'Archivo Black';font-size:22px;text-transform:uppercase;margin-bottom:18px;transform:rotate(-1deg);}
+  .truth-cell p{font-size:15px;line-height:1.6;}
+  .truth-cell .x{position:absolute;bottom:16px;left:34px;font-family:'Permanent Marker';color:var(--red);font-size:18px;transform:rotate(-4deg);}
+
+  /* ---------- how ---------- */
+  .how{background:var(--ink);color:var(--paper);padding:140px 40px;position:relative;overflow:hidden;}
+  .how h2{
+    font-family:'Archivo Black';font-size:clamp(40px,5.5vw,88px);text-transform:uppercase;
+    line-height:.9;margin-bottom:100px;
+  }
+  .how h2 span{color:var(--yellow);display:inline-block;transform:rotate(2deg);}
+  .step{display:flex;align-items:flex-start;gap:5vw;margin-bottom:110px;position:relative;}
+  .step:nth-child(even){flex-direction:row-reverse;}
+  .step .bignum{
+    font-family:'Archivo Black';font-size:clamp(90px,12vw,190px);line-height:.8;
+    color:transparent;-webkit-text-stroke:2px var(--paper);flex-shrink:0;
+    transform:rotate(-3deg);
+  }
+  .step:nth-child(even) .bignum{transform:rotate(3deg);-webkit-text-stroke:2px var(--red);}
+  .step .body{max-width:560px;padding-top:20px;}
+  .step .body h3{font-family:'Archivo Black';font-size:clamp(24px,2.4vw,36px);text-transform:uppercase;margin-bottom:16px;}
+  .step .body h3 mark{background:var(--red);color:var(--paper);padding:0 8px;}
+  .step .body p{font-size:16px;line-height:1.65;color:#cfc9bd;}
+  .how .circle-note{
+    position:absolute;font-family:'Permanent Marker';color:var(--yellow);font-size:20px;
+  }
+
+  /* ---------- proof / numbers ---------- */
+  .proof{padding:140px 40px;position:relative;}
+  .proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:20px;}
+  .stat{position:relative;padding:20px;}
+  .stat:nth-child(1){transform:rotate(-2deg);}
+  .stat:nth-child(2){transform:rotate(1.5deg) translateY(40px);}
+  .stat:nth-child(3){transform:rotate(-1deg);}
+  .stat .big{font-family:'Archivo Black';font-size:clamp(60px,7vw,110px);line-height:1;color:var(--red);}
+  .stat:nth-child(2) .big{color:var(--blue);}
+  .stat:nth-child(3) .big{color:var(--ink);}
+  .stat .lbl{font-family:'Special Elite';font-size:16px;margin-top:14px;max-width:280px;line-height:1.5;}
+  .quote{
+    margin:140px auto 0;max-width:900px;position:relative;transform:rotate(-1deg);
+  }
+  .quote p{font-family:'Special Elite';font-size:clamp(20px,2.2vw,30px);line-height:1.5;}
+  .quote p::before{content:'“';font-family:'Archivo Black';font-size:120px;color:var(--red);position:absolute;left:-60px;top:-40px;}
+  .quote cite{display:block;margin-top:24px;font-style:normal;font-family:'Space Grotesk';font-size:14px;letter-spacing:2px;text-transform:uppercase;}
+  .quote cite b{background:var(--ink);color:var(--paper);padding:2px 8px;}
+
+  /* ---------- demo form ---------- */
+  .demo{background:var(--red);color:var(--paper);padding:140px 40px 160px;position:relative;overflow:hidden;}
+  .demo h2{
+    font-family:'Archivo Black';font-size:clamp(48px,7vw,110px);text-transform:uppercase;
+    line-height:.85;letter-spacing:-.03em;position:relative;z-index:2;
+  }
+  .demo h2 .scratch{color:var(--ink);display:inline-block;transform:rotate(-2deg);}
+  .demo-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:6vw;margin-top:80px;position:relative;z-index:2;}
+  .demo-copy{font-family:'Special Elite';font-size:18px;line-height:1.6;max-width:460px;}
+  .demo-copy ul{list-style:none;margin-top:26px;}
+  .demo-copy li{margin-bottom:14px;padding-left:28px;position:relative;}
+  .demo-copy li::before{content:'✕';position:absolute;left:0;font-family:'Archivo Black';color:var(--ink);}
+  form.demo-form{background:var(--paper);color:var(--ink);padding:44px;transform:rotate(1.2deg);box-shadow:12px 12px 0 var(--ink);}
+  form.demo-form label{display:block;font-family:'Archivo Black';font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:22px 0 8px;}
+  form.demo-form label:first-child{margin-top:0;}
+  form.demo-form input, form.demo-form select{
+    width:100%;border:3px solid var(--ink);background:transparent;padding:14px;
+    font-family:'Space Grotesk';font-size:16px;outline:none;
+  }
+  form.demo-form input:focus, form.demo-form select:focus{border-color:var(--red);background:#fff;}
+  form.demo-form input.err{border-color:var(--red);background:#ffe9e4;}
+  form.demo-form button{
+    margin-top:30px;width:100%;font-family:'Archivo Black';font-size:20px;text-transform:uppercase;
+    background:var(--ink);color:var(--paper);border:none;padding:20px;cursor:pointer;
+    transition:background .15s, transform .15s;
+  }
+  form.demo-form button:hover{background:var(--red);transform:rotate(-1deg);}
+  .form-msg{font-family:'Special Elite';margin-top:16px;font-size:15px;min-height:22px;}
+  .form-msg.ok{color:var(--blue);}
+  .form-msg.bad{color:var(--red);}
+  .demo .big-x{position:absolute;right:-80px;top:-80px;width:400px;height:400px;opacity:.25;z-index:1;animation:spin 40s linear infinite reverse;}
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--ink);color:var(--paper);padding:70px 40px 40px;
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:30px;
+  }
+  footer .f-logo{font-family:'Archivo Black';font-size:clamp(60px,9vw,140px);line-height:.8;letter-spacing:-.04em;}
+  footer .f-logo span{color:var(--red);}
+  footer .meta{font-family:'Special Elite';font-size:13px;line-height:1.8;text-align:right;}
+  footer .meta a{color:var(--yellow);text-decoration:none;}
+
+  /* ---------- misc ---------- */
+  .reveal{opacity:0;transform:translateY(50px) rotate(1deg);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1;transform:translateY(0) rotate(0);}
+  #cursor-dot{position:fixed;width:14px;height:14px;background:var(--red);border-radius:50%;pointer-events:none;z-index:300;mix-blend-mode:multiply;transform:translate(-50%,-50%);transition:width .15s,height .15s;}
+  @media (max-width:900px){
+    .truth-grid,.proof-grid,.demo-wrap{grid-template-columns:1fr;}
+    .truth-cell{border-right:none;border-bottom:3px solid var(--ink);}
+    .step,.step:nth-child(even){flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div id="cursor-dot"></div>
+
+<nav>
+  <div class="logo">AC<span>M</span>E</div>
+  <div>
+    <a href="#truth">The Problem</a>
+    <a href="#how">How It Works</a>
+    <a href="#proof">Proof</a>
+    <a href="#demo" class="cta">Book a Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <svg class="hero-scribble" style="left:38vw;top:14vh;" width="340" height="120" viewBox="0 0 340 120">
+    <path d="M5 60 C60 10, 120 110, 170 55 S 290 20, 335 70" fill="none" stroke="#e8300a" stroke-width="5" stroke-linecap="round"/>
+    <path d="M10 80 C70 40, 130 120, 180 70 S 300 40, 330 90" fill="none" stroke="#1b3fb8" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+  </svg>
+  <svg class="hero-scribble" style="left:2vw;bottom:10vh;" width="200" height="200" viewBox="0 0 200 200">
+    <circle cx="100" cy="100" r="80" fill="none" stroke="#111110" stroke-width="4" stroke-dasharray="14 10"/>
+    <line x1="40" y1="40" x2="160" y2="160" stroke="#e8300a" stroke-width="6"/>
+    <line x1="160" y1="40" x2="40" y2="160" stroke="#e8300a" stroke-width="6"/>
+  </svg>
+
+  <h1>
+    <span class="l1">Your widget</span>
+    <span class="l2">supply chain</span>
+    <span class="l3">is <span class="strike">fine</span> BROKEN.</span>
+  </h1>
+
+  <p class="sub">
+    Spreadsheets. Fax machines. A guy named Dale who "knows a guy."
+    That's how most mid-sized manufacturers still order custom widgets.
+    <b>Acme kills all of that.</b> Configure, order, and track every widget
+    across your entire supply chain — in one platform that doesn't lie to you.
+  </p>
+
+  <div class="tag-rotate">← this is the part where you fix it</div>
+
+  <div class="hero-cta-row">
+    <a href="#demo" class="btn-chaos">Book the damn demo</a>
+    <a href="#truth" class="btn-ghost">or scroll if you need convincing</a>
+  </div>
+
+  <svg class="dead-widget" viewBox="0 0 180 180">
+    <g fill="none" stroke="#111110" stroke-width="5">
+      <circle cx="90" cy="90" r="60"/>
+      <circle cx="90" cy="90" r="22"/>
+      <g stroke-width="8">
+        <line x1="90" y1="14" x2="90" y2="34"/><line x1="90" y1="146" x2="90" y2="166"/>
+        <line x1="14" y1="90" x2="34" y2="90"/><line x1="146" y1="90" x2="166" y2="90"/>
+        <line x1="36" y1="36" x2="50" y2="50"/><line x1="130" y1="130" x2="144" y2="144"/>
+        <line x1="144" y1="36" x2="130" y2="50"/><line x1="50" y1="130" x2="36" y2="144"/>
+      </g>
+    </g>
+  </svg>
+</header>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    NO MORE SPREADSHEETS <em>✕</em> NO MORE FAXES <em>✕</em> NO MORE "WHERE'S MY ORDER?" <em>✕</em> 11-DAY AVERAGE TURNAROUND <em>✕</em> REAL-TIME TRACKING <em>✕</em> BOOK A DEMO <em>✕</em>
+    NO MORE SPREADSHEETS <em>✕</em> NO MORE FAXES <em>✕</em> NO MORE "WHERE'S MY ORDER?" <em>✕</em> 11-DAY AVERAGE TURNAROUND <em>✕</em> REAL-TIME TRACKING <em>✕</em> BOOK A DEMO <em>✕</em>
+  </div>
+</div>
+
+<!-- TRUTH -->
+<section class="truth" id="truth">
+  <h2 class="reveal">Here's the <span class="red">ugly truth</span> about how you're <span class="blue">actually</span> running widget procurement:</h2>
+  <div class="truth-grid">
+    <div class="truth-cell reveal">
+      <div class="num">01</div>
+      <h3>You're quoting blind</h3>
+      <p>Every custom widget spec goes out by email. Quotes come back in 4 to 9 days, in three different formats, two of which you can't read. You pick one based on vibes and hope.</p>
+      <div class="x">stop doing this →</div>
+    </div>
+    <div class="truth-cell reveal">
+      <div class="num">02</div>
+      <h3>Nobody knows where anything is</h3>
+      <p>Your ops team burns 12+ hours a week asking suppliers for status updates. The answer is always "it's on the truck." Which truck? Nobody knows. It's Schrödinger's widget.</p>
+      <div class="x">stop doing this →</div>
+    </div>
+    <div class="truth-cell reveal">
+      <div class="num">03</div>
+      <h3>Errors compound quietly</h3>
+      <p>A miskeyed tolerance in row 4,112 of a spreadsheet becomes 8,000 wrong widgets six weeks later. You find out when the line stops. So does your customer's patience.</p>
+      <div class="x">stop doing this →</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="how" id="how">
+  <h2 class="reveal">Acme in <span>three moves.</span> That's it. That's the product.</h2>
+
+  <div class="step reveal">
+    <div class="bignum">1</div>
+    <div class="body">
+      <h3><mark>Configure</mark> the widget</h3>
+      <p>Material, tolerance, finish, quantity, certification — spec it in a guided configurator that physically will not let you order something impossible. Invalid combos get rejected before they cost you money, not after.</p>
+    </div>
+    <div class="circle-note" style="right:12vw;top:-30px;transform:rotate(6deg);">takes ~4 minutes ↴</div>
+  </div>
+
+  <div class="step reveal">
+    <div class="bignum">2</div>
+    <div class="body">
+      <h3><mark>Order</mark> with real prices</h3>
+      <p>Live quotes from vetted suppliers in your network, side by side, same format, every time. Lead time, unit cost, freight — all visible before you commit. One click routes the order. No email. No fax. No Dale.</p>
+    </div>
+    <div class="circle-note" style="left:10vw;bottom:-20px;transform:rotate(-5deg);">sorry Dale.</div>
+  </div>
+
+  <div class="step reveal">
+    <div class="bignum">3</div>
+    <div class="body">
+      <h3><mark>Track</mark> every unit</h3>
+      <p>From confirmed → in production → on the truck → at your dock, with timestamps and exceptions flagged automatically. When something slips, you know the same hour — not the same quarter.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="proof" id="proof">
+  <div class="proof-grid">
+    <div class="stat reveal">
+      <div class="big" data-count="63" data-suffix="%">0%</div>
+      <div class="lbl">average reduction in procurement cycle time across Acme customers in year one.</div>
+    </div>
+    <div class="stat reveal">
+      <div class="big" data-count="11" data-suffix=" days">0</div>
+      <div class="lbl">average spec-to-dock turnaround for custom widgets. The industry norm is 31.</div>
+    </div>
+    <div class="stat reveal">
+      <div class="big" data-count="0" data-suffix="">0</div>
+      <div class="lbl">spreadsheets required. Zero. We checked. We keep checking.</div>
+    </div>
+  </div>
+
+  <div class="quote reveal">
+    <p>We used to lose two people a week to chasing widget orders. Now I open Acme with my coffee, see everything, and get on with my actual job. I almost miss the chaos. Almost.</p>
+    <cite><b>Marisol Vega</b> — Director of Operations, Hartwell Fabrication (140 employees, 4 plants)</cite>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <svg class="big-x" viewBox="0 0 400 400">
+    <line x1="40" y1="40" x2="360" y2="360" stroke="#efe9df" stroke-width="30"/>
+    <line x1="360" y1="40" x2="40" y2="360" stroke="#efe9df" stroke-width="30"/>
+  </svg>
+
+  <h2 class="reveal">Book the demo.<br><span class="scratch">30 minutes.</span><br>No slides.</h2>
+
+  <div class="demo-wrap">
+    <div class="demo-copy reveal">
+      <p>We log into a live Acme workspace, configure a widget from your actual catalog, and track it through a real order flow. You bring the hard questions. We'll bring answers.</p>
+      <ul>
+        <li>No 40-slide deck. We hate those too.</li>
+        <li>No "let me check with my manager." Our engineers run the demos.</li>
+        <li>No 6-month implementation. Most teams are live in under 3 weeks.</li>
+      </ul>
+    </div>
+
+    <form class="demo-form reveal" id="demoForm" novalidate>
+      <label for="name">Your name</label>
+      <input type="text" id="name" name="name" placeholder="Jane Operations" autocomplete="name">
+      <label for="email">Work email</label>
+      <input type="email" id="email" name="email" placeholder="jane@yourfactory.com" autocomplete="email">
+      <label for="company">Company</label>
+      <input type="text" id="company" name="company" placeholder="Hartwell Fabrication" autocomplete="organization">
+      <label for="size">How many widgets do you order per month?</label>
+      <select id="size" name="size">
+        <option value="">Pick one — be honest</option>
+        <option>Under 500</option>
+        <option>500 – 5,000</option>
+        <option>5,000 – 50,000</option>
+        <option>More than 50,000</option>
+        <option>I genuinely don't know (we should talk)</option>
+      </select>
+      <button type="submit">Get me a demo →</button>
+      <div class="form-msg" id="formMsg"></div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo">AC<span>M</span>E</div>
+  <div class="meta">
+    widgets, configured / ordered / tracked<br>
+    <a href="#demo">book a demo</a> · <a href="#truth">the problem</a> · <a href="#how">how it works</a><br>
+    © 2025 Acme Industrial Systems. No spreadsheets were harmed.
+  </div>
+</footer>
+
+<script>
+  // custom cursor dot
+  const dot = document.getElementById('cursor-dot');
+  let mx = -100, my = -100, dx = -100, dy = -100;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  (function loop(){
+    dx += (mx - dx) * 0.2; dy += (my - dy) * 0.2;
+    dot.style.left = dx + 'px'; dot.style.top = dy + 'px';
+    requestAnimationFrame(loop);
+  })();
+  document.querySelectorAll('a,button,input,select').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{dot.style.width='40px';dot.style.height='40px';});
+    el.addEventListener('mouseleave',()=>{dot.style.width='14px';dot.style.height='14px';});
+  });
+
+  // scroll reveals
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
+  },{threshold:0.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // animated counters
+  const counterIO = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(!en.isIntersecting) return;
+      const el = en.target, target = +el.dataset.count, suffix = el.dataset.suffix || '';
+      const t0 = performance.now(), dur = 1400;
+      (function step(t){
+        const p = Math.min((t - t0)/dur, 1);
+        const eased = 1 - Math.pow(1-p, 3);
+        el.textContent = Math.round(target * eased) + suffix;
+        if(p < 1) requestAnimationFrame(step);
+      })(t0);
+      counterIO.unobserve(el);
+    });
+  },{threshold:0.6});
+  document.querySelectorAll('[data-count]').forEach(el=>counterIO.observe(el));
+
+  // subtle hero parallax on mouse
+  const h1 = document.querySelector('.hero h1');
+  document.querySelector('.hero').addEventListener('mousemove', e=>{
+    const rx = (e.clientX / window.innerWidth - .5) * 10;
+    const ry = (e.clientY / window.innerHeight - .5) * 6;
+    h1.style.transform = `translate(${rx}px, ${ry}px)`;
+  });
+
+  // demo form
+  const form = document.getElementById('demoForm');
+  const msg = document.getElementById('formMsg');
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const company = form.company.value.trim();
+    const size = form.size.value;
+    let bad = [];
+    [['name',name],['email',email],['company',company],['size',size]].forEach(([id,v])=>{
+      const field = document.getElementById(id);
+      const invalid = !v || (id==='email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));
+      field.classList.toggle('err', invalid);
+      if(invalid) bad.push(id);
+    });
+    if(bad.length){
+      msg.className = 'form-msg bad';
+      msg.textContent = '✕ Fill in the highlighted fields. We can\'t demo to a ghost.';
+      return;
+    }
+    msg.className = 'form-msg ok';
+    msg.textContent = '✓ Got it, ' + name.split(' ')[0] + '. A real human from Acme will email ' + email + ' within one business day. No drip campaign. Promise.';
+    form.querySelector('button').textContent = 'REQUESTED ✓';
+    form.querySelector('button').disabled = true;
+  });
+</script>
+</body>
+</html>

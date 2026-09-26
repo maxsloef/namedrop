@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets Without the Nonsense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --yellow:#FFD800;
+    --pink:#FF6FA5;
+    --teal:#00C9B1;
+    --blue:#3D5AFE;
+    --red:#FF3B30;
+    --ink:#111111;
+    --paper:#FFF6E9;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Space Grotesk',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:'Archivo Black',sans-serif;text-transform:uppercase;line-height:.95;}
+
+  /* ---------- shared bits ---------- */
+  .btn{
+    display:inline-block;
+    font-family:'Archivo Black',sans-serif;
+    text-transform:uppercase;
+    font-size:18px;
+    padding:18px 34px;
+    border:4px solid var(--ink);
+    background:var(--yellow);
+    color:var(--ink);
+    text-decoration:none;
+    cursor:pointer;
+    box-shadow:8px 8px 0 var(--ink);
+    transition:transform .12s ease, box-shadow .12s ease;
+    position:relative;
+  }
+  .btn:hover{transform:translate(4px,4px);box-shadow:4px 4px 0 var(--ink);}
+  .btn:active{transform:translate(8px,8px);box-shadow:0 0 0 var(--ink);}
+  .btn.pink{background:var(--pink);}
+  .btn.teal{background:var(--teal);}
+
+  .tag{
+    display:inline-block;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    font-size:13px;
+    border:3px solid var(--ink);
+    padding:8px 16px;
+    background:#fff;
+    box-shadow:5px 5px 0 var(--ink);
+    transform:rotate(-2deg);
+  }
+
+  section{padding:110px 60px;position:relative;}
+  .wrap{max-width:1320px;margin:0 auto;position:relative;}
+
+  /* ---------- floating shape helpers ---------- */
+  .shape{position:absolute;pointer-events:none;}
+  .circle{border:4px solid var(--ink);border-radius:50%;}
+  .ring{border:8px solid var(--pink);border-radius:50%;background:transparent;}
+  .triangle{
+    width:0;height:0;
+    border-left:40px solid transparent;
+    border-right:40px solid transparent;
+    border-bottom:70px solid var(--teal);
+    filter:drop-shadow(6px 6px 0 var(--ink));
+  }
+  .squiggle{stroke:var(--ink);stroke-width:5;fill:none;stroke-linecap:round;}
+  .dots{
+    background-image:radial-gradient(var(--ink) 2.2px, transparent 2.2px);
+    background-size:18px 18px;
+  }
+  .crosshatch{
+    background:repeating-linear-gradient(45deg, var(--ink) 0 3px, transparent 3px 12px);
+  }
+  .spin{animation:spin 14s linear infinite;}
+  .wobble{animation:wobble 5s ease-in-out infinite;}
+  .bob{animation:bob 4s ease-in-out infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes wobble{0%,100%{transform:rotate(-6deg);}50%{transform:rotate(6deg);}}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-16px);}}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 60px;
+    background:var(--yellow);
+    border-bottom:4px solid var(--ink);
+  }
+  .logo{
+    font-family:'Archivo Black',sans-serif;
+    font-size:28px;text-transform:uppercase;text-decoration:none;color:var(--ink);
+    display:flex;align-items:center;gap:12px;
+  }
+  .logo-mark{
+    width:38px;height:38px;background:var(--pink);
+    border:4px solid var(--ink);border-radius:50%;
+    display:grid;place-items:center;
+  }
+  .logo-mark::after{content:"";width:14px;height:14px;background:var(--ink);transform:rotate(45deg);}
+  nav ul{display:flex;gap:34px;list-style:none;align-items:center;}
+  nav ul a{
+    text-decoration:none;color:var(--ink);font-weight:700;text-transform:uppercase;
+    font-size:14px;letter-spacing:1px;
+  }
+  nav ul a:hover{text-decoration:underline wavy var(--pink) 3px;text-underline-offset:6px;}
+  .nav-cta{
+    font-family:'Archivo Black',sans-serif;font-size:14px;text-transform:uppercase;
+    background:var(--ink);color:var(--yellow);text-decoration:none;
+    padding:12px 22px;border:4px solid var(--ink);
+    transition:background .15s;
+  }
+  .nav-cta:hover{background:var(--pink);color:var(--ink);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:92vh;
+    display:flex;flex-direction:column;justify-content:center;
+    background:var(--paper);
+    border-bottom:4px solid var(--ink);
+    overflow:hidden;
+  }
+  .hero .wrap{width:100%;}
+  .hero h1{
+    font-size:clamp(56px,7.2vw,116px);
+    max-width:1100px;
+    margin:26px 0 30px;
+    position:relative;z-index:2;
+  }
+  .hero h1 .hl-pink{
+    background:var(--pink);padding:0 18px;border:4px solid var(--ink);
+    display:inline-block;transform:rotate(-1.5deg);box-shadow:8px 8px 0 var(--ink);
+  }
+  .hero h1 .hl-teal{
+    background:var(--teal);padding:0 18px;border:4px solid var(--ink);
+    display:inline-block;transform:rotate(1.5deg);box-shadow:8px 8px 0 var(--ink);
+  }
+  .hero p{
+    font-size:22px;max-width:560px;font-weight:500;margin-bottom:44px;position:relative;z-index:2;
+  }
+  .hero-actions{display:flex;gap:28px;align-items:center;position:relative;z-index:2;}
+  .hero-note{
+    font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:1px;
+    transform:rotate(-2deg);
+  }
+
+  /* hero shapes */
+  .hero .circle.big{width:210px;height:210px;background:var(--blue);top:60px;right:120px;border-radius:50%;border:5px solid var(--ink);box-shadow:10px 10px 0 var(--ink);}
+  .hero .ring{width:110px;height:110px;bottom:120px;right:330px;}
+  .hero .triangle{top:340px;right:180px;transform:rotate(18deg);}
+  .hero .dots{width:200px;height:140px;top:80px;left:-30px;}
+  .hero svg.zig{position:absolute;bottom:60px;left:40px;}
+  .hero .half-circle{
+    width:150px;height:75px;background:var(--red);
+    border:5px solid var(--ink);border-bottom:none;
+    border-radius:150px 150px 0 0;
+    bottom:0;right:560px;
+  }
+
+  /* ---------- ticker ---------- */
+  .ticker{
+    background:var(--ink);color:var(--yellow);
+    border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);
+    overflow:hidden;padding:16px 0;white-space:nowrap;
+  }
+  .ticker-track{display:inline-block;animation:ticker 22s linear infinite;}
+  .ticker span{
+    font-family:'Archivo Black',sans-serif;text-transform:uppercase;
+    font-size:20px;margin:0 28px;letter-spacing:1px;
+  }
+  .ticker .alt{color:var(--pink);}
+  @keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- problem ---------- */
+  .problem{background:var(--teal);border-bottom:4px solid var(--ink);}
+  .problem h2{font-size:clamp(40px,4.6vw,72px);max-width:900px;margin:24px 0 60px;}
+  .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px;}
+  .pain{
+    background:#fff;border:4px solid var(--ink);padding:36px 30px;
+    box-shadow:10px 10px 0 var(--ink);
+  }
+  .pain:nth-child(1){transform:rotate(-1.5deg);}
+  .pain:nth-child(2){transform:rotate(1deg) translateY(14px);}
+  .pain:nth-child(3){transform:rotate(-0.5deg);}
+  .pain .emoji{
+    width:64px;height:64px;border:4px solid var(--ink);border-radius:50%;
+    display:grid;place-items:center;font-size:28px;margin-bottom:20px;
+  }
+  .pain:nth-child(1) .emoji{background:var(--yellow);}
+  .pain:nth-child(2) .emoji{background:var(--pink);}
+  .pain:nth-child(3) .emoji{background:var(--blue);color:#fff;}
+  .pain h3{font-size:22px;margin-bottom:12px;}
+  .pain p{font-size:16px;line-height:1.5;}
+
+  /* ---------- product ---------- */
+  .product{background:var(--paper);border-bottom:4px solid var(--ink);overflow:hidden;}
+  .product-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;}
+  .product h2{font-size:clamp(38px,4.2vw,66px);margin:24px 0 22px;}
+  .product p.lead{font-size:20px;line-height:1.55;margin-bottom:38px;max-width:520px;}
+  .steps{list-style:none;display:flex;flex-direction:column;gap:22px;}
+  .steps li{
+    display:flex;gap:20px;align-items:flex-start;
+    background:#fff;border:4px solid var(--ink);padding:20px 24px;
+    box-shadow:7px 7px 0 var(--ink);
+  }
+  .steps li:nth-child(1){transform:rotate(-1deg);}
+  .steps li:nth-child(2){transform:rotate(0.8deg) translateX(20px);}
+  .steps li:nth-child(3){transform:rotate(-0.6deg);}
+  .step-num{
+    flex:none;width:52px;height:52px;border:4px solid var(--ink);border-radius:50%;
+    display:grid;place-items:center;font-family:'Archivo Black',sans-serif;font-size:22px;
+  }
+  .steps li:nth-child(1) .step-num{background:var(--yellow);}
+  .steps li:nth-child(2) .step-num{background:var(--pink);}
+  .steps li:nth-child(3) .step-num{background:var(--teal);}
+  .steps h3{font-size:18px;margin-bottom:6px;}
+  .steps p{font-size:15px;line-height:1.45;}
+
+  /* fake dashboard panel */
+  .panel{
+    background:#fff;border:5px solid var(--ink);
+    box-shadow:14px 14px 0 var(--pink);
+    transform:rotate(2deg);
+    padding:0;overflow:hidden;
+  }
+  .panel-bar{
+    background:var(--ink);color:#fff;padding:12px 20px;
+    display:flex;gap:10px;align-items:center;
+    font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;
+  }
+  .panel-bar .dot{width:12px;height:12px;border-radius:50%;}
+  .panel-bar .dot:nth-child(1){background:var(--red);}
+  .panel-bar .dot:nth-child(2){background:var(--yellow);}
+  .panel-bar .dot:nth-child(3){background:var(--teal);}
+  .panel-bar span{margin-left:auto;}
+  .panel-body{padding:28px;}
+  .panel-row{
+    display:flex;justify-content:space-between;align-items:center;
+    border:3px solid var(--ink);padding:14px 18px;margin-bottom:14px;background:var(--paper);
+  }
+  .panel-row .name{font-weight:700;}
+  .badge{
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+    border:3px solid var(--ink);padding:5px 12px;
+  }
+  .badge.ship{background:var(--teal);}
+  .badge.build{background:var(--yellow);}
+  .badge.qa{background:var(--pink);}
+  .progress{height:22px;border:3px solid var(--ink);background:#fff;margin:6px 0 20px;position:relative;}
+  .progress i{position:absolute;inset:0;width:72%;background:repeating-linear-gradient(-45deg,var(--blue) 0 14px,var(--teal) 14px 28px);}
+  .panel-stat{display:flex;gap:14px;}
+  .panel-stat div{
+    flex:1;border:3px solid var(--ink);padding:14px;text-align:center;background:var(--yellow);
+    font-family:'Archivo Black',sans-serif;
+  }
+  .panel-stat div:nth-child(2){background:var(--pink);}
+  .panel-stat div:nth-child(3){background:var(--teal);}
+  .panel-stat small{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-top:6px;}
+
+  /* ---------- stats band ---------- */
+  .stats{background:var(--pink);border-bottom:4px solid var(--ink);padding:80px 60px;}
+  .stats .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;text-align:center;}
+  .stat .num{
+    font-family:'Archivo Black',sans-serif;font-size:clamp(50px,5.5vw,88px);
+    -webkit-text-stroke:2px var(--ink);
+  }
+  .stat:nth-child(1) .num{color:var(--yellow);}
+  .stat:nth-child(2) .num{color:#fff;}
+  .stat:nth-child(3) .num{color:var(--teal);}
+  .stat p{font-weight:700;text-transform:uppercase;letter-spacing:2px;font-size:15px;margin-top:10px;}
+
+  /* ---------- testimonials ---------- */
+  .quotes{background:var(--paper);border-bottom:4px solid var(--ink);}
+  .quotes h2{font-size:clamp(36px,4vw,60px);margin:24px 0 60px;max-width:800px;}
+  .quote-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px;align-items:start;}
+  .quote{
+    border:4px solid var(--ink);padding:34px 30px;background:#fff;
+    box-shadow:9px 9px 0 var(--ink);position:relative;
+  }
+  .quote::before{
+    content:"“";font-family:'Archivo Black',sans-serif;font-size:90px;line-height:1;
+    position:absolute;top:-34px;left:16px;color:var(--pink);
+    -webkit-text-stroke:2px var(--ink);
+  }
+  .quote:nth-child(1){transform:rotate(1.4deg);background:var(--yellow);margin-top:24px;}
+  .quote:nth-child(2){transform:rotate(-1deg);}
+  .quote:nth-child(3){transform:rotate(1deg);background:var(--teal);margin-top:40px;}
+  .quote p{font-size:17px;line-height:1.55;margin-bottom:22px;font-weight:500;}
+  .quote .who{font-weight:700;text-transform:uppercase;font-size:13px;letter-spacing:1px;}
+  .quote .who span{display:block;font-weight:400;text-transform:none;letter-spacing:0;font-size:13px;margin-top:3px;}
+
+  /* ---------- logos ---------- */
+  .logos{background:var(--yellow);border-bottom:4px solid var(--ink);padding:60px;}
+  .logos p{text-align:center;font-weight:700;text-transform:uppercase;letter-spacing:3px;font-size:13px;margin-bottom:34px;}
+  .logo-row{display:flex;justify-content:center;gap:56px;flex-wrap:wrap;}
+  .fake-logo{
+    font-family:'Archivo Black',sans-serif;font-size:22px;text-transform:uppercase;
+    border:4px solid var(--ink);padding:12px 24px;background:#fff;
+    box-shadow:6px 6px 0 var(--ink);
+  }
+  .fake-logo:nth-child(odd){transform:rotate(-2deg);}
+  .fake-logo:nth-child(even){transform:rotate(1.6deg);border-radius:999px;}
+
+  /* ---------- final CTA ---------- */
+  .cta{background:var(--blue);border-bottom:4px solid var(--ink);text-align:center;overflow:hidden;color:#fff;}
+  .cta h2{font-size:clamp(44px,5.5vw,90px);margin:26px auto 30px;max-width:1000px;color:var(--yellow);}
+  .cta p{font-size:20px;max-width:560px;margin:0 auto 46px;font-weight:500;}
+  .cta .btn{font-size:22px;padding:24px 52px;}
+  .cta .shape{opacity:.9;}
+  .cta .circle{width:140px;height:140px;background:var(--pink);top:60px;left:100px;border-radius:50%;border:5px solid var(--ink);}
+  .cta .triangle{top:80px;right:140px;transform:rotate(-14deg);}
+  .cta .dots{width:160px;height:160px;bottom:40px;right:80px;background-image:radial-gradient(#fff 2.2px,transparent 2.2px);}
+  .cta svg.zig{position:absolute;bottom:50px;left:120px;}
+  .cta svg.zig path{stroke:var(--yellow);}
+
+  footer{
+    background:var(--ink);color:var(--paper);
+    padding:50px 60px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;
+  }
+  footer .f-logo{font-family:'Archivo Black',sans-serif;font-size:22px;text-transform:uppercase;color:var(--yellow);}
+  footer p{font-size:14px;}
+  footer a{color:var(--pink);text-decoration:none;font-weight:700;}
+  footer a:hover{text-decoration:underline wavy;}
+
+  @media(max-width:900px){
+    section{padding:70px 24px;}
+    nav{padding:14px 24px;}
+    nav ul li:not(.keep){display:none;}
+    .product-grid,.pain-grid,.quote-grid,.stats .wrap{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#"><span class="logo-mark"></span>Acme</a>
+  <ul>
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#product">How It Works</a></li>
+    <li><a href="#proof">Proof</a></li>
+    <li class="keep"><a class="nav-cta" href="#demo">Book a Demo</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="shape circle big wobble"></div>
+  <div class="shape ring bob"></div>
+  <div class="shape triangle spin" style="animation-duration:20s;"></div>
+  <div class="shape dots"></div>
+  <div class="shape half-circle"></div>
+  <svg class="zig" width="220" height="60" viewBox="0 0 220 60">
+    <path class="squiggle" d="M5 40 L25 10 L45 40 L65 10 L85 40 L105 10 L125 40 L145 10 L165 40 L185 10 L205 40"/>
+  </svg>
+
+  <div class="wrap">
+    <span class="tag">Widget ops for people who hate spreadsheets</span>
+    <h1>
+      Custom widgets.<br>
+      <span class="hl-pink">Zero chaos.</span><br>
+      <span class="hl-teal">Well, less chaos.</span>
+    </h1>
+    <p>Acme lets operations teams at mid-sized manufacturers configure, order, and track custom widgets across the whole supply chain — from one screen that doesn't make you want to cry.</p>
+    <div class="hero-actions">
+      <a class="btn pink" href="#demo">Book a Demo →</a>
+      <span class="hero-note">30 min. No sales yoga. We promise.</span>
+    </div>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="tickerTrack">
+    <span>Configure it</span><span class="alt">✺</span>
+    <span>Order it</span><span class="alt">✺</span>
+    <span>Track it</span><span class="alt">✺</span>
+    <span>Ship it</span><span class="alt">✺</span>
+    <span>Repeat without losing your mind</span><span class="alt">✺</span>
+    <span>Configure it</span><span class="alt">✺</span>
+    <span>Order it</span><span class="alt">✺</span>
+    <span>Track it</span><span class="alt">✺</span>
+    <span>Ship it</span><span class="alt">✺</span>
+    <span>Repeat without losing your mind</span><span class="alt">✺</span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="wrap">
+    <span class="tag" style="background:var(--yellow);">Sound familiar?</span>
+    <h2>Your widget pipeline is held together with email threads and hope.</h2>
+    <div class="pain-grid">
+      <div class="pain">
+        <div class="emoji">✕</div>
+        <h3>Spec sheets from 2017</h3>
+        <p>Every custom order starts with digging through a shared drive for a PDF that three people have "definitely updated." Nobody knows which version is real.</p>
+      </div>
+      <div class="pain">
+        <div class="emoji">?</div>
+        <h3>"Where's my order?"</h3>
+        <p>Your supplier says it shipped. Your freight forwarder says maybe. Your ERP says nothing. You say words we can't print on a landing page.</p>
+      </div>
+      <div class="pain">
+        <div class="emoji">!</div>
+        <h3>The spreadsheet of doom</h3>
+        <p>One master tracker, fourteen tabs, broken formulas, and a cell someone typed "ask Dave" into. Dave left the company in March.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT -->
+<section class="product" id="product">
+  <div class="shape ring" style="width:80px;height:80px;top:70px;right:90px;"></div>
+  <svg style="position:absolute;top:120px;left:30px;" width="180" height="50" viewBox="0 0 180 50">
+    <path class="squiggle" d="M5 30 q10 -20 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0"/>
+  </svg>
+  <div class="wrap">
+    <div class="product-grid">
+      <div>
+        <span class="tag" style="background:var(--teal);">How Acme works</span>
+        <h2>Three steps. That's the whole thing.</h2>
+        <p class="lead">We took everything painful about custom widget procurement and deleted it. What's left fits in three steps and one dashboard.</p>
+        <ul class="steps">
+          <li>
+            <div class="step-num">1</div>
+            <div>
+              <h3>Configure</h3>
+              <p>Build your widget spec visually — dims, tolerances, materials, finishes. Acme validates it against supplier capabilities in real time, so you can't order something nobody can make.</p>
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div>
+              <h3>Order</h3>
+              <p>Get instant quotes from your approved supplier network, compare lead times side by side, and place the PO without leaving the tab. Approvals route themselves.</p>
+            </div>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <div>
+              <h3>Track</h3>
+              <p>Every order, every supplier, every shipment — one live timeline from factory floor to your dock door. If something slips, you know before your supplier admits it.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <div class="panel">
+          <div class="panel-bar">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <span>ACME // ORDER #4471</span>
+          </div>
+          <div class="panel-body">
+            <div class="panel-row">
+              <span class="name">W-220 Flanged Widget ×5,000</span>
+              <span class="badge ship">Shipped</span>
+            </div>
+            <div class="panel-row">
+              <span class="name">W-88 Micro Widget ×12,000</span>
+              <span class="badge build">In Production</span>
+            </div>
+            <div class="panel-row">
+              <span class="name">W-12 Heavy-Duty Widget ×800</span>
+              <span class="badge qa">QA Check</span>
+            </div>
+            <div class="progress"><i></i></div>
+            <div class="panel-stat">
+              <div>98.4%<small>On-time</small></div>
+              <div>14d<small>Avg lead</small></div>
+              <div>0<small>Emails needed</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="wrap">
+    <div class="stat"><div class="num">63%</div><p>Faster quote-to-order cycles</p></div>
+    <div class="stat"><div class="num">11 hrs</div><p>Saved per ops manager, per week</p></div>
+    <div class="stat"><div class="num">4.2M</div><p>Widgets tracked last year</p></div>
+  </div>
+</section>
+
+<!-- QUOTES -->
+<section class="quotes" id="proof">
+  <div class="wrap">
+    <span class="tag" style="background:var(--pink);">Receipts</span>
+    <h2>Ops teams that stopped dreading Mondays.</h2>
+    <div class="quote-grid">
+      <div class="quote">
+        <p>We used to track 200 open widget orders in a spreadsheet that crashed Excel. Now I check one dashboard while drinking my coffee. My coffee is still hot when I finish.</p>
+        <div class="who">Marisol Vega<span>Director of Operations, Hartline Fabrication</span></div>
+      </div>
+      <div class="quote">
+        <p>Acme flagged a supplier delay eleven days before the supplier told us. Eleven. Days. We rerouted the order and didn't miss the customer deadline. That's the whole testimonial.</p>
+        <div class="who">Tom Okafor<span>Supply Chain Lead, Beacon Industries</span></div>
+      </div>
+      <div class="quote">
+        <p>Onboarding took an afternoon. Our most change-resistant plant manager configured his first order without calling IT, which is honestly a miracle worth documenting.</p>
+        <div class="who">Priya Raman<span>VP Manufacturing, Coldbrook Components</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos">
+  <p>Powering widget chaos-control at</p>
+  <div class="logo-row">
+    <span class="fake-logo">Hartline</span>
+    <span class="fake-logo">Beacon</span>
+    <span class="fake-logo">Coldbrook</span>
+    <span class="fake-logo">Vantage Mfg</span>
+    <span class="fake-logo">Ostrander</span>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta" id="demo">
+  <div class="shape circle bob"></div>
+  <div class="shape triangle wobble"></div>
+  <div class="shape dots"></div>
+  <svg class="zig" width="200" height="50" viewBox="0 0 200 50">
+    <path d="M5 35 L25 8 L45 35 L65 8 L85 35 L105 8 L125 35 L145 8 L165 35 L185 8" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </svg>
+  <div class="wrap">
+    <span class="tag" style="background:var(--yellow);">Last chance, hero</span>
+    <h2>Book the demo. Fire the spreadsheet.</h2>
+    <p>Thirty minutes, your actual widget catalog, our actual product. If we're not a fit, we'll tell you and recommend a very nice spreadsheet template instead.</p>
+    <a class="btn" href="#" onclick="fakeBook(event)">Book Your Demo</a>
+  </div>
+</section>
+
+<footer>
+  <span class="f-logo">Acme ✺</span>
+  <p>© 2025 Acme Widget Systems. Widgets without the nonsense. <a href="#">Privacy</a> · <a href="#">Careers</a> · <a href="#">hello@acme.example</a></p>
+</footer>
+
+<script>
+  // Fake demo booking interaction
+  function fakeBook(e){
+    e.preventDefault();
+    const btn = e.target;
+    const original = btn.textContent;
+    btn.textContent = "✓ Nice. Check your inbox.";
+    btn.style.background = "var(--teal)";
+    setTimeout(()=>{ btn.textContent = original; btn.style.background = ""; }, 2600);
+  }
+
+  // Subtle parallax on hero shapes
+  const shapes = document.querySelectorAll('.hero .shape');
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5);
+    const y = (e.clientY / window.innerHeight - 0.5);
+    shapes.forEach((s, i) => {
+      const depth = (i + 1) * 8;
+      s.style.translate = `${x * depth}px ${y * depth}px`;
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme | Custom widgets, ordered like clockwork</title>
+<meta name="description" content="Acme gives operations teams at mid-sized manufacturers one place to configure, order, and track custom widgets across the supply chain.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAF8F3;
+    --bg-2:#F3F0E7;
+    --card:#FFFFFF;
+    --ink:#15171F;
+    --ink-2:#4A4F5E;
+    --ink-3:#7A7F8C;
+    --line:#E6E1D5;
+    --blue:#2D5BFF;
+    --blue-ink:#1D42D6;
+    --blue-soft:#EAF0FF;
+    --sun:#FFD44D;
+    --sun-soft:#FFF3C4;
+    --mint:#16A56B;
+    --mint-soft:#E2F6EC;
+    --coral:#FF6B4A;
+    --radius:18px;
+    --shadow-lg:0 1px 0 rgba(21,23,31,.04), 0 24px 60px -20px rgba(21,23,31,.22), 0 8px 20px -10px rgba(21,23,31,.10);
+    --shadow-sm:0 1px 2px rgba(21,23,31,.06), 0 6px 18px -8px rgba(21,23,31,.14);
+    --display:'Bricolage Grotesque', system-ui, sans-serif;
+    --body:'Figtree', system-ui, sans-serif;
+    --mono:'JetBrains Mono', ui-monospace, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--body);color:var(--ink);background:var(--bg);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button,input,select,textarea{font:inherit;color:inherit}
+  .wrap{max-width:1216px;margin:0 auto;padding:0 32px}
+  .mono{font-family:var(--mono)}
+
+  /* ---------- Buttons ---------- */
+  .btn{display:inline-flex;align-items:center;gap:10px;height:52px;padding:0 24px;border-radius:999px;font-weight:600;font-size:16px;border:0;cursor:pointer;transition:transform .15s ease, background .15s ease, box-shadow .15s ease}
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 8px 20px -8px rgba(45,91,255,.6), inset 0 -2px 0 rgba(0,0,0,.12)}
+  .btn-primary:hover{background:var(--blue-ink);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+  .btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--ink)}
+  .btn svg{transition:transform .15s ease}
+  .btn:hover svg{transform:translateX(3px)}
+  .btn-sm{height:42px;padding:0 18px;font-size:15px}
+
+  /* ---------- Nav ---------- */
+  .nav{position:sticky;top:0;z-index:50;background:rgba(250,248,243,.82);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid transparent;transition:border-color .2s}
+  .nav.scrolled{border-bottom-color:var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.03em}
+  .nav-links{display:flex;gap:36px;font-weight:500;font-size:15px;color:var(--ink-2)}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-cta{display:flex;align-items:center;gap:20px;font-size:15px;font-weight:500}
+  .nav-cta .signin{color:var(--ink-2)}
+  .nav-cta .signin:hover{color:var(--ink)}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;padding:72px 0 96px;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(21,23,31,.09) 1px, transparent 1.2px);background-size:22px 22px;mask-image:radial-gradient(ellipse 70% 60% at 70% 40%, #000 20%, transparent 75%);-webkit-mask-image:radial-gradient(ellipse 70% 60% at 70% 40%, #000 20%, transparent 75%);pointer-events:none}
+  .hero-grid{position:relative;display:grid;grid-template-columns:1fr 1.02fr;gap:56px;align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;background:var(--card);border:1px solid var(--line);border-radius:999px;font-size:14px;font-weight:500;color:var(--ink-2);box-shadow:var(--shadow-sm)}
+  .eyebrow .tag{background:var(--sun);color:var(--ink);font-weight:700;font-size:12px;padding:3px 9px;border-radius:999px;letter-spacing:.02em}
+  .eyebrow:hover{color:var(--ink)}
+  h1{font-family:var(--display);font-weight:700;font-size:76px;line-height:1.0;letter-spacing:-.04em;margin:28px 0 26px}
+  h1 .swash{position:relative;white-space:nowrap;z-index:0}
+  h1 .swash svg{position:absolute;left:-2%;bottom:-6px;width:104%;height:22px;z-index:-1}
+  .lede{font-size:20px;line-height:1.55;color:var(--ink-2);max-width:520px}
+  .hero-ctas{display:flex;gap:14px;margin:36px 0 32px}
+  .hero-proof{display:flex;gap:22px;font-size:14px;color:var(--ink-2);font-weight:500}
+  .hero-proof span{display:inline-flex;align-items:center;gap:7px}
+  .hero-proof svg{color:var(--mint)}
+
+  /* Hero visual */
+  .hero-visual{position:relative;height:590px}
+  .app{position:absolute;right:0;top:10px;width:560px;background:var(--card);border-radius:22px;box-shadow:var(--shadow-lg);border:1px solid rgba(21,23,31,.06);overflow:hidden}
+  .app-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+  .app-bar .crumbs{display:flex;gap:8px;align-items:center}
+  .app-bar .crumbs b{color:var(--ink);font-weight:600}
+  .avatar-stack{display:flex}
+  .avatar-stack i{width:24px;height:24px;border-radius:50%;border:2px solid #fff;margin-left:-7px;display:grid;place-items:center;font-style:normal;font-size:10px;font-weight:700;color:#fff}
+  .app-body{padding:22px 22px 20px}
+  .app-title{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+  .app-title h3{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:-.02em}
+  .app-title .pn{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-top:2px}
+  .status-chip{font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--blue-soft);color:var(--blue-ink)}
+  .config{display:grid;grid-template-columns:190px 1fr;gap:20px}
+  .preview{background:linear-gradient(160deg,#F2F5FF,#E6ECFF);border-radius:14px;display:grid;place-items:center;position:relative;overflow:hidden}
+  .preview::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(45,91,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(45,91,255,.08) 1px,transparent 1px);background-size:16px 16px}
+  .preview svg{position:relative;z-index:1;width:170px;animation:bob 5s ease-in-out infinite}
+  .preview .dim{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:11px;color:var(--blue-ink);z-index:1}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .widget-svg{--m-top:#CFE0FF;--m-side:#9DB8F0;--m-dark:#6F8FD6;transition:all .3s}
+  .widget-svg .t{fill:var(--m-top);transition:fill .35s}
+  .widget-svg .s{fill:var(--m-side);transition:fill .35s}
+  .widget-svg .d{fill:var(--m-dark);transition:fill .35s}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:6px 11px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;transition:all .15s}
+  .chip:hover{border-color:#C9C3B3;color:var(--ink)}
+  .chip.on{border-color:var(--blue);background:var(--blue-soft);color:var(--blue-ink)}
+  .chip:disabled{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+  .stepper{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+  .stepper button{width:34px;height:32px;border:0;background:#fff;cursor:pointer;font-size:18px;font-weight:500;color:var(--ink-2)}
+  .stepper button:hover{background:var(--bg-2)}
+  .stepper output{min-width:74px;text-align:center;font-family:var(--mono);font-size:14px;font-weight:600;border-left:1.5px solid var(--line);border-right:1.5px solid var(--line);line-height:32px}
+  .summary{display:grid;grid-template-columns:repeat(3,1fr);margin-top:6px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .summary div{padding:12px 14px;border-right:1px solid var(--line)}
+  .summary div:last-child{border-right:0}
+  .summary small{display:block;font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+  .summary strong{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:-.02em}
+  .app-foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  .supplier{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-2)}
+  .supplier .mark{width:30px;height:30px;border-radius:8px;background:var(--ink);color:var(--sun);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:13px}
+  .supplier b{display:block;color:var(--ink);font-weight:600}
+  .ok{color:var(--mint);font-weight:600}
+  .app-foot .btn{height:40px;font-size:14px;padding:0 16px}
+
+  .float-pill{position:absolute;top:-6px;right:24px;z-index:3;display:flex;align-items:center;gap:8px;background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:9px 14px 9px 10px;border-radius:999px;box-shadow:var(--shadow-lg);transition:background .25s}
+  .float-pill .dot{width:20px;height:20px;border-radius:50%;background:var(--mint);display:grid;place-items:center}
+  .float-pill.checking .dot{background:var(--sun);animation:pulse 1s infinite}
+  @keyframes pulse{50%{transform:scale(.8)}}
+
+  .track{position:absolute;left:-10px;bottom:0;width:400px;z-index:2;background:var(--card);border-radius:18px;box-shadow:var(--shadow-lg);border:1px solid rgba(21,23,31,.06);padding:18px 20px}
+  .track-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .track-head b{font-size:14px}
+  .track-head .mono{font-size:12px;color:var(--ink-3)}
+  .on-track{font-size:12px;font-weight:700;color:var(--mint);background:var(--mint-soft);padding:4px 9px;border-radius:999px}
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);position:relative;margin-bottom:12px}
+  .steps::before{content:"";position:absolute;top:8px;left:10%;right:10%;height:2px;background:var(--line)}
+  .steps::after{content:"";position:absolute;top:8px;left:10%;width:40%;height:2px;background:var(--mint)}
+  .step{text-align:center;position:relative;z-index:1;font-size:11px;font-weight:600;color:var(--ink-3)}
+  .step i{display:block;width:18px;height:18px;border-radius:50%;margin:0 auto 6px;background:#fff;border:2px solid var(--line)}
+  .step.done i{background:var(--mint);border-color:var(--mint)}
+  .step.done{color:var(--ink-2)}
+  .step.now i{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px var(--blue-soft)}
+  .step.now{color:var(--blue-ink)}
+  .progress{height:8px;background:var(--bg-2);border-radius:99px;overflow:hidden}
+  .progress span{display:block;height:100%;width:64%;background:linear-gradient(90deg,var(--blue),#6C8BFF);border-radius:99px;animation:grow 2.4s cubic-bezier(.2,.8,.2,1)}
+  @keyframes grow{from{width:8%}}
+  .progress-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3);margin-top:7px}
+  .progress-meta b{color:var(--ink);font-weight:600}
+
+  /* ---------- Logos ---------- */
+  .logos{padding:10px 0 90px}
+  .logos p{text-align:center;font-size:14px;font-weight:600;color:var(--ink-3);margin-bottom:26px}
+  .logo-row{display:flex;justify-content:space-between;align-items:center;color:#8B8778}
+  .logo-row span{display:flex;align-items:center;gap:8px;font-weight:700;font-size:19px;letter-spacing:-.01em;white-space:nowrap}
+  .logo-row .serif{font-family:Georgia,serif;font-style:italic;font-weight:600;font-size:21px}
+  .logo-row .wide{letter-spacing:.18em;font-size:15px;text-transform:uppercase}
+  .logo-row .disp{font-family:var(--display);font-weight:800;font-size:21px}
+
+  /* ---------- Section base ---------- */
+  section{scroll-margin-top:80px}
+  .sec{padding:110px 0}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-ink)}
+  .kicker::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--sun);transform:rotate(45deg)}
+  h2{font-family:var(--display);font-size:54px;line-height:1.04;letter-spacing:-.035em;font-weight:700;margin:16px 0 18px}
+  .sec-lede{font-size:19px;color:var(--ink-2);max-width:600px}
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:60px;margin-bottom:56px}
+  .sec-head h2{max-width:640px;margin-bottom:0}
+  .sec-head .sec-lede{max-width:420px}
+
+  /* ---------- Features ---------- */
+  .features{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .feat{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;transition:transform .2s ease, box-shadow .2s ease}
+  .feat:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+  .feat-vis{height:250px;position:relative;padding:26px;display:flex;align-items:center;justify-content:center}
+  .feat-copy{padding:26px 28px 30px;border-top:1px solid var(--line);background:var(--card);flex:1}
+  .feat-copy .num{font-family:var(--mono);font-size:12px;color:var(--ink-3);font-weight:600}
+  .feat-copy h3{font-family:var(--display);font-size:26px;letter-spacing:-.025em;margin:6px 0 10px;line-height:1.15}
+  .feat-copy p{color:var(--ink-2);font-size:16px}
+  .feat-copy ul{list-style:none;margin-top:16px;display:grid;gap:8px}
+  .feat-copy li{display:flex;gap:9px;font-size:15px;font-weight:500}
+  .feat-copy li svg{flex:none;margin-top:4px;color:var(--blue)}
+
+  .v1{background:linear-gradient(170deg,#EEF3FF,#F8F9FF)}
+  .rules{width:100%;background:#fff;border-radius:14px;box-shadow:var(--shadow-sm);padding:8px}
+  .rule{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;font-size:13.5px;font-weight:500}
+  .rule + .rule{border-top:1px dashed var(--line)}
+  .rule .ic{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none}
+  .rule .ic.g{background:var(--mint-soft);color:var(--mint)}
+  .rule .ic.y{background:var(--sun-soft);color:#A07800}
+  .rule .val{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+  .rule.warn{background:#FFFAE6}
+
+  .v2{background:linear-gradient(170deg,#FFF6D6,#FFFBEF)}
+  .quotes{width:100%;display:grid;gap:8px}
+  .q{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;background:#fff;border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-sm);font-size:13.5px;border:1.5px solid transparent}
+  .q b{font-weight:600}
+  .q small{display:block;color:var(--ink-3);font-size:12px}
+  .q .price{font-family:var(--mono);font-weight:600}
+  .q .days{font-size:12px;color:var(--ink-2);font-weight:600;background:var(--bg-2);padding:3px 8px;border-radius:6px}
+  .q.best{border-color:var(--blue)}
+  .q.best .days{background:var(--blue-soft);color:var(--blue-ink)}
+  .best-tag{position:absolute;top:18px;right:26px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;letter-spacing:.03em}
+
+  .v3{background:linear-gradient(170deg,#E4F7EE,#F4FCF8)}
+  .route{width:100%;height:100%}
+  .route .truck{offset-path:path("M20 150 C 90 150, 90 60, 170 70 S 260 140, 320 60");animation:drive 6s ease-in-out infinite alternate}
+  @keyframes drive{from{offset-distance:8%}to{offset-distance:78%}}
+  .eta-card{position:absolute;bottom:22px;right:22px;background:#fff;border-radius:12px;padding:10px 14px;box-shadow:var(--shadow-sm);font-size:12px}
+  .eta-card b{display:block;font-size:15px;font-family:var(--display)}
+  .alert-card{position:absolute;top:22px;left:22px;background:var(--ink);color:#fff;border-radius:12px;padding:9px 12px;font-size:12px;font-weight:500;display:flex;gap:8px;align-items:center;box-shadow:var(--shadow-sm)}
+  .alert-card i{width:8px;height:8px;border-radius:50%;background:var(--sun);display:block}
+
+  /* ---------- How it works ---------- */
+  .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;position:relative}
+  .how-grid::before{content:"";position:absolute;top:34px;left:60px;right:60px;border-top:2px dashed #D6D0C0}
+  .how{position:relative}
+  .how .n{width:68px;height:68px;border-radius:20px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-family:var(--display);font-size:28px;font-weight:800;box-shadow:var(--shadow-sm);margin-bottom:24px;position:relative}
+  .how:nth-child(1) .n{background:var(--sun)}
+  .how:nth-child(2) .n{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .how:nth-child(3) .n{background:var(--ink);color:var(--sun);border-color:var(--ink)}
+  .how .when{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+  .how h3{font-family:var(--display);font-size:24px;letter-spacing:-.02em;margin:6px 0 10px}
+  .how p{color:var(--ink-2);font-size:16px;max-width:340px}
+  .integrations{margin-top:72px;padding:28px 32px;background:var(--card);border:1px solid var(--line);border-radius:20px;display:flex;align-items:center;gap:32px}
+  .integrations > p{font-weight:600;font-size:15px;white-space:nowrap}
+  .int-list{display:flex;flex-wrap:wrap;gap:10px}
+  .int-list span{padding:8px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink-2)}
+
+  /* ---------- Metrics ---------- */
+  .metrics{background:var(--blue);color:#fff;position:relative;overflow:hidden}
+  .metrics::before{content:"";position:absolute;right:-120px;top:-160px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 65%)}
+  .metrics .kicker{color:var(--sun)}
+  .metrics h2{color:#fff;max-width:720px}
+  .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;border-top:1px solid rgba(255,255,255,.22)}
+  .metric{padding:32px 28px 0 0}
+  .metric + .metric{padding-left:28px;border-left:1px solid rgba(255,255,255,.22)}
+  .metric strong{display:block;font-family:var(--display);font-size:64px;font-weight:700;letter-spacing:-.04em;line-height:1;color:var(--sun)}
+  .metric p{margin-top:12px;font-size:16px;color:rgba(255,255,255,.86);max-width:220px}
+  .metrics .fine{margin-top:40px;font-size:13px;color:rgba(255,255,255,.6)}
+
+  /* ---------- Testimonial ---------- */
+  .quote-card{display:grid;grid-template-columns:1.5fr 1fr;background:var(--sun);border-radius:28px;overflow:hidden;position:relative}
+  .quote-main{padding:64px}
+  .quote-main svg.qm{color:var(--ink);opacity:.9}
+  blockquote{font-family:var(--display);font-size:36px;line-height:1.2;letter-spacing:-.025em;font-weight:600;margin:22px 0 36px}
+  .who{display:flex;align-items:center;gap:14px}
+  .who .pic{width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--sun);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:18px}
+  .who b{display:block;font-size:17px}
+  .who span{font-size:15px;color:#5A4A12}
+  .quote-side{background:rgba(255,255,255,.45);padding:64px 48px;display:flex;flex-direction:column;justify-content:center;gap:28px;border-left:1px solid rgba(21,23,31,.1)}
+  .quote-side div{border-bottom:1px solid rgba(21,23,31,.12);padding-bottom:22px}
+  .quote-side div:last-child{border-bottom:0;padding-bottom:0}
+  .quote-side strong{font-family:var(--display);font-size:44px;letter-spacing:-.03em;line-height:1}
+  .quote-side p{font-size:15px;color:#3E3510;margin-top:6px}
+
+  /* ---------- Demo ---------- */
+  .demo{background:var(--ink);color:#fff;border-radius:32px;margin:0 32px;padding:0;overflow:hidden;position:relative}
+  .demo::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px, transparent 1.2px);background-size:22px 22px;pointer-events:none}
+  .demo-grid{position:relative;display:grid;grid-template-columns:1fr 520px;gap:72px;padding:96px 0;align-items:start}
+  .demo .kicker{color:var(--sun)}
+  .demo h2{color:#fff;font-size:58px}
+  .demo .sec-lede{color:rgba(255,255,255,.75)}
+  .agenda{margin-top:40px;display:grid;gap:14px}
+  .agenda-item{display:grid;grid-template-columns:64px 1fr;gap:16px;align-items:start;padding:18px 20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px}
+  .agenda-item .t{font-family:var(--mono);font-size:13px;color:var(--sun);font-weight:600;padding-top:2px}
+  .agenda-item b{display:block;font-size:16px;font-weight:600}
+  .agenda-item span{font-size:15px;color:rgba(255,255,255,.65)}
+  .form-card{background:#fff;color:var(--ink);border-radius:24px;padding:36px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+  .form-card h3{font-family:var(--display);font-size:26px;letter-spacing:-.02em}
+  .form-card > p{color:var(--ink-2);font-size:15px;margin:4px 0 24px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .f{margin-bottom:14px}
+  .f label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  .f input,.f select,.f textarea{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 14px;font-size:15px;outline:none;transition:border-color .15s, box-shadow .15s, background .15s}
+  .f textarea{resize:none;height:84px}
+  .f input:focus,.f select:focus,.f textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px var(--blue-soft)}
+  .f.err input{border-color:var(--coral);box-shadow:0 0 0 4px #FFE9E3}
+  .f .msg{display:none;font-size:12px;color:#D1411F;margin-top:5px;font-weight:500}
+  .f.err .msg{display:block}
+  .form-card .btn{width:100%;justify-content:center;margin-top:6px;height:54px}
+  .form-note{font-size:12.5px;color:var(--ink-3);text-align:center;margin-top:14px}
+  .success{display:none;text-align:center;padding:30px 6px}
+  .success .big{width:72px;height:72px;border-radius:50%;background:var(--mint-soft);color:var(--mint);display:grid;place-items:center;margin:0 auto 20px}
+  .success h3{margin-bottom:10px}
+  .success p{color:var(--ink-2)}
+  .form-card.done form{display:none}
+  .form-card.done .success{display:block}
+
+  /* ---------- FAQ ---------- */
+  .faq-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:80px}
+  .faq-grid h2{margin-top:16px}
+  .faq-grid .sec-lede a{color:var(--blue-ink);font-weight:600;border-bottom:1.5px solid currentColor}
+  details{border-bottom:1px solid var(--line)}
+  details:first-child{border-top:1px solid var(--line)}
+  summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:24px;padding:24px 0;font-weight:600;font-size:19px}
+  summary::-webkit-details-marker{display:none}
+  summary .pm{flex:none;width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;transition:transform .2s, background .2s}
+  details[open] summary .pm{transform:rotate(45deg);background:var(--sun);border-color:var(--sun)}
+  details p{padding:0 56px 24px 0;color:var(--ink-2);font-size:16.5px}
+
+  /* ---------- Footer ---------- */
+  footer{padding:80px 0 40px;margin-top:40px}
+  .foot-grid{display:grid;grid-template-columns:1.6fr repeat(3,1fr);gap:40px;padding-bottom:56px;border-bottom:1px solid var(--line)}
+  .foot-grid p.tag{color:var(--ink-2);font-size:15px;margin-top:14px;max-width:300px}
+  .foot-grid h4{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-bottom:16px}
+  .foot-grid ul{list-style:none;display:grid;gap:10px;font-size:15px;font-weight:500}
+  .foot-grid a:hover{color:var(--blue-ink)}
+  .foot-bottom{display:flex;justify-content:space-between;padding-top:28px;font-size:14px;color:var(--ink-3)}
+  .foot-bottom .badges{display:flex;gap:18px}
+  .foot-bottom .badges span{display:inline-flex;align-items:center;gap:6px}
+
+  /* ---------- Reveal ---------- */
+  .js .rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1)}
+  .js .rv.in{opacity:1;transform:none}
+  .js .rv.d1{transition-delay:.08s}.js .rv.d2{transition-delay:.16s}.js .rv.d3{transition-delay:.24s}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.js .rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 1.5l12.6 7.25v14.5L16 30.5 3.4 23.25V8.75z" fill="#2D5BFF"/><circle cx="16" cy="16" r="5.5" fill="#FFD44D"/></svg>
+      acme
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#product">Product</a>
+      <a href="#how">How it works</a>
+      <a href="#customers">Customers</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#" class="signin">Sign in</a>
+      <a href="#demo" class="btn btn-primary btn-sm">Book a demo</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <a href="#product" class="eyebrow rv"><span class="tag">NEW</span> Supplier scorecards are live <span aria-hidden="true">→</span></a>
+      <h1 class="rv d1">Custom widgets, ordered like <span class="swash">clockwork.<svg viewBox="0 0 300 22" preserveAspectRatio="none" aria-hidden="true"><path d="M4 14 C 70 4, 150 4, 296 12 L 294 20 C 170 12, 80 13, 6 21 Z" fill="#FFD44D"/></svg></span></h1>
+      <p class="lede rv d2">Acme gives operations teams one place to configure custom widgets, order from approved suppliers, and track every unit from quote to dock door. No more spreadsheet relay.</p>
+      <div class="hero-ctas rv d3">
+        <a href="#demo" class="btn btn-primary">Book a 30-minute demo <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a href="#how" class="btn btn-ghost">See how it works</a>
+      </div>
+      <div class="hero-proof rv d3">
+        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="currentColor" opacity=".15"/><path d="M4.5 8.2l2.2 2.2 4.8-4.8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Live in about 30 days</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="currentColor" opacity=".15"/><path d="M4.5 8.2l2.2 2.2 4.8-4.8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Syncs with your ERP</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="currentColor" opacity=".15"/><path d="M4.5 8.2l2.2 2.2 4.8-4.8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Suppliers join free</span>
+      </div>
+    </div>
+
+    <div class="hero-visual rv d2" aria-label="Interactive preview of the Acme widget configurator">
+      <div class="float-pill" id="pill"><span class="dot"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span id="pillText">Tolerance check passed</span></div>
+
+      <div class="app">
+        <div class="app-bar">
+          <div class="crumbs">Orders <span>/</span> <b>New order</b></div>
+          <div class="avatar-stack"><i style="background:#2D5BFF">MR</i><i style="background:#16A56B">JL</i><i style="background:#FF6B4A">+2</i></div>
+        </div>
+        <div class="app-body">
+          <div class="app-title">
+            <div><h3>Flanged mounting widget</h3><div class="pn" id="pn">WX-2291-F40-AL</div></div>
+            <span class="status-chip">Draft · autosaved</span>
+          </div>
+          <div class="config">
+            <div class="preview">
+              <svg class="widget-svg" id="widget" viewBox="0 0 200 200" aria-hidden="true">
+                <ellipse cx="100" cy="134" rx="80" ry="34" class="d"/>
+                <rect x="20" y="118" width="160" height="16" class="s"/>
+                <ellipse cx="100" cy="118" rx="80" ry="34" class="t"/>
+                <g class="d">
+                  <ellipse cx="160" cy="118" rx="7" ry="3.2"/><ellipse cx="130" cy="140" rx="7" ry="3.2"/><ellipse cx="70" cy="140" rx="7" ry="3.2"/>
+                  <ellipse cx="40" cy="118" rx="7" ry="3.2"/><ellipse cx="70" cy="96" rx="7" ry="3.2"/><ellipse cx="130" cy="96" rx="7" ry="3.2"/>
+                </g>
+                <ellipse cx="100" cy="112" rx="38" ry="16" class="d"/>
+                <rect x="62" y="70" width="76" height="42" class="s"/>
+                <ellipse cx="100" cy="70" rx="38" ry="16" class="t"/>
+                <ellipse cx="100" cy="70" rx="17" ry="7.5" class="d"/>
+                <path d="M62 70 v42" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+              </svg>
+              <div class="dim">Ø 40.00 ±0.05 mm</div>
+            </div>
+            <div>
+              <div class="field">
+                <label>Material</label>
+                <div class="chips" data-group="mat">
+                  <button class="chip on" data-v="al">Aluminum 6061</button>
+                  <button class="chip" data-v="ss">Stainless 316</button>
+                  <button class="chip" data-v="ny">Nylon PA12</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Finish</label>
+                <div class="chips" data-group="fin">
+                  <button class="chip on" data-v="anod" id="anod">Anodized</button>
+                  <button class="chip" data-v="bead">Bead blast</button>
+                  <button class="chip" data-v="none">As machined</button>
+                </div>
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label>Quantity</label>
+                <div class="stepper"><button type="button" id="qMinus" aria-label="Decrease quantity">−</button><output id="qty">2,400</output><button type="button" id="qPlus" aria-label="Increase quantity">+</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="summary" style="margin-top:18px">
+            <div><small>Unit price</small><strong id="unit">$4.80</strong></div>
+            <div><small>Order total</small><strong id="total">$11,520</strong></div>
+            <div><small>Lead time</small><strong id="lead">12 days</strong></div>
+          </div>
+          <div class="app-foot">
+            <div class="supplier"><span class="mark">P</span><div><b>Pellam Tool &amp; Die</b><span class="ok">● Approved supplier</span> · 98% on-time</div></div>
+            <button class="btn btn-primary" type="button">Send for approval</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="track">
+        <div class="track-head">
+          <div><b>PO-10482</b> <span class="mono">· 2,400 × WX-1180</span></div>
+          <span class="on-track">On track</span>
+        </div>
+        <div class="steps">
+          <div class="step done"><i></i>Configured</div>
+          <div class="step done"><i></i>Approved</div>
+          <div class="step now"><i></i>Production</div>
+          <div class="step"><i></i>Shipped</div>
+          <div class="step"><i></i>Received</div>
+        </div>
+        <div class="progress"><span></span></div>
+        <div class="progress-meta"><span><b>1,536</b> of 2,400 units machined</span><span>ETA in 6 days</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<section class="logos" id="customers">
+  <div class="wrap">
+    <p>Running the widget supply chain for 400+ plants across North America and Europe</p>
+    <div class="logo-row">
+      <span class="disp"><svg width="22" height="22" viewBox="0 0 22 22"><rect x="2" y="2" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M7 15V7l8 8V7" stroke="currentColor" stroke-width="2.5" fill="none"/></svg>Northbend</span>
+      <span class="serif">Harlow Castings</span>
+      <span class="wide">Pellam&nbsp;Tool</span>
+      <span><svg width="22" height="22" viewBox="0 0 22 22"><path d="M11 2l9 18H2z" fill="currentColor"/></svg>Kestrel Motion</span>
+      <span class="disp">orchard<span style="color:#C9B45A">.</span></span>
+      <span class="wide" style="letter-spacing:.08em">VANTNER&nbsp;/&nbsp;ASSY</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="sec features" id="product">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker rv">The platform</span>
+        <h2 class="rv d1">Everything between “we need a part” and “it’s on the line.”</h2>
+      </div>
+      <p class="sec-lede rv d2">Three jobs your team does every day, finally in one place with one source of truth, so nobody has to chase a PDF, a PO number, or a tracking link.</p>
+    </div>
+
+    <div class="feat-grid">
+      <article class="feat rv">
+        <div class="feat-vis v1">
+          <div class="rules">
+            <div class="rule"><span class="ic g"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span>Bore tolerance<span class="val">±0.05 mm</span></div>
+            <div class="rule"><span class="ic g"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span>Fits housing HX-40<span class="val">rev C</span></div>
+            <div class="rule warn"><span class="ic y">!</span>Anodizing adds 3 days<span class="val">suggest bead</span></div>
+            <div class="rule"><span class="ic g"><svg width="11" height="11" viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2 4.8-4.8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></span>RoHS / REACH<span class="val">compliant</span></div>
+          </div>
+        </div>
+        <div class="feat-copy">
+          <span class="num">01 · CONFIGURE</span>
+          <h3>Spec it once. Spec it right.</h3>
+          <p>A guided configurator checks every widget against your engineering rules before a supplier ever sees it.</p>
+          <ul>
+            <li><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.2l2.8 2.8 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Tolerance, material &amp; fit validation</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.2l2.8 2.8 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Reusable templates for repeat parts</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feat rv d1">
+        <div class="feat-vis v2">
+          <span class="best-tag">BEST VALUE</span>
+          <div class="quotes">
+            <div class="q best"><div><b>Pellam Tool &amp; Die</b><small>Ohio · 98% on-time</small></div><span class="days">10 days</span><span class="price">$4.62</span></div>
+            <div class="q"><div><b>Rivergate Machining</b><small>Ontario · 94% on-time</small></div><span class="days">14 days</span><span class="price">$4.48</span></div>
+            <div class="q"><div><b>Casterly Precision</b><small>Monterrey · 91% on-time</small></div><span class="days">16 days</span><span class="price">$4.19</span></div>
+          </div>
+        </div>
+        <div class="feat-copy">
+          <span class="num">02 · ORDER</span>
+          <h3>Order in minutes, not email threads.</h3>
+          <p>Compare quotes side by side, route approvals automatically, and issue POs that land in your ERP.</p>
+          <ul>
+            <li><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.2l2.8 2.8 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Approval rules by spend, part, or plant</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.2l2.8 2.8 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Supplier scorecards built in</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="feat rv d2">
+        <div class="feat-vis v3">
+          <svg class="route" viewBox="0 0 340 210" aria-hidden="true">
+            <path d="M20 150 C 90 150, 90 60, 170 70 S 260 140, 320 60" fill="none" stroke="#BFE6D3" stroke-width="8" stroke-linecap="round"/>
+            <path d="M20 150 C 90 150, 90 60, 170 70 S 260 140, 320 60" fill="none" stroke="#16A56B" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round"/>
+            <circle cx="20" cy="150" r="8" fill="#15171F"/><circle cx="20" cy="150" r="3" fill="#fff"/>
+            <circle cx="170" cy="70" r="6" fill="#fff" stroke="#16A56B" stroke-width="3"/>
+            <g transform="translate(320 60)"><circle r="14" fill="#2D5BFF" opacity=".15"/><circle r="8" fill="#2D5BFF"/><circle r="3" fill="#fff"/></g>
+            <g class="truck"><rect x="-13" y="-9" width="26" height="18" rx="5" fill="#15171F"/><rect x="3" y="-5" width="7" height="6" rx="1.5" fill="#FFD44D"/></g>
+          </svg>
+          <div class="alert-card"><i></i>Carrier delay flagged 4 days early</div>
+          <div class="eta-card">Dock 3 · Receiving<b>Arrives Thursday</b></div>
+        </div>
+        <div class="feat-copy">
+          <span class="num">03 · TRACK</span>
+          <h3>Know where every widget is.</h3>
+          <p>Live status from the supplier’s floor to your receiving dock, with early warnings when anything starts to slip.</p>
+          <ul>
+            <li><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.2l2.8 2.8 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Production milestones, not just shipping</li>
+            <li><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.2l2.8 2.8 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Slack, Teams &amp; email alerts</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker rv">How it works</span>
+        <h2 class="rv d1">Live in a month, not a fiscal year.</h2>
+      </div>
+      <p class="sec-lede rv d2">A dedicated onboarding engineer does the heavy lifting. Your team keeps shipping while we set things up around the way you already work.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how rv">
+        <div class="n">1</div>
+        <span class="when">Week 1</span>
+        <h3>Connect your systems</h3>
+        <p>Plug Acme into your ERP and invite your current suppliers. They get a free portal. No new software to install on their end.</p>
+      </div>
+      <div class="how rv d1">
+        <div class="n">2</div>
+        <span class="when">Week 2</span>
+        <h3>Import your widget catalog</h3>
+        <p>We map your existing part numbers, drawings, and engineering rules into configurable templates. Nothing gets renamed.</p>
+      </div>
+      <div class="how rv d2">
+        <div class="n">3</div>
+        <span class="when">Weeks 3–4</span>
+        <h3>Go live, one line at a time</h3>
+        <p>Start with a single production line, prove the savings, then roll out plant by plant at whatever pace suits you.</p>
+      </div>
+    </div>
+    <div class="integrations rv">
+      <p>Works with the ERP you already run</p>
+      <div class="int-list">
+        <span>SAP S/4HANA</span><span>Oracle NetSuite</span><span>Epicor Kinetic</span><span>Microsoft Dynamics 365</span><span>Infor CloudSuite</span><span>Plex</span><span>EDI &amp; CSV</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="sec metrics">
+  <div class="wrap" style="position:relative">
+    <span class="kicker rv">The results</span>
+    <h2 class="rv d1">Fewer fire drills. More widgets where they belong.</h2>
+    <div class="metric-grid">
+      <div class="metric rv"><strong data-count="38" data-suffix="%">38%</strong><p>fewer expedite fees in the first year</p></div>
+      <div class="metric rv d1"><strong data-count="4.2" data-decimals="1" data-suffix=" days">4.2 days</strong><p>shorter average lead time on custom parts</p></div>
+      <div class="metric rv d2"><strong data-count="11" data-suffix=" hrs">11 hrs</strong><p>saved per planner, every single week</p></div>
+      <div class="metric rv d3"><strong data-count="97" data-suffix="%">97%</strong><p>of orders spec’d right the first time</p></div>
+    </div>
+    <p class="fine">Median results across Acme customers after 12 months, 2024 customer outcomes survey (n=212 plants).</p>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="sec">
+  <div class="wrap">
+    <div class="quote-card rv">
+      <div class="quote-main">
+        <svg class="qm" width="44" height="34" viewBox="0 0 44 34" aria-hidden="true"><path d="M0 34V20C0 8.5 6 1.8 17 0l2 5.4C12.6 7.2 9.8 11 9.6 16H18v18zm26 0V20C26 8.5 32 1.8 43 0l1 5.4c-6.4 1.8-9.2 5.6-9.4 10.6H44v18z" fill="currentColor"/></svg>
+        <blockquote>We used to find out a batch was late when the line stopped. Now we know nine days out, and we usually have a fix before anyone upstairs asks.</blockquote>
+        <div class="who">
+          <div class="pic">DO</div>
+          <div><b>Dana Okafor</b><span>Director of Operations, Harlow Castings · 3 plants</span></div>
+        </div>
+      </div>
+      <div class="quote-side">
+        <div><strong>$410K</strong><p>saved on expedited freight in year one</p></div>
+        <div><strong>0</strong><p>line stoppages from late widgets since go-live</p></div>
+        <div><strong>26 days</strong><p>from kickoff to first live order</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="wrap demo-grid">
+    <div>
+      <span class="kicker rv">Book a demo</span>
+      <h2 class="rv d1">See Acme run on your own widgets.</h2>
+      <p class="sec-lede rv d2">Bring one part number you order often. In 30 minutes we’ll configure it, quote it, and show you exactly how it would be tracked, using your real workflow and not a canned tour.</p>
+      <div class="agenda">
+        <div class="agenda-item rv"><span class="t">0–10</span><div><b>Your current process</b><span>Where orders stall, who chases what, and what it costs you.</span></div></div>
+        <div class="agenda-item rv d1"><span class="t">10–25</span><div><b>Your part, live in Acme</b><span>Configure, quote, approve, and track it end to end on screen.</span></div></div>
+        <div class="agenda-item rv d2"><span class="t">25–30</span><div><b>A rollout plan &amp; pricing</b><span>A clear timeline and a quote for your plant count. No follow-up guessing.</span></div></div>
+      </div>
+    </div>
+
+    <div class="form-card rv d1" id="formCard">
+      <form id="demoForm" novalidate>
+        <h3>Pick a time that works</h3>
+        <p>A widget specialist will reply within one business day.</p>
+        <div class="row2">
+          <div class="f"><label for="fn">First name</label><input id="fn" name="fn" autocomplete="given-name" placeholder="Jordan" required><span class="msg">Please add your first name.</span></div>
+          <div class="f"><label for="ln">Last name</label><input id="ln" name="ln" autocomplete="family-name" placeholder="Reyes"></div>
+        </div>
+        <div class="f"><label for="em">Work email</label><input id="em" name="em" type="email" autocomplete="email" placeholder="jordan@yourplant.com" required><span class="msg">Please use a valid work email.</span></div>
+        <div class="row2">
+          <div class="f"><label for="co">Company</label><input id="co" name="co" autocomplete="organization" placeholder="Northbend Fluid Systems" required><span class="msg">Which company are you with?</span></div>
+          <div class="f"><label for="pl">Plants</label>
+            <select id="pl" name="pl"><option>1 plant</option><option selected>2–5 plants</option><option>6–15 plants</option><option>16+ plants</option></select>
+          </div>
+        </div>
+        <div class="f"><label for="nt">What would you most like to fix? <span style="color:var(--ink-3);font-weight:500">(optional)</span></label><textarea id="nt" name="nt" placeholder="e.g. We spend too much on expedited freight for bracket widgets."></textarea></div>
+        <button class="btn btn-primary" type="submit">Book my demo <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <p class="form-note">No sales sequence. No spam. Just one email with three times to choose from.</p>
+      </form>
+      <div class="success" role="status" aria-live="polite">
+        <div class="big"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3 id="successTitle">You’re on the schedule.</h3>
+        <p id="successText">Watch your inbox. We’ll send three demo times within one business day. Have a part number handy and we’ll build it live.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec" id="faq">
+  <div class="wrap faq-grid">
+    <div>
+      <span class="kicker rv">FAQ</span>
+      <h2 class="rv d1">Good questions, straight answers.</h2>
+      <p class="sec-lede rv d2">Something else on your mind? Ask it on the demo, or email <a href="mailto:hello@acme.example">hello@acme.example</a>.</p>
+    </div>
+    <div class="rv d1">
+      <details open>
+        <summary>Does Acme replace our ERP?<span class="pm"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></summary>
+        <p>No. Acme sits alongside it. Your ERP stays the system of record for inventory and finance; Acme handles the messy middle of configuring, quoting, approving, and tracking custom widgets, then syncs POs and receipts back automatically.</p>
+      </details>
+      <details>
+        <summary>Do our suppliers have to pay or install anything?<span class="pm"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></summary>
+        <p>Never. Suppliers get a free browser-based portal to receive specs, submit quotes, and post production updates. Suppliers who prefer email or EDI can keep using it, and Acme reads those updates for you.</p>
+      </details>
+      <details>
+        <summary>How long does implementation really take?<span class="pm"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></summary>
+        <p>Most teams place their first live order within 30 days. A dedicated onboarding engineer handles the ERP connection and catalog import; your team typically spends about six hours total on setup.</p>
+      </details>
+      <details>
+        <summary>How is our data secured?<span class="pm"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></summary>
+        <p>Acme is SOC 2 Type II audited, encrypts data in transit and at rest, and supports SSO with role-based permissions. Suppliers only ever see the drawings and orders you share with them.</p>
+      </details>
+      <details>
+        <summary>What does it cost?<span class="pm"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></summary>
+        <p>Acme is priced per plant on an annual plan, with unlimited users and suppliers. We’ll give you an exact number on the demo. Most customers cover the cost with expedite savings in the first two quarters.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="logo">
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 1.5l12.6 7.25v14.5L16 30.5 3.4 23.25V8.75z" fill="#2D5BFF"/><circle cx="16" cy="16" r="5.5" fill="#FFD44D"/></svg>
+          acme
+        </a>
+        <p class="tag">Custom widgets, configured, ordered, and tracked in one cheerful place.</p>
+      </div>
+      <div><h4>Product</h4><ul><li><a href="#product">Configurator</a></li><li><a href="#product">Ordering</a></li><li><a href="#product">Tracking</a></li><li><a href="#how">Integrations</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#">About</a></li><li><a href="#customers">Customers</a></li><li><a href="#">Careers</a></li><li><a href="#">Contact</a></li></ul></div>
+      <div><h4>Resources</h4><ul><li><a href="#">Help center</a></li><li><a href="#">Security</a></li><li><a href="#">Supplier portal</a></li><li><a href="#demo">Book a demo</a></li></ul></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="yr">2025</span> Acme Widgets, Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a></span>
+      <span class="badges"><span>🔒 SOC 2 Type II</span><span>GDPR ready</span><span>99.95% uptime</span></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add('js');
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* Nav border on scroll */
+const nav = document.getElementById('nav');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8), {passive:true});
+
+/* Reveal on scroll + counters */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    e.target.querySelectorAll('[data-count]').forEach(countUp);
+    io.unobserve(e.target);
+  });
+}, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+function countUp(el){
+  const end = parseFloat(el.dataset.count), dec = +(el.dataset.decimals||0), suf = el.dataset.suffix||'';
+  const t0 = performance.now(), dur = 1400;
+  (function tick(t){
+    const p = Math.min(1,(t-t0)/dur), v = end*(1-Math.pow(1-p,3));
+    el.textContent = v.toFixed(dec) + suf;
+    if (p<1) requestAnimationFrame(tick);
+  })(t0);
+}
+
+/* Hero configurator */
+const MAT = {
+  al:{code:'AL', price:4.20, lead:12, c:['#CFE0FF','#9DB8F0','#6F8FD6']},
+  ss:{code:'SS', price:7.85, lead:18, c:['#E6E8EC','#BAC0C9','#848B97']},
+  ny:{code:'NY', price:2.10, lead:8,  c:['#FBF3DC','#EAD9A8','#C9B271']}
+};
+const FIN = {anod:{p:.60,d:3}, bead:{p:.35,d:1}, none:{p:0,d:0}};
+const state = {mat:'al', fin:'anod', qty:2400};
+const $ = id => document.getElementById(id);
+const widget = $('widget'), pill = $('pill'), pillText = $('pillText');
+let pillTimer;
+
+function render(){
+  const m = MAT[state.mat], f = FIN[state.fin];
+  let unit = m.price + f.p;
+  if (state.qty >= 5000) unit *= .92;
+  $('unit').textContent = '$' + unit.toFixed(2);
+  $('total').textContent = '$' + Math.round(unit*state.qty).toLocaleString('en-US');
+  $('lead').textContent = (m.lead + f.d) + ' days';
+  $('qty').textContent = state.qty.toLocaleString('en-US');
+  $('pn').textContent = 'WX-2291-F40-' + m.code;
+  widget.style.setProperty('--m-top', m.c[0]);
+  widget.style.setProperty('--m-side', m.c[1]);
+  widget.style.setProperty('--m-dark', m.c[2]);
+}
+function check(msg){
+  clearTimeout(pillTimer);
+  pill.classList.add('checking');
+  pillText.textContent = 'Checking engineering rules…';
+  pillTimer = setTimeout(() => { pill.classList.remove('checking'); pillText.textContent = msg || 'Tolerance check passed'; }, 650);
+}
+document.querySelectorAll('.chips').forEach(group => {
+  group.addEventListener('click', e => {
+    const btn = e.target.closest('.chip');
+    if (!btn || btn.disabled) return;
+    group.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === btn));
+    state[group.dataset.group] = btn.dataset.v;
+    let msg;
+    if (group.dataset.group === 'mat'){
+      const anod = $('anod');
+      anod.disabled = state.mat === 'ny';
+      if (state.mat === 'ny' && state.fin === 'anod'){
+        state.fin = 'bead';
+        document.querySelectorAll('[data-group="fin"] .chip').forEach(c => c.classList.toggle('on', c.dataset.v === 'bead'));
+        msg = 'PA12 can’t be anodized: switched to bead blast';
+      }
+    }
+    render(); check(msg);
+  });
+});
+$('qPlus').onclick = () => { state.qty = Math.min(20000, state.qty + 400); render(); };
+$('qMinus').onclick = () => { state.qty = Math.max(400, state.qty - 400); render(); };
+render();
+
+/* Demo form */
+const form = $('demoForm');
+const freeMail = /@(gmail|yahoo|hotmail|outlook|aol|icloud|proton)\./i;
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  let ok = true;
+  const setErr = (id, bad) => { $(id).closest('.f').classList.toggle('err', bad); if (bad) ok = false; };
+  setErr('fn', !$('fn').value.trim());
+  const em = $('em').value.trim();
+  setErr('em', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) || freeMail.test(em));
+  setErr('co', !$('co').value.trim());
+  if (!ok){ form.querySelector('.err input').focus(); return; }
+  const name = $('fn').value.trim();
+  $('successTitle').textContent = 'Thanks, ' + name + '. You’re on the schedule.';
+  $('successText').textContent = 'We’ll email ' + em + ' with three demo times within one business day. Have a part number handy and we’ll build it live.';
+  $('formCard').classList.add('done');
+});
+form.querySelectorAll('input').forEach(i => i.addEventListener('input', () => i.closest('.f').classList.remove('err')));
+</script>
+</body>
+</html>

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme | Custom widgets, configured, ordered and tracked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..900,0..100,0..1&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#f5ecd7;
+    --paper:#fbf5e6;
+    --ink:#231f20;
+    --pink:#e0457b;
+    --orange:#f28a2e;
+    --mustard:#e9b52c;
+    --teal:#1f9aa5;
+    --red:#c8352b;
+    --olive:#7a8b3a;
+    --blush:#f4b6c2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Work Sans",system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(233,181,44,.08) 0 2px, transparent 3px),
+      radial-gradient(circle at 70% 80%, rgba(224,69,123,.06) 0 2px, transparent 3px);
+    background-size:38px 38px, 52px 52px;
+    font-size:18px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:"Fraunces",Georgia,serif;
+    font-variation-settings:"SOFT" 100,"WONK" 1;
+    line-height:1.02;
+    letter-spacing:-.01em;
+  }
+  a{color:inherit}
+  .wrap{width:1200px;margin:0 auto;position:relative}
+
+  /* ---------- NAV ---------- */
+  nav{padding:26px 0}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:"Fraunces",serif;font-weight:800;font-size:34px;font-variation-settings:"SOFT" 100,"WONK" 1}
+  .logo svg{width:48px;height:48px}
+  .links{display:flex;gap:36px;align-items:center;list-style:none;font-weight:500}
+  .links a{text-decoration:none;position:relative}
+  .links a:not(.btn):hover{color:var(--pink)}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--pink);color:var(--paper);
+    font-family:"Work Sans",sans-serif;font-weight:700;font-size:18px;
+    padding:14px 26px;border-radius:999px;border:3px solid var(--ink);
+    box-shadow:5px 5px 0 var(--ink);text-decoration:none;cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+  .btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+  .btn.small{padding:10px 20px;font-size:16px;box-shadow:4px 4px 0 var(--ink)}
+  .btn.ghost{background:var(--paper);color:var(--ink)}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:40px 0 80px}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--mustard);border:2.5px solid var(--ink);border-radius:999px;
+    padding:6px 16px;font-weight:600;font-size:15px;letter-spacing:.04em;text-transform:uppercase;
+    transform:rotate(-2deg);margin-bottom:28px;
+  }
+  .eyebrow i{width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block}
+  .hero h1{font-size:88px;font-weight:800}
+  .hero h1 .pink{color:var(--pink)}
+  .hero h1 .teal{color:var(--teal);font-style:italic;font-weight:600}
+  .hero p.lede{font-size:22px;max-width:540px;margin:28px 0 38px}
+  .hero-ctas{display:flex;gap:18px;align-items:center}
+  .hero-note{margin-top:26px;font-size:15px;display:flex;gap:22px;opacity:.85}
+  .hero-note span{display:flex;align-items:center;gap:8px}
+  .hero-note span::before{content:"";width:12px;height:12px;background:var(--teal);transform:rotate(45deg);display:inline-block}
+  .hero-art{position:relative}
+  .hero-art svg{width:100%;height:auto;display:block;filter:drop-shadow(10px 10px 0 var(--ink))}
+  .rays{transform-origin:280px 230px;animation:spin 60s linear infinite}
+  .bob{animation:bob 4s ease-in-out infinite}
+  .bob2{animation:bob 4.6s ease-in-out infinite reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+  /* ---------- BANDS ---------- */
+  .band{display:block;width:100%}
+
+  /* ---------- LOGOS ---------- */
+  .trusted{padding:54px 0;background:var(--paper)}
+  .trusted p{text-align:center;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:14px;margin-bottom:26px}
+  .logos{display:flex;justify-content:space-between;align-items:center}
+  .logos span{font-family:"Fraunces",serif;font-weight:700;font-size:24px;opacity:.8;display:flex;align-items:center;gap:10px}
+  .logos span b{width:22px;height:22px;display:inline-block;border:2.5px solid var(--ink)}
+
+  /* ---------- PROBLEM ---------- */
+  .problem{background:var(--ink);color:var(--paper);padding:110px 0;overflow:hidden}
+  .problem .wrap{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+  .problem h2{font-size:64px;font-weight:700}
+  .problem h2 em{color:var(--mustard)}
+  .problem p{font-size:20px;opacity:.9;margin-top:22px}
+  .hands{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .hand{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:600;font-size:13px;text-align:center;line-height:1.2;color:var(--ink);padding:10px;border:3px solid var(--paper)}
+  .hand strong{font-family:"Fraunces",serif;font-size:28px;display:block}
+  .hand:nth-child(4n+1){background:var(--pink)}
+  .hand:nth-child(4n+2){background:var(--mustard);border-radius:18px;transform:rotate(6deg)}
+  .hand:nth-child(4n+3){background:var(--teal)}
+  .hand:nth-child(4n+4){background:var(--orange);border-radius:50% 50% 12px 12px}
+  .hand.lost{background:transparent!important;color:var(--paper);border-style:dashed}
+
+  /* ---------- PILLARS ---------- */
+  .pillars{padding:120px 0 100px}
+  .section-head{text-align:center;max-width:780px;margin:0 auto 64px}
+  .section-head h2{font-size:68px;font-weight:800}
+  .section-head p{font-size:20px;margin-top:18px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+  .card{
+    background:var(--paper);border:3px solid var(--ink);border-radius:28px;
+    padding:36px 32px 38px;box-shadow:8px 8px 0 var(--ink);position:relative;
+    transition:transform .25s ease;
+  }
+  .card:nth-child(1){transform:rotate(-1.2deg)}
+  .card:nth-child(2){transform:rotate(.8deg) translateY(18px)}
+  .card:nth-child(3){transform:rotate(-.6deg)}
+  .card:hover{transform:rotate(0) translateY(-6px)}
+  .card .icon{width:120px;height:120px;margin-bottom:20px}
+  .card h3{font-size:38px;font-weight:800;margin-bottom:12px}
+  .card p{font-size:17px}
+  .card ul{list-style:none;margin-top:18px;display:grid;gap:8px;font-size:16px}
+  .card li{display:flex;gap:10px;align-items:flex-start}
+  .card li::before{content:"";flex:none;width:10px;height:10px;margin-top:8px;border-radius:50%;background:var(--c,var(--pink))}
+  .tag{position:absolute;top:-16px;right:26px;background:var(--c);color:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:3px 14px;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+
+  /* ---------- STEPS ---------- */
+  .steps{background:var(--teal);padding:110px 0;color:var(--paper);position:relative}
+  .steps .section-head h2{color:var(--paper)}
+  .steps .section-head h2 em{color:var(--mustard)}
+  .step-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative}
+  .step-row::before{content:"";position:absolute;left:60px;right:60px;top:56px;border-top:4px dashed var(--paper);opacity:.6}
+  .step{text-align:center;position:relative}
+  .num{
+    width:112px;height:112px;margin:0 auto 22px;border-radius:50%;border:3px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Fraunces",serif;font-weight:900;font-size:52px;color:var(--ink);position:relative;
+    box-shadow:5px 5px 0 var(--ink);
+  }
+  .step:nth-child(1) .num{background:var(--mustard)}
+  .step:nth-child(2) .num{background:var(--pink);border-radius:26px;transform:rotate(-8deg)}
+  .step:nth-child(3) .num{background:var(--orange)}
+  .step:nth-child(4) .num{background:var(--paper);border-radius:50% 50% 16px 16px}
+  .step h3{font-size:28px;font-weight:700;margin-bottom:10px}
+  .step p{font-size:16px;opacity:.95;max-width:250px;margin:0 auto}
+
+  /* ---------- STATS ---------- */
+  .stats{padding:110px 0 60px}
+  .stats .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+  .stat{text-align:center;padding:40px 20px;position:relative}
+  .stat .big{font-family:"Fraunces",serif;font-weight:900;font-size:108px;line-height:1;font-variation-settings:"SOFT" 100,"WONK" 1}
+  .stat:nth-child(1) .big{color:var(--red)}
+  .stat:nth-child(2) .big{color:var(--teal)}
+  .stat:nth-child(3) .big{color:var(--orange)}
+  .stat p{font-size:18px;max-width:280px;margin:12px auto 0}
+  .stat svg{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:-1;opacity:.35}
+
+  /* ---------- TESTIMONIAL ---------- */
+  .quote{padding:60px 0 120px}
+  .quote-box{
+    display:grid;grid-template-columns:320px 1fr;gap:60px;align-items:center;
+    background:var(--mustard);border:3px solid var(--ink);border-radius:36px;padding:60px 70px;
+    box-shadow:12px 12px 0 var(--ink);
+  }
+  .quote-box blockquote{font-family:"Fraunces",serif;font-size:38px;font-weight:600;line-height:1.2;font-variation-settings:"SOFT" 100,"WONK" 1}
+  .quote-box blockquote::before{content:"“";display:block;font-size:120px;line-height:.6;color:var(--red);margin-bottom:6px}
+  .quote-box cite{display:block;margin-top:26px;font-style:normal;font-weight:600;font-size:18px}
+  .quote-box cite span{display:block;font-weight:400;opacity:.8}
+
+  /* ---------- DEMO ---------- */
+  .demo{background:var(--pink);padding:110px 0 120px;position:relative;overflow:hidden}
+  .demo .wrap{display:grid;grid-template-columns:1fr 1.05fr;gap:70px;align-items:start}
+  .demo h2{font-size:76px;font-weight:800;color:var(--paper)}
+  .demo h2 em{color:var(--ink)}
+  .demo .intro p{color:var(--paper);font-size:21px;margin-top:24px;max-width:470px}
+  .demo .intro ul{list-style:none;margin-top:32px;display:grid;gap:14px;color:var(--paper);font-size:18px;font-weight:500}
+  .demo .intro li{display:flex;gap:14px;align-items:center}
+  .demo .intro li svg{flex:none}
+  form{
+    background:var(--paper);border:3px solid var(--ink);border-radius:32px;padding:44px 44px 40px;
+    box-shadow:12px 12px 0 var(--ink);position:relative;
+  }
+  form h3{font-size:34px;font-weight:800;margin-bottom:6px}
+  form .sub{font-size:16px;margin-bottom:26px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  label{display:block;font-weight:600;font-size:15px;margin-bottom:18px}
+  input,select{
+    display:block;width:100%;margin-top:7px;padding:13px 16px;font:inherit;font-weight:400;font-size:17px;
+    background:#fff;border:2.5px solid var(--ink);border-radius:14px;color:var(--ink);outline:none;
+    transition:box-shadow .15s;
+  }
+  input:focus,select:focus{box-shadow:4px 4px 0 var(--teal)}
+  fieldset{border:none;margin-bottom:26px}
+  legend{font-weight:600;font-size:15px;margin-bottom:10px}
+  .slots{display:flex;flex-wrap:wrap;gap:10px}
+  .slots input{position:absolute;opacity:0;width:0;height:0}
+  .slots label{margin:0}
+  .slots span{
+    display:inline-block;padding:9px 16px;border:2.5px solid var(--ink);border-radius:999px;font-weight:500;font-size:15px;cursor:pointer;background:#fff;transition:background .15s
+  }
+  .slots input:checked + span{background:var(--teal);color:var(--paper)}
+  .slots input:focus-visible + span{outline:3px solid var(--mustard);outline-offset:2px}
+  form .btn{width:100%;justify-content:center;font-size:19px;padding:17px}
+  .fine{font-size:13px;margin-top:14px;text-align:center;opacity:.75}
+  .thanks{display:none;text-align:center;padding:30px 10px}
+  .thanks svg{width:150px;height:150px;margin-bottom:10px}
+  .thanks h3{font-size:40px}
+  .thanks p{margin-top:12px}
+  form.sent .fields{display:none}
+  form.sent .thanks{display:block}
+  .err{color:var(--red);font-size:14px;font-weight:600;margin:-8px 0 14px;display:none}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--ink);color:var(--paper);padding:60px 0 50px}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center}
+  footer .logo{color:var(--paper)}
+  footer ul{list-style:none;display:flex;gap:30px;font-size:15px}
+  footer a{text-decoration:none;opacity:.85}
+  footer a:hover{opacity:1;color:var(--mustard)}
+  footer small{font-size:14px;opacity:.6}
+
+  @media (prefers-reduced-motion: reduce){
+    .rays,.bob,.bob2{animation:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<!-- Reusable SVG defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="zigzag" width="32" height="22" patternUnits="userSpaceOnUse">
+      <rect width="32" height="22" fill="#f5ecd7"/>
+      <polygon points="0,22 16,2 32,22" fill="#e0457b"/>
+      <polygon points="10,22 16,14 22,22" fill="#e9b52c"/>
+    </pattern>
+    <pattern id="zigzagInk" width="32" height="22" patternUnits="userSpaceOnUse">
+      <rect width="32" height="22" fill="#231f20"/>
+      <polygon points="0,0 16,20 32,0" fill="#1f9aa5"/>
+    </pattern>
+    <pattern id="textile" width="96" height="96" patternUnits="userSpaceOnUse">
+      <rect width="96" height="96" fill="#c8352b"/>
+      <circle cx="48" cy="48" r="26" fill="#f28a2e"/>
+      <circle cx="48" cy="48" r="15" fill="#f5ecd7"/>
+      <circle cx="48" cy="48" r="6" fill="#231f20"/>
+      <polygon points="0,-14 14,0 0,14 -14,0" fill="#e9b52c"/>
+      <polygon points="96,-14 110,0 96,14 82,0" fill="#e9b52c"/>
+      <polygon points="0,82 14,96 0,110 -14,96" fill="#e9b52c"/>
+      <polygon points="96,82 110,96 96,110 82,96" fill="#e9b52c"/>
+      <circle cx="48" cy="6" r="4" fill="#f4b6c2"/>
+      <circle cx="48" cy="90" r="4" fill="#f4b6c2"/>
+      <circle cx="6" cy="48" r="4" fill="#f4b6c2"/>
+      <circle cx="90" cy="48" r="4" fill="#f4b6c2"/>
+    </pattern>
+    <pattern id="textile2" width="80" height="60" patternUnits="userSpaceOnUse">
+      <rect width="80" height="60" fill="#e9b52c"/>
+      <path d="M0 30 Q20 0 40 30 T80 30" fill="none" stroke="#231f20" stroke-width="4"/>
+      <circle cx="20" cy="42" r="6" fill="#e0457b"/>
+      <circle cx="60" cy="18" r="6" fill="#1f9aa5"/>
+    </pattern>
+    <g id="heart">
+      <path d="M0 -6 C-8 -18 -26 -12 -22 4 C-19 14 -6 20 0 28 C6 20 19 14 22 4 C26 -12 8 -18 0 -6 Z"/>
+    </g>
+  </defs>
+</svg>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <g fill="#f28a2e">
+          <polygon points="24,0 28,10 20,10"/><polygon points="24,48 28,38 20,38"/>
+          <polygon points="0,24 10,20 10,28"/><polygon points="48,24 38,20 38,28"/>
+          <polygon points="7,7 16,11 11,16"/><polygon points="41,41 32,37 37,32"/>
+          <polygon points="41,7 37,16 32,11"/><polygon points="7,41 11,32 16,37"/>
+        </g>
+        <circle cx="24" cy="24" r="12" fill="#e9b52c" stroke="#231f20" stroke-width="2.5"/>
+        <circle cx="20" cy="22" r="1.8" fill="#231f20"/><circle cx="28" cy="22" r="1.8" fill="#231f20"/>
+        <path d="M19 27 Q24 31 29 27" stroke="#231f20" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      Acme
+    </a>
+    <ul class="links">
+      <li><a href="#platform">Platform</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#customers">Customers</a></li>
+      <li><a href="#demo" class="btn small">Book a demo</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow"><i></i> Widget operations for manufacturers</div>
+      <h1>Every widget, <span class="pink">made to measure</span> and <span class="teal">tracked all the way home.</span></h1>
+      <p class="lede">Acme gives operations teams one cheerful place to configure custom widgets, place orders with suppliers, and follow every shipment from the machine shop to the loading dock.</p>
+      <div class="hero-ctas">
+        <a href="#demo" class="btn">Book a 30-minute demo
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4l6 6-6 6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#how" class="btn ghost">See how it works</a>
+      </div>
+      <div class="hero-note"><span>Live in under 6 weeks</span><span>Works with your ERP</span><span>No per-seat fees</span></div>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 560 560">
+        <rect x="6" y="6" width="548" height="548" rx="40" fill="#1f9aa5" stroke="#231f20" stroke-width="4"/>
+        <!-- sky dots -->
+        <g fill="#f5ecd7" opacity=".5">
+          <circle cx="60" cy="70" r="4"/><circle cx="500" cy="60" r="4"/><circle cx="90" cy="180" r="3"/>
+          <circle cx="480" cy="190" r="3"/><circle cx="40" cy="300" r="4"/><circle cx="520" cy="300" r="4"/>
+        </g>
+        <!-- sun rays -->
+        <g class="rays">
+          <g fill="#f28a2e" stroke="#231f20" stroke-width="3" stroke-linejoin="round">
+            <polygon id="ray" points="280,58 300,118 260,118"/>
+            <use href="#ray" transform="rotate(30 280 230)"/>
+            <use href="#ray" transform="rotate(60 280 230)"/>
+            <use href="#ray" transform="rotate(90 280 230)"/>
+            <use href="#ray" transform="rotate(120 280 230)"/>
+            <use href="#ray" transform="rotate(150 280 230)"/>
+            <use href="#ray" transform="rotate(180 280 230)"/>
+            <use href="#ray" transform="rotate(210 280 230)"/>
+            <use href="#ray" transform="rotate(240 280 230)"/>
+            <use href="#ray" transform="rotate(270 280 230)"/>
+            <use href="#ray" transform="rotate(300 280 230)"/>
+            <use href="#ray" transform="rotate(330 280 230)"/>
+          </g>
+          <g fill="#e0457b">
+            <circle cx="280" cy="88" r="7"/><circle cx="280" cy="372" r="7"/>
+            <circle cx="138" cy="230" r="7"/><circle cx="422" cy="230" r="7"/>
+          </g>
+        </g>
+        <!-- sun face -->
+        <circle cx="280" cy="230" r="112" fill="#e9b52c" stroke="#231f20" stroke-width="4"/>
+        <circle cx="280" cy="230" r="92" fill="none" stroke="#c8352b" stroke-width="3" stroke-dasharray="6 10" stroke-linecap="round"/>
+        <path d="M232 214 Q248 198 264 214 Q248 226 232 214 Z" fill="#f5ecd7" stroke="#231f20" stroke-width="3"/>
+        <path d="M296 214 Q312 198 328 214 Q312 226 296 214 Z" fill="#f5ecd7" stroke="#231f20" stroke-width="3"/>
+        <circle cx="248" cy="213" r="5" fill="#231f20"/><circle cx="312" cy="213" r="5" fill="#231f20"/>
+        <path d="M228 196 Q248 184 268 196" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M292 196 Q312 184 332 196" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M280 220 L272 248 L286 248" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="228" cy="252" r="14" fill="#e0457b" opacity=".85"/><circle cx="332" cy="252" r="14" fill="#e0457b" opacity=".85"/>
+        <path d="M252 270 Q280 296 308 270 Q280 282 252 270 Z" fill="#c8352b" stroke="#231f20" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- ground -->
+        <path d="M6 420 Q140 380 280 410 T554 400 L554 514 Q554 554 514 554 L46 554 Q6 554 6 514 Z" fill="#7a8b3a" stroke="#231f20" stroke-width="4"/>
+        <g fill="#e9b52c">
+          <polygon points="40,470 56,444 72,470"/><polygon points="96,480 112,454 128,480"/>
+          <polygon points="432,478 448,452 464,478"/><polygon points="488,468 504,442 520,468"/>
+        </g>
+        <g fill="#f5ecd7">
+          <circle cx="60" cy="510" r="5"/><circle cx="120" cy="522" r="5"/><circle cx="450" cy="520" r="5"/><circle cx="506" cy="508" r="5"/>
+        </g>
+
+        <!-- widget (hex nut) -->
+        <g transform="translate(280 468)">
+          <polygon points="0,-62 54,-31 54,31 0,62 -54,31 -54,-31" fill="#e0457b" stroke="#231f20" stroke-width="4" stroke-linejoin="round"/>
+          <polygon points="0,-44 38,-22 38,22 0,44 -38,22 -38,-22" fill="none" stroke="#f5ecd7" stroke-width="3" stroke-dasharray="4 7"/>
+          <circle r="22" fill="#f5ecd7" stroke="#231f20" stroke-width="4"/>
+          <circle r="8" fill="#1f9aa5"/>
+        </g>
+
+        <!-- left bird -->
+        <g class="bob">
+          <g transform="translate(118 350)">
+            <polygon points="-42,-4 -78,-26 -72,14" fill="#231f20"/>
+            <ellipse rx="46" ry="30" fill="#c8352b" stroke="#231f20" stroke-width="4"/>
+            <path d="M-22 -4 A24 24 0 0 0 26 -4 Z" fill="#f4b6c2" stroke="#231f20" stroke-width="3"/>
+            <circle cx="-8" cy="4" r="3" fill="#c8352b"/><circle cx="4" cy="6" r="3" fill="#c8352b"/><circle cx="14" cy="2" r="3" fill="#c8352b"/>
+            <circle cx="40" cy="-26" r="20" fill="#c8352b" stroke="#231f20" stroke-width="4"/>
+            <circle cx="46" cy="-30" r="7" fill="#f5ecd7" stroke="#231f20" stroke-width="2.5"/>
+            <circle cx="47" cy="-30" r="3" fill="#231f20"/>
+            <polygon points="58,-28 78,-22 58,-16" fill="#e9b52c" stroke="#231f20" stroke-width="3" stroke-linejoin="round"/>
+            <line x1="-8" y1="28" x2="-12" y2="46" stroke="#231f20" stroke-width="4" stroke-linecap="round"/>
+            <line x1="12" y1="28" x2="14" y2="46" stroke="#231f20" stroke-width="4" stroke-linecap="round"/>
+          </g>
+        </g>
+        <!-- right bird -->
+        <g class="bob2">
+          <g transform="translate(448 340) scale(-1 1)">
+            <polygon points="-40,-4 -74,-30 -70,12" fill="#231f20"/>
+            <ellipse rx="42" ry="28" fill="#e9b52c" stroke="#231f20" stroke-width="4"/>
+            <path d="M-20 -4 A22 22 0 0 0 24 -4 Z" fill="#1f9aa5" stroke="#231f20" stroke-width="3"/>
+            <circle cx="36" cy="-24" r="18" fill="#e9b52c" stroke="#231f20" stroke-width="4"/>
+            <circle cx="42" cy="-27" r="6" fill="#f5ecd7" stroke="#231f20" stroke-width="2.5"/>
+            <circle cx="43" cy="-27" r="2.6" fill="#231f20"/>
+            <polygon points="52,-26 70,-20 52,-14" fill="#e0457b" stroke="#231f20" stroke-width="3" stroke-linejoin="round"/>
+            <line x1="-6" y1="26" x2="-10" y2="44" stroke="#231f20" stroke-width="4" stroke-linecap="round"/>
+            <line x1="10" y1="26" x2="12" y2="44" stroke="#231f20" stroke-width="4" stroke-linecap="round"/>
+          </g>
+        </g>
+        <!-- hearts -->
+        <use href="#heart" transform="translate(80 110) scale(.8)" fill="#e0457b" stroke="#231f20" stroke-width="3"/>
+        <use href="#heart" transform="translate(484 116) scale(.6) rotate(12)" fill="#f5ecd7" stroke="#231f20" stroke-width="3"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<svg class="band" height="22" aria-hidden="true"><rect width="100%" height="22" fill="url(#zigzag)"/></svg>
+
+<section class="trusted" id="customers">
+  <div class="wrap">
+    <p>Trusted by 140+ mid-sized manufacturers who'd rather make things than chase things</p>
+    <div class="logos">
+      <span><b style="background:#e0457b;border-radius:50%"></b>Northgate Castings</span>
+      <span><b style="background:#e9b52c;transform:rotate(45deg)"></b>Hollis &amp; Pike</span>
+      <span><b style="background:#1f9aa5"></b>Verda Pumps</span>
+      <span><b style="background:#f28a2e;border-radius:50% 50% 0 0"></b>Ohlmann Tooling</span>
+      <span><b style="background:#c8352b;border-radius:50%"></b>Brightwater Motors</span>
+      <span><b style="background:#7a8b3a;border-radius:6px"></b>Sable Creek Plastics</span>
+    </div>
+  </div>
+</section>
+
+<svg class="band" height="96" aria-hidden="true"><rect width="100%" height="96" fill="url(#textile)"/></svg>
+
+<section class="problem">
+  <div class="wrap">
+    <div>
+      <h2>A custom widget passes through <em>eleven hands</em> before it reaches your line.</h2>
+      <p>Engineering picks the spec. Purchasing emails the supplier. The supplier's PDF gets forwarded twice. Someone updates a spreadsheet, someone else doesn't. By the time a pallet goes missing, nobody can say which version of the drawing it was built to.</p>
+      <p>Acme puts every one of those hands on the same page, so the widget you designed is the widget that arrives.</p>
+    </div>
+    <div class="hands" aria-label="Steps a widget passes through">
+      <div class="hand"><strong>1</strong>Engineer</div>
+      <div class="hand"><strong>2</strong>Planner</div>
+      <div class="hand"><strong>3</strong>Buyer</div>
+      <div class="hand"><strong>4</strong>Approver</div>
+      <div class="hand"><strong>5</strong>Supplier</div>
+      <div class="hand"><strong>6</strong>Machinist</div>
+      <div class="hand"><strong>7</strong>QA</div>
+      <div class="hand"><strong>8</strong>Packer</div>
+      <div class="hand"><strong>9</strong>Carrier</div>
+      <div class="hand"><strong>10</strong>Receiving</div>
+      <div class="hand"><strong>11</strong>Line lead</div>
+      <div class="hand lost"><strong>?</strong>That one email</div>
+    </div>
+  </div>
+</section>
+
+<section class="pillars" id="platform">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>One platform, three happy habits.</h2>
+      <p>Acme follows a widget from the first sketch to the final signature, with the craft of a good workshop and the rigor of a good audit trail.</p>
+    </div>
+    <div class="cards">
+      <article class="card" style="--c:var(--pink)">
+        <span class="tag">Configure</span>
+        <svg class="icon" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="54" fill="#e0457b" stroke="#231f20" stroke-width="3"/>
+          <g fill="#f5ecd7" stroke="#231f20" stroke-width="2.5">
+            <circle cx="60" cy="30" r="13"/><circle cx="90" cy="60" r="13"/><circle cx="60" cy="90" r="13"/><circle cx="30" cy="60" r="13"/>
+          </g>
+          <circle cx="60" cy="60" r="16" fill="#e9b52c" stroke="#231f20" stroke-width="3"/>
+          <circle cx="60" cy="60" r="5" fill="#231f20"/>
+          <g fill="#1f9aa5"><circle cx="60" cy="30" r="5"/><circle cx="90" cy="60" r="5"/><circle cx="60" cy="90" r="5"/><circle cx="30" cy="60" r="5"/></g>
+        </svg>
+        <h3>Configure</h3>
+        <p>Build any widget from your approved options: material, thread pitch, finish, tolerance. Acme flags combinations your suppliers can't make before anyone hits send.</p>
+        <ul>
+          <li>Rule-based configurator with live pricing</li>
+          <li>Drawing revisions locked to every order</li>
+          <li>Reusable templates for your top 200 parts</li>
+        </ul>
+      </article>
+      <article class="card" style="--c:var(--orange)">
+        <span class="tag">Order</span>
+        <svg class="icon" viewBox="0 0 120 120" aria-hidden="true">
+          <rect x="8" y="8" width="104" height="104" rx="26" fill="#f28a2e" stroke="#231f20" stroke-width="3"/>
+          <use href="#heart" transform="translate(60 56) scale(1.5)" fill="#c8352b" stroke="#231f20" stroke-width="2"/>
+          <path d="M40 58 L54 70 L80 46" stroke="#f5ecd7" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h3>Order</h3>
+        <p>Send the right spec to the right supplier in a click. Quotes, approvals and purchase orders flow through one thread instead of forty inboxes.</p>
+        <ul>
+          <li>Side-by-side supplier quotes</li>
+          <li>Approval chains that match your org chart</li>
+          <li>POs synced to SAP, NetSuite, Epicor and Plex</li>
+        </ul>
+      </article>
+      <article class="card" style="--c:var(--teal)">
+        <span class="tag">Track</span>
+        <svg class="icon" viewBox="0 0 120 120" aria-hidden="true">
+          <circle cx="60" cy="60" r="54" fill="#1f9aa5" stroke="#231f20" stroke-width="3"/>
+          <path d="M20 84 Q40 40 60 64 T100 36" fill="none" stroke="#f5ecd7" stroke-width="4" stroke-dasharray="3 8" stroke-linecap="round"/>
+          <circle cx="20" cy="84" r="8" fill="#e9b52c" stroke="#231f20" stroke-width="2.5"/>
+          <g transform="translate(92 38)">
+            <polygon points="-14,0 -26,-10 -24,8" fill="#231f20"/>
+            <ellipse rx="16" ry="11" fill="#e0457b" stroke="#231f20" stroke-width="2.5"/>
+            <circle cx="12" cy="-8" r="8" fill="#e0457b" stroke="#231f20" stroke-width="2.5"/>
+            <circle cx="14" cy="-9" r="2" fill="#231f20"/>
+            <polygon points="19,-9 27,-6 19,-3" fill="#e9b52c"/>
+          </g>
+        </svg>
+        <h3>Track</h3>
+        <p>Watch every batch move from supplier floor to your receiving dock. When a shipment slips, Acme tells you before your line lead has to.</p>
+        <ul>
+          <li>Live milestones from 60+ carriers</li>
+          <li>Early warnings on late or short shipments</li>
+          <li>Certificates of conformance, filed automatically</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<svg class="band" height="22" aria-hidden="true" style="background:#1f9aa5"><rect width="100%" height="22" fill="url(#zigzag)" transform="scale(1 -1) translate(0 -22)"/></svg>
+
+<section class="steps" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>From kickoff to <em>first order</em> in about six weeks.</h2>
+      <p>No big-bang rollout. We start with one plant and one product family, then grow at your pace.</p>
+    </div>
+    <div class="step-row">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Bring your parts</h3>
+        <p>Share your widget catalog and a few drawings. We'll turn them into configurable templates, usually within ten days.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Invite suppliers</h3>
+        <p>Your vendors get a free, simple portal. No new software on their side, just a link and a login.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Connect your ERP</h3>
+        <p>Our integration team wires Acme to your purchasing system so POs and receipts stay in sync both ways.</p>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <h3>Place the first order</h3>
+        <p>Your team configures, orders and tracks a real widget, with an Acme specialist beside them the whole way.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<svg class="band" height="60" aria-hidden="true"><rect width="100%" height="60" fill="url(#textile2)"/></svg>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat">
+      <svg width="220" height="220" viewBox="0 0 220 220" aria-hidden="true"><circle cx="110" cy="110" r="100" fill="#f4b6c2"/></svg>
+      <div class="big">38%</div>
+      <p>fewer expedite fees in the first year, on average across Acme customers</p>
+    </div>
+    <div class="stat">
+      <svg width="220" height="220" viewBox="0 0 220 220" aria-hidden="true"><rect x="20" y="20" width="180" height="180" rx="40" fill="#e9b52c" transform="rotate(8 110 110)"/></svg>
+      <div class="big">4.2<span style="font-size:.5em">d</span></div>
+      <p>shaved off the average quote-to-PO cycle for custom widgets</p>
+    </div>
+    <div class="stat">
+      <svg width="220" height="220" viewBox="0 0 220 220" aria-hidden="true"><polygon points="110,6 200,58 200,162 110,214 20,162 20,58" fill="#1f9aa5" opacity=".7"/></svg>
+      <div class="big">0</div>
+      <p>spreadsheets named "FINAL_v7" left in the shared drive (we checked)</p>
+    </div>
+  </div>
+</section>
+
+<section class="quote">
+  <div class="wrap">
+    <div class="quote-box">
+      <svg viewBox="0 0 320 320" aria-hidden="true">
+        <rect x="4" y="4" width="312" height="312" rx="36" fill="#1f9aa5" stroke="#231f20" stroke-width="4"/>
+        <g fill="#f5ecd7" opacity=".4"><circle cx="40" cy="40" r="6"/><circle cx="280" cy="40" r="6"/><circle cx="40" cy="280" r="6"/><circle cx="280" cy="280" r="6"/></g>
+        <!-- hair -->
+        <path d="M80 170 Q70 70 160 62 Q250 70 240 170 Q250 230 230 250 L90 250 Q70 230 80 170 Z" fill="#231f20"/>
+        <!-- neck & body -->
+        <rect x="140" y="220" width="40" height="40" fill="#b86b3e"/>
+        <path d="M70 316 Q80 250 160 248 Q240 250 250 316 Z" fill="#e0457b" stroke="#231f20" stroke-width="4"/>
+        <g fill="#e9b52c"><circle cx="120" cy="290" r="7"/><circle cx="160" cy="298" r="7"/><circle cx="200" cy="290" r="7"/></g>
+        <!-- face -->
+        <ellipse cx="160" cy="160" rx="66" ry="76" fill="#c98150" stroke="#231f20" stroke-width="4"/>
+        <path d="M96 140 Q120 90 170 96 Q210 100 226 136 Q200 110 160 118 Q120 122 96 140 Z" fill="#231f20"/>
+        <ellipse cx="134" cy="160" rx="12" ry="7" fill="#f5ecd7" stroke="#231f20" stroke-width="3"/>
+        <ellipse cx="186" cy="160" rx="12" ry="7" fill="#f5ecd7" stroke="#231f20" stroke-width="3"/>
+        <circle cx="134" cy="160" r="4" fill="#231f20"/><circle cx="186" cy="160" r="4" fill="#231f20"/>
+        <path d="M160 166 L152 190 L164 190" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="118" cy="190" r="11" fill="#e0457b" opacity=".75"/><circle cx="202" cy="190" r="11" fill="#e0457b" opacity=".75"/>
+        <path d="M138 206 Q160 224 182 206" stroke="#c8352b" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <!-- earrings -->
+        <polygon points="92,190 100,206 84,206" fill="#e9b52c" stroke="#231f20" stroke-width="2.5"/>
+        <polygon points="228,190 236,206 220,206" fill="#e9b52c" stroke="#231f20" stroke-width="2.5"/>
+        <!-- flower -->
+        <g transform="translate(230 96)">
+          <g fill="#f28a2e" stroke="#231f20" stroke-width="2.5">
+            <circle cx="0" cy="-14" r="10"/><circle cx="14" cy="0" r="10"/><circle cx="0" cy="14" r="10"/><circle cx="-14" cy="0" r="10"/>
+          </g>
+          <circle r="8" fill="#e9b52c" stroke="#231f20" stroke-width="2.5"/>
+        </g>
+      </svg>
+      <div>
+        <blockquote>We used to find out a widget order was late when the line stopped. Now Acme pings us three days early, and we fix it over coffee instead of over the weekend.</blockquote>
+        <cite>Dana Okafor<span>Director of Operations, Northgate Castings · 4 plants, 2,300 active widget SKUs</span></cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<svg class="band" height="22" aria-hidden="true" style="background:#e0457b"><rect width="100%" height="22" fill="url(#zigzag)" transform="scale(1 -1) translate(0 -22)"/></svg>
+
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="intro">
+      <h2>Let's build <em>your</em> first widget together.</h2>
+      <p>In 30 minutes, a product specialist (a real person who has worked on a plant floor) will walk through a widget from your own catalog, live.</p>
+      <ul>
+        <li><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="#e9b52c" stroke="#231f20" stroke-width="2.5"/><path d="M8 14l4 4 8-8" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>See your own part configured in Acme</li>
+        <li><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="#e9b52c" stroke="#231f20" stroke-width="2.5"/><path d="M8 14l4 4 8-8" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Get a rollout plan sized to your plants</li>
+        <li><svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="#e9b52c" stroke="#231f20" stroke-width="2.5"/><path d="M8 14l4 4 8-8" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Walk away with transparent pricing, no haggling</li>
+      </ul>
+    </div>
+
+    <form id="demoForm" novalidate>
+      <div class="fields">
+        <h3>Book your demo</h3>
+        <p class="sub">Pick a time that suits you. We'll send a calendar invite within the hour.</p>
+        <div class="row">
+          <label>Your name<input type="text" name="name" autocomplete="name" required placeholder="Dana Okafor"></label>
+          <label>Work email<input type="email" name="email" autocomplete="email" required placeholder="dana@northgate.com"></label>
+        </div>
+        <div class="row">
+          <label>Company<input type="text" name="company" autocomplete="organization" required placeholder="Northgate Castings"></label>
+          <label>Number of plants
+            <select name="plants">
+              <option>1 plant</option>
+              <option selected>2–5 plants</option>
+              <option>6–15 plants</option>
+              <option>16+ plants</option>
+            </select>
+          </label>
+        </div>
+        <fieldset>
+          <legend>Preferred time (your local time)</legend>
+          <div class="slots">
+            <label><input type="radio" name="slot" value="Tue 9:00 AM" checked><span>Tue 9:00 AM</span></label>
+            <label><input type="radio" name="slot" value="Tue 1:30 PM"><span>Tue 1:30 PM</span></label>
+            <label><input type="radio" name="slot" value="Wed 11:00 AM"><span>Wed 11:00 AM</span></label>
+            <label><input type="radio" name="slot" value="Thu 10:00 AM"><span>Thu 10:00 AM</span></label>
+            <label><input type="radio" name="slot" value="Thu 3:00 PM"><span>Thu 3:00 PM</span></label>
+            <label><input type="radio" name="slot" value="Fri 9:30 AM"><span>Fri 9:30 AM</span></label>
+          </div>
+        </fieldset>
+        <p class="err" id="err">Please add your name, company and a valid work email so we know where to send the invite.</p>
+        <button type="submit" class="btn">Book my demo</button>
+        <p class="fine">No spam, no hard sell. We only use your details to schedule this call.</p>
+      </div>
+      <div class="thanks" role="status" aria-live="polite">
+        <svg viewBox="0 0 150 150" aria-hidden="true">
+          <g fill="#f28a2e" stroke="#231f20" stroke-width="2.5">
+            <polygon points="75,4 84,28 66,28"/><polygon points="75,146 84,122 66,122"/>
+            <polygon points="4,75 28,66 28,84"/><polygon points="146,75 122,66 122,84"/>
+            <polygon points="24,24 44,34 34,44"/><polygon points="126,126 106,116 116,106"/>
+            <polygon points="126,24 116,44 106,34"/><polygon points="24,126 34,106 44,116"/>
+          </g>
+          <circle cx="75" cy="75" r="42" fill="#e9b52c" stroke="#231f20" stroke-width="3"/>
+          <path d="M58 70 Q64 62 70 70" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M80 70 Q86 62 92 70" stroke="#231f20" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="56" cy="84" r="6" fill="#e0457b"/><circle cx="94" cy="84" r="6" fill="#e0457b"/>
+          <path d="M62 88 Q75 102 88 88" stroke="#c8352b" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </svg>
+        <h3>You're on the calendar!</h3>
+        <p id="thanksMsg">We'll send an invite shortly.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<svg class="band" height="22" aria-hidden="true"><rect width="100%" height="22" fill="url(#zigzagInk)"/></svg>
+
+<footer>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <g fill="#f28a2e">
+          <polygon points="24,0 28,10 20,10"/><polygon points="24,48 28,38 20,38"/>
+          <polygon points="0,24 10,20 10,28"/><polygon points="48,24 38,20 38,28"/>
+        </g>
+        <circle cx="24" cy="24" r="12" fill="#e9b52c"/>
+      </svg>
+      Acme
+    </a>
+    <ul>
+      <li><a href="#platform">Platform</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#customers">Customers</a></li>
+      <li><a href="#demo">Book a demo</a></li>
+    </ul>
+    <small>© 2025 Acme Widget Co. Made with care in Grand Rapids, Michigan.</small>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    const form = document.getElementById('demoForm');
+    const err = document.getElementById('err');
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const company = form.company.value.trim();
+      const ok = name && company && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if(!ok){
+        err.style.display = 'block';
+        [form.name, form.email, form.company].forEach(function(el){
+          el.style.borderColor = el.value.trim() ? '' : '#c8352b';
+        });
+        return;
+      }
+      err.style.display = 'none';
+      const slot = form.querySelector('input[name="slot"]:checked').value;
+      const first = name.split(' ')[0];
+      document.getElementById('thanksMsg').textContent =
+        'Thanks, ' + first + '. We\u2019ve pencilled in ' + slot + ' for ' + company +
+        '. A calendar invite is on its way to ' + email + '. Bring a widget drawing if you have one handy!';
+      form.classList.add('sent');
+    });
+    ['name','email','company'].forEach(function(n){
+      form[n].addEventListener('input', function(){ this.style.borderColor=''; });
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme: Stop herding widgets by email</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&family=Shrikhand&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111;
+    --paper:#FFFBEA;
+    --yellow:#F4FF3A;
+    --pink:#FF3EA5;
+    --blue:#2B4BFF;
+    --orange:#FF6B1A;
+    --mint:#3DF2B0;
+    --lilac:#C9A7FF;
+    --b:3px solid var(--ink);
+    --shadow:6px 6px 0 var(--ink);
+    --shadow-lg:10px 10px 0 var(--ink);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"DM Sans",system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    font-size:18px;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  a{color:inherit}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 40px;position:relative}
+  .display{font-family:"Archivo Black",sans-serif;line-height:.95;letter-spacing:-.02em}
+  .mono{font-family:"Space Mono",monospace}
+  .script{font-family:"Shrikhand",cursive;font-weight:400}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:"Archivo Black",sans-serif;font-size:18px;
+    padding:18px 28px;border:var(--b);border-radius:999px;
+    background:var(--pink);color:var(--ink);text-decoration:none;
+    box-shadow:var(--shadow);cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, background .2s;
+  }
+  .btn:hover{transform:translate(-2px,-2px) rotate(-1.5deg);box-shadow:9px 9px 0 var(--ink)}
+  .btn:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
+  .btn:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible{outline:4px dashed var(--blue);outline-offset:4px}
+  .btn.ghost{background:#fff}
+  .btn.yellow{background:var(--yellow)}
+  .btn .arrow{display:inline-block;transition:transform .2s}
+  .btn:hover .arrow{transform:translateX(5px) rotate(-20deg)}
+
+  /* ---------- Marquee ---------- */
+  .marquee{
+    background:var(--ink);color:var(--yellow);
+    overflow:hidden;white-space:nowrap;border-bottom:var(--b);
+    font-family:"Space Mono",monospace;font-weight:700;font-size:14px;letter-spacing:.08em;
+    padding:10px 0;
+  }
+  .marquee-track{display:inline-block;animation:scroll 38s linear infinite}
+  .marquee span{margin:0 22px}
+  .marquee .star{color:var(--pink)}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- Nav ---------- */
+  nav{padding:22px 0;border-bottom:var(--b);background:var(--yellow);position:relative;z-index:5}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo-word{font-family:"Archivo Black";font-size:34px;letter-spacing:-.04em}
+  .logo-word span{display:inline-block}
+  .logo-word span:nth-child(2){transform:rotate(-8deg) translateY(-3px);color:var(--pink);-webkit-text-stroke:1.5px var(--ink)}
+  .logo-word span:nth-child(3){transform:rotate(6deg)}
+  .logo-word span:nth-child(4){transform:translateY(3px) rotate(-4deg);color:var(--blue)}
+  .logo svg{animation:spin 9s linear infinite}
+  .nav-links{display:flex;gap:34px;list-style:none;font-weight:700}
+  .nav-links a{text-decoration:none;position:relative}
+  .nav-links a::after{content:"";position:absolute;left:-4px;right:-4px;bottom:-2px;height:10px;background:var(--pink);z-index:-1;transform:scaleX(0) skewX(-12deg);transform-origin:left;transition:transform .2s}
+  .nav-links a:hover::after{transform:scaleX(1) skewX(-12deg)}
+  nav .btn{padding:12px 22px;font-size:16px;box-shadow:4px 4px 0 var(--ink)}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:var(--yellow);
+    background-image:radial-gradient(var(--ink) 1.2px, transparent 1.4px);
+    background-size:22px 22px;
+    border-bottom:var(--b);
+    padding:80px 0 110px;
+    position:relative;overflow:hidden;
+  }
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+  .eyebrow{
+    display:inline-block;background:#fff;border:var(--b);padding:6px 14px;border-radius:999px;
+    font-family:"Space Mono";font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    transform:rotate(-2deg);box-shadow:3px 3px 0 var(--ink);margin-bottom:26px;
+  }
+  .eyebrow .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--mint);border:2px solid var(--ink);margin-right:8px;vertical-align:-1px;animation:blink 1.2s infinite}
+  @keyframes blink{50%{background:var(--pink)}}
+  h1{font-size:112px;margin-bottom:28px}
+  h1 .herd{
+    display:inline-block;background:var(--pink);color:#fff;padding:0 16px 6px;border:var(--b);
+    transform:rotate(-3deg);box-shadow:var(--shadow);-webkit-text-stroke:2px var(--ink);
+  }
+  h1 .email{position:relative;display:inline-block}
+  h1 .email::after{
+    content:"";position:absolute;left:-6px;right:-6px;top:52%;height:14px;background:var(--blue);
+    transform:rotate(-4deg);border-radius:4px;animation:strike 1s .8s both cubic-bezier(.7,0,.3,1);transform-origin:left;
+  }
+  @keyframes strike{from{transform:rotate(-4deg) scaleX(0)}to{transform:rotate(-4deg) scaleX(1)}}
+  .hero-sub{font-size:22px;max-width:590px;margin-bottom:38px}
+  .hero-sub code{font-family:"Space Mono";font-size:17px;background:#fff;border:2px solid var(--ink);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  .hero-ctas{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .micro{font-family:"Space Mono";font-size:13px;margin-top:22px;display:flex;gap:18px}
+  .micro span::before{content:"✓ ";color:var(--pink);font-weight:700}
+
+  .hero-art{position:relative;height:560px}
+  .big-gear{position:absolute;right:-80px;top:-40px;width:420px;animation:spin 24s linear infinite}
+  .small-gear{position:absolute;right:250px;top:300px;width:170px;animation:spin 12s linear infinite reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .track-card{
+    position:absolute;left:10px;top:70px;width:420px;background:#fff;border:var(--b);border-radius:18px;
+    box-shadow:var(--shadow-lg);padding:22px;transform:rotate(-3deg);z-index:2;
+  }
+  .track-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .track-head .mono{font-size:12px;font-weight:700}
+  .pill{font-family:"Space Mono";font-size:11px;font-weight:700;padding:3px 9px;border:2px solid var(--ink);border-radius:999px;background:var(--mint)}
+  .track-card h3{font-family:"Archivo Black";font-size:26px;margin-bottom:4px}
+  .track-card .meta{font-size:14px;margin-bottom:18px;opacity:.75}
+  .steps{list-style:none;position:relative}
+  .steps::before{content:"";position:absolute;left:13px;top:10px;bottom:10px;width:3px;background:repeating-linear-gradient(var(--ink) 0 6px, transparent 6px 10px)}
+  .steps li{display:flex;align-items:center;gap:14px;padding:7px 0;font-weight:700;font-size:15px;position:relative}
+  .steps li i{
+    width:29px;height:29px;flex:none;border:3px solid var(--ink);border-radius:50%;background:#fff;
+    display:grid;place-items:center;font-style:normal;font-size:13px;z-index:1;transition:background .3s
+  }
+  .steps li.done i{background:var(--mint)}
+  .steps li.now i{background:var(--pink);animation:pulse 1s infinite}
+  .steps li.todo{opacity:.4}
+  .steps li small{margin-left:auto;font-family:"Space Mono";font-size:11px;font-weight:400}
+  @keyframes pulse{50%{transform:scale(1.18)}}
+
+  .sticker{
+    position:absolute;border:var(--b);box-shadow:var(--shadow);font-family:"Archivo Black";z-index:3;text-align:center;
+  }
+  .sticker.round{
+    width:170px;height:170px;border-radius:50%;background:var(--orange);display:grid;place-items:center;
+    right:10px;top:340px;font-size:17px;line-height:1.05;padding:18px;transform:rotate(12deg);
+    animation:wobble 3s ease-in-out infinite;
+  }
+  @keyframes wobble{50%{transform:rotate(-6deg) scale(1.05)}}
+  .sticker.tape{
+    background:var(--lilac);padding:10px 18px;left:230px;top:20px;transform:rotate(7deg);font-size:15px;
+  }
+  .googly{position:absolute;left:40px;top:430px;z-index:3;width:150px;transform:rotate(-8deg)}
+  .googly .pupil{transition:transform .08s linear}
+
+  /* ---------- Logos ---------- */
+  .logos{background:var(--ink);color:#fff;padding:34px 0;border-bottom:var(--b)}
+  .logos .wrap{display:flex;align-items:center;justify-content:space-between;gap:30px}
+  .logos p{font-family:"Space Mono";font-size:13px;max-width:180px;color:var(--yellow)}
+  .logo-list{display:flex;gap:46px;align-items:center;flex:1;justify-content:space-between}
+  .logo-list div{font-size:22px;opacity:.9;white-space:nowrap}
+  .l1{font-family:"Archivo Black";letter-spacing:-.03em}
+  .l2{font-family:"Shrikhand"}
+  .l3{font-family:"Space Mono";font-weight:700;letter-spacing:.2em}
+  .l4{font-family:"DM Sans";font-style:italic;font-weight:700}
+  .l5{font-family:"Archivo Black";text-transform:lowercase;color:var(--mint)}
+
+  /* ---------- Section headings ---------- */
+  section{position:relative}
+  .sec-pad{padding:120px 0}
+  .kicker{font-family:"Space Mono";font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;display:inline-block;padding:4px 10px;background:var(--ink);color:var(--yellow);transform:rotate(-1.5deg)}
+  h2{font-size:80px;margin-bottom:24px}
+  h2 .script{font-size:.85em;color:var(--pink);-webkit-text-stroke:2px var(--ink);letter-spacing:0;display:inline-block;transform:rotate(-4deg)}
+  .lead{font-size:21px;max-width:680px}
+
+  /* ---------- Old way / new way ---------- */
+  .versus{background:var(--paper)}
+  .versus-grid{display:grid;grid-template-columns:1fr 90px 1fr;gap:20px;margin-top:60px;align-items:stretch}
+  .messy{
+    background:#e9e3cf;border:var(--b);border-radius:20px;min-height:470px;position:relative;overflow:hidden;
+    background-image:linear-gradient(90deg, rgba(0,0,0,.05) 1px, transparent 1px),linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px);background-size:30px 30px;
+  }
+  .messy .label, .clean .label{position:absolute;top:18px;left:20px;font-family:"Archivo Black";font-size:26px;z-index:4}
+  .note{
+    position:absolute;padding:16px 18px;border:2px solid var(--ink);width:210px;font-size:15px;font-weight:700;line-height:1.3;
+    box-shadow:4px 4px 0 rgba(0,0,0,.8);cursor:grab;user-select:none;transition:box-shadow .15s;
+  }
+  .note:active{cursor:grabbing;box-shadow:10px 10px 0 rgba(0,0,0,.8)}
+  .note .mono{font-size:11px;font-weight:400;display:block;margin-top:6px;opacity:.7}
+  .n1{background:var(--yellow);left:30px;top:80px;transform:rotate(-7deg)}
+  .n2{background:var(--pink);left:250px;top:70px;transform:rotate(5deg);color:#fff}
+  .n3{background:#fff;left:70px;top:230px;transform:rotate(3deg);font-family:"Space Mono";font-size:13px}
+  .n4{background:var(--mint);left:310px;top:230px;transform:rotate(-4deg)}
+  .n5{background:var(--orange);left:170px;top:350px;transform:rotate(-10deg)}
+  .n6{background:var(--lilac);left:390px;top:370px;transform:rotate(9deg);width:170px}
+  .drag-hint{position:absolute;right:16px;top:22px;font-family:"Space Mono";font-size:12px;z-index:4}
+  .vs{display:grid;place-items:center}
+  .vs span{font-family:"Shrikhand";font-size:54px;color:var(--blue);-webkit-text-stroke:2px var(--ink);transform:rotate(-12deg);display:block}
+  .clean{background:#fff;border:var(--b);border-radius:20px;padding:80px 40px 40px;position:relative;box-shadow:var(--shadow-lg)}
+  .clean .label{color:var(--blue)}
+  .clean ul{list-style:none;display:grid;gap:18px}
+  .clean li{display:flex;gap:16px;align-items:flex-start;font-size:19px}
+  .clean li b{display:block;font-family:"Archivo Black";font-weight:400;font-size:20px}
+  .check{flex:none;width:34px;height:34px;border-radius:9px;border:var(--b);background:var(--mint);display:grid;place-items:center;font-weight:900;transform:rotate(-6deg)}
+  .clean li:nth-child(even) .check{background:var(--yellow);transform:rotate(5deg)}
+
+  /* ---------- Features ---------- */
+  .features{background:var(--blue);color:#fff;border-top:var(--b);border-bottom:var(--b);overflow:hidden}
+  .features h2{color:#fff;-webkit-text-stroke:0}
+  .features .kicker{background:var(--yellow);color:var(--ink)}
+  .features .lead{color:#dfe4ff}
+  .feat-grid{display:grid;grid-template-columns:1.35fr 1fr;grid-template-rows:auto auto;gap:30px;margin-top:60px}
+  .card{background:#fff;color:var(--ink);border:var(--b);border-radius:24px;box-shadow:var(--shadow-lg);padding:34px;position:relative}
+  .card .verb{position:absolute;top:-24px;left:28px;font-family:"Archivo Black";font-size:20px;background:var(--yellow);border:var(--b);padding:6px 16px;border-radius:999px;transform:rotate(-4deg)}
+  .card h3{font-family:"Archivo Black";font-weight:400;font-size:34px;line-height:1;margin:10px 0 12px}
+  .card p{font-size:17px}
+  .config{grid-row:span 2;display:flex;flex-direction:column}
+  .config .verb{background:var(--pink)}
+  .config-body{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:22px;flex:1}
+  .preview{
+    background:var(--paper);border:var(--b);border-radius:18px;display:grid;place-items:center;position:relative;min-height:320px;
+    background-image:radial-gradient(rgba(0,0,0,.18) 1px, transparent 1.2px);background-size:16px 16px;
+  }
+  .preview svg{width:78%;height:auto;transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+  .preview .spec{position:absolute;bottom:10px;left:12px;right:12px;display:flex;justify-content:space-between;font-family:"Space Mono";font-size:12px;font-weight:700}
+  .controls{display:flex;flex-direction:column;gap:20px}
+  .ctrl-label{font-family:"Space Mono";font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;justify-content:space-between}
+  .seg{display:flex;gap:8px;flex-wrap:wrap}
+  .seg button{
+    font-family:"DM Sans";font-weight:700;font-size:15px;padding:9px 14px;border:2.5px solid var(--ink);border-radius:10px;background:#fff;cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);transition:transform .1s
+  }
+  .seg button:hover{transform:translate(-1px,-1px) rotate(-2deg)}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--yellow)}
+  .swatches{display:flex;gap:10px}
+  .swatches button{width:40px;height:40px;border-radius:50%;border:3px solid var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .15s}
+  .swatches button[aria-pressed="true"]{transform:scale(1.18) rotate(20deg);outline:3px solid var(--ink);outline-offset:3px}
+  input[type=range]{width:100%;accent-color:var(--pink);height:26px;cursor:pointer}
+  .quote-box{margin-top:auto;border:var(--b);border-radius:14px;padding:14px 16px;background:var(--yellow);display:flex;justify-content:space-between;align-items:center}
+  .quote-box strong{font-family:"Archivo Black";font-size:26px;font-weight:400;display:block;line-height:1}
+  .quote-box small{font-family:"Space Mono";font-size:11px}
+  .order .verb{background:var(--mint)}
+  .track .verb{background:var(--orange)}
+  .card .mini{margin-top:20px;border:2.5px solid var(--ink);border-radius:14px;overflow:hidden;font-size:14px}
+  .mini-row{display:grid;grid-template-columns:1.3fr .8fr .9fr;padding:10px 14px;border-bottom:2px solid var(--ink);align-items:center}
+  .mini-row:last-child{border-bottom:0}
+  .mini-row.head{background:var(--ink);color:#fff;font-family:"Space Mono";font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  .tag{font-family:"Space Mono";font-size:11px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:2px 8px;justify-self:start}
+  .tag.g{background:var(--mint)}.tag.y{background:var(--yellow)}.tag.p{background:var(--pink);color:#fff}
+  .map{margin-top:20px;border:2.5px solid var(--ink);border-radius:14px;background:#EAF8FF;height:150px;position:relative;overflow:hidden}
+  .map svg{width:100%;height:100%}
+  .truck{animation:drive 6s ease-in-out infinite alternate}
+  @keyframes drive{from{offset-distance:0%}to{offset-distance:100%}}
+  .feat-doodle{position:absolute;right:-60px;top:60px;width:260px;opacity:.9;animation:spin 30s linear infinite}
+
+  /* ---------- Stats ---------- */
+  .stats{background:var(--pink);border-bottom:var(--b);padding:90px 0}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+  .stat{background:#fff;border:var(--b);border-radius:20px;padding:30px 26px;box-shadow:var(--shadow)}
+  .stat:nth-child(1){transform:rotate(-2deg)}
+  .stat:nth-child(2){transform:rotate(1.5deg) translateY(16px);background:var(--yellow)}
+  .stat:nth-child(3){transform:rotate(-1deg)}
+  .stat:nth-child(4){transform:rotate(2.5deg) translateY(10px);background:var(--mint)}
+  .stat .num{font-family:"Archivo Black";font-size:76px;line-height:1;letter-spacing:-.04em}
+  .stat p{font-weight:700;margin-top:10px;font-size:17px;line-height:1.3}
+  .stat small{display:block;font-family:"Space Mono";font-size:11px;margin-top:10px;opacity:.7;font-weight:400}
+
+  /* ---------- Testimonial ---------- */
+  .testimonial{background:var(--paper);padding:130px 0;overflow:hidden}
+  .testimonial .wrap{display:grid;grid-template-columns:260px 1fr;gap:60px;align-items:center}
+  .avatar{width:260px;height:260px;border:var(--b);border-radius:50% 50% 50% 12px;background:var(--orange);box-shadow:var(--shadow-lg);position:relative;overflow:hidden;transform:rotate(-5deg)}
+  blockquote{font-family:"Archivo Black";font-size:52px;line-height:1.05;letter-spacing:-.02em;position:relative}
+  blockquote::before{content:"“";font-family:"Shrikhand";position:absolute;left:-60px;top:-40px;font-size:160px;color:var(--pink);-webkit-text-stroke:2px var(--ink)}
+  blockquote mark{background:var(--yellow);padding:0 8px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  cite{display:block;font-style:normal;margin-top:30px;font-size:18px}
+  cite b{font-family:"Archivo Black";font-weight:400}
+
+  /* ---------- Demo steps ---------- */
+  .demo{background:var(--mint);border-top:var(--b);border-bottom:var(--b)}
+  .step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:60px}
+  .step{background:#fff;border:var(--b);border-radius:22px;padding:34px 30px;box-shadow:var(--shadow);position:relative;transition:transform .2s}
+  .step:hover{transform:rotate(-2deg) translateY(-6px)}
+  .step .n{font-family:"Shrikhand";font-size:80px;line-height:1;color:var(--blue);-webkit-text-stroke:2px var(--ink);display:block;margin-bottom:10px}
+  .step:nth-child(2) .n{color:var(--pink)}
+  .step:nth-child(3) .n{color:var(--orange)}
+  .step h3{font-family:"Archivo Black";font-weight:400;font-size:26px;line-height:1.05;margin-bottom:10px}
+  .step p{font-size:17px}
+  .step .aside{font-family:"Space Mono";font-size:12px;margin-top:14px;display:block;opacity:.7}
+
+  /* ---------- FAQ ---------- */
+  .faq{background:var(--paper)}
+  .faq .wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:70px}
+  details{border:var(--b);border-radius:16px;background:#fff;margin-bottom:16px;box-shadow:4px 4px 0 var(--ink);overflow:hidden}
+  summary{list-style:none;cursor:pointer;padding:22px 26px;font-family:"Archivo Black";font-size:21px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+  summary::-webkit-details-marker{display:none}
+  summary .plus{flex:none;width:34px;height:34px;border:3px solid var(--ink);border-radius:50%;display:grid;place-items:center;background:var(--yellow);transition:transform .25s;font-family:"DM Sans";font-weight:700}
+  details[open] summary .plus{transform:rotate(135deg);background:var(--pink)}
+  details p{padding:0 26px 24px;font-size:17px;max-width:640px}
+
+  /* ---------- CTA / form ---------- */
+  .cta{background:var(--ink);color:#fff;padding:130px 0;overflow:hidden}
+  .cta .wrap{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+  .cta h2{font-size:96px;color:var(--yellow)}
+  .cta h2 .script{color:var(--pink);-webkit-text-stroke:0}
+  .cta .lead{color:#ddd}
+  .cta-list{list-style:none;margin-top:30px;display:grid;gap:12px;font-size:18px}
+  .cta-list li::before{content:"✺ ";color:var(--mint)}
+  form{background:var(--yellow);color:var(--ink);border:var(--b);border-radius:26px;padding:40px;box-shadow:12px 12px 0 var(--pink);transform:rotate(1.5deg);position:relative}
+  form h3{font-family:"Archivo Black";font-weight:400;font-size:32px;margin-bottom:22px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-family:"Space Mono";font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  .field input, .field select{
+    width:100%;font:inherit;font-size:17px;padding:14px 16px;border:var(--b);border-radius:12px;background:#fff;color:var(--ink);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  form .btn{width:100%;justify-content:center;margin-top:8px;font-size:20px}
+  .fine{font-size:13px;margin-top:14px;text-align:center}
+  .success{display:none;text-align:center;padding:40px 10px}
+  .success h3{font-size:42px}
+  form.sent .form-inner{display:none}
+  form.sent .success{display:block}
+  .form-sticker{position:absolute;top:-40px;right:-30px;width:120px;height:120px;border-radius:50%;background:var(--mint);border:var(--b);display:grid;place-items:center;text-align:center;font-family:"Archivo Black";font-size:14px;line-height:1.05;transform:rotate(14deg);box-shadow:var(--shadow);animation:wobble 2.6s ease-in-out infinite}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--yellow);border-top:var(--b);padding:50px 0 30px}
+  footer .wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+  .foot-big{font-family:"Archivo Black";font-size:150px;line-height:.8;letter-spacing:-.06em}
+  .foot-big span{display:inline-block;transition:transform .3s cubic-bezier(.3,1.8,.5,1)}
+  .foot-big span:hover{transform:translateY(-20px) rotate(-12deg);color:var(--pink)}
+  .foot-cols{display:flex;gap:60px;font-size:16px}
+  .foot-cols ul{list-style:none;display:grid;gap:6px}
+  .foot-cols h4{font-family:"Space Mono";font-size:12px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+  .foot-cols a{text-decoration:none}
+  .foot-cols a:hover{text-decoration:underline wavy var(--pink)}
+  .legal{font-family:"Space Mono";font-size:12px;margin-top:40px;display:flex;justify-content:space-between}
+
+  /* ---------- Click chaos ---------- */
+  .pop{position:fixed;pointer-events:none;z-index:9999;width:44px;height:44px;animation:pop .9s cubic-bezier(.2,.8,.3,1) forwards}
+  @keyframes pop{
+    0%{transform:translate(-50%,-50%) scale(0) rotate(0)}
+    40%{transform:translate(-50%,-80%) scale(1.2) rotate(90deg);opacity:1}
+    100%{transform:translate(-50%,-180%) scale(.6) rotate(220deg);opacity:0}
+  }
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:9998}
+
+  .reveal{opacity:0;transform:translateY(40px) rotate(-1deg);transition:opacity .6s, transform .6s cubic-bezier(.3,1.4,.5,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>BOOK A DEMO</span><span class="star">✺</span>
+    <span>NO FAX MACHINES WERE HARMED</span><span class="star">✺</span>
+    <span>2.3M WIDGETS TRACKED LAST YEAR</span><span class="star">✺</span>
+    <span>"JUST FOLLOWING UP" IS NOT A SUPPLY CHAIN STRATEGY</span><span class="star">✺</span>
+    <span>INTEGRATES WITH YOUR ERP, EVEN THE GRUMPY ONE</span><span class="star">✺</span>
+    <span>BOOK A DEMO</span><span class="star">✺</span>
+    <span>NO FAX MACHINES WERE HARMED</span><span class="star">✺</span>
+    <span>2.3M WIDGETS TRACKED LAST YEAR</span><span class="star">✺</span>
+    <span>"JUST FOLLOWING UP" IS NOT A SUPPLY CHAIN STRATEGY</span><span class="star">✺</span>
+    <span>INTEGRATES WITH YOUR ERP, EVEN THE GRUMPY ONE</span><span class="star">✺</span>
+  </div>
+</div>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg width="42" height="42" viewBox="0 0 100 100" aria-hidden="true"><path id="logoGear" fill="#FF3EA5" stroke="#111" stroke-width="6" stroke-linejoin="round"/><circle cx="50" cy="50" r="13" fill="#F4FF3A" stroke="#111" stroke-width="6"/></svg>
+      <span class="logo-word"><span>A</span><span>c</span><span>m</span><span>e</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#product">Product</a></li>
+      <li><a href="#proof">Customers</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a href="#book" class="btn">Book a demo <span class="arrow">→</span></a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Widget ops for mid-sized manufacturers</span>
+      <h1 class="display">Stop <span class="herd">herding</span> widgets by <span class="email">email.</span></h1>
+      <p class="hero-sub">Acme lets operations teams configure, order, and track custom widgets across the whole supply chain, without the spreadsheet named <code>FINAL_final_v7.xlsx</code>.</p>
+      <div class="hero-ctas">
+        <a href="#book" class="btn">Book a 30-min demo <span class="arrow">→</span></a>
+        <a href="#product" class="btn ghost">Poke the product</a>
+      </div>
+      <div class="micro"><span>Live in ~3 weeks</span><span>Plays nice with your ERP</span><span>Zero sales poetry</span></div>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <svg class="big-gear" viewBox="0 0 200 200"><path class="gear-fill" data-teeth="14" data-ro="96" data-ri="80" fill="#2B4BFF" stroke="#111" stroke-width="4" stroke-linejoin="round"/><circle cx="100" cy="100" r="34" fill="#F4FF3A" stroke="#111" stroke-width="4"/><circle cx="100" cy="100" r="12" fill="#111"/></svg>
+      <svg class="small-gear" viewBox="0 0 200 200"><path class="gear-fill" data-teeth="9" data-ro="96" data-ri="74" fill="#3DF2B0" stroke="#111" stroke-width="6" stroke-linejoin="round"/><circle cx="100" cy="100" r="28" fill="#fff" stroke="#111" stroke-width="6"/></svg>
+
+      <div class="track-card">
+        <div class="track-head"><span class="mono">ORDER #WX-4471</span><span class="pill">ON TIME</span></div>
+        <h3>2,400 × Hex Flange, M8</h3>
+        <div class="meta">Brindle Fasteners → Plant 3, Dayton OH</div>
+        <ul class="steps" id="heroSteps">
+          <li class="done"><i>✓</i>Configured<small>Mon 9:14</small></li>
+          <li class="done"><i>✓</i>Approved by Dave<small>Mon 9:31</small></li>
+          <li class="now"><i>•</i>In production<small>62%</small></li>
+          <li class="todo"><i></i>Shipped<small>ETA Thu</small></li>
+          <li class="todo"><i></i>Delivered<small>ETA Fri</small></li>
+        </ul>
+      </div>
+
+      <div class="sticker tape">Dave approved it in 17 min. Dave!</div>
+      <div class="sticker round">All the chaos is on this page. None in your supply chain.</div>
+
+      <svg class="googly" viewBox="0 0 160 150">
+        <path class="gear-fill" data-teeth="10" data-ro="70" data-ri="58" data-cx="80" data-cy="80" fill="#FF3EA5" stroke="#111" stroke-width="4" stroke-linejoin="round"/>
+        <circle cx="58" cy="72" r="17" fill="#fff" stroke="#111" stroke-width="4"/>
+        <circle cx="102" cy="72" r="17" fill="#fff" stroke="#111" stroke-width="4"/>
+        <circle class="pupil" cx="58" cy="72" r="7" fill="#111"/>
+        <circle class="pupil" cx="102" cy="72" r="7" fill="#111"/>
+        <path d="M62 100 Q80 116 98 100" fill="none" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<div class="logos" id="proof">
+  <div class="wrap">
+    <p>Ops teams at 400+ manufacturers stopped yelling at their inbox:</p>
+    <div class="logo-list">
+      <div class="l1">BRINDLE FASTENERS</div>
+      <div class="l2">Oakhurst Molding</div>
+      <div class="l3">PEMBERTON</div>
+      <div class="l4">Kessler &amp; Daughters</div>
+      <div class="l5">northbeam plastics</div>
+    </div>
+  </div>
+</div>
+
+<section class="versus sec-pad" id="how">
+  <div class="wrap">
+    <span class="kicker">The problem</span>
+    <h2 class="display">Your widget process is <span class="script">held together</span><br>by sticky notes and Dave.</h2>
+    <p class="lead">Custom widgets touch engineering, purchasing, three suppliers, and a guy on the loading dock. Right now the only thing connecting them is a reply-all chain.</p>
+
+    <div class="versus-grid">
+      <div class="messy reveal" id="messy">
+        <span class="label">The old way</span>
+        <span class="drag-hint">(go on, drag them around)</span>
+        <div class="note n1">Did Dave approve the flange spec?? He says yes. Email says no.<span class="mono">— sticky, Tuesday</span></div>
+        <div class="note n2">Supplier voicemail #6: "we never got the revised drawing"</div>
+        <div class="note n3">PO_4471_REVISED_v3_<br>USE_THIS_ONE.pdf</div>
+        <div class="note n4">Spreadsheet: 14 tabs, 3 circular references, 1 tab called "DONT TOUCH"</div>
+        <div class="note n5">Where. Is. Order. 4471.</div>
+        <div class="note n6">Expedite fee: $2,800 (again)</div>
+      </div>
+
+      <div class="vs" aria-hidden="true"><span>vs.</span></div>
+
+      <div class="clean reveal">
+        <span class="label">The Acme way</span>
+        <ul>
+          <li><span class="check">✓</span><div><b>One spec, one source of truth</b>Configure the widget once. Engineering, purchasing, and suppliers all see the same version.</div></li>
+          <li><span class="check">✓</span><div><b>Approvals in a click, not a meeting</b>Routing rules send orders to the right person. Dave gets a button. Dave loves the button.</div></li>
+          <li><span class="check">✓</span><div><b>Every order, tracked live</b>From configured to delivered, across every supplier and plant, on one screen.</div></li>
+          <li><span class="check">✓</span><div><b>Problems show up early</b>Delays flag themselves days ahead, so you're not paying for overnight freight on Friday.</div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features sec-pad" id="product">
+  <svg class="feat-doodle" viewBox="0 0 200 200" aria-hidden="true"><path class="gear-fill" data-teeth="18" data-ro="96" data-ri="84" fill="none" stroke="#F4FF3A" stroke-width="4" stroke-dasharray="8 8"/></svg>
+  <div class="wrap">
+    <span class="kicker">The product</span>
+    <h2 class="display">Three verbs.<br>That's the whole thing.</h2>
+    <p class="lead">Configure, order, track. We made them fast, obvious, and slightly fun, which is a lot to ask of widgets.</p>
+
+    <div class="feat-grid">
+      <div class="card config reveal">
+        <span class="verb">1. Configure</span>
+        <h3>Build the widget. See the price. Instantly.</h3>
+        <p>Spec custom widgets with rules your engineers set up, so nobody orders a 4-tooth gear that can't exist. Try it:</p>
+        <div class="config-body">
+          <div class="preview">
+            <svg id="widgetSvg" viewBox="0 0 200 200" role="img" aria-label="Preview of your configured widget">
+              <path id="widgetPath" stroke="#111" stroke-width="5" stroke-linejoin="round"/>
+              <circle id="widgetHole" cx="100" cy="100" r="22" fill="#FFFBEA" stroke="#111" stroke-width="5"/>
+            </svg>
+            <div class="spec"><span id="specName">GEAR-16-PK</span><span id="specSize">Ø 40mm</span></div>
+          </div>
+          <div class="controls">
+            <div>
+              <div class="ctrl-label">Shape</div>
+              <div class="seg" id="shapeSeg">
+                <button type="button" data-shape="gear" aria-pressed="true">Gear</button>
+                <button type="button" data-shape="poly" aria-pressed="false">Polygon</button>
+                <button type="button" data-shape="star" aria-pressed="false">Star</button>
+              </div>
+            </div>
+            <div>
+              <div class="ctrl-label"><span>Teeth / sides</span><span id="teethVal">16</span></div>
+              <input type="range" id="teeth" min="5" max="28" value="16" aria-label="Number of teeth or sides">
+            </div>
+            <div>
+              <div class="ctrl-label">Finish</div>
+              <div class="swatches" id="swatches">
+                <button type="button" data-color="#FF3EA5" data-code="PK" style="background:#FF3EA5" aria-label="Hot pink" aria-pressed="true"></button>
+                <button type="button" data-color="#2B4BFF" data-code="BL" style="background:#2B4BFF" aria-label="Electric blue" aria-pressed="false"></button>
+                <button type="button" data-color="#3DF2B0" data-code="MT" style="background:#3DF2B0" aria-label="Mint" aria-pressed="false"></button>
+                <button type="button" data-color="#FF6B1A" data-code="OR" style="background:#FF6B1A" aria-label="Orange" aria-pressed="false"></button>
+                <button type="button" data-color="#B8B8B8" data-code="ZN" style="background:#B8B8B8" aria-label="Zinc" aria-pressed="false"></button>
+              </div>
+            </div>
+            <div>
+              <div class="ctrl-label">Size</div>
+              <div class="seg" id="sizeSeg">
+                <button type="button" data-size="30" aria-pressed="false">S</button>
+                <button type="button" data-size="40" aria-pressed="true">M</button>
+                <button type="button" data-size="60" aria-pressed="false">L</button>
+                <button type="button" data-size="90" aria-pressed="false">XL</button>
+              </div>
+            </div>
+            <div class="quote-box" aria-live="polite">
+              <div><small>UNIT PRICE @ 1,000</small><strong id="price">$1.84</strong></div>
+              <div style="text-align:right"><small>LEAD TIME</small><strong id="lead">9 days</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card order reveal">
+        <span class="verb">2. Order</span>
+        <h3>POs that route themselves.</h3>
+        <p>Approval rules, supplier selection, and ERP sync happen automatically. You press one button and go get coffee.</p>
+        <div class="mini">
+          <div class="mini-row head"><span>Order</span><span>Qty</span><span>Status</span></div>
+          <div class="mini-row"><span>Hex Flange M8</span><span>2,400</span><span class="tag g">Approved</span></div>
+          <div class="mini-row"><span>Spur Gear 16T</span><span>900</span><span class="tag y">With Dave</span></div>
+          <div class="mini-row"><span>Bracket, custom</span><span>1,150</span><span class="tag p">Quote in</span></div>
+        </div>
+      </div>
+
+      <div class="card track reveal">
+        <span class="verb">3. Track</span>
+        <h3>Know where every widget is. Right now.</h3>
+        <p>Live status from every supplier and carrier, with delay alerts days before they become your problem.</p>
+        <div class="map" aria-hidden="true">
+          <svg viewBox="0 0 400 150" preserveAspectRatio="none">
+            <path d="M0 110 Q60 90 110 110 T220 100 T400 90" fill="none" stroke="#9fd6f0" stroke-width="18"/>
+            <path id="route" d="M40 120 C 100 20, 180 140, 250 60 S 350 40, 370 40" fill="none" stroke="#111" stroke-width="4" stroke-dasharray="10 8"/>
+            <circle cx="40" cy="120" r="10" fill="#FF3EA5" stroke="#111" stroke-width="3"/>
+            <circle cx="370" cy="40" r="10" fill="#3DF2B0" stroke="#111" stroke-width="3"/>
+            <g class="truck" style="offset-path:path('M40 120 C 100 20, 180 140, 250 60 S 350 40, 370 40');offset-rotate:auto">
+              <rect x="-16" y="-10" width="24" height="20" rx="3" fill="#F4FF3A" stroke="#111" stroke-width="3"/>
+              <rect x="8" y="-6" width="10" height="16" rx="2" fill="#FF6B1A" stroke="#111" stroke-width="3"/>
+            </g>
+            <text x="46" y="143" font-family="Space Mono" font-size="12" font-weight="700">Brindle, OH</text>
+            <text x="290" y="24" font-family="Space Mono" font-size="12" font-weight="700">Plant 3</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat-grid">
+      <div class="stat reveal"><div class="num" data-count="61" data-suffix="%">0%</div><p>fewer "just following up" emails</p><small>Median, customers after 90 days</small></div>
+      <div class="stat reveal"><div class="num" data-count="4.2" data-suffix=" days" data-dec="1">0</div><p>shaved off average widget lead time</p><small>Turns out waiting for approvals was slow</small></div>
+      <div class="stat reveal"><div class="num" data-count="38" data-prefix="$" data-suffix="K">$0</div><p>saved per year on rush freight, on average</p><small>Buy your team something nice</small></div>
+      <div class="stat reveal"><div class="num" data-count="0">0</div><p>fax machines required</p><small>We checked. Twice.</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="testimonial">
+  <div class="wrap">
+    <div class="avatar reveal" aria-hidden="true">
+      <svg viewBox="0 0 260 260" width="100%" height="100%">
+        <rect width="260" height="260" fill="#FF6B1A"/>
+        <circle cx="130" cy="300" r="120" fill="#2B4BFF" stroke="#111" stroke-width="5"/>
+        <circle cx="130" cy="120" r="62" fill="#8a5a3c" stroke="#111" stroke-width="5"/>
+        <path d="M66 110 Q70 40 130 44 Q196 42 196 112 Q180 70 130 72 Q86 72 66 110Z" fill="#111"/>
+        <circle cx="108" cy="122" r="16" fill="#fff" stroke="#111" stroke-width="4"/>
+        <circle cx="152" cy="122" r="16" fill="#fff" stroke="#111" stroke-width="4"/>
+        <line x1="124" y1="122" x2="136" y2="122" stroke="#111" stroke-width="4"/>
+        <circle cx="110" cy="124" r="5" fill="#111"/><circle cx="154" cy="124" r="5" fill="#111"/>
+        <path d="M110 150 Q130 168 150 150" fill="none" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+        <path d="M50 40 l10 20 l20 4 l-16 12 l4 20 l-18 -10 l-18 10 l4 -20 l-16 -12 l20 -4z" fill="#F4FF3A" stroke="#111" stroke-width="3"/>
+      </svg>
+    </div>
+    <div class="reveal">
+      <blockquote>I used to spend every Monday figuring out where our widgets were. <mark>Now I spend Mondays complaining about normal things.</mark> Like Mondays.</blockquote>
+      <cite><b>Renata Okafor</b>, Director of Operations, Pemberton Hydraulics · 1,100 employees, 4 plants</cite>
+    </div>
+  </div>
+</section>
+
+<section class="demo sec-pad">
+  <div class="wrap">
+    <span class="kicker">The demo</span>
+    <h2 class="display">30 minutes. <span class="script">Actually</span> useful.</h2>
+    <p class="lead">No 40-slide deck about our founding story. Here's exactly what happens:</p>
+    <div class="step-grid">
+      <div class="step reveal">
+        <span class="n">1</span>
+        <h3>You tell us how you order widgets today.</h3>
+        <p>Spreadsheets, email, carrier pigeon: walk us through it. We've seen worse. Probably.</p>
+        <span class="aside">~8 minutes · judgment-free zone</span>
+      </div>
+      <div class="step reveal">
+        <span class="n">2</span>
+        <h3>We rebuild one of your real orders in Acme, live.</h3>
+        <p>Your widget, your suppliers, your approval chain. You'll see exactly what changes for your team.</p>
+        <span class="aside">~17 minutes · the fun part</span>
+      </div>
+      <div class="step reveal">
+        <span class="n">3</span>
+        <h3>You decide. We don't stalk you.</h3>
+        <p>Get a straight quote and rollout plan. No nine-email nurture sequence. Pinky promise.</p>
+        <span class="aside">~5 minutes · zero pressure</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq sec-pad" id="faq">
+  <div class="wrap">
+    <div>
+      <span class="kicker">Questions</span>
+      <h2 class="display">Things ops people ask us.</h2>
+      <p class="lead">Usually with their arms crossed. Fair enough.</p>
+    </div>
+    <div>
+      <details open>
+        <summary>Does it work with our ERP? <span class="plus">+</span></summary>
+        <p>Yes. We have native integrations with SAP Business One, NetSuite, Epicor, Microsoft Dynamics, and Plex, plus an API and flat-file sync for the homegrown system Gary built in 2009.</p>
+      </details>
+      <details>
+        <summary>How long does setup take? <span class="plus">+</span></summary>
+        <p>Most teams are live in about three weeks. We import your existing widget specs, suppliers, and approval rules, and your dedicated onboarding lead does the boring parts.</p>
+      </details>
+      <details>
+        <summary>Are we the right size for Acme? <span class="plus">+</span></summary>
+        <p>Acme is built for manufacturers with roughly 50 to 2,000 employees: big enough that widgets are chaos, small enough that you don't want a six-month enterprise implementation.</p>
+      </details>
+      <details>
+        <summary>Do our suppliers need to pay for it? <span class="plus">+</span></summary>
+        <p>Nope. Suppliers get a free portal to confirm orders, upload drawings, and post status updates. Most of them are relieved, honestly.</p>
+      </details>
+      <details>
+        <summary>Is my data safe? <span class="plus">+</span></summary>
+        <p>SOC 2 Type II, SSO, role-based permissions, and full audit trails. Your specs stay yours. We're chaotic in design only.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="book">
+  <div class="wrap">
+    <div>
+      <h2 class="display">Book a demo.<br><span class="script">Bring your worst spreadsheet.</span></h2>
+      <p class="lead">We'll show you what your widget process looks like when it isn't living in someone's inbox.</p>
+      <ul class="cta-list">
+        <li>30 minutes, on your calendar, this week</li>
+        <li>Built around one of your real orders</li>
+        <li>Straight pricing, no mystery quote</li>
+      </ul>
+    </div>
+    <form id="demoForm" novalidate>
+      <div class="form-sticker" aria-hidden="true">Takes 20 seconds!</div>
+      <div class="form-inner">
+        <h3>Let's untangle your widgets.</h3>
+        <div class="row2">
+          <div class="field"><label for="fname">Your name</label><input id="fname" name="name" autocomplete="name" placeholder="Renata Okafor" required></div>
+          <div class="field"><label for="company">Company</label><input id="company" name="company" autocomplete="organization" placeholder="Pemberton Hydraulics" required></div>
+        </div>
+        <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="renata@pemberton.com" required></div>
+        <div class="row2">
+          <div class="field"><label for="skus">Custom widget SKUs</label>
+            <select id="skus" name="skus">
+              <option>Under 50</option><option>50–250</option><option selected>250–1,000</option><option>1,000+</option><option>Honestly, no idea</option>
+            </select>
+          </div>
+          <div class="field"><label for="pain">Biggest headache</label>
+            <select id="pain" name="pain">
+              <option>Tracking orders</option><option>Approvals</option><option>Spec mistakes</option><option>Supplier chaos</option><option>All of the above</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn">Book my demo <span class="arrow">→</span></button>
+        <p class="fine" id="formMsg">We'll email you a calendar link within one business day. No spam, no newsletter ambush.</p>
+      </div>
+      <div class="success" aria-live="polite">
+        <h3 class="display">You're in! 🎉</h3>
+        <p style="font-size:19px;margin-top:14px">Check your inbox for a calendar link. Start warming up that spreadsheet.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-big" aria-label="Acme"><span>A</span><span>c</span><span>m</span><span>e</span><span style="color:var(--pink)">.</span></div>
+    <div class="foot-cols">
+      <div><h4>Product</h4><ul><li><a href="#product">Configure</a></li><li><a href="#product">Order</a></li><li><a href="#product">Track</a></li><li><a href="#faq">Integrations</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#proof">Customers</a></li><li><a href="#">Careers</a></li><li><a href="#">Security</a></li><li><a href="#book">Contact</a></li></ul></div>
+      <div><h4>Say hi</h4><ul><li><a href="mailto:hello@acme.example">hello@acme.example</a></li><li>Columbus, Ohio</li><li>Mostly sane since 2016</li></ul></div>
+    </div>
+  </div>
+  <div class="wrap legal"><span>© 2025 Acme Widget Systems, Inc.</span><span>Privacy · Terms · Click anywhere for a surprise</span></div>
+</footer>
+
+<canvas id="confetti"></canvas>
+
+<script>
+(() => {
+  const COLORS = ['#FF3EA5','#F4FF3A','#2B4BFF','#3DF2B0','#FF6B1A','#C9A7FF'];
+
+  // ---------- Shape generators ----------
+  function gearPath(cx, cy, teeth, ro, ri){
+    const step = Math.PI * 2 / teeth;
+    let d = '';
+    for (let i = 0; i < teeth; i++){
+      const a = i * step - Math.PI/2;
+      const pts = [
+        [a, ri], [a + step*0.18, ro], [a + step*0.5, ro], [a + step*0.68, ri]
+      ];
+      pts.forEach(([ang, r], j) => {
+        const x = (cx + Math.cos(ang) * r).toFixed(2), y = (cy + Math.sin(ang) * r).toFixed(2);
+        d += (i === 0 && j === 0 ? 'M' : 'L') + x + ' ' + y + ' ';
+      });
+    }
+    return d + 'Z';
+  }
+  function polyPath(cx, cy, n, r){
+    let d = '';
+    for (let i = 0; i < n; i++){
+      const a = i * Math.PI * 2 / n - Math.PI/2;
+      d += (i ? 'L' : 'M') + (cx + Math.cos(a)*r).toFixed(2) + ' ' + (cy + Math.sin(a)*r).toFixed(2) + ' ';
+    }
+    return d + 'Z';
+  }
+  function starPath(cx, cy, n, ro, ri){
+    let d = '';
+    for (let i = 0; i < n*2; i++){
+      const a = i * Math.PI / n - Math.PI/2, r = i % 2 ? ri : ro;
+      d += (i ? 'L' : 'M') + (cx + Math.cos(a)*r).toFixed(2) + ' ' + (cy + Math.sin(a)*r).toFixed(2) + ' ';
+    }
+    return d + 'Z';
+  }
+
+  document.getElementById('logoGear').setAttribute('d', gearPath(50, 50, 8, 46, 34));
+  document.querySelectorAll('.gear-fill').forEach(p => {
+    const cx = +(p.dataset.cx || 100), cy = +(p.dataset.cy || 100);
+    p.setAttribute('d', gearPath(cx, cy, +p.dataset.teeth, +p.dataset.ro, +p.dataset.ri));
+  });
+
+  // ---------- Googly eyes ----------
+  const pupils = document.querySelectorAll('.googly .pupil');
+  const googly = document.querySelector('.googly');
+  window.addEventListener('mousemove', e => {
+    if (!googly) return;
+    const r = googly.getBoundingClientRect();
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
+    const ang = Math.atan2(e.clientY - cy, e.clientX - cx);
+    const dist = Math.min(8, Math.hypot(e.clientX - cx, e.clientY - cy) / 30);
+    pupils.forEach(p => p.style.transform = `translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist}px)`);
+  });
+
+  // ---------- Hero tracking card progress ----------
+  const steps = [...document.querySelectorAll('#heroSteps li')];
+  const labels = ['Mon 9:14','Mon 9:31','Wed 2:05','Thu 7:40','Fri 11:02'];
+  let current = 2, pct = 62;
+  setInterval(() => {
+    const now = steps[current];
+    if (!now) return;
+    pct += 7;
+    if (pct >= 100){
+      now.className = 'done'; now.querySelector('i').textContent = '✓'; now.querySelector('small').textContent = labels[current];
+      current++; pct = 0;
+      if (current >= steps.length){
+        setTimeout(() => {
+          steps.forEach((s, i) => {
+            if (i < 2){ s.className = 'done'; }
+            else { s.className = i === 2 ? 'now' : 'todo'; s.querySelector('i').textContent = i === 2 ? '•' : ''; }
+          });
+          steps[2].querySelector('small').textContent = '12%';
+          steps[3].querySelector('small').textContent = 'ETA Thu';
+          steps[4].querySelector('small').textContent = 'ETA Fri';
+          current = 2; pct = 12;
+        }, 2500);
+        return;
+      }
+      steps[current].className = 'now'; steps[current].querySelector('i').textContent = '•';
+    }
+    if (steps[current]) steps[current].querySelector('small').textContent = pct + '%';
+  }, 700);
+
+  // ---------- Draggable notes ----------
+  const messy = document.getElementById('messy');
+  let z = 10;
+  messy.querySelectorAll('.note').forEach(note => {
+    note.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      note.setPointerCapture(e.pointerId);
+      note.style.zIndex = ++z;
+      const startX = e.clientX, startY = e.clientY;
+      const left = note.offsetLeft, top = note.offsetTop;
+      const rot = (Math.random()*20 - 10).toFixed(1);
+      const move = ev => {
+        const maxX = messy.clientWidth - note.offsetWidth, maxY = messy.clientHeight - note.offsetHeight;
+        note.style.left = Math.max(0, Math.min(maxX, left + ev.clientX - startX)) + 'px';
+        note.style.top = Math.max(50, Math.min(maxY, top + ev.clientY - startY)) + 'px';
+        note.style.transform = `rotate(${rot}deg) scale(1.05)`;
+      };
+      const up = () => {
+        note.style.transform = `rotate(${rot}deg)`;
+        note.removeEventListener('pointermove', move);
+        note.removeEventListener('pointerup', up);
+      };
+      note.addEventListener('pointermove', move);
+      note.addEventListener('pointerup', up);
+    });
+  });
+
+  // ---------- Configurator ----------
+  const state = { shape:'gear', teeth:16, color:'#FF3EA5', code:'PK', size:40 };
+  const wPath = document.getElementById('widgetPath'), wSvg = document.getElementById('widgetSvg');
+  const teethIn = document.getElementById('teeth');
+  function renderWidget(spin){
+    let d;
+    if (state.shape === 'gear') d = gearPath(100,100,state.teeth,90,74);
+    else if (state.shape === 'poly') d = polyPath(100,100,state.teeth,88);
+    else d = starPath(100,100,state.teeth,92,62);
+    wPath.setAttribute('d', d);
+    wPath.setAttribute('fill', state.color);
+    document.getElementById('teethVal').textContent = state.teeth;
+    const prefix = {gear:'GEAR',poly:'POLY',star:'STAR'}[state.shape];
+    document.getElementById('specName').textContent = `${prefix}-${state.teeth}-${state.code}`;
+    document.getElementById('specSize').textContent = `Ø ${state.size}mm`;
+    const shapeMult = {gear:1.2, poly:.8, star:1.45}[state.shape];
+    const finishMult = state.code === 'ZN' ? .85 : 1;
+    const price = (0.35 + state.size*0.022 + state.teeth*0.03) * shapeMult * finishMult;
+    document.getElementById('price').textContent = '$' + price.toFixed(2);
+    const lead = Math.round(5 + state.size/15 + (state.shape==='star'?3:0) + state.teeth/8);
+    document.getElementById('lead').textContent = lead + ' days';
+    if (spin){
+      const r = (Math.random() > .5 ? 1 : -1) * (30 + Math.random()*60);
+      wSvg.style.transform = `rotate(${r}deg) scale(${0.7 + state.size/200})`;
+    } else {
+      wSvg.style.transform = `scale(${0.7 + state.size/200})`;
+    }
+  }
+  function segHandler(id, key, attr, cast){
+    document.getElementById(id).addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      [...e.currentTarget.children].forEach(x => x.setAttribute('aria-pressed', x === b));
+      state[key] = cast ? cast(b.dataset[attr]) : b.dataset[attr];
+      if (key === 'color') state.code = b.dataset.code;
+      renderWidget(true);
+    });
+  }
+  segHandler('shapeSeg','shape','shape');
+  segHandler('sizeSeg','size','size', Number);
+  segHandler('swatches','color','color');
+  teethIn.addEventListener('input', () => { state.teeth = +teethIn.value; renderWidget(false); });
+  renderWidget(false);
+
+  // ---------- Reveal + counters ----------
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      const num = en.target.querySelector('[data-count]');
+      if (num && !num.dataset.done){
+        num.dataset.done = 1;
+        const target = +num.dataset.count, dec = +(num.dataset.dec || 0);
+        const pre = num.dataset.prefix || '', suf = num.dataset.suffix || '';
+        const t0 = performance.now(), dur = 1400;
+        const tick = t => {
+          const p = Math.min(1, (t - t0)/dur), eased = 1 - Math.pow(1-p, 3);
+          num.textContent = pre + (target*eased).toFixed(dec) + suf;
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+      io.unobserve(en.target);
+    });
+  }, { threshold: .2 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ---------- Click chaos ----------
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.addEventListener('click', e => {
+    if (reduce || e.target.closest('a,button,input,select,summary,label,.note,form')) return;
+    for (let i = 0; i < 3; i++){
+      const s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      s.setAttribute('viewBox','0 0 100 100');
+      s.classList.add('pop');
+      const kind = Math.floor(Math.random()*3);
+      const d = kind === 0 ? gearPath(50,50,8,44,34) : kind === 1 ? starPath(50,50,5,46,20) : polyPath(50,50,6,44);
+      s.innerHTML = `<path d="${d}" fill="${COLORS[Math.floor(Math.random()*COLORS.length)]}" stroke="#111" stroke-width="6" stroke-linejoin="round"/>`;
+      s.style.left = (e.clientX + (Math.random()*80 - 40)) + 'px';
+      s.style.top = (e.clientY + (Math.random()*40 - 20)) + 'px';
+      s.style.animationDelay = (i*60) + 'ms';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 1200);
+    }
+  });
+
+  // ---------- Confetti ----------
+  const cv = document.getElementById('confetti'), ctx = cv.getContext('2d');
+  let parts = [], running = false;
+  function resize(){ cv.width = innerWidth; cv.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+  function burst(x, y){
+    for (let i = 0; i < 180; i++){
+      parts.push({
+        x, y, vx:(Math.random()-.5)*18, vy:Math.random()*-18 - 4,
+        w:6 + Math.random()*10, h:4 + Math.random()*8, r:Math.random()*6, vr:(Math.random()-.5)*.4,
+        c:COLORS[Math.floor(Math.random()*COLORS.length)], life:0
+      });
+    }
+    if (!running){ running = true; requestAnimationFrame(frame); }
+  }
+  function frame(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    parts.forEach(p => {
+      p.vy += .45; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.c; ctx.strokeStyle = '#111'; ctx.lineWidth = 1.5;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.strokeRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    parts = parts.filter(p => p.y < cv.height + 40 && p.life < 400);
+    if (parts.length) requestAnimationFrame(frame);
+    else { running = false; ctx.clearRect(0,0,cv.width,cv.height); }
+  }
+
+  // ---------- Form ----------
+  const form = document.getElementById('demoForm'), msg = document.getElementById('formMsg');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = form.name.value.trim(), company = form.company.value.trim(), email = form.email.value.trim();
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!name || !company || !emailOk){
+      msg.textContent = !emailOk && email ? 'That email looks a little wonky. Mind double-checking?' : 'We need your name, company, and work email. Three fields, we promise.';
+      msg.style.fontWeight = '700';
+      form.animate([{transform:'rotate(1.5deg)'},{transform:'rotate(-2deg) translateX(-10px)'},{transform:'rotate(4deg) translateX(10px)'},{transform:'rotate(1.5deg)'}], {duration:400});
+      return;
+    }
+    const r = form.getBoundingClientRect();
+    form.classList.add('sent');
+    form.querySelector('.success h3').textContent = `You're in, ${name.split(' ')[0]}!`;
+    if (!reduce) burst(r.left + r.width/2, r.top + r.height/3);
+  });
+})();
+</script>
+</body>
+</html>

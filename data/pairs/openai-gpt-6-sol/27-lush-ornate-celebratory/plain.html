@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#10382f" />
+  <title>Acme — Custom widgets, beautifully in motion</title>
+  <meta name="description" content="Configure, order, and track custom widgets across your supply chain in one connected workspace. Book a demo of Acme." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --forest: #10382f;
+      --forest-deep: #092820;
+      --forest-light: #205246;
+      --cream: #f7f2e8;
+      --paper: #fffdf8;
+      --gold: #dbb977;
+      --gold-light: #f1dca9;
+      --ink: #203b32;
+      --muted: #69786e;
+      --coral: #d7836d;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .container { width: min(1280px, calc(100% - 112px)); margin-inline: auto; }
+
+    .dark-stage {
+      position: relative;
+      overflow: hidden;
+      color: var(--cream);
+      background:
+        radial-gradient(circle at 79% 42%, rgba(58, 113, 86, .39), transparent 35%),
+        radial-gradient(circle at 9% 100%, rgba(39, 92, 70, .33), transparent 32%),
+        linear-gradient(135deg, #123b32 0%, #092a23 76%);
+    }
+    .dark-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .19;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E");
+    }
+    .stage-decoration { position: absolute; pointer-events: none; color: #c6ad72; opacity: .28; }
+    .stage-decoration.left { width: 300px; left: -165px; top: 148px; transform: rotate(-18deg); }
+    .stage-decoration.right { width: 280px; right: -155px; top: 106px; transform: rotate(29deg); }
+
+    .site-header {
+      position: relative;
+      z-index: 10;
+      height: 91px;
+      border-bottom: 1px solid rgba(233, 217, 177, .15);
+    }
+    .header-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 34px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; white-space: nowrap; }
+    .brand-mark { width: 33px; height: 33px; color: var(--gold); }
+    .brand-name { font-family: "Playfair Display", serif; font-size: 29px; font-weight: 600; letter-spacing: -.07em; line-height: 1; }
+    .nav-links { display: flex; align-items: center; gap: 39px; margin-left: auto; }
+    .nav-links a { color: #e1e8df; font-size: 13px; font-weight: 600; transition: color .2s; }
+    .nav-links a:hover { color: var(--gold-light); }
+    .header-cta {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 21px;
+      border: 1px solid rgba(241, 220, 169, .72);
+      border-radius: 3px;
+      color: var(--gold-light);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .035em;
+      transition: background .2s, color .2s;
+      white-space: nowrap;
+    }
+    .header-cta:hover { background: var(--gold-light); color: var(--forest-deep); }
+    .menu-toggle { display: none; }
+
+    .hero { position: relative; z-index: 1; }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 51%) minmax(0, 49%);
+      min-height: 665px;
+      align-items: center;
+    }
+    .hero-copy { padding: 38px 12px 68px 0; position: relative; z-index: 3; }
+    .eyebrow { display: flex; align-items: center; gap: 13px; color: var(--gold-light); font-size: 11px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+    .eyebrow::before { content: "✦"; font-size: 19px; line-height: 0; letter-spacing: 0; }
+    h1, h2, h3, p { margin-top: 0; }
+    .hero h1 {
+      max-width: 690px;
+      margin: 30px 0 25px;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(64px, 5.75vw, 86px);
+      font-weight: 500;
+      line-height: 1.115;
+      letter-spacing: -.064em;
+    }
+    .hero h1 em { color: var(--gold-light); font-weight: 500; }
+    .hero-description { max-width: 520px; margin-bottom: 31px; color: #d2dfd4; font-size: 16px; line-height: 1.78; }
+    .hero-actions { display: flex; align-items: center; gap: 24px; }
+    .button-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 24px;
+      min-height: 56px; padding: 0 25px;
+      border: 1px solid var(--gold-light); border-radius: 3px;
+      background: var(--gold-light); color: #173a2d;
+      font-size: 13px; font-weight: 700;
+      box-shadow: 0 12px 26px rgba(4, 21, 14, .14);
+      transition: transform .2s, background .2s;
+    }
+    .button-primary:hover { transform: translateY(-2px); background: #ffe7b4; }
+    .button-primary svg { width: 17px; height: 17px; }
+    .text-link { color: #f0e7d5; font-size: 13px; font-weight: 600; border-bottom: 1px solid rgba(240,231,213,.65); padding-bottom: 5px; }
+    .text-link:hover { color: var(--gold-light); border-color: var(--gold-light); }
+    .hero-note { display: flex; align-items: center; gap: 10px; margin-top: 37px; color: #b9cbbf; font-size: 12px; }
+    .hero-note svg { width: 17px; height: 17px; color: var(--gold); }
+
+    .hero-art { position: relative; height: 600px; min-width: 0; align-self: end; }
+    .arch {
+      position: absolute; width: 556px; height: 538px; right: 2px; bottom: -3px;
+      border: 1px solid rgba(229, 194, 124, .64);
+      border-radius: 290px 290px 0 0;
+      background: radial-gradient(circle at 50% 42%, rgba(68, 118, 87, .42), rgba(14, 54, 43, .3) 65%, rgba(8, 36, 29, .38));
+    }
+    .arch::before {
+      content: ""; position: absolute; inset: 11px 11px 0;
+      border: 1px solid rgba(229, 194, 124, .25);
+      border-bottom: 0; border-radius: 280px 280px 0 0;
+    }
+    .arch::after {
+      content: ""; position: absolute; width: 440px; height: 440px; top: 38px; left: 56px;
+      border: 1px dashed rgba(228, 197, 132, .22); border-radius: 50%;
+    }
+    .arch-star { position: absolute; color: var(--gold-light); opacity: .8; font-size: 25px; }
+    .arch-star.one { top: 91px; left: 63px; }
+    .arch-star.two { top: 172px; right: 33px; font-size: 17px; }
+    .arch-star.three { bottom: 76px; right: 26px; font-size: 14px; }
+    .arch-flower { position: absolute; top: 17px; left: 258px; width: 39px; height: 39px; color: var(--gold-light); opacity: .85; }
+
+    .dashboard {
+      position: absolute; z-index: 2; right: 26px; top: 128px;
+      width: 528px; height: 371px; display: flex; overflow: hidden;
+      border: 1px solid #d8d7ca; border-radius: 9px;
+      background: #fbfaf6; color: #233e34;
+      box-shadow: 0 32px 65px rgba(0, 17, 12, .39), 0 3px 0 rgba(255,255,255,.2);
+    }
+    .dash-rail {
+      display: flex; flex-direction: column; align-items: center; gap: 17px;
+      width: 57px; flex: 0 0 57px; padding-top: 19px;
+      background: #163e34; color: #a9c6ad;
+    }
+    .dash-rail .rail-brand { display: grid; place-items: center; width: 27px; height: 27px; margin-bottom: 16px; color: var(--gold-light); }
+    .rail-icon { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 5px; }
+    .rail-icon.active { background: #356052; color: #fff5dd; }
+    .rail-icon svg { width: 16px; height: 16px; stroke-width: 1.7; }
+    .rail-bottom { margin-top: auto; margin-bottom: 16px; width: 25px; height: 25px; border-radius: 50%; background: #c8967e; color: white; display: grid; place-items: center; font-size: 10px; font-weight: 700; }
+    .dash-main { flex: 1; min-width: 0; }
+    .dash-top { display: flex; justify-content: space-between; align-items: center; height: 49px; padding: 0 21px; border-bottom: 1px solid #e9e8df; font-size: 10px; color: #7b877e; }
+    .dash-top strong { font-size: 11px; color: #294537; }
+    .dash-top-right { display: flex; align-items: center; gap: 12px; }
+    .dash-avatar { width: 21px; height: 21px; display: grid; place-items: center; border-radius: 50%; background: #ecd3b5; color: #714e38; font-size: 9px; font-weight: 700; }
+    .dash-content { padding: 20px 22px 16px; }
+    .dash-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .dash-heading h3 { margin: 0; font-family: "Playfair Display",serif; font-size: 23px; font-weight: 600; letter-spacing: -.045em; }
+    .dash-heading span { color: #859188; font-size: 9px; }
+    .dash-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 19px; }
+    .metric { padding: 12px 12px 10px; border: 1px solid #e8e8dc; border-radius: 5px; background: #fff; }
+    .metric small { display: block; margin-bottom: 5px; color: #7f8b80; font-size: 8px; }
+    .metric strong { font-family: "Playfair Display",serif; font-size: 21px; font-weight: 600; line-height: 1; }
+    .metric .mini-trend { margin-left: 4px; color: #4e966c; font-size: 8px; font-weight: 700; }
+    .dash-table-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; font-size: 10px; font-weight: 700; }
+    .dash-table-title a { color: #3c8065; font-size: 9px; }
+    .dash-table { border: 1px solid #e8e8df; border-radius: 5px; overflow: hidden; background: white; }
+    .table-row { display: grid; grid-template-columns: 1.6fr 1fr .8fr; align-items: center; gap: 6px; padding: 10px 11px; border-bottom: 1px solid #efeee8; font-size: 9px; }
+    .table-row:last-child { border-bottom: 0; }
+    .table-row.head { padding-top: 8px; padding-bottom: 8px; background: #f8f8f3; color: #8c968c; font-size: 8px; }
+    .table-row strong { font-weight: 700; }
+    .table-row .sub { display: block; margin-top: 2px; color: #929c92; font-size: 8px; }
+    .pill { display: inline-block; width: fit-content; padding: 4px 6px; border-radius: 2px; color: #387354; background: #e6f1e8; font-size: 8px; font-weight: 700; white-space: nowrap; }
+    .pill.gold { background: #faf0d9; color: #936e2c; }
+    .pill.blue { background: #e9eff3; color: #54758c; }
+
+    .floating-card {
+      position: absolute; z-index: 4; display: flex; align-items: center; gap: 11px;
+      border: 1px solid #eee8d8; border-radius: 5px; background: #fffdf8; color: var(--ink);
+      box-shadow: 0 17px 35px rgba(0, 24, 16, .25);
+    }
+    .floating-card.top { top: 78px; right: -14px; padding: 13px 17px 13px 12px; transform: rotate(3deg); }
+    .floating-card.bottom { bottom: 53px; left: -29px; padding: 15px 20px 15px 14px; transform: rotate(-3deg); }
+    .float-icon { display: grid; place-items: center; flex: 0 0 34px; height: 34px; border-radius: 50%; color: #39734d; background: #e6efdf; }
+    .float-icon.gold { color: #9d7433; background: #f9edd4; }
+    .float-icon svg { width: 18px; height: 18px; }
+    .floating-card strong { display: block; font-size: 11px; white-space: nowrap; }
+    .floating-card small { display: block; margin-top: 4px; color: #879086; font-size: 9px; white-space: nowrap; }
+
+    .value-band { position: relative; z-index: 2; border-top: 1px solid rgba(233, 217, 177, .19); background: rgba(4, 30, 24, .25); }
+    .value-inner { min-height: 89px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+    .value-label { color: #d6bc82; font-family: "Playfair Display",serif; font-size: 19px; font-style: italic; white-space: nowrap; }
+    .value-divider { height: 30px; width: 1px; background: rgba(232,220,187,.22); }
+    .value-item { display: flex; align-items: center; gap: 10px; color: #e8eee6; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .value-item svg { width: 18px; height: 18px; color: var(--gold); }
+
+    .section { padding: 112px 0; }
+    .section-kicker { color: #9d713b; font-size: 11px; font-weight: 700; letter-spacing: .19em; text-transform: uppercase; }
+    .section h2 { font-family: "Playfair Display",serif; font-size: clamp(38px, 4vw, 55px); font-weight: 500; line-height: 1.18; letter-spacing: -.052em; }
+    .section h2 em { color: #a37b47; }
+    .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: end; }
+    .intro-grid h2 { max-width: 670px; margin: 18px 0 0; }
+    .intro-grid > p { max-width: 490px; margin: 0 0 6px auto; color: #65756b; font-size: 15px; line-height: 1.85; }
+    .features { background: var(--cream); }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 48px; }
+    .feature-card {
+      position: relative; min-height: 300px; padding: 35px 32px;
+      overflow: hidden; border: 1px solid #e6e0d2; background: var(--paper);
+    }
+    .feature-card::after { content: "✦"; position: absolute; right: -9px; bottom: -67px; color: #f2e9d9; font-size: 180px; line-height: 1; }
+    .feature-number { color: #b18b53; font-size: 11px; font-weight: 700; letter-spacing: .1em; }
+    .feature-icon { display: grid; place-items: center; width: 48px; height: 48px; margin: 27px 0 24px; border-radius: 50%; background: #eaf0e7; color: #32624b; }
+    .feature-icon svg { width: 24px; height: 24px; }
+    .feature-card h3 { position: relative; z-index: 1; margin-bottom: 10px; font-family: "Playfair Display",serif; font-size: 25px; font-weight: 600; letter-spacing: -.04em; }
+    .feature-card p { position: relative; z-index: 1; max-width: 305px; margin: 0; color: #69786d; font-size: 13px; line-height: 1.75; }
+
+    .process { background: #eaece2; }
+    .process-layout { display: grid; grid-template-columns: 40% 1fr; gap: 90px; align-items: center; }
+    .process h2 { margin: 18px 0 20px; }
+    .process-lede { max-width: 390px; color: #68786d; font-size: 15px; line-height: 1.8; }
+    .process-list { border-top: 1px solid #cbd3c7; }
+    .process-step { display: grid; grid-template-columns: 46px 1fr; gap: 21px; padding: 25px 0; border-bottom: 1px solid #cbd3c7; }
+    .step-number { color: #a37b47; font-family: "Playfair Display",serif; font-size: 24px; }
+    .process-step h3 { margin: 0 0 6px; font-family: "Playfair Display",serif; font-size: 22px; font-weight: 600; letter-spacing: -.035em; }
+    .process-step p { margin: 0; color: #65746a; font-size: 13px; line-height: 1.65; }
+
+    .demo-section { position: relative; overflow: hidden; background: #123b31; color: var(--cream); }
+    .demo-section::after { content: "✳"; position: absolute; right: -66px; bottom: -270px; color: rgba(218,187,119,.09); font-size: 690px; line-height: 1; pointer-events: none; }
+    .demo-layout { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 460px; gap: 95px; align-items: center; }
+    .demo-section .section-kicker { color: var(--gold-light); }
+    .demo-section h2 { margin: 19px 0 18px; max-width: 650px; }
+    .demo-section h2 em { color: var(--gold-light); }
+    .demo-section p { max-width: 470px; color: #c5d7c9; font-size: 15px; line-height: 1.8; }
+    .demo-form { padding: 31px; border: 1px solid rgba(220,187,119,.48); background: #fcfaf4; color: var(--ink); box-shadow: 0 18px 45px rgba(0,0,0,.13); }
+    .demo-form h3 { margin: 0 0 21px; font-family: "Playfair Display",serif; font-size: 25px; font-weight: 600; letter-spacing: -.04em; }
+    .form-field { margin-bottom: 14px; }
+    .form-field label { display: block; margin-bottom: 7px; font-size: 11px; font-weight: 700; }
+    .form-field input {
+      display: block; width: 100%; height: 43px; padding: 0 12px;
+      border: 1px solid #dcded2; border-radius: 2px; outline: none;
+      background: white; color: var(--ink); font-size: 13px;
+    }
+    .form-field input:focus { border-color: #8b9e77; box-shadow: 0 0 0 2px rgba(139,158,119,.13); }
+    .form-submit { width: 100%; min-height: 47px; margin-top: 6px; border: 0; border-radius: 2px; background: var(--forest); color: white; font-size: 12px; font-weight: 700; }
+    .form-submit:hover { background: #235847; }
+    .form-note { margin: 12px 0 0 !important; color: #89938a !important; font-size: 10px !important; line-height: 1.5 !important; }
+    footer { background: #092820; color: #d5e0d3; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 108px; }
+    footer .brand-name { font-size: 25px; color: white; }
+    footer .brand-mark { width: 29px; height: 29px; }
+    .footer-text { color: #96ada0; font-size: 11px; }
+    .footer-links { display: flex; gap: 28px; color: #c4d5c5; font-size: 11px; }
+    .footer-links a:hover { color: var(--gold-light); }
+
+    @media (max-width: 1100px) {
+      .container { width: min(100% - 64px, 1280px); }
+      .hero-inner { grid-template-columns: 51% 49%; }
+      .hero h1 { font-size: clamp(57px, 6vw, 76px); }
+      .hero-art { transform: scale(.84); transform-origin: right bottom; margin-left: -70px; }
+      .value-inner { gap: 17px; }
+      .value-item { font-size: 11px; }
+      .demo-layout { gap: 40px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 40px, 560px); }
+      .site-header { height: 72px; }
+      .header-cta { margin-left: auto; min-height: 38px; padding-inline: 12px; }
+      .menu-toggle { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid rgba(241,220,169,.5); border-radius: 3px; background: transparent; color: var(--cream); font-size: 21px; }
+      .nav-links { display: none; position: absolute; top: 72px; left: 0; right: 0; margin: 0; padding: 24px 20px; background: #10382f; border-bottom: 1px solid rgba(241,220,169,.3); flex-direction: column; gap: 22px; align-items: flex-start; }
+      .nav-links.open { display: flex; }
+      .hero-inner { display: block; min-height: 0; }
+      .hero-copy { padding: 70px 0 35px; }
+      .hero h1 { font-size: clamp(52px, 12vw, 73px); }
+      .hero-description { font-size: 14px; }
+      .hero-art { width: 600px; height: 490px; margin-left: calc(50% - 300px); transform: scale(.77); transform-origin: center top; }
+      .arch { bottom: 0; }
+      .dashboard { top: 105px; }
+      .floating-card.top { top: 55px; }
+      .floating-card.bottom { bottom: 45px; }
+      .value-inner { padding: 24px 0; flex-wrap: wrap; justify-content: flex-start; gap: 16px 28px; }
+      .value-label { width: 100%; }
+      .value-divider { display: none; }
+      .section { padding: 76px 0; }
+      .intro-grid, .process-layout, .demo-layout { grid-template-columns: 1fr; gap: 26px; }
+      .intro-grid > p { margin: 0; }
+      .feature-grid { grid-template-columns: 1fr; margin-top: 32px; }
+      .feature-card { min-height: 250px; }
+      .process-layout { gap: 30px; }
+      .demo-form { padding: 24px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; padding: 30px 0; }
+    }
+    @media (max-width: 420px) {
+      .header-cta { display: none; }
+      .hero-art { margin-left: calc(50% - 300px); transform: scale(.63); height: 390px; }
+      .hero-actions { gap: 15px; }
+      .button-primary { gap: 12px; padding-inline: 17px; }
+      .value-item { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden">
+    <symbol id="flower" viewBox="0 0 64 64">
+      <path d="M32 6c5 6 7 12 5 18 6-4 12-4 19-2-2 7-7 12-14 14 7 2 12 7 14 14-7 2-13 2-19-2 2 6 0 12-5 18-5-6-7-12-5-18-6 4-12 4-19 2 2-7 7-12 14-14C15 34 10 29 8 22c7-2 13-2 19 2-2-6 0-12 5-18Z" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <circle cx="32" cy="36" r="5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M32 0v8M32 56v8M0 36h8M56 36h8" stroke="currentColor" stroke-width="1.4"/>
+    </symbol>
+    <symbol id="check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m8 12 2.6 2.6L16 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="box" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Zm-9 5 9 5 9-5M12 12v10m-4.5-17.5 9 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="sliders" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M9 3v6m6 0v6m-5 0v6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="6" r="2" fill="white" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="12" r="2" fill="white" stroke="currentColor" stroke-width="1.4"/><circle cx="10" cy="18" r="2" fill="white" stroke="currentColor" stroke-width="1.4"/></symbol>
+    <symbol id="route" viewBox="0 0 24 24"><circle cx="5" cy="5" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="19" cy="19" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 7v7a4 4 0 0 0 4 4h8M9 5h9a2 2 0 0 1 0 4h-5a2 2 0 0 0 0 4h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <div class="dark-stage">
+    <svg class="stage-decoration left" viewBox="0 0 300 520" fill="none" aria-hidden="true">
+      <path d="M-20 500C157 400 18 250 170 42M98 398c-3-65 53-76 70-86-1 55-27 77-70 86Zm8-135c-44-49-34-82-27-108 37 32 53 66 27 108Zm50-118c-18-46 5-81 32-105 14 43-1 81-32 105ZM48 460c-25-45-11-81 8-112 24 37 22 75-8 112Z" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M67 432c22-35 52-44 90-37-19 33-51 48-90 37Zm29-223C45 207 19 184 6 151c49-2 77 20 90 58Z" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+    <svg class="stage-decoration right" viewBox="0 0 300 520" fill="none" aria-hidden="true">
+      <path d="M310 510C110 382 266 200 87 1m115 409c10-66-43-86-59-100-5 56 16 81 59 100Zm-17-141c50-43 45-78 41-104-41 28-61 60-41 104Zm-39-121c24-42 7-80-17-107-19 40-9 80 17 107Z" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#" aria-label="Acme home">
+          <svg class="brand-mark"><use href="#flower"/></svg>
+          <span class="brand-name">acme.</span>
+        </a>
+        <nav class="nav-links" id="main-nav" aria-label="Main navigation">
+          <a href="#platform">Platform</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#book-demo">Why Acme</a>
+        </nav>
+        <a class="header-cta" href="#book-demo">Book a demo ↗</a>
+        <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">☰</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="container hero-inner">
+          <div class="hero-copy">
+            <div class="eyebrow">A better way to make things happen</div>
+            <h1 id="hero-title">Custom widgets, <em>beautifully</em> in motion.</h1>
+            <p class="hero-description">From first configuration to final delivery, bring every custom widget order, supplier, and milestone into one beautifully clear place.</p>
+            <div class="hero-actions">
+              <a class="button-primary" href="#book-demo">Book a demo <svg><use href="#arrow"/></svg></a>
+              <a class="text-link" href="#platform">Explore the platform</a>
+            </div>
+            <div class="hero-note"><svg><use href="#check-circle"/></svg> Built for the teams behind every moving part.</div>
+          </div>
+
+          <div class="hero-art" aria-label="Preview of the Acme order management workspace" role="img">
+            <div class="arch">
+              <svg class="arch-flower"><use href="#flower"/></svg>
+              <span class="arch-star one">✧</span><span class="arch-star two">✦</span><span class="arch-star three">✧</span>
+            </div>
+            <div class="dashboard" aria-hidden="true">
+              <div class="dash-rail">
+                <div class="rail-brand"><svg width="24" height="24"><use href="#flower"/></svg></div>
+                <div class="rail-icon active"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9H3v-9Zm6 9v-6h6v6" fill="none" stroke="currentColor" stroke-linejoin="round"/></svg></div>
+                <div class="rail-icon"><svg><use href="#box"/></svg></div>
+                <div class="rail-icon"><svg><use href="#sliders"/></svg></div>
+                <div class="rail-icon"><svg><use href="#route"/></svg></div>
+                <div class="rail-bottom">JD</div>
+              </div>
+              <div class="dash-main">
+                <div class="dash-top"><strong>acme<span style="color:#b18b53">.</span></strong><div class="dash-top-right">Operations workspace <span class="dash-avatar">JD</span></div></div>
+                <div class="dash-content">
+                  <div class="dash-heading"><h3>Good morning, Jordan.</h3><span>Tuesday, May 20</span></div>
+                  <div class="dash-metrics">
+                    <div class="metric"><small>Active orders</small><strong>24</strong><span class="mini-trend">↗ 4</span></div>
+                    <div class="metric"><small>On schedule</small><strong>92%</strong><span class="mini-trend">↗ 6%</span></div>
+                    <div class="metric"><small>Ready to ship</small><strong>08</strong></div>
+                  </div>
+                  <div class="dash-table-title"><span>Orders in motion</span><a href="#platform">View all →</a></div>
+                  <div class="dash-table">
+                    <div class="table-row head"><span>WIDGET / ORDER</span><span>SUPPLIER</span><span>STATUS</span></div>
+                    <div class="table-row"><span><strong>Precision Housing A4</strong><span class="sub">#AC-2048 · 240 units</span></span><span>Northline Works</span><span class="pill">On track</span></div>
+                    <div class="table-row"><span><strong>Custom Valve Assembly</strong><span class="sub">#AC-2047 · 120 units</span></span><span>Atlas Components</span><span class="pill gold">In production</span></div>
+                    <div class="table-row"><span><strong>Mounting Bracket S2</strong><span class="sub">#AC-2046 · 500 units</span></span><span>Meridian Mfg.</span><span class="pill blue">In transit</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="floating-card top" aria-hidden="true">
+              <span class="float-icon"><svg><use href="#check-circle"/></svg></span>
+              <span><strong>Order approved</strong><small>Precision Housing A4</small></span>
+            </div>
+            <div class="floating-card bottom" aria-hidden="true">
+              <span class="float-icon gold"><svg><use href="#route"/></svg></span>
+              <span><strong>Every detail, in the loop.</strong><small>From your floor to their door.</small></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="value-band">
+        <div class="container value-inner">
+          <span class="value-label">Made for momentum.</span>
+          <span class="value-divider"></span>
+          <span class="value-item"><svg><use href="#check-circle"/></svg> One connected workspace</span>
+          <span class="value-item"><svg><use href="#check-circle"/></svg> Fewer handoffs, more clarity</span>
+          <span class="value-item"><svg><use href="#check-circle"/></svg> Confidence at every step</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <section class="section features" id="platform" aria-labelledby="platform-title">
+    <div class="container">
+      <div class="intro-grid">
+        <div>
+          <div class="section-kicker">The Acme platform</div>
+          <h2 id="platform-title">The whole journey, <em>thoughtfully connected.</em></h2>
+        </div>
+        <p>Custom work comes with moving parts. Acme gives operations teams a calmer way to manage them all—without chasing spreadsheets, status updates, or the next person in the chain.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span class="feature-number">01 / CONFIGURE</span>
+          <div class="feature-icon"><svg><use href="#sliders"/></svg></div>
+          <h3>Get the details right.</h3>
+          <p>Bring specifications, options, and requirements together so every custom widget starts with a clear plan.</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-number">02 / ORDER</span>
+          <div class="feature-icon"><svg><use href="#box"/></svg></div>
+          <h3>Keep orders moving.</h3>
+          <p>Turn approved configurations into organized orders your team and suppliers can work from with confidence.</p>
+        </article>
+        <article class="feature-card">
+          <span class="feature-number">03 / TRACK</span>
+          <div class="feature-icon"><svg><use href="#route"/></svg></div>
+          <h3>See what’s next.</h3>
+          <p>Follow progress across your supply chain and spot the milestones that need your attention.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section process" id="how-it-works" aria-labelledby="process-title">
+    <div class="container process-layout">
+      <div>
+        <div class="section-kicker">A clearer way forward</div>
+        <h2 id="process-title">Less chasing.<br /><em>More making.</em></h2>
+        <p class="process-lede">Give your team a shared view of the work, from the first request to the final arrival.</p>
+      </div>
+      <div class="process-list">
+        <div class="process-step">
+          <span class="step-number">01</span>
+          <div><h3>Start with what you need</h3><p>Capture the precise configuration for each custom widget in one place.</p></div>
+        </div>
+        <div class="process-step">
+          <span class="step-number">02</span>
+          <div><h3>Bring everyone along</h3><p>Keep orders and their essential details aligned as work moves between teams and suppliers.</p></div>
+        </div>
+        <div class="process-step">
+          <span class="step-number">03</span>
+          <div><h3>Know where things stand</h3><p>Track progress and make the next decision with a clearer picture of what’s happening.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section demo-section" id="book-demo" aria-labelledby="demo-title">
+    <div class="container demo-layout">
+      <div>
+        <div class="section-kicker">Let’s make it happen</div>
+        <h2 id="demo-title">Your next chapter starts with a <em>clearer view.</em></h2>
+        <p>See how Acme can bring more ease and visibility to the way your team makes, orders, and moves custom widgets.</p>
+      </div>
+      <form class="demo-form" id="demo-form">
+        <h3>Let’s talk about your workflow.</h3>
+        <div class="form-field"><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Alex Morgan" required /></div>
+        <div class="form-field"><label for="email">Work email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="alex@company.com" required /></div>
+        <div class="form-field"><label for="company">Company</label><input id="company" name="company" type="text" autocomplete="organization" placeholder="Your company" required /></div>
+        <button class="form-submit" type="submit">Request a demo &nbsp; ↗</button>
+        <p class="form-note">This opens your email app with your request ready to send.</p>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container footer-inner">
+      <a class="brand" href="#" aria-label="Acme home"><svg class="brand-mark"><use href="#flower"/></svg><span class="brand-name">acme.</span></a>
+      <span class="footer-text">Custom widgets, beautifully in motion. © 2026 Acme.</span>
+      <div class="footer-links"><a href="#platform">Platform</a><a href="#how-it-works">How it works</a><a href="mailto:hello@acme.com">Contact</a></div>
+    </div>
+  </footer>
+
+  <script>
+    const menuButton = document.querySelector(".menu-toggle");
+    const nav = document.querySelector("#main-nav");
+    menuButton.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.textContent = isOpen ? "×" : "☰";
+    });
+    nav.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
+      nav.classList.remove("open");
+      menuButton.setAttribute("aria-expanded", "false");
+      menuButton.textContent = "☰";
+    }));
+
+    document.querySelector("#demo-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      const name = String(data.get("name")).trim();
+      const email = String(data.get("email")).trim();
+      const company = String(data.get("company")).trim();
+      const subject = encodeURIComponent(`Acme demo request from ${company}`);
+      const body = encodeURIComponent(`Hi Acme,\n\nI'd like to book a demo.\n\nName: ${name}\nWork email: ${email}\nCompany: ${company}\n\nThanks!`);
+      window.location.href = `mailto:hello@acme.com?subject=${subject}&body=${body}`;
+    });
+  </script>
+</body>
+</html>

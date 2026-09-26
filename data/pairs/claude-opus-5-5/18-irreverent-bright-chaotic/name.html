@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme | Custom Widgets, Minus the Mayhem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#FF6FB5;
+    --yellow:#FFD23F;
+    --teal:#1FC8B8;
+    --blue:#3A5BFF;
+    --red:#FF4B3E;
+    --lilac:#B69CFF;
+    --ink:#141414;
+    --cream:#FFF6E5;
+    --b:3px solid var(--ink);
+    --shadow:8px 8px 0 var(--ink);
+    --shadow-sm:5px 5px 0 var(--ink);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"DM Sans",system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+    font-size:18px;
+    line-height:1.55;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:"Archivo Black",sans-serif;font-weight:400;line-height:1.02;letter-spacing:-.01em}
+  a{color:inherit}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 48px;position:relative}
+  :focus-visible{outline:4px dashed var(--blue);outline-offset:4px}
+
+  /* ---------- Patterns ---------- */
+  .dots{background-image:radial-gradient(var(--ink) 2.2px,transparent 2.6px);background-size:18px 18px}
+  .stripes{background:repeating-linear-gradient(-45deg,var(--ink) 0 6px,transparent 6px 16px)}
+  .squiggle-bg{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40'%3E%3Cpath d='M0 20 Q10 4 20 20 T40 20 T60 20 T80 20' fill='none' stroke='%23141414' stroke-width='4'/%3E%3C/svg%3E");
+    background-size:80px 40px;
+  }
+  .terrazzo{
+    background-color:var(--cream);
+    background-image:
+      radial-gradient(circle at 12% 18%, var(--pink) 0 7px, transparent 8px),
+      radial-gradient(circle at 78% 32%, var(--teal) 0 6px, transparent 7px),
+      radial-gradient(circle at 40% 70%, var(--yellow) 0 9px, transparent 10px),
+      radial-gradient(circle at 88% 82%, var(--blue) 0 5px, transparent 6px),
+      radial-gradient(circle at 25% 90%, var(--ink) 0 3px, transparent 4px),
+      radial-gradient(circle at 60% 12%, var(--ink) 0 3px, transparent 4px),
+      radial-gradient(circle at 52% 44%, var(--red) 0 4px, transparent 5px);
+    background-size:220px 220px;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;gap:12px;
+    font-family:"Archivo Black",sans-serif;font-size:19px;
+    text-decoration:none;cursor:pointer;
+    padding:18px 30px;border:var(--b);border-radius:0;
+    background:var(--pink);color:var(--ink);
+    box-shadow:var(--shadow-sm);
+    transition:transform .15s ease, box-shadow .15s ease, background .15s;
+  }
+  .btn:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--ink)}
+  .btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+  .btn.alt{background:#fff}
+  .btn.yellow{background:var(--yellow)}
+  .btn svg{width:22px;height:22px}
+
+  /* ---------- Nav ---------- */
+  .topbar{
+    background:var(--ink);color:var(--yellow);
+    font-family:"Archivo Black",sans-serif;font-size:14px;letter-spacing:.08em;
+    overflow:hidden;white-space:nowrap;border-bottom:var(--b);
+  }
+  .marquee{display:inline-block;padding:10px 0;animation:marq 40s linear infinite}
+  .marquee span{margin:0 28px}
+  .marquee span:nth-child(3n+2){color:var(--pink)}
+  .marquee span:nth-child(3n){color:var(--teal)}
+  @keyframes marq{to{transform:translateX(-50%)}}
+
+  nav{position:sticky;top:0;z-index:50;background:var(--cream);border-bottom:var(--b)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:84px}
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:"Archivo Black";font-size:30px}
+  .logo svg{width:46px;height:46px}
+  .navlinks{display:flex;gap:36px;list-style:none;font-weight:700}
+  .navlinks a{text-decoration:none;position:relative;padding:4px 0}
+  .navlinks a::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:4px;background:var(--pink);transform:scaleX(0);transform-origin:left;transition:transform .2s}
+  .navlinks a:hover::after{transform:scaleX(1)}
+  nav .btn{padding:12px 22px;font-size:16px}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;padding:90px 0 120px;overflow:hidden;border-bottom:var(--b)}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+  .tag{
+    display:inline-block;background:var(--teal);border:var(--b);
+    padding:6px 14px;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;
+    transform:rotate(-3deg);box-shadow:4px 4px 0 var(--ink);margin-bottom:28px;
+  }
+  .hero h1{font-size:92px;margin-bottom:28px}
+  .hero h1 .hl{position:relative;display:inline-block;z-index:1}
+  .hero h1 .hl::before{content:"";position:absolute;left:-8px;right:-8px;bottom:6px;height:38%;background:var(--yellow);z-index:-1;transform:skew(-8deg)}
+  .hero h1 .pinkword{color:var(--pink);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-shadow:5px 5px 0 var(--ink)}
+  .hero p.lede{font-size:22px;max-width:560px;margin-bottom:40px}
+  .hero-ctas{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+  .scribble-note{font-family:"Caveat",cursive;font-size:30px;color:var(--blue);transform:rotate(-4deg);display:inline-flex;align-items:center;gap:6px;margin-top:26px}
+
+  .hero-art{position:relative;height:620px}
+  .shape{position:absolute;will-change:transform}
+  .s-circle{width:360px;height:360px;border-radius:50%;background:var(--yellow);border:var(--b);right:30px;top:40px}
+  .s-dots{width:260px;height:200px;left:10px;top:10px;border:var(--b);background-color:var(--lilac)}
+  .s-stripe{width:180px;height:180px;right:-10px;bottom:30px;border:var(--b);background-color:var(--teal)}
+  .s-tri{left:30px;bottom:40px;width:0;height:0}
+  .s-squig{left:120px;top:250px}
+  .s-half{width:160px;height:80px;border-radius:160px 160px 0 0;background:var(--red);border:var(--b);border-bottom:none;right:210px;top:0}
+  .confetti-bit{position:absolute;border:2.5px solid var(--ink)}
+
+  .widget-card{
+    position:absolute;left:110px;top:120px;width:400px;
+    background:#fff;border:var(--b);box-shadow:var(--shadow);z-index:5;
+  }
+  .wc-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:var(--b);background:var(--pink);font-weight:700}
+  .wc-head .lights{display:flex;gap:6px}
+  .wc-head .lights i{width:14px;height:14px;border-radius:50%;border:2.5px solid var(--ink);background:#fff;display:block}
+  .wc-head .lights i:nth-child(2){background:var(--yellow)}
+  .wc-head .lights i:nth-child(3){background:var(--teal)}
+  .wc-body{padding:20px 18px 22px}
+  .wc-body svg.widget{display:block;margin:0 auto 14px;width:190px;height:150px}
+  .spec-row{display:flex;justify-content:space-between;font-size:15px;padding:7px 0;border-bottom:2px dashed #ccc}
+  .spec-row b{font-weight:700}
+  .progress{margin-top:16px;height:22px;border:var(--b);background:#fff;position:relative;overflow:hidden}
+  .progress span{position:absolute;inset:0 32% 0 0;background:var(--teal);border-right:var(--b)}
+  .progress span::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,rgba(0,0,0,.18) 0 6px,transparent 6px 14px);animation:slide 1s linear infinite}
+  @keyframes slide{to{background-position:28px 0}}
+  .status-line{display:flex;justify-content:space-between;margin-top:8px;font-size:14px;font-weight:700}
+  .sticker{
+    position:absolute;right:20px;top:430px;z-index:6;
+    width:150px;height:150px;border-radius:50%;background:var(--blue);color:#fff;border:var(--b);
+    display:grid;place-items:center;text-align:center;font-family:"Archivo Black";font-size:18px;line-height:1.1;
+    transform:rotate(12deg);box-shadow:var(--shadow-sm);
+  }
+  .sticker span{display:block;font-size:40px}
+
+  /* ---------- Logos ---------- */
+  .logos{background:var(--ink);color:var(--cream);padding:38px 0;border-bottom:var(--b)}
+  .logos .wrap{display:flex;align-items:center;justify-content:space-between;gap:30px}
+  .logos p{font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.1em;color:var(--yellow);max-width:190px;line-height:1.3}
+  .logo-item{font-family:"Archivo Black";font-size:24px;opacity:.9;display:flex;align-items:center;gap:10px}
+  .logo-item i{display:inline-block;width:22px;height:22px;border:2.5px solid var(--cream)}
+
+  /* ---------- Section heads ---------- */
+  section{position:relative}
+  .sec-head{text-align:center;max-width:860px;margin:0 auto 70px}
+  .sec-head .kicker{font-family:"Caveat";font-size:34px;color:var(--red);display:block;transform:rotate(-2deg);margin-bottom:6px}
+  .sec-head h2{font-size:66px}
+  .sec-head p{font-size:21px;margin-top:20px}
+
+  /* ---------- Problem ---------- */
+  .problem{padding:120px 0;border-bottom:var(--b)}
+  .chaos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+  .chaos{
+    background:#fff;border:var(--b);padding:34px 30px;box-shadow:var(--shadow);position:relative;
+  }
+  .chaos:nth-child(1){transform:rotate(-2deg)}
+  .chaos:nth-child(2){transform:rotate(1.5deg) translateY(20px)}
+  .chaos:nth-child(3){transform:rotate(-1deg)}
+  .chaos .num{font-family:"Archivo Black";font-size:64px;line-height:1;color:var(--pink);-webkit-text-stroke:2.5px var(--ink);margin-bottom:14px}
+  .chaos:nth-child(2) .num{color:var(--teal)}
+  .chaos:nth-child(3) .num{color:var(--yellow)}
+  .chaos h3{font-size:26px;margin-bottom:10px}
+  .chaos .x{position:absolute;top:-22px;right:-18px;width:54px;height:54px;background:var(--red);border:var(--b);border-radius:50%;display:grid;place-items:center;color:#fff;font-family:"Archivo Black";font-size:26px}
+
+  /* ---------- Features ---------- */
+  .features{padding:130px 0;border-bottom:var(--b);overflow:hidden}
+  .feature{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:120px}
+  .feature:last-child{margin-bottom:0}
+  .feature.flip .f-art{order:2}
+  .f-copy .label{display:inline-flex;align-items:center;gap:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:15px;margin-bottom:18px}
+  .f-copy .label b{display:inline-grid;place-items:center;width:40px;height:40px;border:var(--b);background:var(--yellow);font-family:"Archivo Black";font-size:18px}
+  .f-copy h3{font-size:52px;margin-bottom:22px}
+  .f-copy p{font-size:20px;margin-bottom:24px}
+  .f-copy ul{list-style:none;display:grid;gap:12px}
+  .f-copy li{display:flex;gap:14px;align-items:flex-start;font-weight:500}
+  .f-copy li::before{content:"";flex:0 0 18px;height:18px;margin-top:5px;background:var(--pink);border:2.5px solid var(--ink);transform:rotate(45deg)}
+  .feature:nth-child(2) li::before{background:var(--teal);border-radius:50%;transform:none}
+  .feature:nth-child(3) li::before{background:var(--yellow);clip-path:polygon(50% 0,100% 100%,0 100%);border:none;box-shadow:inset 0 0 0 3px var(--ink)}
+
+  .f-art{position:relative;height:460px}
+  .f-panel{position:absolute;inset:40px 30px 30px 40px;background:#fff;border:var(--b);box-shadow:var(--shadow);z-index:2;padding:26px}
+  .f-back{position:absolute;inset:0 70px 70px 0;border:var(--b);z-index:1}
+
+  /* configurator */
+  .cfg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:2px dashed #ccc;font-weight:700;font-size:16px}
+  .swatches{display:flex;gap:8px}
+  .swatches button{width:30px;height:30px;border:2.5px solid var(--ink);border-radius:50%;cursor:pointer;transition:transform .15s}
+  .swatches button[aria-pressed="true"]{transform:scale(1.2);box-shadow:0 0 0 3px var(--cream),0 0 0 6px var(--ink)}
+  .seg{display:flex;border:2.5px solid var(--ink)}
+  .seg button{font:inherit;font-size:14px;padding:5px 12px;background:#fff;border:none;border-right:2.5px solid var(--ink);cursor:pointer}
+  .seg button:last-child{border-right:none}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--yellow)}
+  .cfg-preview{display:flex;align-items:center;gap:22px;margin-top:18px}
+  .cfg-preview svg{width:130px;height:110px;flex:0 0 auto}
+  .cfg-preview .price{font-family:"Archivo Black";font-size:34px}
+  .cfg-preview small{display:block;font-size:14px;font-weight:500}
+
+  /* ordering */
+  .po{font-size:15px}
+  .po-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .po-head h4{font-family:"Archivo Black";font-weight:400;font-size:22px}
+  .pill{border:2.5px solid var(--ink);padding:3px 12px;font-weight:700;font-size:13px;background:var(--yellow);border-radius:40px}
+  .po table{width:100%;border-collapse:collapse}
+  .po th,.po td{text-align:left;padding:10px 6px;border-bottom:2px solid var(--ink)}
+  .po th{font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  .po td:last-child,.po th:last-child{text-align:right}
+  .approvals{display:flex;gap:10px;margin-top:18px;align-items:center;font-weight:700;font-size:14px}
+  .approvals .av{width:38px;height:38px;border-radius:50%;border:2.5px solid var(--ink);display:grid;place-items:center;font-family:"Archivo Black";font-size:14px}
+
+  /* tracking */
+  .track h4{font-family:"Archivo Black";font-weight:400;font-size:22px;margin-bottom:6px}
+  .track .sub{font-size:14px;margin-bottom:18px}
+  .route{position:relative;height:120px;margin:10px 0 18px}
+  .route svg{width:100%;height:100%}
+  .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:13px;font-weight:700;text-align:center}
+  .timeline div{border:2.5px solid var(--ink);padding:8px 4px;background:#fff}
+  .timeline .done{background:var(--teal)}
+  .timeline .now{background:var(--yellow);animation:blink 1.2s steps(2) infinite}
+  @keyframes blink{50%{background:#fff}}
+
+  /* ---------- How it works ---------- */
+  .how{padding:130px 0;background:var(--blue);color:#fff;border-bottom:var(--b);overflow:hidden}
+  .how .sec-head h2{color:#fff;text-shadow:5px 5px 0 var(--ink)}
+  .how .sec-head .kicker{color:var(--yellow)}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;position:relative}
+  .step{background:var(--cream);color:var(--ink);border:var(--b);padding:30px 26px;box-shadow:var(--shadow);position:relative;z-index:2}
+  .step:nth-child(even){margin-top:50px}
+  .step .n{width:62px;height:62px;border:var(--b);display:grid;place-items:center;font-family:"Archivo Black";font-size:28px;margin-bottom:20px;background:var(--pink)}
+  .step:nth-child(2) .n{background:var(--yellow);border-radius:50%}
+  .step:nth-child(3) .n{background:var(--teal);transform:rotate(45deg)}
+  .step:nth-child(3) .n span{transform:rotate(-45deg)}
+  .step:nth-child(4) .n{background:var(--lilac);border-radius:0 30px 0 30px}
+  .step h3{font-size:24px;margin-bottom:10px}
+  .step p{font-size:16px}
+  .how-squig{position:absolute;left:0;right:0;top:50%;height:60px;z-index:1;opacity:.35}
+
+  /* ---------- Stats ---------- */
+  .stats{padding:110px 0;border-bottom:var(--b)}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);border:var(--b);background:#fff;box-shadow:var(--shadow)}
+  .stat{padding:44px 30px;border-right:var(--b);position:relative;overflow:hidden}
+  .stat:last-child{border-right:none}
+  .stat .big{font-family:"Archivo Black";font-size:68px;line-height:1}
+  .stat p{font-weight:500;margin-top:12px;font-size:17px}
+  .stat::after{content:"";position:absolute;width:90px;height:90px;right:-30px;top:-30px;border:var(--b);border-radius:50%}
+  .stat:nth-child(1)::after{background:var(--pink)}
+  .stat:nth-child(2)::after{background:var(--teal);border-radius:0;transform:rotate(20deg)}
+  .stat:nth-child(3)::after{background:var(--yellow)}
+  .stat:nth-child(4)::after{background:var(--lilac);border-radius:0}
+
+  /* ---------- Testimonial ---------- */
+  .quote-sec{padding:130px 0;border-bottom:var(--b);overflow:hidden}
+  .quote-box{
+    position:relative;max-width:1000px;margin:0 auto;background:var(--yellow);border:var(--b);box-shadow:14px 14px 0 var(--ink);
+    padding:70px 80px 60px;
+  }
+  .quote-box .qm{position:absolute;top:-58px;left:50px;font-family:"Archivo Black";font-size:180px;line-height:1;color:var(--pink);-webkit-text-stroke:3px var(--ink)}
+  .quote-box blockquote{font-family:"Archivo Black";font-size:38px;line-height:1.2}
+  .quote-box blockquote em{font-style:normal;background:#fff;padding:0 8px;border:2.5px solid var(--ink)}
+  .who{display:flex;align-items:center;gap:18px;margin-top:36px}
+  .who .face{width:72px;height:72px;border-radius:50%;border:var(--b);background:var(--teal);overflow:hidden}
+  .who b{display:block;font-size:20px}
+  .q-deco1{position:absolute;right:-60px;bottom:-50px;width:140px;height:140px;border:var(--b);background-color:var(--teal);z-index:-1}
+  .q-deco2{position:absolute;left:-90px;bottom:40px;width:120px;height:120px;border-radius:50%;border:var(--b);background:var(--lilac);z-index:-1}
+
+  /* ---------- Demo ---------- */
+  .demo{padding:130px 0;overflow:hidden;border-bottom:var(--b)}
+  .demo .wrap{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+  .demo h2{font-size:72px;margin-bottom:26px}
+  .demo h2 span{color:var(--teal);-webkit-text-stroke:3px var(--ink);text-shadow:5px 5px 0 var(--ink)}
+  .demo .copy p{font-size:21px;margin-bottom:30px}
+  .agenda{list-style:none;display:grid;gap:14px;counter-reset:ag}
+  .agenda li{display:flex;gap:16px;align-items:center;font-weight:700;background:#fff;border:var(--b);padding:14px 18px;box-shadow:4px 4px 0 var(--ink)}
+  .agenda li::before{counter-increment:ag;content:counter(ag,decimal-leading-zero);font-family:"Archivo Black";background:var(--ink);color:var(--yellow);padding:4px 8px;font-size:15px}
+  .agenda li:nth-child(2){margin-left:24px}
+  .agenda li:nth-child(3){margin-left:48px}
+  .agenda .time{margin-left:auto;font-weight:500;font-size:15px}
+
+  .form-card{position:relative;background:#fff;border:var(--b);box-shadow:14px 14px 0 var(--ink);padding:44px 44px 40px}
+  .form-card::before{content:"";position:absolute;top:-26px;right:40px;width:120px;height:44px;background:var(--pink);border:var(--b);transform:rotate(-6deg)}
+  .form-card h3{font-size:32px;margin-bottom:6px}
+  .form-card .sub{margin-bottom:26px}
+  .field{margin-bottom:18px}
+  .field label{display:block;font-weight:700;font-size:15px;margin-bottom:6px}
+  .field input,.field select{
+    width:100%;font:inherit;font-size:17px;padding:14px 16px;border:var(--b);background:var(--cream);border-radius:0;appearance:none;
+    transition:box-shadow .15s, background .15s;
+  }
+  .field select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(-45deg,transparent 50%,var(--ink) 50%);background-position:calc(100% - 26px) 50%,calc(100% - 18px) 50%;background-size:8px 8px;background-repeat:no-repeat}
+  .field input:focus,.field select:focus{outline:none;background-color:#fff;box-shadow:5px 5px 0 var(--pink)}
+  .field.err input,.field.err select{box-shadow:5px 5px 0 var(--red)}
+  .field .msg{color:var(--red);font-weight:700;font-size:14px;margin-top:6px;display:none}
+  .field.err .msg{display:block}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .form-card .btn{width:100%;justify-content:center;margin-top:8px;font-size:21px}
+  .fine{font-size:13px;margin-top:14px;text-align:center}
+  .success{display:none;text-align:center;padding:30px 0}
+  .success.show{display:block}
+  .success h3{font-size:40px;margin:16px 0 10px}
+  .success svg{width:120px;height:120px}
+
+  /* ---------- FAQ ---------- */
+  .faq{padding:120px 0;border-bottom:var(--b)}
+  .faq-list{max-width:900px;margin:0 auto;display:grid;gap:18px}
+  details{border:var(--b);background:#fff;box-shadow:var(--shadow-sm)}
+  details:nth-child(4n+1) summary{--c:var(--pink)}
+  details:nth-child(4n+2) summary{--c:var(--teal)}
+  details:nth-child(4n+3) summary{--c:var(--yellow)}
+  details:nth-child(4n+4) summary{--c:var(--lilac)}
+  summary{list-style:none;cursor:pointer;padding:22px 26px;font-family:"Archivo Black";font-size:22px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";flex:0 0 44px;height:44px;display:grid;place-items:center;border:var(--b);background:var(--c);font-size:26px;transition:transform .2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details[open] summary{border-bottom:var(--b)}
+  details p{padding:20px 26px 24px;font-size:18px}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--ink);color:var(--cream);padding:80px 0 40px;position:relative;overflow:hidden}
+  .foot-cta{display:flex;justify-content:space-between;align-items:center;gap:40px;padding-bottom:60px;border-bottom:3px dashed #555;margin-bottom:40px}
+  .foot-cta h2{font-size:64px;color:var(--yellow);max-width:760px}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;font-size:16px}
+  .foot-grid h4{font-family:"Archivo Black";font-weight:400;color:var(--pink);margin-bottom:14px;font-size:17px}
+  .foot-grid ul{list-style:none;display:grid;gap:8px}
+  .foot-grid a{text-decoration:none;opacity:.85}
+  .foot-grid a:hover{opacity:1;color:var(--teal)}
+  .foot-grid .logo{color:var(--cream);margin-bottom:14px}
+  .legal{margin-top:50px;font-size:14px;opacity:.6;display:flex;justify-content:space-between}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity .6s ease, transform .6s cubic-bezier(.2,.9,.3,1.3)}
+  .reveal.in{opacity:1;transform:none}
+  .chaos.reveal.in:nth-child(1){transform:rotate(-2deg)}
+  .chaos.reveal.in:nth-child(2){transform:rotate(1.5deg) translateY(20px)}
+  .chaos.reveal.in:nth-child(3){transform:rotate(-1deg)}
+
+  .spin{animation:spin 18s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .bob{animation:bob 4s ease-in-out infinite}
+  @keyframes bob{50%{translate:0 -14px}}
+
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:100}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar" aria-hidden="true">
+  <div class="marquee">
+    <span>★ CONFIGURE IT</span><span>● ORDER IT</span><span>▲ TRACK IT</span><span>■ STOP EMAILING SPREADSHEETS</span><span>★ WIDGETS WITHOUT THE WOBBLE</span><span>● BOOK A DEMO, IT'S 30 MINUTES</span>
+    <span>★ CONFIGURE IT</span><span>● ORDER IT</span><span>▲ TRACK IT</span><span>■ STOP EMAILING SPREADSHEETS</span><span>★ WIDGETS WITHOUT THE WOBBLE</span><span>● BOOK A DEMO, IT'S 30 MINUTES</span>
+  </div>
+</div>
+
+<nav aria-label="Main">
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg viewBox="0 0 46 46" aria-hidden="true">
+        <circle cx="16" cy="16" r="13" fill="#FFD23F" stroke="#141414" stroke-width="3"/>
+        <rect x="18" y="18" width="24" height="24" fill="#FF6FB5" stroke="#141414" stroke-width="3"/>
+        <path d="M4 42 L14 26 L24 42 Z" fill="#1FC8B8" stroke="#141414" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+      acme
+    </a>
+    <ul class="navlinks">
+      <li><a href="#features">Platform</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#proof">Customers</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a href="#demo" class="btn">Book a demo</a>
+  </div>
+</nav>
+
+<header class="hero terrazzo">
+  <div class="wrap">
+    <div>
+      <span class="tag">Widget ops for mid-sized manufacturers</span>
+      <h1>Custom widgets.<br><span class="hl">Zero</span> <span class="pinkword">chaos.</span></h1>
+      <p class="lede">Acme gives your operations team one bright, loud, delightfully organized place to configure, order, and track every custom widget across your supply chain. No more spec sheets named <em>FINAL_v7_actualfinal.xlsx</em>.</p>
+      <div class="hero-ctas">
+        <a href="#demo" class="btn">Book a 30-min demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#features" class="btn alt">See the platform</a>
+      </div>
+      <div class="scribble-note">
+        <svg width="54" height="40" viewBox="0 0 54 40" fill="none" stroke="#3A5BFF" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M50 36 C 34 36, 14 30, 8 8"/><path d="M2 14 L8 6 L15 13"/></svg>
+        a real human, not a sales robot
+      </div>
+    </div>
+
+    <div class="hero-art" id="heroArt" aria-hidden="true">
+      <div class="shape s-circle" data-depth="12"></div>
+      <div class="shape s-dots dots" data-depth="24"></div>
+      <div class="shape s-half" data-depth="30"></div>
+      <div class="shape s-stripe stripes" data-depth="18"></div>
+      <svg class="shape s-tri" data-depth="34" width="150" height="130" viewBox="0 0 150 130" style="width:150px;height:130px"><path d="M75 6 L144 124 H6 Z" fill="#FF4B3E" stroke="#141414" stroke-width="4" stroke-linejoin="round"/></svg>
+      <svg class="shape s-squig" data-depth="40" width="260" height="60" viewBox="0 0 260 60" style="left:-40px;top:470px;z-index:7"><path d="M6 30 Q26 4 46 30 T86 30 T126 30 T166 30 T206 30 T246 30" fill="none" stroke="#141414" stroke-width="14" stroke-linecap="round"/><path d="M6 30 Q26 4 46 30 T86 30 T126 30 T166 30 T206 30 T246 30" fill="none" stroke="#1FC8B8" stroke-width="7" stroke-linecap="round"/></svg>
+      <svg class="shape spin" data-depth="20" style="right:40px;top:0;width:90px;height:90px" viewBox="0 0 90 90"><g stroke="#141414" stroke-width="7" stroke-linecap="round"><path d="M45 8V82M8 45H82M19 19L71 71M71 19L19 71"/></g></svg>
+
+      <div class="widget-card bob">
+        <div class="wc-head"><span>Order #AC-4471</span><span class="lights"><i></i><i></i><i></i></span></div>
+        <div class="wc-body">
+          <svg class="widget" viewBox="0 0 190 150">
+            <ellipse cx="95" cy="128" rx="70" ry="12" fill="#141414" opacity=".15"/>
+            <rect x="40" y="52" width="110" height="64" fill="#3A5BFF" stroke="#141414" stroke-width="4"/>
+            <ellipse cx="95" cy="116" rx="55" ry="14" fill="#3A5BFF" stroke="#141414" stroke-width="4"/>
+            <rect x="42" y="54" width="106" height="62" fill="#3A5BFF"/>
+            <line x1="40" y1="52" x2="40" y2="116" stroke="#141414" stroke-width="4"/>
+            <line x1="150" y1="52" x2="150" y2="116" stroke="#141414" stroke-width="4"/>
+            <path d="M60 60v50M80 62v52M100 62v52M120 62v52M138 60v50" stroke="#141414" stroke-width="3" opacity=".35"/>
+            <ellipse cx="95" cy="52" rx="55" ry="14" fill="#FFD23F" stroke="#141414" stroke-width="4"/>
+            <ellipse cx="95" cy="52" rx="20" ry="5" fill="#FF6FB5" stroke="#141414" stroke-width="3"/>
+            <rect x="88" y="14" width="14" height="38" fill="#1FC8B8" stroke="#141414" stroke-width="4"/>
+            <circle cx="95" cy="12" r="9" fill="#FF4B3E" stroke="#141414" stroke-width="4"/>
+          </svg>
+          <div class="spec-row"><span>Model</span><b>WX-900 Flange, Cobalt</b></div>
+          <div class="spec-row"><span>Quantity</span><b>12,500 units</b></div>
+          <div class="spec-row"><span>Tolerance</span><b>±0.02 mm</b></div>
+          <div class="progress"><span></span></div>
+          <div class="status-line"><span>In transit → Plant 3, Dayton</span><span>ETA Thu</span></div>
+        </div>
+      </div>
+      <div class="sticker"><div><span>0</span>lost POs this quarter</div></div>
+
+      <i class="confetti-bit shape" data-depth="50" style="width:22px;height:22px;background:#FF6FB5;left:40px;top:250px;transform:rotate(20deg)"></i>
+      <i class="confetti-bit shape" data-depth="44" style="width:18px;height:18px;border-radius:50%;background:#FFD23F;left:540px;top:370px"></i>
+      <i class="confetti-bit shape" data-depth="60" style="width:34px;height:12px;background:#3A5BFF;left:300px;top:590px;transform:rotate(-30deg)"></i>
+      <i class="confetti-bit shape" data-depth="38" style="width:14px;height:14px;background:#1FC8B8;left:520px;top:80px;transform:rotate(45deg)"></i>
+    </div>
+  </div>
+</header>
+
+<section class="logos" aria-label="Trusted by">
+  <div class="wrap">
+    <p>Keeping widgets in line at 140+ plants</p>
+    <span class="logo-item"><i style="border-radius:50%"></i>Halvorsen Fab</span>
+    <span class="logo-item"><i></i>Ridgeline Metals</span>
+    <span class="logo-item"><i style="transform:rotate(45deg)"></i>Brightwater Co.</span>
+    <span class="logo-item"><i style="border-radius:0 12px"></i>Kestrel Assembly</span>
+    <span class="logo-item"><i style="border-radius:50% 50% 0 0"></i>Northpine Tooling</span>
+  </div>
+</section>
+
+<section class="problem">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">sound familiar?</span>
+      <h2>Your widget process is held together with email and hope.</h2>
+      <p>Custom parts have a lot of moving pieces. Right now, most of them are moving between inboxes.</p>
+    </div>
+    <div class="chaos-grid">
+      <div class="chaos reveal">
+        <span class="x" aria-hidden="true">✕</span>
+        <div class="num">01</div>
+        <h3>Specs go sideways</h3>
+        <p>A tolerance gets fat-fingered on revision four, nobody notices, and 8,000 flanges arrive that fit absolutely nothing.</p>
+      </div>
+      <div class="chaos reveal">
+        <span class="x" aria-hidden="true">✕</span>
+        <div class="num">02</div>
+        <h3>Orders vanish</h3>
+        <p>Purchasing thinks engineering approved it. Engineering thinks purchasing sent it. The supplier is still waiting on a PDF.</p>
+      </div>
+      <div class="chaos reveal">
+        <span class="x" aria-hidden="true">✕</span>
+        <div class="num">03</div>
+        <h3>Tracking is guessing</h3>
+        <p>"Where's the shipment?" becomes a three-day scavenger hunt through carrier portals, voicemails, and a whiteboard in Plant 2.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">enter: acme</span>
+      <h2>One platform. Three superpowers.</h2>
+      <p>Everything your ops team needs to get the right widget to the right line, on the right day.</p>
+    </div>
+
+    <!-- Configure -->
+    <div class="feature">
+      <div class="f-art reveal">
+        <div class="f-back dots" style="background-color:var(--pink)"></div>
+        <div class="f-panel">
+          <div class="cfg-row"><span>Finish</span>
+            <div class="swatches" id="swatches">
+              <button aria-label="Cobalt" aria-pressed="true" data-c="#3A5BFF" style="background:#3A5BFF"></button>
+              <button aria-label="Flamingo" aria-pressed="false" data-c="#FF6FB5" style="background:#FF6FB5"></button>
+              <button aria-label="Citron" aria-pressed="false" data-c="#FFD23F" style="background:#FFD23F"></button>
+              <button aria-label="Lagoon" aria-pressed="false" data-c="#1FC8B8" style="background:#1FC8B8"></button>
+            </div>
+          </div>
+          <div class="cfg-row"><span>Material</span>
+            <div class="seg" id="mat">
+              <button aria-pressed="true" data-p="0">Steel</button>
+              <button aria-pressed="false" data-p="0.18">Titanium</button>
+              <button aria-pressed="false" data-p="-0.12">Nylon</button>
+            </div>
+          </div>
+          <div class="cfg-row"><span>Diameter</span>
+            <div class="seg" id="dia">
+              <button aria-pressed="false" data-p="-0.08">40mm</button>
+              <button aria-pressed="true" data-p="0">60mm</button>
+              <button aria-pressed="false" data-p="0.14">80mm</button>
+            </div>
+          </div>
+          <div class="cfg-preview">
+            <svg viewBox="0 0 130 110" aria-hidden="true">
+              <rect x="25" y="40" width="80" height="46" id="cfgBody" fill="#3A5BFF" stroke="#141414" stroke-width="4"/>
+              <ellipse cx="65" cy="86" rx="40" ry="10" id="cfgBot" fill="#3A5BFF" stroke="#141414" stroke-width="4"/>
+              <rect x="27" y="42" width="76" height="44" id="cfgFill" fill="#3A5BFF"/>
+              <ellipse cx="65" cy="40" rx="40" ry="10" fill="#FFD23F" stroke="#141414" stroke-width="4"/>
+              <rect x="58" y="10" width="14" height="30" fill="#1FC8B8" stroke="#141414" stroke-width="4"/>
+              <circle cx="65" cy="9" r="7" fill="#FF4B3E" stroke="#141414" stroke-width="4"/>
+            </svg>
+            <div>
+              <div class="price" id="price">$4.82</div>
+              <small>per unit at 10k qty · validated against 214 rules</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="f-copy reveal">
+        <div class="label"><b>1</b> Configure</div>
+        <h3>Build the widget. Skip the back-and-forth.</h3>
+        <p>A visual configurator that knows your engineering rules, so impossible specs can't sneak through. Try it: click the swatches on the left.</p>
+        <ul>
+          <li>Guardrails flag out-of-tolerance specs before anyone hits submit</li>
+          <li>Live pricing from your approved suppliers as you build</li>
+          <li>Every revision versioned, diffed, and signed off in one thread</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Order -->
+    <div class="feature flip">
+      <div class="f-art reveal">
+        <div class="f-back stripes" style="background-color:var(--yellow);inset:0 0 70px 70px"></div>
+        <div class="f-panel po" style="inset:40px 40px 30px 30px">
+          <div class="po-head"><h4>PO-2291</h4><span class="pill">Awaiting 1 approval</span></div>
+          <table>
+            <thead><tr><th>Widget</th><th>Qty</th><th>Total</th></tr></thead>
+            <tbody>
+              <tr><td>WX-900 Flange, Cobalt</td><td>12,500</td><td>$60,250</td></tr>
+              <tr><td>Hex Coupler, Nylon</td><td>4,000</td><td>$9,840</td></tr>
+              <tr><td>Swivel Cap, Titanium</td><td>800</td><td>$11,120</td></tr>
+            </tbody>
+          </table>
+          <div class="approvals">
+            <span class="av" style="background:var(--teal)">JR</span>
+            <span class="av" style="background:var(--pink)">MK</span>
+            <span class="av" style="background:#fff;border-style:dashed">?</span>
+            <span>Priya in Finance is up next</span>
+          </div>
+        </div>
+      </div>
+      <div class="f-copy reveal">
+        <div class="label"><b style="background:var(--teal)">2</b> Order</div>
+        <h3>Purchase orders that actually go somewhere.</h3>
+        <p>Turn an approved config into a PO in two clicks. Acme routes it through your approval chain and sends it straight to the supplier, formatted the way they like it.</p>
+        <ul>
+          <li>Custom approval flows by plant, spend, or widget category</li>
+          <li>Syncs with SAP, NetSuite, Oracle, and Dynamics</li>
+          <li>Reorder a past run in seconds, specs and all</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Track -->
+    <div class="feature">
+      <div class="f-art reveal">
+        <div class="f-back squiggle-bg" style="background-color:var(--teal)"></div>
+        <div class="f-panel track">
+          <h4>12,500 × WX-900 Flange</h4>
+          <div class="sub">Supplier: Ridgeline Metals · Carrier: FastFreight LTL</div>
+          <div class="route">
+            <svg viewBox="0 0 400 120" aria-hidden="true">
+              <path d="M20 90 C 90 10, 150 110, 210 60 S 330 20, 380 40" fill="none" stroke="#141414" stroke-width="4" stroke-dasharray="10 8"/>
+              <path id="doneRoute" d="M20 90 C 90 10, 150 110, 210 60" fill="none" stroke="#FF6FB5" stroke-width="8" stroke-linecap="round"/>
+              <circle cx="20" cy="90" r="11" fill="#1FC8B8" stroke="#141414" stroke-width="4"/>
+              <rect x="368" y="28" width="24" height="24" fill="#FFD23F" stroke="#141414" stroke-width="4"/>
+              <g id="truck">
+                <circle r="14" fill="#fff" stroke="#141414" stroke-width="4"/>
+                <path d="M-6 -2 h8 v6 h-8z M2 0 h4 l2 3 v1 h-6z" fill="#141414"/>
+              </g>
+            </svg>
+          </div>
+          <div class="timeline">
+            <div class="done">Ordered</div>
+            <div class="done">Machined</div>
+            <div class="now">In transit</div>
+            <div>Received</div>
+          </div>
+        </div>
+      </div>
+      <div class="f-copy reveal">
+        <div class="label"><b style="background:var(--pink)">3</b> Track</div>
+        <h3>Know where every widget is. Every time.</h3>
+        <p>From the machining floor to your loading dock, Acme pulls status from suppliers and carriers into one live view. When something slips, you hear about it first.</p>
+        <ul>
+          <li>Real-time milestones from 60+ carriers and supplier portals</li>
+          <li>Delay alerts with the downstream production runs they affect</li>
+          <li>Receiving checklists that match deliveries to the original spec</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <svg class="how-squig" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 Q 60 0 120 30 T 240 30 T 360 30 T 480 30 T 600 30 T 720 30 T 840 30 T 960 30 T 1080 30 T 1200 30 T 1320 30 T 1440 30" fill="none" stroke="#FFD23F" stroke-width="10"/></svg>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">no six-month rollout</span>
+      <h2>Live in weeks, not fiscal years.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="n"><span>1</span></div><h3>Book the demo</h3><p>We'll walk through your current widget workflow and show you Acme using parts like yours.</p></div>
+      <div class="step reveal"><div class="n"><span>2</span></div><h3>Import your catalog</h3><p>Send us your spec sheets, however messy. Our team turns them into configurable, rule-checked templates.</p></div>
+      <div class="step reveal"><div class="n"><span>3</span></div><h3>Connect your stack</h3><p>Plug in your ERP, suppliers, and carriers. Most teams are fully connected in under two weeks.</p></div>
+      <div class="step reveal"><div class="n"><span>4</span></div><h3>Run the show</h3><p>Your ops team configures, orders, and tracks from one screen. The group chat finally goes quiet.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="stats" id="proof">
+  <div class="wrap">
+    <div class="stat-grid reveal">
+      <div class="stat"><div class="big" data-count="41" data-suffix="%">0%</div><p>fewer spec errors reaching suppliers</p></div>
+      <div class="stat"><div class="big" data-count="6" data-suffix=" days">0 days</div><p>shaved off the average order cycle</p></div>
+      <div class="stat"><div class="big" data-count="12" data-suffix=" hrs">0 hrs</div><p>saved per ops planner, every week</p></div>
+      <div class="stat"><div class="big" data-count="98" data-suffix="%">0%</div><p>of shipments tracked without a phone call</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="quote-sec">
+  <div class="wrap">
+    <figure class="quote-box reveal">
+      <span class="qm" aria-hidden="true">“</span>
+      <span class="q-deco1 dots" aria-hidden="true"></span>
+      <span class="q-deco2" aria-hidden="true"></span>
+      <blockquote>We used to run custom parts across four plants on email threads and a shared drive. Now it's all in Acme, and <em>nobody has asked me "where's the order?"</em> in three months.</blockquote>
+      <figcaption class="who">
+        <span class="face" aria-hidden="true">
+          <svg viewBox="0 0 72 72"><circle cx="36" cy="30" r="14" fill="#FFD23F" stroke="#141414" stroke-width="3"/><path d="M10 72 C 12 50, 60 50, 62 72" fill="#FF6FB5" stroke="#141414" stroke-width="3"/><path d="M22 26 Q36 8 50 26" fill="#141414"/></svg>
+        </span>
+        <div><b>Dana Okafor</b>Director of Operations, Halvorsen Fabrication</div>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="demo terrazzo" id="demo">
+  <div class="wrap">
+    <div class="copy reveal">
+      <h2>Let's make your widgets <span>behave.</span></h2>
+      <p>Grab 30 minutes with a widget ops specialist. Bring your gnarliest part and your most painful process. We'll show you exactly how Acme handles both.</p>
+      <ol class="agenda">
+        <li>Your current workflow, mapped <span class="time">5 min</span></li>
+        <li>Live build of one of your widgets <span class="time">15 min</span></li>
+        <li>Rollout plan and pricing <span class="time">10 min</span></li>
+      </ol>
+    </div>
+
+    <div class="form-card reveal">
+      <form id="demoForm" novalidate>
+        <h3>Book your demo</h3>
+        <p class="sub">We'll reply within one business day with times that work.</p>
+        <div class="row2">
+          <div class="field"><label for="fname">Full name</label><input id="fname" name="fname" autocomplete="name" required><div class="msg">We'd love to know who we're talking to.</div></div>
+          <div class="field"><label for="title">Job title</label><input id="title" name="title" autocomplete="organization-title"><div class="msg"></div></div>
+        </div>
+        <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" autocomplete="email" required><div class="msg">That email looks a little wobbly.</div></div>
+        <div class="field"><label for="company">Company</label><input id="company" name="company" autocomplete="organization" required><div class="msg">Which manufacturer are you with?</div></div>
+        <div class="field"><label for="plants">How many plants do you run?</label>
+          <select id="plants" name="plants" required>
+            <option value="">Choose one</option>
+            <option>1 plant</option>
+            <option>2–5 plants</option>
+            <option>6–15 plants</option>
+            <option>16+ plants</option>
+          </select>
+          <div class="msg">Pick the closest option.</div>
+        </div>
+        <button class="btn" type="submit">Book my demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg>
+        </button>
+        <p class="fine">No spam, no 14-email nurture sequence. Just one calendar invite.</p>
+      </form>
+      <div class="success" id="success" role="status" aria-live="polite">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="#1FC8B8" stroke="#141414" stroke-width="5"/><path d="M36 62 L54 80 L86 42" fill="none" stroke="#141414" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>You're on the list!</h3>
+        <p id="successMsg">Check your inbox. A calendar link is on its way.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">asked &amp; answered</span>
+      <h2>Questions, loudly answered.</h2>
+    </div>
+    <div class="faq-list">
+      <details class="reveal"><summary>Who is Acme built for?</summary><p>Operations, procurement, and supply chain teams at manufacturers with roughly 1 to 30 plants who order custom or configured widgets from outside suppliers. If your team juggles specs, POs, and shipment status across multiple systems, you're our people.</p></details>
+      <details class="reveal"><summary>Does it work with our ERP?</summary><p>Yes. Acme ships with native connectors for SAP S/4HANA, NetSuite, Oracle, and Microsoft Dynamics, plus a REST API and flat-file sync for everything else. POs, receipts, and item masters stay in sync both ways.</p></details>
+      <details class="reveal"><summary>Do our suppliers need to sign up?</summary><p>No. Suppliers can receive orders by email, EDI, or their own portal, and update status through a no-login link. Those who want deeper visibility can join Acme free.</p></details>
+      <details class="reveal"><summary>How long does implementation take?</summary><p>Most customers are live in three to six weeks. Our onboarding team converts your existing spec sheets into configurable templates, so you don't have to rebuild your catalog by hand.</p></details>
+      <details class="reveal"><summary>How is Acme priced?</summary><p>Annual plans based on the number of plants you run, with unlimited users. We'll walk through exact numbers on the demo, based on what you actually need.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cta">
+      <h2>Stop chasing widgets. Start running them.</h2>
+      <a href="#demo" class="btn yellow">Book a demo</a>
+    </div>
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="logo" aria-label="Acme home">
+          <svg viewBox="0 0 46 46" aria-hidden="true" width="46" height="46">
+            <circle cx="16" cy="16" r="13" fill="#FFD23F" stroke="#FFF6E5" stroke-width="3"/>
+            <rect x="18" y="18" width="24" height="24" fill="#FF6FB5" stroke="#FFF6E5" stroke-width="3"/>
+            <path d="M4 42 L14 26 L24 42 Z" fill="#1FC8B8" stroke="#FFF6E5" stroke-width="3" stroke-linejoin="round"/>
+          </svg>
+          acme
+        </a>
+        <p style="max-width:320px;opacity:.8">The widget operations platform for mid-sized manufacturers. Configure, order, and track, all in one wonderfully loud place.</p>
+      </div>
+      <div><h4>Platform</h4><ul><li><a href="#features">Configurator</a></li><li><a href="#features">Ordering</a></li><li><a href="#features">Tracking</a></li><li><a href="#faq">Integrations</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="#proof">Customers</a></li><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Press</a></li></ul></div>
+      <div><h4>Say hi</h4><ul><li><a href="#demo">Book a demo</a></li><li><a href="mailto:hello@acme.example">hello@acme.example</a></li><li><a href="#">Security</a></li><li><a href="#">Status</a></li></ul></div>
+    </div>
+    <div class="legal"><span>© 2025 Acme Widget Systems, Inc.</span><span>Privacy · Terms · Made with too many shapes</span></div>
+  </div>
+</footer>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Hero parallax */
+  const art = document.getElementById('heroArt');
+  const shapes = art.querySelectorAll('.shape');
+  if (!reduce) {
+    window.addEventListener('mousemove', e => {
+      const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+      shapes.forEach(s => {
+        const d = +s.dataset.depth || 10;
+        s.style.translate = `${-x * d}px ${-y * d}px`;
+      });
+    });
+  }
+
+  /* Reveal on scroll */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, { threshold: .15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* Count-up stats */
+  const cio = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.querySelectorAll('[data-count]').forEach(el => {
+        const end = +el.dataset.count, suf = el.dataset.suffix;
+        const t0 = performance.now(), dur = reduce ? 0 : 1300;
+        const tick = now => {
+          const p = dur ? Math.min((now - t0) / dur, 1) : 1;
+          el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))) + suf;
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+      cio.unobserve(en.target);
+    });
+  }, { threshold: .4 });
+  cio.observe(document.querySelector('.stat-grid'));
+
+  /* Configurator */
+  const base = 4.82;
+  const fillEls = ['cfgBody','cfgBot','cfgFill'].map(id => document.getElementById(id));
+  const price = document.getElementById('price');
+  function group(id, onPick) {
+    const btns = document.querySelectorAll('#' + id + ' button');
+    btns.forEach(b => b.addEventListener('click', () => {
+      btns.forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+      onPick && onPick(b);
+      updatePrice();
+    }));
+  }
+  function sel(id) { return document.querySelector('#' + id + ' [aria-pressed="true"]'); }
+  function updatePrice() {
+    const m = +sel('mat').dataset.p, d = +sel('dia').dataset.p;
+    const c = sel('swatches').dataset.c === '#3A5BFF' ? 0 : 0.06;
+    price.textContent = '$' + (base * (1 + m + d) + c).toFixed(2);
+  }
+  group('swatches', b => fillEls.forEach(el => el.setAttribute('fill', b.dataset.c)));
+  group('mat'); group('dia');
+
+  /* Truck along route */
+  const route = document.getElementById('doneRoute');
+  const truck = document.getElementById('truck');
+  const len = route.getTotalLength();
+  let tp = 0;
+  function moveTruck() {
+    tp = (tp + 0.0025) % 1;
+    const pt = route.getPointAtLength(len * (0.55 + 0.45 * (0.5 - 0.5 * Math.cos(tp * Math.PI * 2))));
+    truck.setAttribute('transform', `translate(${pt.x},${pt.y})`);
+    if (!reduce) requestAnimationFrame(moveTruck);
+  }
+  moveTruck();
+
+  /* Confetti */
+  const cv = document.getElementById('confetti'), ctx = cv.getContext('2d');
+  const colors = ['#FF6FB5','#FFD23F','#1FC8B8','#3A5BFF','#FF4B3E','#B69CFF'];
+  let bits = [];
+  function resize() { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+  resize(); addEventListener('resize', resize);
+  function burst(x, y) {
+    if (reduce) return;
+    for (let i = 0; i < 140; i++) {
+      const a = Math.random() * Math.PI * 2, s = 4 + Math.random() * 10;
+      bits.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 6, r: Math.random() * 6.28, vr: (Math.random() - .5) * .3,
+        size: 8 + Math.random() * 12, c: colors[i % colors.length], t: i % 4, life: 1 });
+    }
+    if (bits.length === 140) requestAnimationFrame(draw);
+  }
+  function draw() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    bits.forEach(b => {
+      b.vy += .28; b.vx *= .99; b.x += b.vx; b.y += b.vy; b.r += b.vr; b.life -= .006;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r); ctx.globalAlpha = Math.max(b.life, 0);
+      ctx.fillStyle = b.c; ctx.strokeStyle = '#141414'; ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      const s = b.size;
+      if (b.t === 0) ctx.rect(-s/2, -s/2, s, s);
+      else if (b.t === 1) ctx.arc(0, 0, s/2, 0, 6.28);
+      else if (b.t === 2) { ctx.moveTo(0, -s/2); ctx.lineTo(s/2, s/2); ctx.lineTo(-s/2, s/2); ctx.closePath(); }
+      else ctx.rect(-s, -s/5, s * 2, s / 2.5);
+      ctx.fill(); ctx.stroke(); ctx.restore();
+    });
+    bits = bits.filter(b => b.life > 0 && b.y < innerHeight + 60);
+    if (bits.length) requestAnimationFrame(draw); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+  }
+
+  /* Form */
+  const form = document.getElementById('demoForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true, first = null;
+    [['fname', v => v.trim().length > 1], ['email', v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())],
+     ['company', v => v.trim().length > 1], ['plants', v => v !== '']].forEach(([id, test]) => {
+      const el = document.getElementById(id), f = el.closest('.field');
+      const good = test(el.value);
+      f.classList.toggle('err', !good);
+      el.setAttribute('aria-invalid', !good);
+      if (!good) { ok = false; first = first || el; }
+    });
+    if (!ok) { first.focus(); return; }
+    const name = document.getElementById('fname').value.trim().split(' ')[0];
+    const email = document.getElementById('email').value.trim();
+    document.getElementById('successMsg').textContent =
+      `Thanks, ${name}! A widget specialist will email ${email} within one business day with a few times to meet.`;
+    form.style.display = 'none';
+    document.getElementById('success').classList.add('show');
+    const r = form.parentElement.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + 120);
+  });
+  form.querySelectorAll('input,select').forEach(el => el.addEventListener('input', () => el.closest('.field').classList.remove('err')));
+
+  /* A little chaos: click hero shapes for confetti */
+  art.addEventListener('click', e => burst(e.clientX, e.clientY));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, made to behave.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400;1,6..96,700&family=Jost:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f2ead8;
+    --paper-2:#e9dfc8;
+    --ink:#141210;
+    --red:#e2361f;
+    --blue:#1f4ea3;
+    --yellow:#f5c211;
+    --green:#1f8a4c;
+    --serif:'Bodoni Moda', 'Didot', serif;
+    --sans:'Jost', 'Futura', sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:18px;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.22;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.25  0 0 0 0 0.2  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  a{color:inherit}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 48px;position:relative}
+
+  /* NAV */
+  nav{padding:28px 0}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:900;font-size:30px;letter-spacing:-.02em}
+  .logo svg{width:44px;height:44px}
+  .logo:hover svg{animation:spin 1.2s ease-in-out}
+  .navlinks{display:flex;gap:40px;align-items:center;font-weight:500;font-size:16px;letter-spacing:.04em;text-transform:uppercase}
+  .navlinks a{text-decoration:none;position:relative}
+  .navlinks a:not(.btn)::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:3px;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .25s}
+  .navlinks a:not(.btn):hover::after{transform:scaleX(1)}
+  .btn{
+    display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;
+    font-family:var(--sans);font-weight:700;font-size:16px;letter-spacing:.06em;text-transform:uppercase;
+    padding:16px 28px;border:none;cursor:pointer;position:relative;transition:transform .15s, box-shadow .15s;
+    box-shadow:6px 6px 0 var(--red);
+  }
+  .btn:hover{transform:translate(-3px,-3px) rotate(-1.5deg);box-shadow:9px 9px 0 var(--red)}
+  .btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--red)}
+  .btn.yellow{box-shadow:6px 6px 0 var(--yellow)}
+  .btn.yellow:hover{box-shadow:9px 9px 0 var(--yellow)}
+
+  /* HERO */
+  .hero{padding:40px 0 90px}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
+  .eyebrow{font-weight:700;font-size:14px;letter-spacing:.24em;text-transform:uppercase;display:inline-flex;align-items:center;gap:12px;margin-bottom:28px}
+  .eyebrow i{display:inline-block;width:14px;height:14px;background:var(--red);border-radius:50%}
+  h1{
+    font-family:var(--sans);font-weight:900;font-size:112px;line-height:.9;letter-spacing:-.045em;margin-bottom:34px;
+  }
+  h1 em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--blue)}
+  h1 .dot{color:var(--red)}
+  h1 .tilt{display:inline-block;transform:rotate(-6deg);transform-origin:left bottom;background:var(--yellow);padding:0 12px;margin-left:-4px}
+  .lede{font-size:22px;max-width:520px;margin-bottom:40px}
+  .lede b{font-weight:700}
+  .hero-cta{display:flex;align-items:center;gap:28px}
+  .hero-cta small{font-family:var(--serif);font-style:italic;font-size:18px;max-width:200px;line-height:1.3}
+  .collage{position:relative;height:600px}
+  .collage svg{width:100%;height:100%;overflow:visible}
+  .gear{transform-box:fill-box;transform-origin:center;animation:spin 14s linear infinite}
+  .gear.rev{animation-direction:reverse;animation-duration:9s}
+  .wobble{transform-box:fill-box;transform-origin:center bottom;animation:wobble 3.2s ease-in-out infinite}
+  .bob{animation:bob 4s ease-in-out infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes wobble{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(5deg)}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+  /* MARQUEE */
+  .marquee{background:var(--ink);color:var(--paper);overflow:hidden;transform:rotate(-1.6deg);margin:0 -20px;padding:22px 0;border-top:6px solid var(--red);border-bottom:6px solid var(--yellow)}
+  .marquee-track{display:flex;gap:48px;white-space:nowrap;animation:scroll 26s linear infinite;width:max-content}
+  .marquee span{font-weight:900;font-size:44px;letter-spacing:-.01em;text-transform:uppercase;display:flex;align-items:center;gap:48px}
+  .marquee span em{font-family:var(--serif);font-weight:400;text-transform:none;color:var(--yellow)}
+  .shape-s{display:inline-block;width:30px;height:30px}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* PROBLEM */
+  .problem{padding:150px 0 120px}
+  .problem .wrap{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+  .kicker{font-weight:700;font-size:14px;letter-spacing:.24em;text-transform:uppercase;color:var(--red);margin-bottom:20px}
+  h2{font-weight:900;font-size:72px;line-height:.95;letter-spacing:-.04em}
+  h2 em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.015em}
+  .problem p{font-size:22px;margin-bottom:24px}
+  .problem p.big{font-family:var(--serif);font-size:34px;line-height:1.2}
+  .problem p.big u{text-decoration-color:var(--red);text-decoration-thickness:4px;text-underline-offset:6px}
+  .mess{margin-top:40px;position:relative;height:260px}
+  .scrap{position:absolute;padding:14px 18px;font-size:15px;font-weight:500;box-shadow:3px 4px 0 rgba(0,0,0,.15);transition:transform .3s}
+  .scrap:hover{transform:rotate(0) scale(1.05)!important;z-index:5}
+  .scrap small{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.7;margin-bottom:4px}
+
+  /* THREE SHAPES */
+  .shapes{padding:40px 0 140px}
+  .shapes-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:70px;gap:40px}
+  .shapes-head p{font-size:21px;max-width:420px}
+  .rebus{display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
+  .card{position:relative;padding:44px 40px 48px;min-height:520px;display:flex;flex-direction:column;transition:transform .3s}
+  .card:hover{transform:rotate(-1.2deg) translateY(-8px)}
+  .card:nth-child(2):hover{transform:rotate(1.2deg) translateY(-8px)}
+  .card .glyph{height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:30px}
+  .card .glyph svg{height:190px;width:auto;overflow:visible}
+  .card .num{font-family:var(--serif);font-style:italic;font-size:22px;margin-bottom:8px}
+  .card h3{font-weight:900;font-size:44px;letter-spacing:-.03em;line-height:1;margin-bottom:16px}
+  .card p{font-size:18px}
+  .card ul{list-style:none;margin-top:auto;padding-top:24px;font-size:15px;font-weight:500;letter-spacing:.02em}
+  .card li{padding:8px 0;border-top:2px solid currentColor;display:flex;justify-content:space-between}
+  .c-red{background:var(--red);color:var(--paper)}
+  .c-blue{background:var(--blue);color:var(--paper)}
+  .c-yellow{background:var(--yellow);color:var(--ink)}
+  .card:hover .glyph svg{animation:wobble .8s ease-in-out}
+
+  /* STATS */
+  .stats{background:var(--ink);color:var(--paper);padding:130px 0;position:relative;overflow:hidden}
+  .stats .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .stat{padding:0 40px;border-left:3px solid rgba(242,234,216,.2)}
+  .stat:first-child{border-left:none;padding-left:0}
+  .stat .n{font-family:var(--serif);font-size:150px;line-height:.9;letter-spacing:-.04em;font-weight:400}
+  .stat .n sup{font-family:var(--sans);font-size:48px;font-weight:900;vertical-align:top;position:relative;top:24px;margin-left:4px}
+  .stat:nth-child(1) .n{color:var(--yellow)}
+  .stat:nth-child(2) .n{color:var(--paper)}
+  .stat:nth-child(3) .n{color:var(--red)}
+  .stat p{font-size:19px;margin-top:18px;max-width:300px}
+  .stats-title{grid-column:1/-1;margin-bottom:80px;display:flex;justify-content:space-between;align-items:end}
+  .stats-title h2{max-width:760px}
+  .stats-title small{font-family:var(--serif);font-style:italic;font-size:16px;opacity:.6;max-width:240px;text-align:right}
+  .deco-circle{position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:var(--blue);opacity:.9}
+
+  /* HOW */
+  .how{padding:140px 0}
+  .how h2{margin-bottom:80px;max-width:800px}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+  .steps::before{content:"";position:absolute;top:60px;left:40px;right:40px;border-top:4px dashed var(--ink)}
+  .step{position:relative;padding-right:30px}
+  .step .bubble{width:120px;height:120px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:64px;font-style:italic;margin-bottom:30px;position:relative;z-index:1;transition:transform .3s}
+  .step:hover .bubble{transform:rotate(20deg) scale(1.08)}
+  .step:nth-child(1) .bubble{background:var(--red);color:var(--paper);border-radius:50%}
+  .step:nth-child(2) .bubble{background:var(--yellow);clip-path:polygon(50% 0,100% 100%,0 100%);padding-top:34px;font-size:52px}
+  .step:nth-child(3) .bubble{background:var(--blue);color:var(--paper)}
+  .step:nth-child(4) .bubble{background:var(--ink);color:var(--paper);border-radius:50% 50% 0 50%}
+  .step h4{font-weight:900;font-size:26px;letter-spacing:-.02em;margin-bottom:10px}
+  .step p{font-size:17px}
+
+  /* QUOTE */
+  .quote{padding:40px 0 140px}
+  .quote .wrap{display:grid;grid-template-columns:380px 1fr;gap:80px;align-items:center}
+  .portrait{height:440px;position:relative}
+  .portrait svg{width:100%;height:100%}
+  blockquote{font-family:var(--serif);font-size:52px;line-height:1.1;letter-spacing:-.015em;position:relative}
+  blockquote::before{content:"“";position:absolute;left:-60px;top:-50px;font-size:180px;color:var(--red);line-height:1}
+  blockquote em{background:linear-gradient(transparent 60%, var(--yellow) 60%);font-style:italic}
+  cite{display:block;margin-top:34px;font-family:var(--sans);font-style:normal;font-size:17px;letter-spacing:.04em}
+  cite b{font-weight:900;text-transform:uppercase;letter-spacing:.12em;display:block}
+
+  .logos{border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);padding:36px 0;margin-top:0}
+  .logos .wrap{display:flex;justify-content:space-between;align-items:center;gap:30px}
+  .logos small{font-weight:700;font-size:13px;letter-spacing:.2em;text-transform:uppercase;max-width:160px}
+  .lg{font-size:28px;opacity:.85;transition:opacity .2s, transform .2s}
+  .lg:hover{opacity:1;transform:rotate(-4deg)}
+  .lg1{font-family:var(--serif);font-weight:700;font-style:italic}
+  .lg2{font-weight:900;letter-spacing:.2em}
+  .lg3{font-family:var(--serif);letter-spacing:.1em;text-transform:uppercase}
+  .lg4{font-weight:500;letter-spacing:-.04em}
+  .lg5{font-weight:900;font-style:italic}
+
+  /* DEMO */
+  .demo{padding:140px 0 120px;position:relative}
+  .demo .wrap{display:grid;grid-template-columns:1fr 560px;gap:80px;align-items:center}
+  .demo h2{font-size:96px;margin-bottom:28px}
+  .demo .lede{max-width:480px}
+  .demo-list{list-style:none;margin-top:30px}
+  .demo-list li{display:flex;gap:16px;align-items:center;font-size:19px;padding:10px 0}
+  .demo-list li::before{content:"";width:18px;height:18px;flex:none}
+  .demo-list li:nth-child(1)::before{background:var(--red);border-radius:50%}
+  .demo-list li:nth-child(2)::before{background:var(--blue)}
+  .demo-list li:nth-child(3)::before{background:var(--yellow);clip-path:polygon(50% 0,100% 100%,0 100%)}
+  form{background:var(--blue);color:var(--paper);padding:52px 48px;position:relative;box-shadow:16px 16px 0 var(--ink)}
+  form::before{content:"";position:absolute;width:110px;height:110px;background:var(--yellow);border-radius:50%;top:-44px;right:-40px;z-index:-1}
+  form h3{font-weight:900;font-size:36px;letter-spacing:-.02em;margin-bottom:6px}
+  form .sub{font-family:var(--serif);font-style:italic;font-size:18px;margin-bottom:30px;opacity:.9}
+  .field{margin-bottom:18px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  label{display:block;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
+  input,select{
+    width:100%;padding:14px 16px;font-family:var(--sans);font-size:17px;border:none;background:var(--paper);color:var(--ink);
+    border-bottom:4px solid var(--ink);outline:none;border-radius:0;appearance:none
+  }
+  input:focus,select:focus{border-bottom-color:var(--yellow)}
+  form .btn{width:100%;margin-top:14px;font-size:18px;padding:20px}
+  .fine{font-size:13px;margin-top:16px;opacity:.8;text-align:center}
+  .thanks{display:none;text-align:center;padding:40px 0}
+  .thanks svg{width:140px;height:140px;margin-bottom:20px}
+  .thanks h3{font-size:40px}
+  .thanks p{font-size:19px;margin-top:10px}
+  form.done .form-body{display:none}
+  form.done .thanks{display:block}
+
+  footer{background:var(--ink);color:var(--paper);padding:70px 0 40px}
+  footer .wrap{display:flex;justify-content:space-between;align-items:end}
+  footer .logo{color:var(--paper)}
+  footer p{font-family:var(--serif);font-style:italic;font-size:18px;opacity:.75;margin-top:14px}
+  footer .fl{display:flex;gap:32px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+  footer .fl a{text-decoration:none;opacity:.8}
+  footer .fl a:hover{opacity:1;color:var(--yellow)}
+  .copy{text-align:right;font-size:13px;opacity:.5;margin-top:18px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="14" fill="none" stroke="#e2361f" stroke-width="10" stroke-dasharray="5.5 3.3"/><circle cx="22" cy="22" r="9" fill="#141210"/><rect x="18" y="18" width="8" height="8" fill="#f5c211"/></svg>
+      acme
+    </a>
+    <div class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#platform">Platform</a>
+      <a href="#proof">Customers</a>
+      <a href="#demo" class="btn">Book a demo</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow"><i></i>Widget operations for manufacturers</div>
+      <h1>Widgets,<br>made to <em>behave</em><span class="dot">.</span><br><span class="tilt">Finally.</span></h1>
+      <p class="lede">Acme lets your operations team <b>configure, order, and track</b> every custom widget across your supply chain — from one screen instead of fourteen spreadsheets.</p>
+      <div class="hero-cta">
+        <a href="#demo" class="btn">Book a 30-min demo</a>
+        <small>No slide decks. We'll build one of your widgets live.</small>
+      </div>
+    </div>
+    <div class="collage" aria-hidden="true">
+      <svg viewBox="0 0 540 600">
+        <!-- big yellow sun -->
+        <circle cx="300" cy="270" r="230" fill="#f5c211"/>
+        <!-- torn blue paper -->
+        <polygon points="60,420 110,402 150,415 200,396 260,410 300,392 340,408 360,600 40,600" fill="#1f4ea3"/>
+        <!-- dashed track line -->
+        <path d="M20 540 C 140 470, 260 590, 400 520 S 520 470, 540 500" fill="none" stroke="#141210" stroke-width="5" stroke-dasharray="14 12"/>
+        <!-- gears -->
+        <g class="gear">
+          <circle cx="440" cy="120" r="56" fill="none" stroke="#e2361f" stroke-width="30" stroke-dasharray="18 12"/>
+          <circle cx="440" cy="120" r="42" fill="#e2361f"/>
+          <circle cx="440" cy="120" r="14" fill="#f2ead8"/>
+        </g>
+        <g class="gear rev">
+          <circle cx="370" cy="200" r="30" fill="none" stroke="#141210" stroke-width="18" stroke-dasharray="10 7.3"/>
+          <circle cx="370" cy="200" r="22" fill="#141210"/>
+          <circle cx="370" cy="200" r="7" fill="#f5c211"/>
+        </g>
+        <!-- character -->
+        <g class="bob">
+          <g class="wobble">
+            <!-- legs -->
+            <line x1="235" y1="470" x2="215" y2="540" stroke="#141210" stroke-width="7" stroke-linecap="round"/>
+            <line x1="295" y1="470" x2="320" y2="540" stroke="#141210" stroke-width="7" stroke-linecap="round"/>
+            <rect x="195" y="535" width="36" height="12" fill="#141210"/>
+            <rect x="308" y="535" width="36" height="12" fill="#141210"/>
+            <!-- arms -->
+            <path d="M200 380 L130 330 L112 280" fill="none" stroke="#141210" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M330 380 L400 400" fill="none" stroke="#141210" stroke-width="7" stroke-linecap="round"/>
+            <!-- carrying a box -->
+            <rect x="392" y="372" width="64" height="56" fill="#f2ead8" stroke="#141210" stroke-width="5" transform="rotate(8 424 400)"/>
+            <path d="M400 392 L452 400" stroke="#e2361f" stroke-width="5" transform="rotate(8 424 400)"/>
+            <!-- waving hand -->
+            <circle cx="112" cy="272" r="14" fill="#e2361f"/>
+            <!-- body -->
+            <rect x="190" y="330" width="150" height="150" fill="#1f4ea3" transform="rotate(-5 265 405)"/>
+            <rect x="222" y="370" width="30" height="30" fill="#f5c211" transform="rotate(-5 265 405)"/>
+            <circle cx="295" cy="420" r="15" fill="#f2ead8"/>
+            <!-- head -->
+            <circle cx="262" cy="258" r="82" fill="#e2361f"/>
+            <!-- eye -->
+            <circle cx="290" cy="245" r="30" fill="#f2ead8"/>
+            <circle id="pupil" cx="290" cy="245" r="13" fill="#141210"/>
+            <!-- wink line -->
+            <path d="M212 245 Q 228 232 244 245" fill="none" stroke="#141210" stroke-width="6" stroke-linecap="round"/>
+            <!-- grin -->
+            <path d="M225 290 Q 262 322 305 285" fill="none" stroke="#141210" stroke-width="6" stroke-linecap="round"/>
+            <!-- hat -->
+            <polygon points="195,196 330,190 250,70" fill="#141210"/>
+            <circle cx="250" cy="70" r="14" fill="#f5c211"/>
+          </g>
+        </g>
+        <!-- confetti -->
+        <rect x="80" y="120" width="26" height="26" fill="#141210" transform="rotate(20 93 133)"/>
+        <circle cx="150" cy="60" r="10" fill="#e2361f"/>
+        <polygon points="480,300 510,350 450,350" fill="#1f4ea3"/>
+        <circle cx="500" cy="440" r="7" fill="#141210"/>
+        <text x="40" y="240" font-family="Bodoni Moda, serif" font-style="italic" font-size="30" fill="#141210" transform="rotate(-14 40 240)">psst.</text>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Configure <svg class="shape-s" viewBox="0 0 30 30"><circle cx="15" cy="15" r="15" fill="#e2361f"/></svg> Order <svg class="shape-s" viewBox="0 0 30 30"><rect width="30" height="30" fill="#f2ead8"/></svg> Track <svg class="shape-s" viewBox="0 0 30 30"><polygon points="15,0 30,30 0,30" fill="#f5c211"/></svg> <em>and repeat, without the drama</em> <svg class="shape-s" viewBox="0 0 30 30"><circle cx="15" cy="15" r="15" fill="#1f4ea3"/></svg></span>
+    <span>Configure <svg class="shape-s" viewBox="0 0 30 30"><circle cx="15" cy="15" r="15" fill="#e2361f"/></svg> Order <svg class="shape-s" viewBox="0 0 30 30"><rect width="30" height="30" fill="#f2ead8"/></svg> Track <svg class="shape-s" viewBox="0 0 30 30"><polygon points="15,0 30,30 0,30" fill="#f5c211"/></svg> <em>and repeat, without the drama</em> <svg class="shape-s" viewBox="0 0 30 30"><circle cx="15" cy="15" r="15" fill="#1f4ea3"/></svg></span>
+  </div>
+</div>
+
+<section class="problem">
+  <div class="wrap">
+    <div>
+      <div class="kicker">The situation</div>
+      <h2>Right now, your widgets live in <em>fourteen</em> spreadsheets, three inboxes, and one guy named Dave.</h2>
+      <div class="mess" aria-hidden="true">
+        <div class="scrap" style="background:#fff;left:0;top:10px;transform:rotate(-6deg)"><small>Spreadsheet</small>WIDGET_SPECS_FINAL_v7_REAL.xlsx</div>
+        <div class="scrap" style="background:var(--yellow);left:240px;top:0;transform:rotate(5deg)"><small>Sticky note</small>Did anyone reorder the M8 flanges??</div>
+        <div class="scrap" style="background:var(--red);color:var(--paper);left:60px;top:110px;transform:rotate(3deg)"><small>Email · Re: Re: Fwd: Re:</small>“Supplier says it shipped. Carrier says it didn't.”</div>
+        <div class="scrap" style="background:var(--blue);color:var(--paper);left:330px;top:120px;transform:rotate(-4deg)"><small>Voicemail</small>Dave, 4:52pm, Friday</div>
+        <div class="scrap" style="background:#fff;left:170px;top:196px;transform:rotate(-2deg)"><small>Whiteboard</small>DO NOT ERASE — Q3 widget plan</div>
+      </div>
+    </div>
+    <div>
+      <p class="big">Acme puts every configuration, purchase order, and shipment in <u>one place</u> your whole ops team can see.</p>
+      <p>Mid-sized manufacturers run on custom widgets — brackets, housings, couplings, the small parts with big consequences. When one is spec'd wrong or stuck at a port, the line stops.</p>
+      <p>Acme gives you a single source of truth for every widget you buy: what it is, who makes it, where it is, and when it lands. Your planners stop chasing. Your suppliers stop guessing.</p>
+      <p style="font-family:var(--serif);font-style:italic;font-size:24px">And Dave can finally take a vacation.</p>
+    </div>
+  </div>
+</section>
+
+<section class="shapes" id="platform">
+  <div class="wrap">
+    <div class="shapes-head">
+      <div>
+        <div class="kicker">The platform</div>
+        <h2>Three shapes.<br><em>One</em> supply chain.</h2>
+      </div>
+      <p>Everything Acme does fits in a circle, a square, and a triangle. We think that's a feature.</p>
+    </div>
+    <div class="rebus">
+      <article class="card c-red">
+        <div class="glyph">
+          <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="none" stroke="#f2ead8" stroke-width="36" stroke-dasharray="22 12.5"/><circle cx="100" cy="100" r="60" fill="#f2ead8"/><circle cx="100" cy="100" r="22" fill="#e2361f"/></svg>
+        </div>
+        <div class="num">No. 1</div>
+        <h3>Configure</h3>
+        <p>Build any widget from a visual spec sheet — dimensions, materials, tolerances, finishes. Acme flags impossible combinations before a supplier ever sees them.</p>
+        <ul><li>Rule-based spec validation <span>●</span></li><li>Versioned drawings &amp; BOMs <span>●</span></li><li>Reusable widget templates <span>●</span></li></ul>
+      </article>
+      <article class="card c-yellow">
+        <div class="glyph">
+          <svg viewBox="0 0 200 200"><rect x="30" y="50" width="140" height="120" fill="#141210"/><rect x="30" y="50" width="140" height="30" fill="#1f4ea3"/><rect x="85" y="50" width="30" height="120" fill="#e2361f"/><polygon points="30,50 60,20 200,20 170,50" fill="#141210" opacity=".8"/></svg>
+        </div>
+        <div class="num">No. 2</div>
+        <h3>Order</h3>
+        <p>Turn a finished spec into a purchase order in one click. Compare quotes across approved suppliers, route approvals, and push POs straight into your ERP.</p>
+        <ul><li>Multi-supplier quoting <span>■</span></li><li>Approval workflows <span>■</span></li><li>SAP, NetSuite &amp; Epicor sync <span>■</span></li></ul>
+      </article>
+      <article class="card c-blue">
+        <div class="glyph">
+          <svg viewBox="0 0 200 200"><polygon points="100,18 186,180 14,180" fill="#f5c211"/><path d="M40 160 L80 120 L110 140 L160 80" fill="none" stroke="#141210" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="160" cy="80" r="11" fill="#e2361f"/></svg>
+        </div>
+        <div class="num">No. 3</div>
+        <h3>Track</h3>
+        <p>Follow every widget from the supplier's floor to your receiving dock. Live status, carrier updates, and early warnings when a delivery starts to drift.</p>
+        <ul><li>Live milestone tracking <span>▲</span></li><li>Delay prediction alerts <span>▲</span></li><li>Receiving &amp; QC sign-off <span>▲</span></li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="deco-circle"></div>
+  <div class="wrap">
+    <div class="stats-title">
+      <h2>What happens when widgets <em>stop misbehaving.</em></h2>
+      <small>Median results across Acme customers after their first two quarters.</small>
+    </div>
+    <div class="stat"><div class="n">38<sup>%</sup></div><p>fewer order errors, because bad specs get caught at the configuration step — not at the loading dock.</p></div>
+    <div class="stat"><div class="n">11<sup>d</sup></div><p>shaved off average widget lead time with faster quoting and approvals that don't wait on email.</p></div>
+    <div class="stat"><div class="n">9<sup>h</sup></div><p>per planner, per week, handed back from chasing suppliers and reconciling spreadsheets.</p></div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="kicker">How it works</div>
+    <h2>Live in weeks, not <em>quarters.</em> Here's the whole plan.</h2>
+    <div class="steps">
+      <div class="step"><div class="bubble">1</div><h4>Book a demo</h4><p>Bring a widget that's been giving you trouble. We'll configure it live and show you where it goes wrong today.</p></div>
+      <div class="step"><div class="bubble">2</div><h4>Import your catalog</h4><p>We migrate your specs, suppliers, and open POs from spreadsheets and your ERP. You don't retype a thing.</p></div>
+      <div class="step"><div class="bubble">3</div><h4>Invite suppliers</h4><p>Suppliers get a free portal to quote, confirm, and post shipment updates. No logins to your ERP required.</p></div>
+      <div class="step"><div class="bubble">4</div><h4>Run the floor</h4><p>Your team configures, orders, and tracks in one place. Typical rollout: 4–6 weeks per plant.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="logos">
+  <div class="wrap">
+    <small>Trusted by 240+ manufacturers</small>
+    <span class="lg lg1">Halvorsen &amp; Co.</span>
+    <span class="lg lg2">KESTREL</span>
+    <span class="lg lg3">Brightwater</span>
+    <span class="lg lg4">northfold</span>
+    <span class="lg lg5">Tamarack Tool</span>
+    <span class="lg lg2" style="letter-spacing:.05em">OHIO VALVE</span>
+  </div>
+</div>
+
+<section class="quote" id="proof">
+  <div class="wrap" style="padding-top:120px">
+    <div class="portrait" aria-hidden="true">
+      <svg viewBox="0 0 380 440">
+        <rect x="20" y="40" width="340" height="380" fill="#1f4ea3"/>
+        <circle cx="190" cy="180" r="90" fill="#f2ead8"/>
+        <path d="M60 420 Q 190 260 320 420 Z" fill="#141210"/>
+        <rect x="120" y="150" width="60" height="30" fill="none" stroke="#141210" stroke-width="7"/>
+        <rect x="200" y="150" width="60" height="30" fill="none" stroke="#141210" stroke-width="7"/>
+        <line x1="180" y1="165" x2="200" y2="165" stroke="#141210" stroke-width="7"/>
+        <path d="M150 225 Q 190 250 230 222" fill="none" stroke="#e2361f" stroke-width="8" stroke-linecap="round"/>
+        <path d="M100 150 Q 110 70 190 80 Q 280 80 280 150 Q 250 110 190 115 Q 130 110 100 150 Z" fill="#141210"/>
+        <circle cx="330" cy="60" r="44" fill="#f5c211"/>
+        <polygon points="20,40 0,120 40,90" fill="#e2361f"/>
+      </svg>
+    </div>
+    <div>
+      <blockquote>
+        We used to find out a widget was late when the line went quiet. Now Acme tells us <em>nine days early</em>, and nobody has to yell.
+        <cite><b>Renata Okafor</b>Director of Operations, Halvorsen &amp; Co. — 4 plants, 1,100 custom SKUs</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div>
+      <div class="kicker">Book a demo</div>
+      <h2>Bring us your <em>worst</em> widget.</h2>
+      <p class="lede">In 30 minutes we'll configure it, order it, and track it inside Acme — using your real specs. If it doesn't look easier than what you do today, we'll say so.</p>
+      <ul class="demo-list">
+        <li>A live build of one of your widgets</li>
+        <li>A rollout estimate for your plants</li>
+        <li>Pricing, straight — no "let me check"</li>
+      </ul>
+    </div>
+    <form id="demoForm" novalidate>
+      <div class="form-body">
+        <h3>Pick a time.</h3>
+        <p class="sub">We'll reply within one business day.</p>
+        <div class="row">
+          <div class="field"><label for="fn">First name</label><input id="fn" name="fn" required autocomplete="given-name"></div>
+          <div class="field"><label for="ln">Last name</label><input id="ln" name="ln" required autocomplete="family-name"></div>
+        </div>
+        <div class="field"><label for="em">Work email</label><input id="em" name="em" type="email" required autocomplete="email" placeholder="you@company.com"></div>
+        <div class="field"><label for="co">Company</label><input id="co" name="co" required autocomplete="organization"></div>
+        <div class="row">
+          <div class="field"><label for="pl">Plants</label>
+            <select id="pl" name="pl"><option>1</option><option>2–5</option><option>6–15</option><option>16+</option></select>
+          </div>
+          <div class="field"><label for="sk">Custom SKUs</label>
+            <select id="sk" name="sk"><option>Under 100</option><option>100–500</option><option>500–2,000</option><option>2,000+</option></select>
+          </div>
+        </div>
+        <button type="submit" class="btn yellow">Book my demo →</button>
+        <p class="fine">No spam. No 11-email nurture sequence. Promise.</p>
+      </div>
+      <div class="thanks">
+        <svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="66" fill="#f5c211"/><path d="M40 72 L62 94 L102 50" fill="none" stroke="#141210" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>You're on the list<span id="thxName"></span>.</h3>
+        <p>Start picking out your most troublesome widget. We'll be in touch within a business day.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <a href="#" class="logo">
+        <svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="14" fill="none" stroke="#e2361f" stroke-width="10" stroke-dasharray="5.5 3.3"/><circle cx="22" cy="22" r="9" fill="#f2ead8"/><rect x="18" y="18" width="8" height="8" fill="#f5c211"/></svg>
+        acme
+      </a>
+      <p>Good widgets. Well-behaved supply chains.</p>
+    </div>
+    <div>
+      <div class="fl"><a href="#platform">Platform</a><a href="#how">How it works</a><a href="#proof">Customers</a><a href="#">Security</a><a href="#demo">Book a demo</a></div>
+      <div class="copy">© 2025 Acme Widget Systems, Inc. Made with circles, squares &amp; triangles.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // The mischievous eye follows you around.
+  const pupil = document.getElementById('pupil');
+  const svg = pupil.ownerSVGElement;
+  document.addEventListener('mousemove', e => {
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const ctm = pupil.parentNode.getScreenCTM();
+    if(!ctm) return;
+    const p = pt.matrixTransform(ctm.inverse());
+    const dx = p.x - 290, dy = p.y - 245;
+    const d = Math.hypot(dx, dy) || 1;
+    const m = Math.min(14, d / 12);
+    pupil.setAttribute('cx', 290 + dx / d * m);
+    pupil.setAttribute('cy', 245 + dy / d * m);
+  });
+
+  // Demo form
+  const form = document.getElementById('demoForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true;
+    form.querySelectorAll('input[required]').forEach(i => {
+      const bad = !i.value.trim() || (i.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(i.value));
+      i.style.borderBottomColor = bad ? '#e2361f' : '';
+      i.style.background = bad ? '#fde2dc' : '';
+      if (bad) ok = false;
+    });
+    if (!ok) {
+      form.animate([{transform:'translateX(0)'},{transform:'translateX(-10px) rotate(-1deg)'},{transform:'translateX(10px) rotate(1deg)'},{transform:'translateX(0)'}],{duration:350});
+      return;
+    }
+    document.getElementById('thxName').textContent = ', ' + document.getElementById('fn').value.trim();
+    form.classList.add('done');
+  });
+</script>
+</body>
+</html>

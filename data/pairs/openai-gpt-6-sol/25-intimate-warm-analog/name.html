@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f3e9">
+  <meta name="description" content="Acme brings custom widget configuration, ordering, and tracking together in one clear place for manufacturing operations teams.">
+  <title>Acme — Custom widgets, beautifully in order</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,20,1;9..144,500,20,1;9..144,600,20,1;9..144,700,20,1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f7f3e9;
+      --paper-deep: #eee9d9;
+      --ink: #263c35;
+      --muted: #66736a;
+      --red: #be563e;
+      --red-dark: #a84631;
+      --sage: #dce4d4;
+      --yellow: #e9c878;
+      --line: #d9d5c7;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "DM Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    body.modal-open { overflow: hidden; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      opacity: .19;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.77' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.18' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    :focus-visible { outline: 3px solid var(--red); outline-offset: 4px; }
+    .wrap { width: min(100% - 144px, 1296px); margin-inline: auto; }
+
+    /* Header */
+    .site-header { position: relative; z-index: 10; }
+    .nav {
+      height: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(38, 60, 53, .16);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .brand-word {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 37px;
+      font-weight: 700;
+      letter-spacing: -.085em;
+      line-height: 1;
+    }
+    .brand-flower { width: 25px; height: 25px; margin-top: -17px; transform: rotate(-13deg); }
+    .nav-links { display: flex; align-items: center; gap: 39px; margin-left: 84px; }
+    .nav-links a, .nav-right > a {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .005em;
+      transition: color .2s;
+    }
+    .nav-links a:hover, .nav-right > a:hover { color: var(--red); }
+    .nav-right { display: flex; align-items: center; gap: 29px; }
+    .nav-button {
+      border: 1.5px solid var(--ink);
+      border-radius: 5px;
+      padding: 13px 21px;
+      color: var(--ink);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background .2s, color .2s, transform .2s;
+    }
+    .nav-button:hover { background: var(--ink); color: white; transform: translateY(-2px); }
+    .menu-toggle { display: none; background: none; border: 0; padding: 8px; }
+
+    /* Hero */
+    .hero { overflow: hidden; }
+    .hero-grid {
+      min-height: 690px;
+      display: grid;
+      grid-template-columns: 48% 52%;
+      align-items: center;
+      position: relative;
+      padding-bottom: 35px;
+    }
+    .hero-copy { position: relative; z-index: 2; padding-top: 13px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      color: var(--red-dark);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 27px; height: 1px; background: var(--red); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: "Fraunces", Georgia, serif; }
+    h1 {
+      margin: 29px 0 24px;
+      max-width: 650px;
+      font-size: clamp(65px, 5.75vw, 86px);
+      line-height: 1.045;
+      font-weight: 600;
+      letter-spacing: -.069em;
+    }
+    h1 em {
+      color: var(--red);
+      font-weight: 500;
+      white-space: nowrap;
+      position: relative;
+    }
+    h1 em::after {
+      content: "";
+      position: absolute;
+      left: 3%;
+      right: 0;
+      bottom: -10px;
+      height: 11px;
+      background: url("data:image/svg+xml,%3Csvg width='420' height='12' viewBox='0 0 420 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 8C83-2 153 7 223 5c76-3 132-6 195-1' stroke='%23be563e' stroke-width='2.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    }
+    .hero-description {
+      max-width: 475px;
+      margin: 34px 0 28px;
+      color: #4c5b51;
+      font-size: 17px;
+      line-height: 1.75;
+    }
+    .hero-actions { display: flex; align-items: center; gap: 25px; }
+    .primary-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 25px;
+      min-height: 60px;
+      padding: 0 19px 0 25px;
+      border: 1px solid var(--red);
+      border-radius: 5px;
+      color: #fffaf1;
+      background: var(--red);
+      font-size: 15px;
+      font-weight: 700;
+      box-shadow: 4px 5px 0 #e5d9c4;
+      transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .primary-button:hover {
+      background: var(--red-dark);
+      transform: translate(2px, 2px);
+      box-shadow: 2px 3px 0 #e5d9c4;
+    }
+    .button-arrow { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.6); border-radius: 50%; }
+    .hand-note {
+      color: #697765;
+      font-family: "Caveat", cursive;
+      font-size: 23px;
+      transform: rotate(-5deg);
+      white-space: nowrap;
+    }
+    .hero-footnote {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 45px;
+      color: #69766c;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .hero-footnote svg { flex: none; }
+
+    /* Hand-built illustration */
+    .hero-art {
+      height: 627px;
+      width: 100%;
+      max-width: 665px;
+      position: relative;
+      justify-self: end;
+      margin-right: -13px;
+    }
+    .art-background { position: absolute; inset: 6px 0 0; width: 100%; height: 100%; }
+    .order-sheet {
+      position: absolute;
+      top: 78px;
+      left: 101px;
+      width: 437px;
+      min-height: 456px;
+      padding: 28px 29px 24px;
+      background: #fffdf7;
+      border: 1px solid #e2ddce;
+      box-shadow: 9px 12px 0 rgba(81, 99, 78, .12), 15px 20px 28px rgba(48, 68, 52, .12);
+      transform: rotate(-3deg);
+    }
+    .sheet-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 1px solid #dfdfd5; }
+    .sheet-brand { display: flex; align-items: center; gap: 7px; font-family: "Fraunces", Georgia, serif; font-size: 19px; font-weight: 700; letter-spacing: -.06em; }
+    .sheet-date { color: #798178; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .sheet-heading { margin: 20px 0 3px; font-size: 31px; font-weight: 600; letter-spacing: -.055em; }
+    .sheet-sub { margin-bottom: 19px; color: #758077; font-size: 11px; }
+    .sheet-list-label { margin-bottom: 8px; color: #53675b; font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+    .order-row { display: flex; align-items: center; gap: 12px; min-height: 64px; border-top: 1px solid #ece9df; }
+    .part-icon { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 4px; flex: none; }
+    .part-icon svg { width: 29px; height: 29px; }
+    .part-icon.yellow { background: #f3e8c7; }
+    .part-icon.sage { background: #dfe9db; }
+    .part-icon.pink { background: #f1dfd3; }
+    .order-details { flex: 1; min-width: 0; }
+    .order-name { display: block; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .order-number { display: block; margin-top: 4px; color: #899087; font-size: 9px; }
+    .status { padding: 6px 8px; border-radius: 30px; background: #e7eddc; color: #57745c; font-size: 8px; font-weight: 700; white-space: nowrap; }
+    .status.ship { background: #e1e9eb; color: #58747c; }
+    .status.review { background: #f7e8d7; color: #a16c3f; }
+    .sheet-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 13px; border-top: 1px solid #ece9df; color: var(--red); font-size: 10px; font-weight: 700; }
+    .sheet-bottom span:last-child { font-size: 17px; line-height: .6; }
+    .art-note {
+      position: absolute;
+      left: 15px;
+      bottom: 42px;
+      width: 166px;
+      height: 119px;
+      padding: 28px 13px 12px;
+      background: #f6d990;
+      box-shadow: 5px 7px 0 rgba(75, 80, 54, .14);
+      transform: rotate(8deg);
+      text-align: center;
+      color: #364b39;
+      font-family: "Caveat", cursive;
+      font-size: 27px;
+      line-height: .91;
+    }
+    .art-note::before {
+      content: "";
+      position: absolute;
+      top: -8px;
+      left: 57px;
+      width: 56px;
+      height: 19px;
+      background: rgba(250, 247, 232, .68);
+      transform: rotate(-7deg);
+    }
+    .art-note small { display: block; margin-top: 10px; font-family: "DM Sans", sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .widget-illustration { position: absolute; width: 195px; height: 189px; right: 0; bottom: 6px; filter: drop-shadow(5px 10px 2px rgba(45, 66, 48, .16)); }
+    .art-spark { position: absolute; top: 32px; right: 48px; width: 69px; transform: rotate(13deg); }
+    .art-caption { position: absolute; right: 12px; top: 132px; transform: rotate(8deg); color: #4f7057; font-family: "Caveat", cursive; font-size: 22px; }
+    .art-caption::after { content: "↙"; display: block; margin: -8px 0 0 12px; font-size: 34px; }
+
+    /* Sections */
+    .section-kicker { color: var(--red-dark); font-size: 11px; font-weight: 700; letter-spacing: .19em; text-transform: uppercase; }
+    .features { padding: 92px 0 108px; background: var(--paper-deep); border-top: 1px solid #e0dbcb; }
+    .features-head { display: flex; justify-content: space-between; align-items: end; gap: 50px; margin-bottom: 49px; }
+    .features h2, .steps h2, .closing h2 { font-size: clamp(41px, 4vw, 59px); line-height: 1.1; letter-spacing: -.058em; font-weight: 600; }
+    .features h2 { margin: 15px 0 0; max-width: 660px; }
+    .features-head > p { max-width: 340px; margin: 0 5px 8px 0; font-size: 15px; line-height: 1.7; color: #5e6b61; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .feature-card { min-height: 302px; padding: 26px 30px 29px; border: 1px solid #dfdac9; background: #f8f5ec; }
+    .feature-card:nth-child(2) { background: #f4f1e6; }
+    .feature-card:nth-child(3) { background: #f8f5ec; }
+    .feature-illustration { height: 107px; display: flex; align-items: flex-start; }
+    .feature-illustration svg { height: 84px; width: 112px; }
+    .feature-number { color: var(--red); font-family: "Caveat", cursive; font-size: 22px; }
+    .feature-card h3 { margin: 5px 0 10px; font-size: 26px; font-weight: 600; letter-spacing: -.045em; }
+    .feature-card p { max-width: 320px; margin-bottom: 0; color: #657166; font-size: 13px; line-height: 1.7; }
+
+    .steps { background: var(--ink); color: #f6f1e5; padding: 100px 0 106px; }
+    .steps-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 110px; }
+    .steps .section-kicker { color: #e9bd83; }
+    .steps h2 { max-width: 480px; margin: 19px 0 20px; }
+    .steps-intro { max-width: 390px; color: #c2ccc0; font-size: 15px; line-height: 1.8; }
+    .steps-doodle { width: 150px; height: 100px; margin: 23px 0 0 8px; }
+    .step-list { border-top: 1px solid #6b7b6e; }
+    .step { display: grid; grid-template-columns: 54px 1fr; gap: 21px; padding: 26px 0; border-bottom: 1px solid #6b7b6e; }
+    .step > span { color: #edc781; font-family: "Caveat", cursive; font-size: 31px; line-height: 1; }
+    .step h3 { margin: 0 0 7px; font-size: 23px; font-weight: 500; letter-spacing: -.035em; }
+    .step p { max-width: 455px; margin: 0; color: #c2ccc0; font-size: 13px; line-height: 1.7; }
+
+    .closing { position: relative; overflow: hidden; padding: 110px 0 105px; text-align: center; }
+    .closing-inner { position: relative; z-index: 1; max-width: 750px; margin: auto; }
+    .closing h2 { margin: 15px 0 20px; }
+    .closing p { max-width: 530px; margin: 0 auto 29px; color: #657166; font-size: 16px; line-height: 1.7; }
+    .closing-sun { position: absolute; left: max(6%, calc((100% - 1300px)/2)); top: 80px; width: 150px; transform: rotate(-15deg); }
+    .closing-squiggle { position: absolute; right: max(6%, calc((100% - 1300px)/2)); bottom: 75px; width: 150px; }
+    .site-footer { background: #eae5d7; border-top: 1px solid #d8d2c3; }
+    .footer-inner { min-height: 126px; display: flex; justify-content: space-between; align-items: center; gap: 25px; }
+    .footer-inner .brand-word { font-size: 30px; }
+    .footer-inner .brand-flower { width: 20px; height: 20px; margin-top: -12px; }
+    .footer-middle { color: #68756a; font-size: 12px; }
+    .footer-links { display: flex; gap: 26px; font-size: 12px; font-weight: 700; }
+
+    /* Demo dialog */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(28, 47, 39, .65);
+    }
+    .modal.is-open { display: flex; }
+    .dialog {
+      position: relative;
+      width: min(100%, 510px);
+      max-height: min(90vh, 740px);
+      overflow-y: auto;
+      padding: 39px;
+      background: var(--paper);
+      box-shadow: 10px 11px 0 rgba(15, 32, 25, .25);
+    }
+    .close-modal { position: absolute; right: 19px; top: 15px; border: 0; background: none; font-size: 31px; line-height: 1; color: var(--ink); }
+    .dialog h2 { margin: 12px 0 12px; font-size: 43px; line-height: 1.08; letter-spacing: -.06em; }
+    .dialog > p { color: #5e6b61; font-size: 14px; line-height: 1.7; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 25px 0 20px; }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 11px; font-weight: 700; }
+    .field input { width: 100%; height: 45px; padding: 0 12px; border: 1px solid #c9c9b8; border-radius: 2px; color: var(--ink); background: #fffcf5; outline: none; }
+    .field input:focus { border-color: var(--red); box-shadow: 0 0 0 2px rgba(190,86,62,.15); }
+    .form-note { margin: 15px 0 0; font-size: 11px; color: #738075; line-height: 1.5; }
+    .form-feedback { margin-top: 14px; color: #426b4d; font-size: 13px; font-weight: 700; }
+
+    @media (max-width: 1100px) {
+      .wrap { width: min(100% - 80px, 1296px); }
+      .hero-grid { grid-template-columns: 50% 50%; }
+      h1 { font-size: clamp(58px, 6vw, 76px); }
+      .hero-art { transform: scale(.83); transform-origin: center right; margin-left: -45px; }
+      .nav-links { gap: 22px; margin-left: 30px; }
+      .steps-layout { gap: 55px; }
+    }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 40px, 600px); }
+      .nav { height: 76px; }
+      .brand-word { font-size: 32px; }
+      .nav-links { display: none; position: absolute; left: 0; right: 0; top: 76px; margin: 0; padding: 22px 20px; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 15px 20px rgba(20,40,30,.08); flex-direction: column; align-items: flex-start; gap: 20px; }
+      .nav-links.is-open { display: flex; }
+      .nav-right > a { display: none; }
+      .nav-button { padding: 10px 13px; }
+      .menu-toggle { display: block; }
+      .nav-right { gap: 8px; }
+      .hero-grid { display: flex; flex-direction: column; align-items: stretch; padding: 60px 0 35px; }
+      .hero-copy { padding: 0; }
+      h1 { font-size: clamp(53px, 10vw, 78px); }
+      .hero-description { margin-top: 30px; font-size: 15px; }
+      .hero-footnote { margin-top: 35px; }
+      .hero-art { align-self: center; width: 665px; height: 627px; flex: none; margin: -20px 0 -105px; transform: scale(.68); transform-origin: center center; }
+      .features { padding: 68px 0; }
+      .features-head { display: block; margin-bottom: 30px; }
+      .features h2, .steps h2, .closing h2 { font-size: 43px; }
+      .features-head > p { margin: 20px 0 0; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 240px; }
+      .feature-illustration { height: 90px; }
+      .steps { padding: 75px 0; }
+      .steps-layout { grid-template-columns: 1fr; gap: 35px; }
+      .steps-doodle { display: none; }
+      .closing { padding: 95px 0; }
+      .closing-sun { opacity: .25; top: 15px; left: -55px; }
+      .closing-squiggle { opacity: .3; right: -50px; bottom: 15px; }
+      .footer-inner { padding-block: 30px; flex-wrap: wrap; }
+      .footer-middle { order: 3; flex-basis: 100%; }
+    }
+    @media (max-width: 430px) {
+      .nav-button { display: none; }
+      h1 { font-size: 51px; }
+      .hero-actions { gap: 14px; }
+      .hand-note { font-size: 19px; }
+      .hero-art { transform: scale(.53); margin: -75px 0 -150px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .dialog { padding: 31px 23px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Acme home">
+        <span class="brand-word">acme</span>
+        <svg class="brand-flower" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+          <path d="M15 12C12 8 13 3 15 2c3-1 5 4 3 9 4-4 9-3 10-1 1 3-3 6-9 5 5 2 7 7 5 9-2 2-7 0-9-6-1 6-5 9-8 7-2-2-1-7 5-10-6 1-10-1-10-4 0-3 5-5 10 1Z" fill="#BE563E" stroke="#A84631" stroke-width="1.1"/>
+          <circle cx="15" cy="15" r="2.4" fill="#F3D78C"/>
+        </svg>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="#why-acme">Why Acme</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#for-teams">For operations teams</a>
+      </div>
+      <div class="nav-right">
+        <a href="mailto:hello@acme.com?subject=Hello%20Acme">Say hello</a>
+        <button class="nav-button" type="button" data-open-demo>Book a demo ↗</button>
+        <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
+          <svg width="25" height="25" viewBox="0 0 25 25" fill="none" aria-hidden="true"><path d="M3 7h19M3 13h19M3 19h19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">A better way to make things</div>
+          <h1 id="hero-title">Every widget<br>in its <em>right place.</em></h1>
+          <p class="hero-description">Custom widgets have a lot of moving parts. Acme brings configuration, ordering, and tracking into one clear place—so your team can get back to making things.</p>
+          <div class="hero-actions">
+            <button class="primary-button" type="button" data-open-demo>
+              Book a demo
+              <span class="button-arrow" aria-hidden="true">↗</span>
+            </button>
+            <span class="hand-note">We'll show you around.</span>
+          </div>
+          <div class="hero-footnote">
+            <svg width="35" height="31" viewBox="0 0 35 31" fill="none" aria-hidden="true">
+              <path d="M4 26V11l7-4v19M11 26V4l8-3v25M19 26V9l7 4v13M26 26V17l6-3v12M2 27h31" stroke="#69816E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 8v3m0 4v3m8-4v2m-17-2v2" stroke="#BE563E" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            Made for the teams who keep production moving.
+          </div>
+        </div>
+
+        <div class="hero-art" aria-label="Illustration of an organized widget order board">
+          <svg class="art-background" viewBox="0 0 665 627" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M138 40C229-12 327 27 408 28c110 1 199 60 210 149 12 96 24 161-8 262-28 91-126 158-218 160-93 2-178-3-266-58C37 485 8 399 26 307 43 222 46 92 138 40Z" fill="#DEE6D6"/>
+            <path d="M119 44C214-5 325 31 406 31c111 0 192 59 207 143" stroke="#A9BEA8" stroke-width="1.7" fill="none" stroke-linecap="round" opacity=".6"/>
+            <path d="M46 414c-19-72-7-158 12-209M616 447c-24 69-84 117-142 132" stroke="#A9BEA8" stroke-width="1.7" fill="none" stroke-linecap="round" opacity=".55"/>
+            <path d="M69 122c9-14 25-23 43-25M570 78c9 4 17 11 22 20" stroke="#F7F4E9" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <circle cx="55" cy="278" r="5" fill="#BE563E"/>
+            <circle cx="579" cy="512" r="4" fill="#E2BA70"/>
+            <path d="M78 266l12-8m-3 20 11 3M541 36l-4 15m15-7-7 10" stroke="#A5B6A0" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+
+          <svg class="art-spark" viewBox="0 0 70 72" fill="none" aria-hidden="true">
+            <path d="M34 3c-1 20-9 28-29 32 19 1 28 12 29 34 2-21 11-31 32-34C46 32 36 23 34 3Z" fill="#EBC77B" stroke="#B77D4F" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="34" cy="35" r="3" fill="#BD664A"/>
+          </svg>
+          <span class="art-caption">all together</span>
+
+          <div class="order-sheet" aria-hidden="true">
+            <div class="sheet-top">
+              <div class="sheet-brand"><span style="color:#be563e;font-size:23px;line-height:0">✳</span> acme</div>
+              <span class="sheet-date">Your workspace · Today</span>
+            </div>
+            <h2 class="sheet-heading">The good kind of busy.</h2>
+            <p class="sheet-sub">A little clarity for everything in motion.</p>
+            <div class="sheet-list-label">Widget orders <span style="float:right;letter-spacing:0;color:#8c958a">View all  →</span></div>
+            <div class="order-row">
+              <div class="part-icon yellow">
+                <svg viewBox="0 0 32 32" fill="none"><path d="M7 9h18v15H7zM11 5h10v4H11zM11 24v3m10-3v3" fill="#D8A753" stroke="#805F3E" stroke-width="1.3" stroke-linejoin="round"/><circle cx="16" cy="16" r="4" fill="#F8E5B8" stroke="#805F3E" stroke-width="1.1"/></svg>
+              </div>
+              <div class="order-details"><span class="order-name">Atlas valve housing</span><span class="order-number">Order #W-1048 · 240 units</span></div>
+              <span class="status">In production</span>
+            </div>
+            <div class="order-row">
+              <div class="part-icon sage">
+                <svg viewBox="0 0 32 32" fill="none"><path d="m5 12 11-6 11 6v9l-11 6-11-6v-9Z" fill="#A6BDA3" stroke="#4D6657" stroke-width="1.3" stroke-linejoin="round"/><path d="m5 12 11 6 11-6m-11 6v9M12 8l11 7" stroke="#4D6657" stroke-width="1.2" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="order-details"><span class="order-name">Northline coupler</span><span class="order-number">Order #W-1042 · 500 units</span></div>
+              <span class="status ship">Ready to ship</span>
+            </div>
+            <div class="order-row">
+              <div class="part-icon pink">
+                <svg viewBox="0 0 32 32" fill="none"><path d="M7 11h18v12H7zM10 8h12v3H10z" fill="#D9A18D" stroke="#915F51" stroke-width="1.3" stroke-linejoin="round"/><path d="M11 15h10m-10 4h7" stroke="#FFF6E9" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </div>
+              <div class="order-details"><span class="order-name">Meridian bracket</span><span class="order-number">Order #W-1039 · 120 units</span></div>
+              <span class="status review">Needs approval</span>
+            </div>
+            <div class="sheet-bottom"><span>See what needs you today</span><span>↗</span></div>
+          </div>
+
+          <div class="art-note" aria-hidden="true">the details<br>are handled.
+            <small>finally, some breathing room</small>
+          </div>
+          <svg class="widget-illustration" viewBox="0 0 195 189" fill="none" aria-hidden="true">
+            <path d="M97 12 119 29 148 25 153 53 178 68 165 94 177 120 152 134 146 162 116 157 96 178 75 158 46 164 40 137 15 120 28 95 16 68 43 55 49 26 78 30 97 12Z" fill="#C87252" stroke="#704737" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M97 24 116 40 143 37 145 60 166 72 154 95 166 116 143 126 137 149 111 146 96 165 79 147 53 151 49 128 28 116 40 95 28 74 50 64 55 39 82 42 97 24Z" fill="#E9B17B" stroke="#704737" stroke-width="1.8" stroke-linejoin="round"/>
+            <circle cx="97" cy="95" r="52" fill="#F2CF91" stroke="#704737" stroke-width="2"/>
+            <circle cx="97" cy="95" r="28" fill="#A9BBA6" stroke="#704737" stroke-width="2"/>
+            <circle cx="97" cy="95" r="13" fill="#DEE6D6" stroke="#704737" stroke-width="1.8"/>
+            <path d="M79 50c13-6 31-5 42 2M48 88c-1 12 2 24 9 33M138 132c9-9 14-20 15-31" stroke="#FFF0C7" stroke-width="3" stroke-linecap="round"/>
+            <path d="M90 82c4-3 10-3 14 0" stroke="#6A7A67" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="features" id="why-acme" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="features-head">
+          <div>
+            <span class="section-kicker">Less chasing. More making.</span>
+            <h2 id="features-title">From first spec to final shipment.</h2>
+          </div>
+          <p>One thoughtful home for the little details and big decisions that keep your supply chain moving.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <div class="feature-illustration">
+              <svg viewBox="0 0 112 84" fill="none" aria-hidden="true">
+                <path d="M18 14h60v62H18z" fill="#E6D3B0" stroke="#41594A" stroke-width="2" stroke-linejoin="round" transform="rotate(-6 18 14)"/>
+                <path d="M32 20h57v58H32z" fill="#FFFDF5" stroke="#41594A" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M43 34h24m-24 9h36m-36 9h28" stroke="#A2AE9E" stroke-width="2" stroke-linecap="round"/>
+                <path d="m75 60 7 7 15-19" stroke="#BE563E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="94" cy="18" r="9" fill="#EBC77B" stroke="#41594A" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <span class="feature-number">01 /</span>
+            <h3>Make it yours.</h3>
+            <p>Configure the right widget with the right specifications. No scattered spreadsheets, no crossed wires.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-illustration">
+              <svg viewBox="0 0 112 84" fill="none" aria-hidden="true">
+                <path d="M20 30 56 10l36 20v38L56 79 20 68V30Z" fill="#EBC77B" stroke="#41594A" stroke-width="2" stroke-linejoin="round"/>
+                <path d="m20 30 36 20 36-20M56 50v29M38 20l36 20" stroke="#41594A" stroke-width="2" stroke-linejoin="round"/>
+                <path d="m68 57 6 5 10-12" stroke="#BE563E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="feature-number">02 /</span>
+            <h3>Order with confidence.</h3>
+            <p>Turn approved configurations into orders your whole team can see, with every detail already in place.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-illustration">
+              <svg viewBox="0 0 112 84" fill="none" aria-hidden="true">
+                <path d="M12 62h89" stroke="#41594A" stroke-width="2" stroke-linecap="round"/>
+                <path d="M22 61V41h26v20M48 48h23l10 13H48V48Z" fill="#AFC4AE" stroke="#41594A" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M25 27h23v14H25z" fill="#EBC77B" stroke="#41594A" stroke-width="2"/>
+                <circle cx="37" cy="62" r="8" fill="#FFFDF5" stroke="#41594A" stroke-width="2"/>
+                <circle cx="72" cy="62" r="8" fill="#FFFDF5" stroke="#41594A" stroke-width="2"/>
+                <path d="m63 18 8 8 20-19" stroke="#BE563E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="feature-number">03 /</span>
+            <h3>Know where things stand.</h3>
+            <p>See approvals, production, and delivery in one view. The answer to “any update?” is already there.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="steps" id="how-it-works" aria-labelledby="steps-title">
+      <div class="wrap steps-layout">
+        <div>
+          <span class="section-kicker">Simple by design</span>
+          <h2 id="steps-title">A clearer day starts here.</h2>
+          <p class="steps-intro">Your work is wonderfully complex. Your tools don't need to be. Acme gives everyone—from the office to the shop floor—a shared picture of what's next.</p>
+          <svg class="steps-doodle" viewBox="0 0 150 100" fill="none" aria-hidden="true">
+            <path d="M8 62c35-49 60 35 99-15 13-17 18-27 32-23" stroke="#E8C67E" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 7"/>
+            <path d="m127 19 14 4-9 12" stroke="#E8C67E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 24c3-8 5-11 8-2 2-8 5-7 7 0" stroke="#D88C73" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="step-list">
+          <div class="step">
+            <span>one.</span>
+            <div><h3>Set the specs.</h3><p>Build a custom widget configuration your team and suppliers can actually agree on.</p></div>
+          </div>
+          <div class="step">
+            <span>two.</span>
+            <div><h3>Place the order.</h3><p>Move from an approved design to a purchase without re-entering a single detail.</p></div>
+          </div>
+          <div class="step">
+            <span>three.</span>
+            <div><h3>Follow it through.</h3><p>Keep tabs on milestones, spot what needs attention, and give everyone the same answer.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" id="for-teams" aria-labelledby="closing-title">
+      <svg class="closing-sun" viewBox="0 0 150 150" fill="none" aria-hidden="true">
+        <circle cx="75" cy="75" r="33" fill="#EBC77B" stroke="#BF855B" stroke-width="2"/>
+        <path d="M75 5v22m0 96v22M5 75h22m96 0h22M26 26l16 16m66 66 16 16m0-98-16 16m-66 66-16 16" stroke="#BF855B" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M60 69c3-3 7-3 10 0m12 0c3-3 7-3 10 0M63 84c8 9 19 9 27 0" stroke="#9C614A" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div class="wrap closing-inner">
+        <span class="section-kicker">Let's make room for better work</span>
+        <h2 id="closing-title">The next order could feel a little easier.</h2>
+        <p>See what a more connected way of working looks like for your team. We’d love to hear what you’re making.</p>
+        <button class="primary-button" type="button" data-open-demo>Book your demo <span class="button-arrow" aria-hidden="true">↗</span></button>
+      </div>
+      <svg class="closing-squiggle" viewBox="0 0 150 110" fill="none" aria-hidden="true">
+        <path d="M7 61c30-44 52 35 80-5 16-23 31-28 55-13" stroke="#92A88F" stroke-width="3" stroke-linecap="round"/>
+        <path d="M105 29c4-12 7-18 11-2 7-11 13-11 13 5" stroke="#BE563E" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="26" cy="29" r="4" fill="#EBC77B"/>
+      </svg>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <a class="brand" href="#top" aria-label="Acme home">
+        <span class="brand-word">acme</span>
+        <svg class="brand-flower" viewBox="0 0 30 30" fill="none" aria-hidden="true"><path d="M15 12C12 8 13 3 15 2c3-1 5 4 3 9 4-4 9-3 10-1 1 3-3 6-9 5 5 2 7 7 5 9-2 2-7 0-9-6-1 6-5 9-8 7-2-2-1-7 5-10-6 1-10-1-10-4 0-3 5-5 10 1Z" fill="#BE563E"/><circle cx="15" cy="15" r="2.4" fill="#F3D78C"/></svg>
+      </a>
+      <span class="footer-middle">Good things are made together. © <span id="year">2026</span> Acme.</span>
+      <div class="footer-links"><a href="mailto:hello@acme.com">Get in touch</a><a href="#top">Back to top ↑</a></div>
+    </div>
+  </footer>
+
+  <div class="modal" id="demo-modal" role="presentation">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+      <button class="close-modal" type="button" aria-label="Close dialog">×</button>
+      <span class="section-kicker">A good place to start</span>
+      <h2 id="dialog-title">Let's talk widgets.</h2>
+      <p id="dialog-description">Tell us a bit about your team. We'll open a ready-to-send email so we can find a time to show you Acme.</p>
+      <form id="demo-form">
+        <div class="form-grid">
+          <div class="field"><label for="first-name">Your name</label><input id="first-name" name="name" autocomplete="name" required placeholder="Alex Morgan"></div>
+          <div class="field"><label for="work-email">Work email</label><input id="work-email" name="email" type="email" autocomplete="email" required placeholder="alex@company.com"></div>
+          <div class="field full"><label for="company">Company</label><input id="company" name="company" autocomplete="organization" required placeholder="Your company name"></div>
+        </div>
+        <button class="primary-button" type="submit">Prepare my demo request <span class="button-arrow" aria-hidden="true">↗</span></button>
+        <p class="form-note">This opens your email app with the details filled in. Nothing is sent until you choose to send it.</p>
+        <div class="form-feedback" id="form-feedback" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('demo-modal');
+    const closeButton = modal.querySelector('.close-modal');
+    let previousFocus = null;
+
+    function openDemo() {
+      previousFocus = document.activeElement;
+      modal.classList.add('is-open');
+      document.body.classList.add('modal-open');
+      closeButton.focus();
+    }
+
+    function closeDemo() {
+      modal.classList.remove('is-open');
+      document.body.classList.remove('modal-open');
+      document.getElementById('form-feedback').textContent = '';
+      if (previousFocus) previousFocus.focus();
+    }
+
+    document.querySelectorAll('[data-open-demo]').forEach(button => button.addEventListener('click', openDemo));
+    closeButton.addEventListener('click', closeDemo);
+    modal.addEventListener('click', event => { if (event.target === modal) closeDemo(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && modal.classList.contains('is-open')) closeDemo();
+      if (event.key === 'Tab' && modal.classList.contains('is-open')) {
+        const focusable = [...modal.querySelectorAll('button, input')].filter(el => !el.disabled);
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
+
+    document.getElementById('demo-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const name = document.getElementById('first-name').value.trim();
+      const email = document.getElementById('work-email').value.trim();
+      const company = document.getElementById('company').value.trim();
+      const subject = encodeURIComponent(`Acme demo request — ${company}`);
+      const body = encodeURIComponent(`Hi Acme,\n\nI'd like to book a demo for our team.\n\nName: ${name}\nWork email: ${email}\nCompany: ${company}\n\nLooking forward to talking widgets!\n`);
+      document.getElementById('form-feedback').textContent = 'Your email app should open with your request ready to review.';
+      window.location.href = `mailto:hello@acme.com?subject=${subject}&body=${body}`;
+    });
+
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+    menuToggle.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('is-open');
+      menuToggle.setAttribute('aria-expanded', String(isOpen));
+    });
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      navLinks.classList.remove('is-open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }));
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

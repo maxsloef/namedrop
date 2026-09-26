@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme: Custom Widgets, Configured, Ordered & Tracked with Ceremony</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c1512;
+    --emerald:#0e3a2d;
+    --emerald-2:#15503f;
+    --wine:#5b1429;
+    --wine-2:#7a1f38;
+    --gold:#d4a84b;
+    --gold-deep:#a97a2a;
+    --gold-light:#f5e0a3;
+    --cream:#f8f0de;
+    --cream-2:#efe2c6;
+    --text:#2a2320;
+    --foil:linear-gradient(100deg,#b8862f 0%,#f6e3a6 22%,#c99a42 45%,#fff0c2 60%,#b8862f 82%,#e9cc7d 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Figtree',sans-serif;
+    color:var(--text);
+    background:var(--cream);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{width:1240px;margin:0 auto;position:relative}
+  .display{font-family:'Cormorant Garamond',serif;font-weight:600;letter-spacing:-.01em;line-height:1.02}
+  .eyebrow{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold-deep)}
+  .foil{background:var(--foil);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 7s linear infinite}
+  @keyframes shimmer{to{background-position:-200% 0}}
+
+  /* Buttons */
+  .btn{
+    display:inline-flex;align-items:center;gap:12px;
+    font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.18em;text-transform:uppercase;
+    padding:20px 34px;border-radius:2px;cursor:pointer;border:none;position:relative;transition:transform .25s, box-shadow .25s;
+  }
+  .btn-gold{
+    background:var(--foil);background-size:200% 100%;color:#2b1a05;
+    box-shadow:0 0 0 1px #8a6220 inset,0 0 0 4px rgba(212,168,75,.25),0 14px 34px -10px rgba(212,168,75,.7);
+    animation:shimmer 9s linear infinite;
+  }
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 0 0 1px #8a6220 inset,0 0 0 6px rgba(212,168,75,.3),0 20px 40px -10px rgba(212,168,75,.85)}
+  .btn-ghost{color:var(--gold-light);box-shadow:0 0 0 1px rgba(245,224,163,.5) inset;background:transparent}
+  .btn-ghost:hover{background:rgba(245,224,163,.08)}
+  .btn svg{width:18px;height:18px}
+
+  /* NAV */
+  nav{position:absolute;top:0;left:0;right:0;z-index:20;padding:30px 0}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:14px;color:var(--cream)}
+  .logo svg{width:44px;height:44px}
+  .logo span{font-family:'Cinzel',serif;font-size:24px;font-weight:700;letter-spacing:.3em}
+  .navlinks{display:flex;gap:44px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:rgba(248,240,222,.8)}
+  .navlinks a:hover{color:var(--gold-light)}
+  nav .btn{padding:14px 24px;font-size:12px}
+
+  /* HERO */
+  .hero{
+    position:relative;min-height:940px;padding:170px 0 120px;color:var(--cream);overflow:hidden;
+    background:
+      radial-gradient(ellipse 60% 55% at 72% 45%,rgba(212,168,75,.22),transparent 70%),
+      radial-gradient(ellipse 50% 60% at 10% 90%,rgba(122,31,56,.55),transparent 70%),
+      radial-gradient(ellipse at 50% 0%,#1a5a47 0%,var(--emerald) 45%,#07201a 100%);
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;opacity:.13;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23f5e0a3' stroke-width='1'%3E%3Cpath d='M40 4 C52 20 60 28 76 40 C60 52 52 60 40 76 C28 60 20 52 4 40 C20 28 28 20 40 4Z'/%3E%3Ccircle cx='40' cy='40' r='6'/%3E%3Ccircle cx='0' cy='0' r='3'/%3E%3Ccircle cx='80' cy='0' r='3'/%3E%3Ccircle cx='0' cy='80' r='3'/%3E%3Ccircle cx='80' cy='80' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  #confetti{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center;z-index:2}
+  .hero .eyebrow{color:var(--gold-light);display:flex;align-items:center;gap:16px;margin-bottom:28px}
+  .hero .eyebrow::before{content:"";width:48px;height:1px;background:var(--gold)}
+  .hero h1{font-size:96px;margin-bottom:30px}
+  .hero h1 em{font-style:italic;font-weight:500}
+  .hero p.lede{font-size:20px;color:rgba(248,240,222,.82);max-width:540px;margin-bottom:44px}
+  .cta-row{display:flex;gap:18px;align-items:center}
+  .hero-note{margin-top:34px;display:flex;gap:28px;font-size:14px;color:rgba(248,240,222,.65)}
+  .hero-note span{display:flex;align-items:center;gap:8px}
+  .hero-note span::before{content:"✦";color:var(--gold)}
+
+  /* Gilded frame */
+  .gilded{position:relative;padding:14px;background:linear-gradient(135deg,#f5e0a3,#a97a2a 30%,#f8e7b5 55%,#8d6220 80%,#e7c877);box-shadow:0 40px 80px -30px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.3)}
+  .gilded::after{content:"";position:absolute;inset:6px;border:1px solid rgba(60,35,5,.45);pointer-events:none}
+  .corner{position:absolute;width:86px;height:86px;color:var(--gold-light);z-index:3;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+  .corner.tl{top:-28px;left:-28px}
+  .corner.tr{top:-28px;right:-28px;transform:scaleX(-1)}
+  .corner.bl{bottom:-28px;left:-28px;transform:scaleY(-1)}
+  .corner.br{bottom:-28px;right:-28px;transform:scale(-1,-1)}
+
+  .dash{background:#fbf6ea;color:var(--text);padding:26px 28px;position:relative}
+  .dash-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e3d3ae;padding-bottom:16px;margin-bottom:20px}
+  .dash-top .t{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.2em;color:var(--gold-deep)}
+  .dash-top h4{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--emerald)}
+  .pill{font-size:12px;font-weight:600;padding:6px 12px;border-radius:40px;background:#e5f0e9;color:var(--emerald-2);display:inline-flex;gap:6px;align-items:center}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:#2c9a6c;box-shadow:0 0 0 3px rgba(44,154,108,.2);animation:pulse 2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 6px rgba(44,154,108,0)}}
+  .dash-body{display:grid;grid-template-columns:200px 1fr;gap:24px}
+  .medallion{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#113d30,#07201a);display:grid;place-items:center;box-shadow:inset 0 0 0 3px var(--gold),inset 0 0 0 8px #0c2c23,inset 0 0 0 9px rgba(212,168,75,.5)}
+  .medallion svg{width:160px;height:160px;animation:spin 30s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spec{font-size:13px}
+  .spec-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed #e3d3ae}
+  .spec-row b{font-weight:600;color:var(--emerald)}
+  .spec-row span{color:#7a6c5b}
+  .swatches{display:flex;gap:8px;margin-top:12px}
+  .swatches i{width:26px;height:26px;border-radius:50%;box-shadow:inset 0 -3px 6px rgba(0,0,0,.25)}
+  .swatches i.on{outline:2px solid var(--gold-deep);outline-offset:3px}
+  .timeline{margin-top:24px;display:grid;grid-template-columns:repeat(5,1fr);position:relative}
+  .timeline::before{content:"";position:absolute;top:13px;left:10%;right:10%;height:2px;background:#e3d3ae}
+  .timeline::after{content:"";position:absolute;top:13px;left:10%;width:40%;height:2px;background:linear-gradient(90deg,var(--gold-deep),var(--gold))}
+  .step{text-align:center;position:relative;z-index:1;font-size:11px;color:#8b7c68;font-weight:500}
+  .step i{display:grid;place-items:center;width:28px;height:28px;margin:0 auto 8px;border-radius:50%;background:#fbf6ea;border:2px solid #e3d3ae;font-style:normal;font-size:12px}
+  .step.done i{background:var(--gold);border-color:var(--gold-deep);color:#2b1a05}
+  .step.now i{background:var(--emerald);border-color:var(--gold);color:var(--gold-light);box-shadow:0 0 0 5px rgba(212,168,75,.25)}
+  .step.done,.step.now{color:var(--emerald);font-weight:600}
+  .floatcard{position:absolute;z-index:4;background:var(--wine);color:var(--cream);padding:16px 20px;box-shadow:0 20px 40px -12px rgba(0,0,0,.6),0 0 0 1px var(--gold) inset,0 0 0 5px var(--wine),0 0 0 6px rgba(212,168,75,.6);animation:bob 6s ease-in-out infinite}
+  .floatcard small{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--gold-light);display:block}
+  .floatcard strong{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;line-height:1.1}
+  .fc1{left:-70px;bottom:40px}
+  .fc2{right:-40px;top:-60px;animation-delay:-3s;background:var(--emerald);box-shadow:0 20px 40px -12px rgba(0,0,0,.6),0 0 0 1px var(--gold) inset,0 0 0 5px var(--emerald),0 0 0 6px rgba(212,168,75,.6)}
+  @keyframes bob{50%{transform:translateY(-10px)}}
+
+  /* Scalloped edge */
+  .scallop{height:28px;background:radial-gradient(circle at 20px 0,transparent 19px,var(--cream) 20px) 0 0/40px 28px repeat-x;margin-top:-28px;position:relative;z-index:5}
+
+  /* Logos */
+  .trust{padding:70px 0 40px;text-align:center}
+  .trust .eyebrow{margin-bottom:34px}
+  .logos{display:flex;justify-content:space-between;align-items:center}
+  .logos div{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#6d5d48;font-style:italic;display:flex;align-items:center;gap:10px;opacity:.85}
+  .logos div:nth-child(even){font-family:'Cinzel',serif;font-style:normal;font-size:18px;letter-spacing:.14em}
+  .logos svg{width:26px;height:26px;color:var(--gold-deep)}
+
+  /* Divider */
+  .divider{display:flex;align-items:center;justify-content:center;gap:18px;color:var(--gold-deep);margin:0 auto}
+  .divider::before,.divider::after{content:"";height:1px;width:180px;background:linear-gradient(90deg,transparent,var(--gold))}
+  .divider::after{transform:scaleX(-1)}
+  .divider svg{width:60px;height:24px}
+
+  /* Section heads */
+  section{position:relative}
+  .head{text-align:center;max-width:820px;margin:0 auto 70px}
+  .head .eyebrow{margin-bottom:18px}
+  .head h2{font-size:68px;color:var(--emerald);margin-bottom:22px}
+  .head h2 em{color:var(--wine);font-style:italic}
+  .head p{font-size:19px;color:#5c4f42}
+
+  /* Features */
+  .features{padding:90px 0 130px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+  .card{
+    position:relative;background:#fffaf0;padding:54px 40px 44px;text-align:center;
+    box-shadow:0 0 0 1px #e3cf9f,0 0 0 8px #fffaf0,0 0 0 9px #e3cf9f,0 30px 50px -30px rgba(90,60,20,.4);
+    transition:transform .35s;
+  }
+  .card:hover{transform:translateY(-8px)}
+  .card .num{position:absolute;top:-26px;left:50%;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;background:var(--emerald);color:var(--gold-light);display:grid;place-items:center;font-family:'Cinzel',serif;font-weight:700;box-shadow:0 0 0 3px var(--cream),0 0 0 4px var(--gold)}
+  .card .icon{width:96px;height:96px;margin:0 auto 24px}
+  .card h3{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:var(--emerald);margin-bottom:12px}
+  .card p{color:#5c4f42;font-size:16px;margin-bottom:22px}
+  .card ul{list-style:none;text-align:left;border-top:1px solid #eadcb9;padding-top:20px}
+  .card li{font-size:15px;padding:6px 0 6px 28px;position:relative;color:#3d342c}
+  .card li::before{content:"❦";position:absolute;left:0;color:var(--gold-deep)}
+  .card.feature-mid{background:linear-gradient(180deg,var(--wine),#40091b);color:var(--cream);box-shadow:0 0 0 1px var(--gold),0 0 0 8px var(--wine),0 0 0 9px var(--gold),0 40px 60px -30px rgba(90,20,40,.7)}
+  .card.feature-mid h3{color:var(--gold-light)}
+  .card.feature-mid p,.card.feature-mid li{color:rgba(248,240,222,.85)}
+  .card.feature-mid ul{border-color:rgba(245,224,163,.25)}
+  .card.feature-mid li::before{color:var(--gold)}
+
+  /* Stats */
+  .stats{background:radial-gradient(ellipse at 50% 0,#2a5e4d,var(--emerald) 50%,#072019);color:var(--cream);padding:110px 0;overflow:hidden}
+  .stats::before,.stats::after{content:"";position:absolute;left:0;right:0;height:18px;background:repeating-linear-gradient(90deg,var(--gold) 0 2px,transparent 2px 14px),linear-gradient(var(--gold-deep),var(--gold-deep));background-size:auto,100% 1px;background-repeat:repeat,no-repeat;background-position:0 0,0 100%;opacity:.5}
+  .stats::before{top:16px}.stats::after{bottom:16px}
+  .stats .head h2{color:var(--cream)}
+  .stats .head p{color:rgba(248,240,222,.75)}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+  .stat{text-align:center;padding:10px 20px;position:relative}
+  .stat+.stat::before{content:"✦";position:absolute;left:-8px;top:40%;color:var(--gold);font-size:16px}
+  .stat .n{font-family:'Cormorant Garamond',serif;font-size:92px;font-weight:600;line-height:1}
+  .stat .l{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-light);margin-top:10px}
+  .stat .d{font-size:15px;color:rgba(248,240,222,.65);margin-top:8px}
+
+  /* Journey */
+  .journey{padding:130px 0}
+  .journey-grid{display:grid;grid-template-columns:1fr 1fr;gap:90px;align-items:center}
+  .journey h2{font-size:64px;color:var(--emerald);margin:18px 0 26px}
+  .journey h2 em{color:var(--wine)}
+  .journey .intro{font-size:18px;color:#5c4f42;margin-bottom:40px}
+  .steps{list-style:none;counter-reset:s}
+  .steps li{display:grid;grid-template-columns:70px 1fr;gap:10px;padding:22px 0;border-top:1px solid #e3cf9f}
+  .steps li:last-child{border-bottom:1px solid #e3cf9f}
+  .steps .rn{font-family:'Cinzel',serif;font-size:28px;color:var(--gold-deep)}
+  .steps h4{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--emerald)}
+  .steps p{color:#5c4f42;font-size:16px}
+  .arch{position:relative;height:640px;border-radius:320px 320px 0 0;overflow:hidden;background:radial-gradient(circle at 50% 40%,#2a5e4d,var(--emerald) 55%,#051812);box-shadow:0 0 0 2px var(--gold),0 0 0 12px var(--cream),0 0 0 13px var(--gold),0 50px 80px -40px rgba(0,0,0,.6)}
+  .arch svg{position:absolute;inset:0;width:100%;height:100%}
+  .orbit{transform-origin:300px 300px;animation:spin 60s linear infinite}
+  .orbit-r{transform-origin:300px 300px;animation:spin 40s linear infinite reverse}
+
+  /* Testimonial */
+  .quote{padding:40px 0 140px}
+  .quote-box{position:relative;background:var(--wine);color:var(--cream);padding:90px 120px;text-align:center;
+    background-image:radial-gradient(ellipse at 50% 0,rgba(212,168,75,.25),transparent 60%),radial-gradient(circle at 0 100%,#3d0717,transparent 50%);
+    box-shadow:0 0 0 1px var(--gold) inset,0 0 0 10px var(--wine) inset,0 0 0 11px rgba(212,168,75,.5) inset,0 50px 90px -40px rgba(90,20,40,.8)}
+  .quote-box .corner{width:70px;height:70px}
+  .quote-box .corner.tl{top:18px;left:18px}.quote-box .corner.tr{top:18px;right:18px}
+  .quote-box .corner.bl{bottom:18px;left:18px}.quote-box .corner.br{bottom:18px;right:18px}
+  .quote-mark{font-family:'Cormorant Garamond',serif;font-size:160px;line-height:.5;height:60px}
+  blockquote{font-family:'Cormorant Garamond',serif;font-size:44px;font-style:italic;font-weight:500;line-height:1.25;margin:10px 0 40px}
+  .who{display:flex;align-items:center;justify-content:center;gap:18px}
+  .avatar{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#f1d9b8 0 30%,transparent 31%),radial-gradient(circle at 50% 110%,#f1d9b8 0 45%,transparent 46%),linear-gradient(#1b4f3f,#0e3a2d);box-shadow:0 0 0 3px var(--gold)}
+  .who b{display:block;font-family:'Cinzel',serif;letter-spacing:.14em;font-size:15px;color:var(--gold-light)}
+  .who span{font-size:14px;color:rgba(248,240,222,.7)}
+
+  /* Demo */
+  .demo{background:linear-gradient(180deg,var(--cream),var(--cream-2));padding:130px 0 140px;overflow:hidden}
+  .demo::before{content:"";position:absolute;right:-200px;top:-100px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(212,168,75,.28),transparent 65%)}
+  .demo-grid{display:grid;grid-template-columns:1fr 560px;gap:90px;align-items:center}
+  .demo h2{font-size:78px;color:var(--emerald);margin:18px 0 26px}
+  .demo h2 em{color:var(--wine)}
+  .demo .intro{font-size:19px;color:#5c4f42;margin-bottom:36px;max-width:520px}
+  .perks{list-style:none;display:grid;gap:16px}
+  .perks li{display:flex;gap:16px;align-items:flex-start;font-size:17px}
+  .perks li i{flex:none;width:30px;height:30px;border-radius:50%;background:var(--emerald);color:var(--gold-light);display:grid;place-items:center;font-style:normal;font-size:13px;box-shadow:0 0 0 2px var(--cream),0 0 0 3px var(--gold)}
+  form{background:#fffaf0;padding:50px 46px;position:relative}
+  form h3{font-family:'Cormorant Garamond',serif;font-size:38px;color:var(--emerald);text-align:center;font-weight:600}
+  form .sub{text-align:center;color:#7a6c5b;font-size:15px;margin-bottom:28px}
+  .field{margin-bottom:18px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  label{display:block;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:8px;font-weight:700}
+  input,select{width:100%;padding:15px 16px;font:inherit;font-size:16px;background:#fbf4e3;border:1px solid #e0cc9c;border-radius:2px;color:var(--text);outline:none;transition:border .2s, box-shadow .2s}
+  input:focus,select:focus{border-color:var(--gold-deep);box-shadow:0 0 0 4px rgba(212,168,75,.2)}
+  form .btn{width:100%;justify-content:center;margin-top:10px}
+  .fine{text-align:center;font-size:13px;color:#8b7c68;margin-top:16px}
+  .thanks{display:none;text-align:center;padding:40px 0}
+  .thanks h3{font-size:46px;margin:14px 0 10px}
+  .thanks p{color:#5c4f42;font-size:17px}
+  form.sent .form-inner{display:none}
+  form.sent .thanks{display:block}
+  #burst{position:fixed;inset:0;pointer-events:none;z-index:100;width:100%;height:100%}
+
+  /* FAQ */
+  .faq{padding:120px 0}
+  .faq-list{max-width:900px;margin:0 auto}
+  details{border-top:1px solid #e3cf9f;padding:26px 0}
+  details:last-child{border-bottom:1px solid #e3cf9f}
+  summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--emerald)}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"✦";color:var(--gold-deep);font-size:20px;transition:transform .4s}
+  details[open] summary::after{transform:rotate(135deg)}
+  details p{margin-top:14px;font-size:17px;color:#5c4f42;max-width:780px}
+
+  /* Footer */
+  footer{background:#07201a;color:rgba(248,240,222,.7);padding:90px 0 40px;position:relative}
+  footer::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;background:var(--foil)}
+  .foot-cta{text-align:center;padding-bottom:70px;border-bottom:1px solid rgba(212,168,75,.25);margin-bottom:40px}
+  .foot-cta h2{font-size:64px;color:var(--cream);margin-bottom:30px}
+  .foot-row{display:flex;justify-content:space-between;align-items:center;font-size:14px}
+  .foot-row .links{display:flex;gap:32px}
+  .foot-row a:hover{color:var(--gold-light)}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 1s ease,transform 1s ease}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="g-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6e3a6"/><stop offset=".45" stop-color="#c99a42"/><stop offset=".7" stop-color="#fff0c2"/><stop offset="1" stop-color="#a97a2a"/>
+    </linearGradient>
+    <symbol id="corner" viewBox="0 0 120 120">
+      <g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+        <path d="M6 116 V42 C6 20 20 6 42 6 H116"/>
+        <path d="M16 116 V48 C16 30 30 16 48 16 H116" stroke-width="1.2"/>
+        <path d="M42 42 C62 46 72 62 66 78 C62 88 50 86 52 76 C54 68 64 70 62 76"/>
+        <path d="M42 42 C46 62 62 72 78 66 C88 62 86 50 76 52 C68 54 70 64 76 62"/>
+        <path d="M30 116 C30 100 26 92 18 88" stroke-width="1.2"/>
+        <path d="M116 30 C100 30 92 26 88 18" stroke-width="1.2"/>
+      </g>
+      <circle cx="42" cy="42" r="7" fill="currentColor"/>
+      <circle cx="6" cy="6" r="4" fill="currentColor"/>
+      <path d="M100 6 l6 -5 l6 5 l-6 5z M6 100 l-5 6 l5 6 l5 -6z" fill="currentColor"/>
+    </symbol>
+    <symbol id="flourish" viewBox="0 0 60 24">
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M2 12 C12 2 20 2 24 12 C20 22 12 22 2 12Z"/>
+        <path d="M58 12 C48 2 40 2 36 12 C40 22 48 22 58 12Z"/>
+      </g>
+      <path d="M30 4 l6 8 l-6 8 l-6 -8z" fill="currentColor"/>
+    </symbol>
+    <symbol id="mark" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="21" fill="none" stroke="url(#g-gold)" stroke-width="2"/>
+      <circle cx="24" cy="24" r="15" fill="none" stroke="url(#g-gold)" stroke-width="5" stroke-dasharray="4.2 3.65"/>
+      <path d="M24 13 L31 32 H27.5 L26 27.5 H22 L20.5 32 H17Z M23 24.5 H25 L24 21Z" fill="url(#g-gold)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo"><svg><use href="#mark"/></svg><span>ACME</span></a>
+    <div class="navlinks">
+      <a href="#platform">Platform</a>
+      <a href="#journey">How it works</a>
+      <a href="#proof">Customers</a>
+      <a href="#faq">Questions</a>
+    </div>
+    <a href="#demo" class="btn btn-gold">Book a demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <canvas id="confetti"></canvas>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Custom widgets for modern manufacturers</div>
+      <h1 class="display">Every widget made to order. <em class="foil">Every order, a triumph.</em></h1>
+      <p class="lede">Acme gives operations teams one resplendent command center to configure custom widgets, place orders with confidence, and follow every unit from the foundry floor to your loading dock.</p>
+      <div class="cta-row">
+        <a href="#demo" class="btn btn-gold">Book your demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="#platform" class="btn btn-ghost">Tour the platform</a>
+      </div>
+      <div class="hero-note"><span>30-minute tailored walkthrough</span><span>Live in under two weeks</span></div>
+    </div>
+
+    <div style="position:relative;padding:30px">
+      <div class="gilded">
+        <svg class="corner tl"><use href="#corner"/></svg>
+        <svg class="corner tr"><use href="#corner"/></svg>
+        <svg class="corner bl"><use href="#corner"/></svg>
+        <svg class="corner br"><use href="#corner"/></svg>
+        <div class="dash">
+          <div class="dash-top">
+            <div><div class="t">ORDER WX-2048</div><h4>Precision Flange Widget</h4></div>
+            <div class="pill">In production</div>
+          </div>
+          <div class="dash-body">
+            <div class="medallion">
+              <svg viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="80" fill="none" stroke="url(#g-gold)" stroke-width="20" stroke-dasharray="14.6 11.6"/>
+                <circle cx="100" cy="100" r="66" fill="#0e3a2d" stroke="url(#g-gold)" stroke-width="3"/>
+                <circle cx="100" cy="100" r="50" fill="none" stroke="#f5e0a3" stroke-width="1" stroke-dasharray="2 4"/>
+                <g fill="url(#g-gold)">
+                  <path d="M100 52 C108 72 116 84 136 92 C116 100 108 112 100 148 C92 112 84 100 64 92 C84 84 92 72 100 52Z" opacity=".9"/>
+                </g>
+                <circle cx="100" cy="100" r="12" fill="#0e3a2d" stroke="url(#g-gold)" stroke-width="3"/>
+              </svg>
+            </div>
+            <div class="spec">
+              <div class="spec-row"><span>Material</span><b>Brushed brass C360</b></div>
+              <div class="spec-row"><span>Bore diameter</span><b>42.00 mm ± 0.02</b></div>
+              <div class="spec-row"><span>Finish</span><b>Satin, passivated</b></div>
+              <div class="spec-row"><span>Quantity</span><b>12,500 units</b></div>
+              <div class="swatches">
+                <i class="on" style="background:linear-gradient(135deg,#f3d68a,#a97a2a)"></i>
+                <i style="background:linear-gradient(135deg,#e6e6e6,#8a8f94)"></i>
+                <i style="background:linear-gradient(135deg,#e6a57a,#8a4a2a)"></i>
+                <i style="background:linear-gradient(135deg,#4a4f55,#15181b)"></i>
+              </div>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="step done"><i>✓</i>Configured</div>
+            <div class="step done"><i>✓</i>Approved</div>
+            <div class="step now"><i>✦</i>Machining</div>
+            <div class="step"><i>4</i>QA check</div>
+            <div class="step"><i>5</i>Delivered</div>
+          </div>
+        </div>
+      </div>
+      <div class="floatcard fc1"><small>ETA TO DOCK</small><strong>Thu, 14 Nov</strong></div>
+      <div class="floatcard fc2"><small>SPEC MATCH</small><strong>99.6%</strong></div>
+    </div>
+  </div>
+</header>
+<div class="scallop"></div>
+
+<!-- TRUST -->
+<section class="trust">
+  <div class="wrap">
+    <div class="eyebrow">Trusted by the ops teams behind 340+ manufacturers</div>
+    <div class="logos">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Halvorsen Castings</div>
+      <div>BRIGHTWATER</div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>Meridian Pumps</div>
+      <div>OAKRIDGE FAB</div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 16c4-8 8-10 20-12-4 6-8 12-20 12z"/></svg>Kestrel Motion</div>
+      <div>TAMSIN &amp; VALE</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="platform">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="eyebrow">The platform</div>
+      <h2 class="display">Three movements, <em>one grand symphony</em></h2>
+      <p>Spreadsheets, supplier emails, and hallway guesswork give way to a single, beautifully orchestrated flow, built for the people who keep production lines humming.</p>
+    </div>
+    <div class="cards">
+      <article class="card reveal">
+        <div class="num">I</div>
+        <svg class="icon" viewBox="0 0 96 96" fill="none" stroke="url(#g-gold)" stroke-width="2.2">
+          <circle cx="48" cy="48" r="44" stroke-width="1"/>
+          <circle cx="48" cy="48" r="26" stroke-width="7" stroke-dasharray="6 4.2"/>
+          <circle cx="48" cy="48" r="10"/>
+          <path d="M48 4v10M48 82v10M4 48h10M82 48h10"/>
+        </svg>
+        <h3>Configure</h3>
+        <p>Design exactly the widget you need with guided specs that know your tolerances, materials, and compliance rules.</p>
+        <ul>
+          <li>Visual configurator with live pricing</li>
+          <li>Saved templates for repeat SKUs</li>
+          <li>Automatic spec validation before submit</li>
+        </ul>
+      </article>
+      <article class="card feature-mid reveal">
+        <div class="num">II</div>
+        <svg class="icon" viewBox="0 0 96 96" fill="none" stroke="url(#g-gold)" stroke-width="2.2">
+          <circle cx="48" cy="48" r="44" stroke-width="1"/>
+          <path d="M26 30h44l-5 36H31z"/>
+          <path d="M38 30c0-8 4-12 10-12s10 4 10 12"/>
+          <path d="M40 48l6 6 12-12"/>
+        </svg>
+        <h3>Order</h3>
+        <p>Route approvals, compare supplier quotes, and release purchase orders in minutes instead of weeks.</p>
+        <ul>
+          <li>Multi-step approvals that respect your org chart</li>
+          <li>Side-by-side quotes from vetted suppliers</li>
+          <li>One-click sync to SAP, NetSuite, and Oracle</li>
+        </ul>
+      </article>
+      <article class="card reveal">
+        <div class="num">III</div>
+        <svg class="icon" viewBox="0 0 96 96" fill="none" stroke="url(#g-gold)" stroke-width="2.2">
+          <circle cx="48" cy="48" r="44" stroke-width="1"/>
+          <path d="M48 20c-11 0-19 8-19 18 0 14 19 34 19 34s19-20 19-34c0-10-8-18-19-18z"/>
+          <circle cx="48" cy="38" r="7"/>
+          <path d="M22 78h52" stroke-dasharray="3 4"/>
+        </svg>
+        <h3>Track</h3>
+        <p>Follow every batch through machining, QA, and freight, with alerts the moment anything drifts from plan.</p>
+        <ul>
+          <li>Live milestones from 1,200+ partner plants</li>
+          <li>Predictive ETAs and delay warnings</li>
+          <li>Certificates of conformance, auto-filed</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="eyebrow" style="color:var(--gold-light)">Results worth celebrating</div>
+      <h2 class="display">The numbers take a <em class="foil">bow</em></h2>
+      <p>Averages measured across Acme customers in their first twelve months on the platform.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat reveal"><div class="n foil"><span data-count="38">0</span>%</div><div class="l">Faster order cycles</div><div class="d">From spec to signed PO</div></div>
+      <div class="stat reveal"><div class="n foil"><span data-count="4.2" data-dec="1">0</span>M</div><div class="l">Widgets tracked</div><div class="d">Across our network last year</div></div>
+      <div class="stat reveal"><div class="n foil"><span data-count="99.6" data-dec="1">0</span>%</div><div class="l">On-spec delivery</div><div class="d">Validated before production</div></div>
+      <div class="stat reveal"><div class="n foil"><span data-count="11">0</span></div><div class="l">Days to go live</div><div class="d">Median onboarding time</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section class="journey" id="journey">
+  <div class="wrap journey-grid">
+    <div class="reveal">
+      <div class="eyebrow">How it works</div>
+      <h2 class="display">From first sketch to <em>final shipment</em>, handled with grace</h2>
+      <p class="intro">Acme meets your team where it already works, then quietly removes every bottleneck between an idea and a pallet of finished widgets.</p>
+      <ol class="steps">
+        <li><div class="rn">I</div><div><h4>Import your catalog</h4><p>We map your existing SKUs, drawings, and supplier list, so you start with history, not a blank page.</p></div></li>
+        <li><div class="rn">II</div><div><h4>Invite your ensemble</h4><p>Engineering, procurement, and plant managers each get a view tuned to the decisions they own.</p></div></li>
+        <li><div class="rn">III</div><div><h4>Order and orchestrate</h4><p>Configure, approve, and release in one flow, then watch progress unfold in real time.</p></div></li>
+        <li><div class="rn">IV</div><div><h4>Celebrate the dock date</h4><p>Receive on time, on spec, with every certificate already filed and every stakeholder informed.</p></div></li>
+      </ol>
+    </div>
+    <div class="arch reveal">
+      <svg viewBox="0 0 600 640" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <radialGradient id="glow"><stop offset="0" stop-color="#f5e0a3" stop-opacity=".5"/><stop offset="1" stop-color="#f5e0a3" stop-opacity="0"/></radialGradient>
+        </defs>
+        <circle cx="300" cy="300" r="240" fill="url(#glow)"/>
+        <g class="orbit" fill="none" stroke="url(#g-gold)">
+          <circle cx="300" cy="300" r="230" stroke-width="1" stroke-dasharray="2 6"/>
+          <circle cx="300" cy="300" r="190" stroke-width="1.5"/>
+          <g fill="url(#g-gold)" stroke="none">
+            <circle cx="300" cy="110" r="8"/><circle cx="490" cy="300" r="8"/><circle cx="300" cy="490" r="8"/><circle cx="110" cy="300" r="8"/>
+          </g>
+        </g>
+        <g class="orbit-r" fill="none" stroke="url(#g-gold)">
+          <circle cx="300" cy="300" r="140" stroke-width="22" stroke-dasharray="18 14"/>
+          <circle cx="300" cy="300" r="120" stroke-width="2"/>
+        </g>
+        <circle cx="300" cy="300" r="112" fill="#0e3a2d"/>
+        <g fill="none" stroke="url(#g-gold)" stroke-width="1.5">
+          <path d="M300 200 C320 250 350 270 400 300 C350 330 320 350 300 400 C280 350 250 330 200 300 C250 270 280 250 300 200Z"/>
+          <path d="M300 230 C312 265 335 280 370 300 C335 320 312 335 300 370 C288 335 265 320 230 300 C265 280 288 265 300 230Z" fill="url(#g-gold)" fill-opacity=".85"/>
+        </g>
+        <circle cx="300" cy="300" r="18" fill="#5b1429" stroke="url(#g-gold)" stroke-width="3"/>
+        <g font-family="Cinzel, serif" font-size="14" letter-spacing="4" fill="#f5e0a3" text-anchor="middle">
+          <text x="300" y="585">CONFIGURE · ORDER · TRACK</text>
+        </g>
+        <path d="M150 610 H250 M350 610 H450" stroke="#d4a84b" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="quote" id="proof">
+  <div class="wrap">
+    <div class="quote-box reveal">
+      <svg class="corner tl"><use href="#corner"/></svg>
+      <svg class="corner tr"><use href="#corner"/></svg>
+      <svg class="corner bl"><use href="#corner"/></svg>
+      <svg class="corner br"><use href="#corner"/></svg>
+      <div class="quote-mark foil">“</div>
+      <blockquote>We used to spend Monday mornings chasing widget orders across four inboxes. Now the whole plant can see every order at a glance, and our line hasn't stopped for a missing part in eight months.</blockquote>
+      <div class="who">
+        <div class="avatar"></div>
+        <div style="text-align:left"><b>Renata Okafor</b><span>VP of Operations, Halvorsen Castings</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="wrap demo-grid">
+    <div class="reveal">
+      <div class="eyebrow">Reserve your seat</div>
+      <h2 class="display">See Acme take the stage <em>with your own widgets</em></h2>
+      <p class="intro">In thirty minutes, a product specialist will walk your team through a live configuration built from your real parts, then show you exactly how orders and tracking would flow at your plant.</p>
+      <ul class="perks">
+        <li><i>✦</i><span>A tailored walkthrough using your SKUs and suppliers</span></li>
+        <li><i>✦</i><span>A clear rollout plan and ROI estimate for your team</span></li>
+        <li><i>✦</i><span>No slides, no pressure, and answers from real experts</span></li>
+      </ul>
+    </div>
+    <div class="gilded reveal">
+      <svg class="corner tl"><use href="#corner"/></svg>
+      <svg class="corner tr"><use href="#corner"/></svg>
+      <svg class="corner bl"><use href="#corner"/></svg>
+      <svg class="corner br"><use href="#corner"/></svg>
+      <form id="demoForm" novalidate>
+        <div class="form-inner">
+          <h3>Book your demo</h3>
+          <p class="sub">Most teams hear back within one business day.</p>
+          <div class="row2">
+            <div class="field"><label for="fn">First name</label><input id="fn" required placeholder="Jordan"></div>
+            <div class="field"><label for="ln">Last name</label><input id="ln" required placeholder="Reyes"></div>
+          </div>
+          <div class="field"><label for="em">Work email</label><input id="em" type="email" required placeholder="jordan@yourplant.com"></div>
+          <div class="field"><label for="co">Company</label><input id="co" required placeholder="Northfield Manufacturing"></div>
+          <div class="field"><label for="sz">Operations team size</label>
+            <select id="sz">
+              <option>1–10 people</option>
+              <option selected>11–50 people</option>
+              <option>51–200 people</option>
+              <option>200+ people</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-gold">Reserve my demo</button>
+          <p class="fine">We respect your inbox. No spam, ever.</p>
+        </div>
+        <div class="thanks">
+          <div class="divider"><svg><use href="#flourish"/></svg></div>
+          <h3 class="display foil">Bravo!</h3>
+          <p>Your demo request is in. A specialist will reach out shortly to set a time that suits your team.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="head reveal">
+      <div class="eyebrow">Questions, answered</div>
+      <h2 class="display">Before the <em>curtain rises</em></h2>
+    </div>
+    <div class="faq-list reveal">
+      <details open>
+        <summary>Who is Acme built for?</summary>
+        <p>Operations, procurement, and plant teams at mid-sized manufacturers, typically 100 to 2,000 employees, who order custom widgets regularly and are tired of managing them in spreadsheets and email threads.</p>
+      </details>
+      <details>
+        <summary>Does Acme work with our existing suppliers?</summary>
+        <p>Yes. Bring your current suppliers onto the platform at no cost to them, or tap into our network of 1,200+ vetted partner plants when you need extra capacity or a new capability.</p>
+      </details>
+      <details>
+        <summary>How long does implementation take?</summary>
+        <p>Our median customer is live in eleven days. A dedicated onboarding lead imports your catalog, connects your ERP, and trains your team, so there's no heavy lifting on your side.</p>
+      </details>
+      <details>
+        <summary>What happens during the demo?</summary>
+        <p>We'll ask a few questions about your widgets and workflow, then show you a live configuration, approval, and tracking flow modeled on your operation. You'll leave with a rollout plan and pricing tailored to your team.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-cta">
+      <div class="divider" style="margin-bottom:26px"><svg><use href="#flourish"/></svg></div>
+      <h2 class="display">Your next order deserves <em class="foil">a standing ovation.</em></h2>
+      <a href="#demo" class="btn btn-gold">Book your demo</a>
+    </div>
+    <div class="foot-row">
+      <a href="#" class="logo"><svg style="width:34px;height:34px"><use href="#mark"/></svg><span style="font-size:18px">ACME</span></a>
+      <div class="links"><a href="#platform">Platform</a><a href="#journey">How it works</a><a href="#faq">FAQ</a><a href="#">Privacy</a><a href="#">Security</a></div>
+      <div>© 2025 Acme Widget Co. Crafted with ceremony.</div>
+    </div>
+  </div>
+</footer>
+
+<canvas id="burst"></canvas>
+
+<script>
+(() => {
+  const COLORS = ['#f5e0a3','#d4a84b','#fff0c2','#a97a2a','#7a1f38','#2c9a6c','#f8f0de'];
+
+  // Ambient hero confetti
+  const c = document.getElementById('confetti'), ctx = c.getContext('2d');
+  let W, H, pieces = [];
+  function size(){ W = c.width = c.offsetWidth * devicePixelRatio; H = c.height = c.offsetHeight * devicePixelRatio; }
+  size(); addEventListener('resize', size);
+  function make(initial){
+    return {
+      x: Math.random()*W, y: initial ? Math.random()*H : -20,
+      w: (4+Math.random()*7)*devicePixelRatio, h: (8+Math.random()*12)*devicePixelRatio,
+      vy: (.3+Math.random()*.8)*devicePixelRatio, vx: (Math.random()-.5)*.4,
+      r: Math.random()*Math.PI, vr: (Math.random()-.5)*.04,
+      sway: Math.random()*Math.PI*2, color: COLORS[Math.floor(Math.random()*5)],
+      shape: Math.random() < .25 ? 'star' : 'rect', a: .35 + Math.random()*.5
+    };
+  }
+  for (let i=0;i<70;i++) pieces.push(make(true));
+  function star(g, s){
+    g.beginPath();
+    for(let i=0;i<4;i++){ g.rotate(Math.PI/2); g.quadraticCurveTo(0,0,0,-s); g.quadraticCurveTo(0,0,s*.001,0); }
+    g.moveTo(0,-s); g.quadraticCurveTo(0,0,s,0); g.quadraticCurveTo(0,0,0,s); g.quadraticCurveTo(0,0,-s,0); g.quadraticCurveTo(0,0,0,-s);
+    g.fill();
+  }
+  function draw(g, p){
+    g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.globalAlpha = p.a; g.fillStyle = p.color;
+    if (p.shape==='star') star(g, p.w*1.3);
+    else { g.scale(1, Math.cos(p.sway*2)); g.fillRect(-p.w/2,-p.h/2,p.w,p.h); }
+    g.restore();
+  }
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    pieces.forEach((p,i) => {
+      p.sway += .02; p.y += p.vy; p.x += p.vx + Math.sin(p.sway)*.4; p.r += p.vr;
+      if (p.y > H+20) pieces[i] = make(false);
+      draw(ctx, p);
+    });
+    requestAnimationFrame(loop);
+  }
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) loop();
+
+  // Burst confetti
+  const b = document.getElementById('burst'), bx = b.getContext('2d');
+  let bits = [], running = false;
+  function bsize(){ b.width = innerWidth*devicePixelRatio; b.height = innerHeight*devicePixelRatio; }
+  bsize(); addEventListener('resize', bsize);
+  function burst(x, y){
+    const d = devicePixelRatio;
+    for (let i=0;i<220;i++){
+      const ang = Math.random()*Math.PI*2, sp = (4+Math.random()*12)*d;
+      bits.push({x:x*d,y:y*d,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp-6*d,w:(5+Math.random()*7)*d,h:(8+Math.random()*12)*d,
+        r:Math.random()*6,vr:(Math.random()-.5)*.3,sway:Math.random()*6,color:COLORS[Math.floor(Math.random()*COLORS.length)],
+        shape:Math.random()<.3?'star':'rect',a:1,life:0});
+    }
+    if (!running){ running = true; bloop(); }
+  }
+  function bloop(){
+    bx.clearRect(0,0,b.width,b.height);
+    bits.forEach(p => {
+      p.vy += .25*devicePixelRatio; p.vx *= .98; p.vy *= .985; p.x += p.vx; p.y += p.vy;
+      p.r += p.vr; p.sway += .1; p.life++; if (p.life > 110) p.a -= .02;
+      draw(bx, p);
+    });
+    bits = bits.filter(p => p.a > 0 && p.y < b.height+40);
+    if (bits.length) requestAnimationFrame(bloop); else { running = false; bx.clearRect(0,0,b.width,b.height); }
+  }
+
+  // Form
+  const form = document.getElementById('demoForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true;
+    form.querySelectorAll('input[required]').forEach(i => {
+      const bad = !i.value.trim() || (i.type==='email' && !/^\S+@\S+\.\S+$/.test(i.value));
+      i.style.borderColor = bad ? '#b3263e' : '';
+      if (bad) ok = false;
+    });
+    if (!ok) return;
+    const r = form.getBoundingClientRect();
+    form.classList.add('sent');
+    burst(r.left + r.width/2, r.top + r.height/2);
+    setTimeout(() => burst(r.left + 40, r.top + 60), 250);
+    setTimeout(() => burst(r.right - 40, r.top + 60), 450);
+  });
+
+  // Reveal + counters
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      en.target.querySelectorAll('[data-count]').forEach(el => {
+        const end = parseFloat(el.dataset.count), dec = +el.dataset.dec || 0, t0 = performance.now();
+        const tick = t => {
+          const k = Math.min(1,(t-t0)/1800), e = 1 - Math.pow(1-k,3);
+          el.textContent = (end*e).toFixed(dec);
+          if (k<1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+      io.unobserve(en.target);
+    });
+  }, {threshold:.2});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom widgets, configured, ordered, and tracked without the spreadsheet gymnastics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f7f3ec;
+    --paper-2:#efe8dc;
+    --ink:#22201b;
+    --ink-soft:#5c574c;
+    --line:#d9d0c0;
+    --orange:#e0591f;
+    --orange-deep:#b8440f;
+    --blue:#1f4e79;
+    --green:#2e6b46;
+    --card:#fffdf9;
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--orange);color:#fff}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:500;line-height:1.12;letter-spacing:-.01em}
+  .mono{font-family:'IBM Plex Mono',monospace}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 40px}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--orange-deep);display:inline-flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--orange-deep)}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(247,243,236,.88);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-size:22px;font-weight:600;text-decoration:none;color:var(--ink)}
+  .logo svg{display:block}
+  .nav-links{display:flex;gap:34px;align-items:center}
+  .nav-links a{color:var(--ink-soft);text-decoration:none;font-size:14.5px;font-weight:500;transition:color .2s}
+  .nav-links a:hover{color:var(--ink)}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    background:var(--orange);color:#fff;border:none;cursor:pointer;
+    font-family:'Inter',sans-serif;font-weight:600;font-size:15px;
+    padding:13px 24px;border-radius:10px;text-decoration:none;
+    box-shadow:0 2px 0 var(--orange-deep);
+    transition:transform .15s, box-shadow .15s, background .2s;
+  }
+  .btn:hover{background:var(--orange-deep);transform:translateY(-1px);box-shadow:0 3px 0 #93350a}
+  .btn:active{transform:translateY(1px);box-shadow:0 1px 0 #93350a}
+  .btn.ghost{
+    background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink);
+  }
+  .btn.ghost:hover{background:var(--ink);color:var(--paper);box-shadow:inset 0 0 0 1.5px var(--ink)}
+  .btn.sm{padding:9px 18px;font-size:14px;border-radius:8px}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:88px 0 70px;position:relative;overflow:hidden}
+  .hero-grid-bg{
+    position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,black 20%,transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,black 20%,transparent 75%);
+  }
+  .hero-inner{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+  .hero h1{font-size:56px;margin:22px 0 22px}
+  .hero h1 em{font-style:italic;color:var(--orange-deep)}
+  .hero p.lede{font-size:18.5px;color:var(--ink-soft);max-width:520px;margin-bottom:34px}
+  .hero-ctas{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .hero-note{margin-top:16px;font-size:13px;color:var(--ink-soft);font-family:'IBM Plex Mono',monospace}
+  .hero-note b{color:var(--green);font-weight:500}
+
+  /* blueprint card */
+  .blueprint{
+    background:var(--blue);border-radius:var(--radius);
+    padding:26px;position:relative;color:#dce9f5;
+    box-shadow:0 24px 60px -20px rgba(31,78,121,.45);
+    overflow:hidden;
+  }
+  .blueprint::before{
+    content:"";position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
+    background-size:28px 28px;
+  }
+  .bp-head{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;opacity:.85;position:relative;margin-bottom:14px}
+  .bp-stage{position:relative;display:flex;justify-content:center;padding:8px 0 4px}
+  .bp-stage svg{max-width:100%;height:auto}
+  .bp-controls{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;margin-top:18px}
+  .bp-ctl label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;display:flex;justify-content:space-between;margin-bottom:6px}
+  .bp-ctl input[type=range]{width:100%;accent-color:var(--orange);cursor:pointer}
+  .bp-readout{
+    position:relative;margin-top:16px;border-top:1px dashed rgba(255,255,255,.3);padding-top:12px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;
+  }
+  .bp-readout .ok{color:#8fd6a8}
+  .spin{animation:spin 14s linear infinite;transform-origin:center}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* widgets floating ticker */
+  .ticker-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--paper-2);overflow:hidden;padding:14px 0}
+  .ticker{display:flex;gap:48px;white-space:nowrap;animation:tick 30s linear infinite;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft)}
+  .ticker span b{color:var(--ink);font-weight:500}
+  @keyframes tick{to{transform:translateX(-50%)}}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:96px 0}
+  .sec-head{max-width:640px;margin-bottom:56px}
+  .sec-head h2{font-size:40px;margin:18px 0 16px}
+  .sec-head p{color:var(--ink-soft);font-size:17px}
+
+  /* pain / honesty */
+  .honest{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .honest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .honest-card{border:1px solid var(--line);border-radius:var(--radius);padding:30px;background:var(--paper);position:relative}
+  .honest-card .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--orange-deep);letter-spacing:.1em;margin-bottom:14px;display:block}
+  .honest-card h3{font-size:21px;margin-bottom:10px}
+  .honest-card p{font-size:15px;color:var(--ink-soft)}
+  .honest-card .strike{color:#a89f8d;text-decoration:line-through;text-decoration-color:var(--orange);text-decoration-thickness:2px}
+
+  /* how it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:step}
+  .step{border-top:2px solid var(--ink);padding-top:22px;position:relative}
+  .step::before{
+    counter-increment:step;content:"0" counter(step);
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--orange-deep);
+    display:block;margin-bottom:14px;letter-spacing:.1em;
+  }
+  .step h3{font-size:22px;margin-bottom:10px}
+  .step p{font-size:15px;color:var(--ink-soft)}
+  .step .tag{display:inline-block;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;background:var(--paper-2);border:1px solid var(--line);border-radius:6px;padding:4px 10px;color:var(--ink-soft)}
+
+  /* feature table */
+  .spec{background:var(--ink);color:#e8e2d6;border-radius:0}
+  .spec .eyebrow{color:#f0a172}
+  .spec .eyebrow::before{background:#f0a172}
+  .spec h2{color:#fdfaf4}
+  .spec .sec-head p{color:#b3ab9c}
+  .spec-table{width:100%;border-collapse:collapse;font-size:15px}
+  .spec-table th{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:#8f8778;text-align:left;padding:14px 18px;border-bottom:1px solid #3a372f}
+  .spec-table td{padding:18px;border-bottom:1px solid #3a372f;vertical-align:top}
+  .spec-table tr:last-child td{border-bottom:none}
+  .spec-table td:first-child{font-weight:600;color:#fdfaf4;width:26%}
+  .spec-table td:nth-child(2){color:#c9c1b1;width:47%}
+  .spec-table td:last-child{font-family:'IBM Plex Mono',monospace;font-size:13px;color:#8fd6a8}
+  .spec-table tr{transition:background .2s}
+  .spec-table tbody tr:hover{background:#2c2a24}
+
+  /* quote */
+  .quote-block{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:center}
+  .quote-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:38px;position:relative}
+  .quote-card::before{content:"“";font-family:'Fraunces',serif;font-size:90px;color:var(--orange);position:absolute;top:6px;left:26px;line-height:1}
+  .quote-card p{font-family:'Fraunces',serif;font-size:23px;line-height:1.4;margin:34px 0 24px}
+  .quote-who{display:flex;align-items:center;gap:14px}
+  .avatar{width:46px;height:46px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:14px;flex-shrink:0}
+  .quote-who b{display:block;font-size:14.5px}
+  .quote-who span{font-size:13px;color:var(--ink-soft)}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .stat{border-left:3px solid var(--orange);padding-left:20px}
+  .stat .big{font-family:'Fraunces',serif;font-size:44px;line-height:1.1}
+  .stat .lbl{font-size:13.5px;color:var(--ink-soft);margin-top:4px}
+
+  /* generosity / free stuff */
+  .freebies{background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .free-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .free-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:30px;transition:transform .2s, box-shadow .2s}
+  .free-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px -18px rgba(34,32,27,.25)}
+  .free-card .icon{width:44px;height:44px;border-radius:10px;background:var(--paper-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .free-card h3{font-size:20px;margin-bottom:8px}
+  .free-card p{font-size:14.5px;color:var(--ink-soft);margin-bottom:16px}
+  .free-card a{font-size:14px;font-weight:600;color:var(--orange-deep);text-decoration:none;border-bottom:1.5px solid var(--orange)}
+  .free-card a:hover{color:var(--ink);border-color:var(--ink)}
+  .free-badge{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--green);border:1px solid var(--green);border-radius:20px;padding:3px 10px;display:inline-block;margin-bottom:14px}
+
+  /* FAQ */
+  .faq-list{max-width:760px}
+  details{border-bottom:1px solid var(--line)}
+  summary{
+    cursor:pointer;list-style:none;padding:24px 0;display:flex;justify-content:space-between;align-items:center;
+    font-family:'Fraunces',serif;font-size:20px;gap:20px;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary .plus{font-family:'IBM Plex Mono',monospace;font-size:20px;color:var(--orange-deep);transition:transform .25s;flex-shrink:0}
+  details[open] .plus{transform:rotate(45deg)}
+  details .ans{padding:0 0 26px;color:var(--ink-soft);font-size:15.5px;max-width:640px}
+
+  /* final CTA */
+  .final{background:var(--blue);color:#eaf1f8;text-align:center;position:relative;overflow:hidden}
+  .final::before{
+    content:"";position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);
+    background-size:40px 40px;
+  }
+  .final-inner{position:relative;max-width:680px;margin:0 auto}
+  .final h2{font-size:46px;color:#fff;margin-bottom:18px}
+  .final p{color:#b9cbdd;font-size:17px;margin-bottom:34px}
+  .final .fineprint{margin-top:18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#8fa9c4}
+
+  footer{border-top:1px solid var(--line);padding:44px 0;font-size:13.5px;color:var(--ink-soft)}
+  .foot-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+  .foot-links{display:flex;gap:26px}
+  .foot-links a{color:var(--ink-soft);text-decoration:none}
+  .foot-links a:hover{color:var(--ink)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:1000px){
+    .hero-inner,.quote-block{grid-template-columns:1fr}
+    .honest-grid,.steps,.free-grid{grid-template-columns:1fr}
+    .hero h1{font-size:42px}
+    .nav-links a:not(.btn){display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-inner">
+    <a class="logo" href="#top">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect x="2" y="2" width="24" height="24" rx="6" fill="#e0591f"/>
+        <circle cx="14" cy="14" r="5.5" stroke="#fff" stroke-width="2.4"/>
+        <circle cx="14" cy="14" r="1.6" fill="#fff"/>
+      </svg>
+      Acme
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#specs">Specs</a>
+      <a href="#free">Free stuff</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn sm" href="#demo">Book a demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-grid-bg"></div>
+  <div class="wrap hero-inner">
+    <div>
+      <span class="eyebrow">Widget operations, since 2016</span>
+      <h1>Custom widgets, without the <em>spreadsheet gymnastics.</em></h1>
+      <p class="lede">Acme is the configure-order-track platform for operations teams at mid-sized manufacturers. Spec a widget in minutes, get a real quote in hours, and watch it move through your supply chain — all in one place.</p>
+      <div class="hero-ctas">
+        <a class="btn" href="#demo">Book a demo
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+      <p class="hero-note"><b>●</b> 30-minute demo · your actual widget catalog · zero obligation</p>
+    </div>
+
+    <div class="blueprint">
+      <div class="bp-head"><span>ACME CONFIGURATOR v4.2</span><span>DWG № W-1187</span></div>
+      <div class="bp-stage">
+        <svg id="widgetSvg" width="360" height="230" viewBox="0 0 360 230" fill="none">
+          <!-- dimension lines -->
+          <line x1="60" y1="205" x2="300" y2="205" stroke="#7fa8cc" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="60" y1="200" x2="60" y2="210" stroke="#7fa8cc" stroke-width="1"/>
+          <line x1="300" y1="200" x2="300" y2="210" stroke="#7fa8cc" stroke-width="1"/>
+          <text id="dimText" x="180" y="222" text-anchor="middle" fill="#a8c6e2" font-family="IBM Plex Mono" font-size="11">Ø 120 mm</text>
+          <!-- body -->
+          <rect id="wBody" x="80" y="70" width="200" height="110" rx="10" stroke="#dce9f5" stroke-width="2" fill="rgba(255,255,255,.05)"/>
+          <!-- bore -->
+          <circle id="wBore" cx="180" cy="125" r="26" stroke="#f0a172" stroke-width="2" fill="none"/>
+          <circle cx="180" cy="125" r="3" fill="#f0a172"/>
+          <line x1="180" y1="95" x2="180" y2="155" stroke="#f0a172" stroke-width=".7" stroke-dasharray="3 3"/>
+          <line x1="150" y1="125" x2="210" y2="125" stroke="#f0a172" stroke-width=".7" stroke-dasharray="3 3"/>
+          <!-- bolt holes -->
+          <g id="wBolts" stroke="#dce9f5" stroke-width="1.6">
+            <circle cx="105" cy="90" r="6"/><circle cx="255" cy="90" r="6"/>
+            <circle cx="105" cy="160" r="6"/><circle cx="255" cy="160" r="6"/>
+          </g>
+          <!-- gear accent -->
+          <g class="spin" style="transform-origin:305px 45px">
+            <circle cx="305" cy="45" r="14" stroke="#8fd6a8" stroke-width="1.6" fill="none"/>
+            <g stroke="#8fd6a8" stroke-width="2.4">
+              <line x1="305" y1="27" x2="305" y2="33"/><line x1="305" y1="57" x2="305" y2="63"/>
+              <line x1="287" y1="45" x2="293" y2="45"/><line x1="317" y1="45" x2="323" y2="45"/>
+              <line x1="292" y1="32" x2="296" y2="36"/><line x1="314" y1="54" x2="318" y2="58"/>
+              <line x1="318" y1="32" x2="314" y2="36"/><line x1="296" y1="54" x2="292" y2="58"/>
+            </g>
+          </g>
+          <text x="80" y="52" fill="#a8c6e2" font-family="IBM Plex Mono" font-size="10">TOL ±0.05</text>
+          <text x="80" y="196" fill="#a8c6e2" font-family="IBM Plex Mono" font-size="10" id="matLabel">6061-T6 ALUMINUM</text>
+        </svg>
+      </div>
+      <div class="bp-controls">
+        <div class="bp-ctl">
+          <label>Diameter <span id="dVal">120 mm</span></label>
+          <input type="range" id="dSlider" min="60" max="200" value="120">
+        </div>
+        <div class="bp-ctl">
+          <label>Bore <span id="bVal">26 mm</span></label>
+          <input type="range" id="bSlider" min="10" max="60" value="26">
+        </div>
+      </div>
+      <div class="bp-readout">
+        <span>UNIT EST. <b id="priceOut">$14.20</b></span>
+        <span>LEAD <b id="leadOut">9 days</b></span>
+        <span class="ok" id="dfmOut">✓ DFM PASS</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ticker -->
+<div class="ticker-band">
+  <div class="ticker" id="ticker">
+    <span>PO-4471 · <b>1,200× flanged sprocket</b> · anodizing · on schedule</span>
+    <span>PO-4468 · <b>300× titanium coupling</b> · QC passed · shipped early</span>
+    <span>PO-4475 · <b>5,000× nylon bushing</b> · machining · day 3 of 9</span>
+    <span>PO-4462 · <b>80× stainless manifold</b> · delivered · signed by R. Okafor</span>
+    <span>PO-4479 · <b>950× brass insert</b> · quoting · response in 2h 14m</span>
+  </div>
+</div>
+
+<!-- HONEST -->
+<section class="honest">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">We’ll just say it</span>
+      <h2>Ordering custom widgets is still weirdly hard.</h2>
+      <p>Not because your team isn’t good at their jobs — because the tooling got stuck in 2009. Here’s what we kept hearing from ops teams, and what we did about it.</p>
+    </div>
+    <div class="honest-grid">
+      <div class="honest-card reveal">
+        <span class="num">COMPLAINT 01</span>
+        <h3><span class="strike">“Just email me the drawing again.”</span></h3>
+        <p>Revision roulette ends here. Every widget lives as a versioned spec with a full change history, so the v7_final_FINAL.pdf era is officially over.</p>
+      </div>
+      <div class="honest-card reveal">
+        <span class="num">COMPLAINT 02</span>
+        <h3><span class="strike">“Quote’s been pending for three weeks.”</span></h3>
+        <p>Acme quotes 84% of configurations in under four business hours. The other 16% get a human engineer and a phone call — which, honestly, some people prefer.</p>
+      </div>
+      <div class="honest-card reveal">
+        <span class="num">COMPLAINT 03</span>
+        <h3><span class="strike">“Where’s my order?” “Let me check…”</span></h3>
+        <p>Live milestone tracking from machining to your dock door. When something slips, you hear it from us first, with a new date and a reason.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps. No procurement PhD required.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <h3>Configure</h3>
+        <p>Start from one of 240+ parametric widget templates or upload your own drawing. Set dimensions, materials, tolerances, and finishes with instant DFM feedback as you go.</p>
+        <span class="tag">avg. config time: 6 min</span>
+      </div>
+      <div class="step reveal">
+        <h3>Order</h3>
+        <p>Get a real, itemized quote — not a “starting at” teaser. Approve with your existing PO workflow, multi-level sign-off included. We match you with vetted capacity in our manufacturing network.</p>
+        <span class="tag">84% quoted &lt; 4 hrs</span>
+      </div>
+      <div class="step reveal">
+        <h3>Track</h3>
+        <p>Follow every order through machining, finishing, QC, and freight. Inspection reports, certs, and photos attach automatically. Your ERP stays in sync via API or good old CSV.</p>
+        <span class="tag">on-time rate: 96.4%</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECS -->
+<section class="spec" id="specs">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">For the detail-oriented</span>
+      <h2>The spec sheet, because we’d want one too.</h2>
+      <p>We’re nerds. We assume you might be too. Here’s the stuff that usually takes three sales calls to extract.</p>
+    </div>
+    <table class="spec-table reveal">
+      <thead>
+        <tr><th>Capability</th><th>What that actually means</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Parametric templates</td><td>240+ widget families — sprockets, bushings, couplings, manifolds, housings — with constraint-checked inputs.</td><td>SHIPPED</td></tr>
+        <tr><td>Instant DFM checks</td><td>42 manufacturability rules run client-side as you configure. Fails include the why, not just a red box.</td><td>SHIPPED</td></tr>
+        <tr><td>Materials library</td><td>68 metals and polymers with certs on file. Need something exotic? Request it; median add time is 11 days.</td><td>SHIPPED</td></tr>
+        <tr><td>ERP integration</td><td>NetSuite, SAP Business One, Epicor, and a REST API with webhooks. CSV import/export for everyone else.</td><td>SHIPPED</td></tr>
+        <tr><td>QC documentation</td><td>Dimensional reports, material certs, and first-article inspections attached to every order, automatically.</td><td>SHIPPED</td></tr>
+        <tr><td>AI quote negotiation</td><td>A robot haggles on your behalf while you sleep.</td><td>KIDDING. HUMANS.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- QUOTE + STATS -->
+<section>
+  <div class="wrap quote-block">
+    <div class="quote-card reveal">
+      <p>We used to lose a day a week chasing widget quotes. Now my team configures on Monday and has tracking numbers by Friday. I keep waiting for the catch. It’s been two years.</p>
+      <div class="quote-who">
+        <div class="avatar">MK</div>
+        <div><b>Marta Kowalski</b><span>Director of Operations, Halcyon Fabrication (340 employees)</span></div>
+      </div>
+    </div>
+    <div class="stat-grid reveal">
+      <div class="stat"><div class="big" data-count="96.4" data-suffix="%">0%</div><div class="lbl">On-time delivery across 41,000 orders last year</div></div>
+      <div class="stat"><div class="big" data-count="3.8" data-suffix=" hrs">0</div><div class="lbl">Median time from configuration to firm quote</div></div>
+      <div class="stat"><div class="big" data-count="612" data-suffix="">0</div><div class="lbl">Mid-sized manufacturers running widget ops on Acme</div></div>
+      <div class="stat"><div class="big" data-count="31" data-suffix="%">0%</div><div class="lbl">Average reduction in per-unit cost after year one</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FREE STUFF -->
+<section class="freebies" id="free">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The generous part</span>
+      <h2>Useful whether or not you ever pay us.</h2>
+      <p>We got into this business because we like manufacturing. These are free, no email gate, no strings. Tell your friends.</p>
+    </div>
+    <div class="free-grid">
+      <div class="free-card reveal">
+        <span class="free-badge">FREE FOREVER</span>
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0591f" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg></div>
+        <h3>Tolerance Calculator</h3>
+        <p>Stack-up analysis with proper statistical (RSS) and worst-case methods. Exports a clean PDF your machinist will actually read.</p>
+        <a href="#demo">Open the calculator →</a>
+      </div>
+      <div class="free-card reveal">
+        <span class="free-badge">FREE FOREVER</span>
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0591f" stroke-width="1.8"><path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-7"/></svg></div>
+        <h3>Widget Cost Index</h3>
+        <p>Quarterly benchmark data on widget pricing by process, material, and region, anonymized from real orders. Know if your quote is fair.</p>
+        <a href="#demo">Read the latest index →</a>
+      </div>
+      <div class="free-card reveal">
+        <span class="free-badge">FREE FOREVER</span>
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e0591f" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg></div>
+        <h3>RFQ Template Pack</h3>
+        <p>The request-for-quote templates our best customers use, in Word and Sheets. Designed to get you faster, more comparable quotes anywhere.</p>
+        <a href="#demo">Download the pack →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Fair questions</span>
+      <h2>Asked by people like you.</h2>
+    </div>
+    <div class="faq-list reveal">
+      <details open>
+        <summary>We already have suppliers we like. Is this replacing them?<span class="plus">+</span></summary>
+        <div class="ans">No — bring them. About a third of our customers use Acme as the system of record for their existing supplier relationships, and tap our network only for overflow or new processes. Your suppliers get a clean portal instead of your email attachments. They tend to like that.</div>
+      </details>
+      <details>
+        <summary>How big do we need to be for this to make sense?<span class="plus">+</span></summary>
+        <div class="ans">Our sweet spot is manufacturers with 100–2,000 employees spending at least ~$250k/year on custom components. Below that, our free tools are genuinely useful and we’ll say so on the demo call rather than sell you something premature.</div>
+      </details>
+      <details>
+        <summary>What does implementation actually look like?<span class="plus">+</span></summary>
+        <div class="ans">Median time to first order is 9 days. We migrate your widget catalog and open POs ourselves (yes, a human does this, it’s included), connect your ERP, and train your team in two 45-minute sessions. No consultants, no six-month rollout.</div>
+      </details>
+      <details>
+        <summary>How do you make money?<span class="plus">+</span></summary>
+        <div class="ans">A flat platform subscription based on order volume, published on our pricing page. We don’t mark up parts and we don’t take kickbacks from manufacturers — that would make our quotes suspect, and quotes are kind of the whole point.</div>
+      </details>
+      <details>
+        <summary>Is our design data safe?<span class="plus">+</span></summary>
+        <div class="ans">SOC 2 Type II, SSO/SAML, region-pinned storage, and NDAs with every manufacturing partner in the network. Your drawings are shared only with the specific shops quoting your order, and we log every access. Happy to send the full security whitepaper.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final" id="demo">
+  <div class="wrap final-inner reveal">
+    <h2>Bring one widget. We’ll configure it live.</h2>
+    <p>Thirty minutes, your real part, your real questions. If Acme isn’t a fit, we’ll tell you what is — we keep a list.</p>
+    <a class="btn" href="mailto:demo@acme-widgets.example?subject=Demo%20request" style="font-size:16px;padding:16px 32px">Book your demo
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <p class="fineprint">No credit card · No 14-email nurture sequence · An engineer joins every call</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2025 Acme Widget Systems, Inc. Made with tolerances of ±0.05 mm.</span>
+    <div class="foot-links">
+      <a href="#how">How it works</a>
+      <a href="#specs">Specs</a>
+      <a href="#free">Free tools</a>
+      <a href="#demo">Book a demo</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // --- Interactive blueprint configurator ---
+  const dSlider = document.getElementById('dSlider');
+  const bSlider = document.getElementById('bSlider');
+  const dVal = document.getElementById('dVal');
+  const bVal = document.getElementById('bVal');
+  const wBody = document.getElementById('wBody');
+  const wBore = document.getElementById('wBore');
+  const dimText = document.getElementById('dimText');
+  const priceOut = document.getElementById('priceOut');
+  const leadOut = document.getElementById('leadOut');
+  const dfmOut = document.getElementById('dfmOut');
+
+  function updateWidget(){
+    const d = +dSlider.value;      // 60–200 mm
+    const b = +bSlider.value;      // 10–60 mm
+    dVal.textContent = d + ' mm';
+    bVal.textContent = b + ' mm';
+    dimText.textContent = 'Ø ' + d + ' mm';
+
+    // scale body: width maps 60..200 -> 140..220 px, keep centered at 180
+    const w = 140 + (d - 60) * (80 / 140);
+    wBody.setAttribute('x', 180 - w/2);
+    wBody.setAttribute('width', w);
+
+    // bore radius maps 10..60 -> 10..38 px
+    const r = 10 + (b - 10) * (28 / 50);
+    wBore.setAttribute('r', r);
+
+    // price model: base + volume-ish + bore penalty
+    const price = 6.5 + d * 0.045 + b * 0.06 + (b/d > 0.4 ? 3.2 : 0);
+    priceOut.textContent = '$' + price.toFixed(2);
+
+    // lead time
+    const lead = Math.round(5 + d/40 + b/30);
+    leadOut.textContent = lead + ' days';
+
+    // DFM check: bore can't exceed 45% of diameter
+    if (b / d > 0.45){
+      dfmOut.textContent = '✗ BORE TOO LARGE';
+      dfmOut.style.color = '#f0a172';
+    } else {
+      dfmOut.textContent = '✓ DFM PASS';
+      dfmOut.style.color = '#8fd6a8';
+    }
+  }
+  dSlider.addEventListener('input', updateWidget);
+  bSlider.addEventListener('input', updateWidget);
+  updateWidget();
+
+  // --- Duplicate ticker for seamless loop ---
+  const ticker = document.getElementById('ticker');
+  ticker.innerHTML += ticker.innerHTML;
+
+  // --- Scroll reveal ---
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // --- Animated stat counters ---
+  const statIO = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting) return;
+      const el = entry.target;
+      statIO.unobserve(el);
+      const target = parseFloat(el.dataset.count);
+      const suffix = el.dataset.suffix || '';
+      const decimals = (String(target).split('.')[1]||'').length;
+      const dur = 1400, t0 = performance.now();
+      function frame(t){
+        const p = Math.min((t - t0)/dur, 1);
+        const eased = 1 - Math.pow(1-p, 3);
+        el.textContent = (target*eased).toFixed(decimals) + suffix;
+        if(p < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
+  },{threshold:.5});
+  document.querySelectorAll('.stat .big').forEach(el=>statIO.observe(el));
+</script>
+</body>
+</html>

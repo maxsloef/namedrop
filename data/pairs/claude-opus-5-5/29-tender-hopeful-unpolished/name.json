@@ -1,0 +1,7 @@
+{
+  "model": "claude-opus-5-5",
+  "stop_reason": "end_turn",
+  "input_tokens": 271,
+  "output_tokens": 17092,
+  "cost": 0.342924
+}

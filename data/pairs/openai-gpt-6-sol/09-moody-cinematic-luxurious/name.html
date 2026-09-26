@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101211">
+  <meta name="description" content="Acme brings custom widget configuration, ordering, and supply-chain tracking into one clear view. Book a demo.">
+  <title>Acme — Clarity for every custom widget</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #101211;
+      --ink-soft: #191d1b;
+      --paper: #e9e6de;
+      --muted: #aaa9a0;
+      --line: rgba(233,230,222,.16);
+      --accent: #d7b88a;
+      --accent-light: #eddbc0;
+      --sans: "DM Sans", Arial, sans-serif;
+      --serif: "Cormorant Garamond", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--ink); color: var(--paper); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    ::selection { background: var(--accent); color: var(--ink); }
+
+    .container { width: min(100% - 104px, 1336px); margin-inline: auto; }
+    .eyebrow { color: var(--accent); font-size: 11px; font-weight: 700; letter-spacing: .23em; text-transform: uppercase; }
+    .arrow { display: inline-block; font-size: 20px; font-weight: 400; line-height: 0; transform: translateY(2px); transition: transform .2s; }
+    a:hover .arrow, button:hover .arrow { transform: translate(4px, 2px); }
+
+    /* Navigation */
+    .site-header { position: absolute; z-index: 20; top: 0; left: 0; right: 0; height: 91px; border-bottom: 1px solid rgba(255,255,255,.13); }
+    .nav-inner { height: 100%; display: flex; align-items: center; gap: 58px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; flex: none; }
+    .brand-mark { width: 31px; height: 31px; }
+    .brand-name { font-size: 23px; font-weight: 700; letter-spacing: -.085em; line-height: 1; }
+    .nav-links { display: flex; gap: 38px; align-items: center; margin-left: 30px; }
+    .nav-links a, .nav-contact { color: #d4d4cf; font-size: 12px; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover, .nav-contact:hover { color: #fff; }
+    .nav-actions { display: flex; align-items: center; gap: 29px; margin-left: auto; }
+    .nav-button { min-height: 41px; display: inline-flex; align-items: center; gap: 24px; padding: 0 17px; border: 1px solid rgba(233,230,222,.5); font-size: 11px; font-weight: 700; transition: background .2s, color .2s; }
+    .nav-button:hover { background: var(--paper); color: var(--ink); }
+
+    /* Hero */
+    .hero { min-height: 790px; position: relative; overflow: hidden; background: #101310; }
+    .hero-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #101211 0%, rgba(16,18,17,.98) 19%, rgba(16,18,17,.78) 38%, rgba(16,18,17,.13) 73%, rgba(16,18,17,.10) 100%), linear-gradient(0deg, rgba(9,11,10,.9) 0%, transparent 25%, transparent 72%, rgba(9,11,10,.23) 100%); }
+    .hero-grain { position: absolute; inset: 0; pointer-events: none; opacity: .18; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.36'/%3E%3C/svg%3E"); }
+    .hero-content { position: relative; z-index: 2; padding-top: 210px; padding-bottom: 169px; }
+    .hero .eyebrow { display: flex; align-items: center; gap: 14px; }
+    .hero .eyebrow::before { content: ""; width: 23px; height: 1px; background: var(--accent); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 800px; margin: 29px 0 22px; font-family: var(--serif); font-size: clamp(76px, 7.2vw, 112px); font-weight: 400; letter-spacing: -.048em; line-height: .89; }
+    h1 em { color: var(--accent-light); font-weight: 400; }
+    .hero-copy { max-width: 454px; color: #c4c6be; font-size: 15px; line-height: 1.85; }
+    .hero-ctas { display: flex; align-items: center; gap: 29px; margin-top: 34px; }
+    .button-primary { display: inline-flex; justify-content: space-between; align-items: center; gap: 34px; min-height: 54px; padding: 0 21px; border: 1px solid var(--accent-light); background: var(--accent-light); color: #171915; font-size: 12px; font-weight: 700; transition: background .2s, border-color .2s, transform .2s; }
+    .button-primary:hover { background: #fff0d6; border-color: #fff0d6; transform: translateY(-2px); }
+    .text-link { display: inline-flex; align-items: center; gap: 12px; color: #e8e7e1; font-size: 12px; font-weight: 600; border-bottom: 1px solid rgba(232,231,225,.55); padding: 12px 0; transition: color .2s; }
+    .text-link:hover { color: var(--accent-light); }
+    .hero-bottom { position: absolute; z-index: 3; bottom: 0; left: 0; right: 0; border-top: 1px solid rgba(233,230,222,.19); }
+    .hero-bottom-inner { min-height: 96px; display: flex; align-items: center; justify-content: space-between; }
+    .hero-bottom p { margin: 0; color: #c5c5bc; font-size: 11px; letter-spacing: .055em; }
+    .hero-bottom strong { color: #f1eee7; font-weight: 600; }
+    .hero-index { display: flex; gap: 11px; align-items: center; color: #d8d3c9; font-size: 11px; letter-spacing: .15em; }
+    .hero-index span { display: block; width: 52px; height: 1px; background: var(--accent); }
+
+    /* Intro */
+    .intro { background: #e7e4dc; color: #222723; }
+    .intro-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; min-height: 309px; padding-block: 58px; }
+    .intro .eyebrow { color: #8b6842; }
+    .intro h2 { margin: 16px 0 0; max-width: 510px; font-family: var(--serif); font-size: 55px; font-weight: 500; letter-spacing: -.035em; line-height: 1.02; }
+    .intro-right { border-left: 1px solid #bdbbb1; padding-left: 64px; }
+    .intro-right p { max-width: 460px; margin: 0 0 22px; color: #555a54; font-size: 14px; line-height: 1.9; }
+    .intro-right a { color: #353931; display: inline-flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 700; border-bottom: 1px solid #8b8d83; padding-bottom: 7px; }
+
+    /* Platform */
+    .platform { padding: 116px 0 123px; background: #151917; }
+    .section-top { display: flex; justify-content: space-between; align-items: end; gap: 50px; margin-bottom: 48px; }
+    .section-top h2 { max-width: 660px; margin: 17px 0 0; font-family: var(--serif); font-size: clamp(50px, 5vw, 72px); font-weight: 400; line-height: .98; letter-spacing: -.035em; }
+    .section-top > p { max-width: 325px; margin: 0 5px 5px 0; color: #aaa9a0; font-size: 13px; line-height: 1.8; }
+    .workspace { display: grid; grid-template-columns: 1.48fr 1fr; gap: 14px; height: 486px; }
+    .dashboard { display: flex; overflow: hidden; border: 1px solid #414843; background: #e8e8e1; color: #27302b; box-shadow: 0 30px 60px rgba(0,0,0,.18); }
+    .dash-sidebar { flex: 0 0 151px; background: #252d29; color: #cdd4ca; padding: 23px 13px; }
+    .dash-logo { display: flex; gap: 8px; align-items: center; padding: 0 10px 28px; color: white; font-weight: 700; font-size: 15px; letter-spacing: -.06em; }
+    .dash-logo svg { width: 17px; }
+    .dash-menu-label { padding: 0 10px; margin-bottom: 10px; color: #849087; font-size: 8px; text-transform: uppercase; letter-spacing: .15em; }
+    .dash-menu-item { padding: 11px 10px; margin-bottom: 3px; color: #aeb7ad; font-size: 10px; display: flex; align-items: center; gap: 10px; }
+    .dash-menu-item.active { color: #fff; background: #3b473e; border-radius: 3px; }
+    .dash-menu-item svg { flex: none; width: 13px; height: 13px; }
+    .dash-profile { margin-top: 143px; border-top: 1px solid #465148; padding: 17px 8px 0; display: flex; gap: 8px; align-items: center; font-size: 9px; line-height: 1.4; }
+    .avatar { width: 24px; height: 24px; flex: none; display: grid; place-items: center; background: #9d9d82; color: #fff; border-radius: 50%; font-size: 9px; }
+    .dash-main { flex: 1; min-width: 0; padding: 23px 27px; }
+    .dash-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; border-bottom: 1px solid #d4d7cf; }
+    .dash-head span { color: #808780; font-size: 9px; }
+    .dash-head strong { display: block; margin-top: 4px; font-family: var(--serif); font-size: 27px; font-weight: 600; line-height: 1; }
+    .dash-head .dash-date { color: #636c63; font-size: 9px; border: 1px solid #cbd0c7; padding: 8px 10px; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 18px 0; }
+    .metric { min-width: 0; padding: 14px; background: #f6f6f1; border: 1px solid #dde0d7; }
+    .metric span { display: block; color: #737e73; font-size: 9px; }
+    .metric strong { display: block; margin-top: 10px; font-family: var(--serif); font-size: 27px; font-weight: 600; line-height: 1; }
+    .metric small { display: block; margin-top: 9px; color: #648368; font-size: 8px; white-space: nowrap; }
+    .dash-table { background: #f6f6f1; border: 1px solid #dde0d7; }
+    .table-title { display: flex; justify-content: space-between; padding: 15px 15px 13px; font-size: 11px; font-weight: 700; }
+    .table-title span { color: #727f73; font-size: 9px; font-weight: 500; }
+    .table-row { display: grid; grid-template-columns: 1.55fr .8fr .8fr; align-items: center; padding: 11px 15px; border-top: 1px solid #e0e3db; font-size: 9px; color: #647067; }
+    .table-row.header { padding-block: 8px; color: #8b948b; font-size: 8px; text-transform: uppercase; letter-spacing: .08em; }
+    .table-row strong { display: block; color: #2e3831; font-size: 9px; font-weight: 600; }
+    .table-row small { display: block; margin-top: 3px; color: #919a91; font-size: 8px; }
+    .status { display: inline-block; padding: 5px 7px; border-radius: 2px; background: #e2ecdd; color: #4f7354; font-size: 8px; }
+    .status.amber { background: #f2e9d9; color: #946c36; }
+    .status.gray { background: #e8e8e4; color: #71776e; }
+
+    .platform-side { display: grid; grid-template-rows: 1fr 1fr; gap: 14px; }
+    .feature-card { position: relative; overflow: hidden; border: 1px solid #3c443f; background: #202621; padding: 29px 30px; }
+    .feature-card::after { content: ""; position: absolute; right: -65px; bottom: -130px; width: 290px; height: 290px; border: 1px solid rgba(215,184,138,.16); border-radius: 50%; box-shadow: 0 0 0 42px rgba(215,184,138,.035), 0 0 0 84px rgba(215,184,138,.025); }
+    .feature-card:nth-child(2) { background: #262721; }
+    .feature-number { color: var(--accent); font-size: 10px; letter-spacing: .17em; }
+    .feature-card h3 { position: relative; z-index: 1; margin: 32px 0 8px; font-family: var(--serif); font-size: 32px; font-weight: 500; line-height: 1; }
+    .feature-card p { position: relative; z-index: 1; max-width: 310px; color: #b1b8ae; font-size: 11px; line-height: 1.7; }
+    .feature-icon { position: absolute; top: 28px; right: 29px; width: 29px; height: 29px; color: #bca17c; }
+
+    /* Process */
+    .process { padding: 106px 0 115px; background: #1c211e; border-top: 1px solid #343b35; }
+    .process .section-top { margin-bottom: 68px; }
+    .process-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #4c544b; }
+    .step { position: relative; min-height: 244px; padding: 29px 45px 20px 0; }
+    .step + .step { padding-left: 38px; border-left: 1px solid #4c544b; }
+    .step-number { color: var(--accent); font-size: 12px; letter-spacing: .1em; }
+    .step h3 { margin: 45px 0 12px; font-family: var(--serif); font-size: 37px; font-weight: 500; line-height: 1; }
+    .step p { max-width: 330px; color: #adb5aa; font-size: 12px; line-height: 1.8; }
+
+    /* Closing CTA */
+    .closing { position: relative; overflow: hidden; padding: 106px 0 110px; background: #d9d2c4; color: #20251f; }
+    .closing::before { content: ""; position: absolute; top: -210px; right: -80px; width: 780px; height: 780px; border: 1px solid rgba(81,75,63,.16); border-radius: 50%; box-shadow: 0 0 0 70px rgba(81,75,63,.035), 0 0 0 145px rgba(81,75,63,.025), 0 0 0 225px rgba(81,75,63,.02); }
+    .closing-inner { position: relative; display: grid; grid-template-columns: 1fr 475px; gap: 100px; align-items: center; }
+    .closing .eyebrow { color: #846747; }
+    .closing h2 { max-width: 650px; margin: 18px 0 19px; font-family: var(--serif); font-size: clamp(58px, 5.7vw, 82px); font-weight: 500; letter-spacing: -.04em; line-height: .94; }
+    .closing-copy { max-width: 410px; color: #596057; font-size: 14px; line-height: 1.8; }
+    .demo-form { padding: 30px; background: #f1eee6; border: 1px solid #c3bbae; box-shadow: 0 22px 55px rgba(45,40,29,.08); }
+    .demo-form h3 { margin: 0 0 5px; font-family: var(--serif); font-size: 32px; font-weight: 600; }
+    .demo-form > p { margin: 0 0 22px; color: #6b7169; font-size: 11px; line-height: 1.6; }
+    .field { margin-bottom: 13px; }
+    .field label { display: block; margin-bottom: 6px; color: #434940; font-size: 10px; font-weight: 700; }
+    .field input { display: block; width: 100%; height: 42px; padding: 0 12px; outline: none; border: 1px solid #c9ccc2; border-radius: 0; background: #faf9f5; color: #20251f; font-size: 12px; transition: border-color .2s; }
+    .field input:focus { border-color: #887256; }
+    .field input::placeholder { color: #9b9e96; }
+    .demo-form button { width: 100%; margin-top: 7px; border-color: #29312a; background: #29312a; color: #fff; }
+    .demo-form button:hover { background: #435044; border-color: #435044; }
+    .form-note { margin: 12px 0 0 !important; color: #777d73 !important; font-size: 10px !important; }
+    #form-message { min-height: 16px; margin: 8px 0 0; color: #4f7354; font-size: 11px; }
+
+    footer { background: #101211; border-top: 1px solid #30352f; }
+    .footer-inner { min-height: 94px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+    .footer-left { display: flex; align-items: center; gap: 29px; }
+    .footer-left .brand-name { font-size: 20px; }
+    .footer-left p, .footer-links a { margin: 0; color: #8d958b; font-size: 11px; }
+    .footer-links { display: flex; gap: 26px; }
+    .footer-links a:hover { color: #fff; }
+
+    @media (max-width: 1050px) {
+      .container { width: min(100% - 64px, 1336px); }
+      .nav-links { gap: 20px; margin-left: 0; }
+      .nav-inner { gap: 35px; }
+      .hero-art { width: 125%; max-width: none; left: -8%; }
+      .workspace { grid-template-columns: 1.3fr 1fr; }
+      .dash-sidebar { flex-basis: 120px; }
+      .closing-inner { gap: 50px; grid-template-columns: 1fr 420px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 40px, 1336px); }
+      .site-header { height: 73px; }
+      .nav-links, .nav-contact { display: none; }
+      .nav-inner { justify-content: space-between; }
+      .nav-actions { margin-left: auto; }
+      .hero { min-height: 760px; }
+      .hero-art { width: 190%; left: -54%; opacity: .75; }
+      .hero-shade { background: linear-gradient(90deg, rgba(16,18,17,.92), rgba(16,18,17,.54)), linear-gradient(0deg, #101211, transparent 35%); }
+      .hero-content { padding-top: 181px; padding-bottom: 155px; }
+      h1 { font-size: clamp(67px, 12vw, 93px); }
+      .hero-copy { max-width: 400px; }
+      .hero-bottom-inner { min-height: 80px; }
+      .hero-index { display: none; }
+      .intro-inner, .closing-inner { grid-template-columns: 1fr; gap: 29px; }
+      .intro-inner { padding-block: 70px; }
+      .intro-right { border-left: none; border-top: 1px solid #bdbbb1; padding: 25px 0 0; }
+      .intro h2 { font-size: 48px; }
+      .platform, .process { padding-block: 80px; }
+      .section-top { display: block; }
+      .section-top > p { margin-top: 20px; }
+      .workspace { display: block; height: auto; }
+      .dashboard { min-height: 450px; }
+      .platform-side { grid-template-columns: 1fr 1fr; grid-template-rows: auto; margin-top: 14px; }
+      .feature-card { min-height: 230px; padding: 23px; }
+      .feature-card h3 { font-size: 28px; }
+      .process-grid { grid-template-columns: 1fr; }
+      .step, .step + .step { min-height: 0; padding: 26px 0 30px; border-left: 0; border-bottom: 1px solid #4c544b; }
+      .step h3 { margin-top: 24px; }
+      .closing { padding-block: 80px; }
+      .closing h2 { font-size: 64px; }
+      .demo-form { max-width: 500px; }
+    }
+    @media (max-width: 520px) {
+      .nav-button { gap: 10px; padding-inline: 11px; }
+      .hero { min-height: 730px; }
+      h1 { font-size: 64px; }
+      .hero-ctas { align-items: flex-start; flex-direction: column; gap: 10px; }
+      .dashboard { overflow: auto; }
+      .dash-main { min-width: 440px; }
+      .platform-side { grid-template-columns: 1fr; }
+      .feature-card { min-height: 205px; }
+      .footer-inner, .footer-left { align-items: flex-start; flex-direction: column; gap: 17px; }
+      .footer-inner { padding-block: 27px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="container nav-inner" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 2.5 29.5 26H2.5L16 2.5Z" stroke="#E7D4B5" stroke-width="2"/>
+          <path d="M16 12.5 23.5 26h-15L16 12.5Z" fill="#E7D4B5"/>
+        </svg>
+        <span class="brand-name">acme</span>
+      </a>
+      <div class="nav-links">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#why-acme">Why Acme</a>
+      </div>
+      <div class="nav-actions">
+        <a class="nav-contact" href="mailto:hello@acme.com">Contact</a>
+        <a class="nav-button" href="#book-demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-heading">
+      <svg class="hero-art" viewBox="0 0 1440 790" preserveAspectRatio="xMidYMid slice" role="img" aria-label="A precision-machined metal component illuminated in a dark workshop">
+        <defs>
+          <linearGradient id="room" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#111511"/><stop offset=".54" stop-color="#272b24"/><stop offset="1" stop-color="#0b0f0d"/>
+          </linearGradient>
+          <radialGradient id="glow" cx="72%" cy="39%" r="60%">
+            <stop offset="0" stop-color="#ba9364" stop-opacity=".43"/><stop offset=".45" stop-color="#8d765b" stop-opacity=".12"/><stop offset="1" stop-color="#090c0a" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="beam" x1=".15" y1="0" x2=".9" y2="1">
+            <stop offset="0" stop-color="#f6d6a3" stop-opacity=".38"/><stop offset="1" stop-color="#cbb088" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="metalFace" x1=".06" y1=".12" x2=".94" y2=".9">
+            <stop offset="0" stop-color="#ddd0b3"/><stop offset=".12" stop-color="#837c6a"/><stop offset=".29" stop-color="#292e29"/><stop offset=".49" stop-color="#858676"/><stop offset=".67" stop-color="#303731"/><stop offset=".86" stop-color="#8c8068"/><stop offset="1" stop-color="#222824"/>
+          </linearGradient>
+          <linearGradient id="metalSide" x1="0" y1="0" x2=".7" y2="1">
+            <stop offset="0" stop-color="#6c6656"/><stop offset=".3" stop-color="#252b26"/><stop offset=".7" stop-color="#131a17"/><stop offset="1" stop-color="#7c6c51"/>
+          </linearGradient>
+          <linearGradient id="ringLight" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f2dbb2"/><stop offset=".26" stop-color="#948970"/><stop offset=".55" stop-color="#323a33"/><stop offset=".84" stop-color="#a39476"/><stop offset="1" stop-color="#272e28"/>
+          </linearGradient>
+          <radialGradient id="hole">
+            <stop offset="0" stop-color="#080e0c"/><stop offset=".65" stop-color="#151b17"/><stop offset=".9" stop-color="#454b3f"/><stop offset="1" stop-color="#1b201b"/>
+          </radialGradient>
+          <filter id="blur40"><feGaussianBlur stdDeviation="40"/></filter>
+          <filter id="blur12"><feGaussianBlur stdDeviation="12"/></filter>
+          <filter id="shadow"><feGaussianBlur stdDeviation="22"/></filter>
+          <filter id="grain">
+            <feTurbulence type="fractalNoise" baseFrequency=".45" numOctaves="3" stitchTiles="stitch"/>
+            <feColorMatrix type="saturate" values="0"/>
+          </filter>
+        </defs>
+        <rect width="1440" height="790" fill="url(#room)"/>
+        <rect width="1440" height="790" fill="url(#glow)"/>
+        <!-- Distant workshop architecture -->
+        <g opacity=".64">
+          <rect x="780" y="-30" width="62" height="610" fill="#121713"/>
+          <rect x="815" y="-30" width="9" height="610" fill="#68604d" opacity=".28"/>
+          <rect x="1280" y="-30" width="93" height="670" fill="#121612"/>
+          <rect x="1280" y="-30" width="5" height="670" fill="#a58a64" opacity=".28"/>
+          <path d="M570 132H1440M680 188H1440M740 535H1440" stroke="#9c937b" stroke-opacity=".12" stroke-width="5"/>
+          <path d="M1320 0V620M1380 0V620" stroke="#050907" stroke-width="12"/>
+          <path d="M980 0V184M1001 0V184" stroke="#0b100d" stroke-width="10"/>
+        </g>
+        <path d="M712 0H1190L1410 648 873 568Z" fill="url(#beam)" opacity=".68"/>
+        <ellipse cx="1118" cy="240" rx="270" ry="183" fill="#d4ac77" opacity=".13" filter="url(#blur40)"/>
+        <path d="M0 610 1440 565V790H0Z" fill="#111612"/>
+        <path d="M0 649 1440 589" stroke="#b6a282" stroke-opacity=".12" stroke-width="3"/>
+        <path d="M0 708 1440 625" stroke="#b6a282" stroke-opacity=".07" stroke-width="2"/>
+        <path d="M920 590 1380 548 1440 656 772 746Z" fill="#030706" opacity=".7" filter="url(#shadow)"/>
+        <!-- Low machinery silhouettes -->
+        <path d="M548 461h163v167H548zM590 396h83v88h-83zM523 620h263v76H523z" fill="#0c110f"/>
+        <path d="M1330 338h110v332h-110z" fill="#0c110d"/>
+        <path d="M1336 369h9v254h-9z" fill="#6f6752" opacity=".28"/>
+        <!-- Precision widget -->
+        <g transform="translate(1047 379) rotate(-23)">
+          <ellipse cx="10" cy="176" rx="301" ry="183" fill="#050a08" opacity=".8" filter="url(#shadow)"/>
+          <!-- cylindrical depth -->
+          <path d="M-280 0 C-280 105 -155 177 0 177 C155 177 280 105 280 0 L280 100 C280 205 155 277 0 277 C-155 277 -280 205 -280 100Z" fill="url(#metalSide)" stroke="#7b745f" stroke-opacity=".5" stroke-width="2"/>
+          <path d="M-278 76 C-257 182 -132 254 0 256 C140 258 262 177 279 80" fill="none" stroke="#b7a37d" stroke-opacity=".57" stroke-width="3"/>
+          <path d="M-277 96 C-240 201 -133 270 0 271 C132 272 253 193 278 96" fill="none" stroke="#181e19" stroke-width="9"/>
+          <path d="M-271 114 C-223 210 -115 267 0 268 C135 269 240 197 270 116" fill="none" stroke="#c2a47d" stroke-opacity=".24" stroke-width="2"/>
+          <ellipse rx="282" ry="186" fill="#171e19" stroke="#ac9877" stroke-width="4"/>
+          <ellipse rx="274" ry="179" fill="url(#metalFace)" stroke="#d0b58a" stroke-opacity=".65" stroke-width="2"/>
+          <ellipse rx="255" ry="165" fill="none" stroke="#1b221d" stroke-width="13"/>
+          <ellipse rx="244" ry="158" fill="none" stroke="#ccb995" stroke-opacity=".67" stroke-width="2"/>
+          <ellipse rx="228" ry="145" fill="none" stroke="#171f1a" stroke-width="11"/>
+          <ellipse rx="217" ry="138" fill="url(#ringLight)" stroke="#b0a181" stroke-width="2"/>
+          <ellipse rx="186" ry="116" fill="#272f28" stroke="#d1bc94" stroke-opacity=".65" stroke-width="3"/>
+          <ellipse rx="171" ry="107" fill="url(#hole)" stroke="#111813" stroke-width="9"/>
+          <ellipse rx="133" ry="79" fill="#090f0c" stroke="#5c6656" stroke-opacity=".65" stroke-width="2"/>
+          <path d="M-120-43C-71-75 37-85 113-47" fill="none" stroke="#c5af89" stroke-opacity=".2" stroke-width="8"/>
+          <!-- fasteners -->
+          <g fill="#222a23" stroke="#d1b991" stroke-width="2">
+            <circle cx="0" cy="-151" r="10"/><circle cx="175" cy="-103" r="10"/>
+            <circle cx="245" cy="0" r="10"/><circle cx="175" cy="103" r="10"/>
+            <circle cx="0" cy="151" r="10"/><circle cx="-175" cy="103" r="10"/>
+            <circle cx="-245" cy="0" r="10"/><circle cx="-175" cy="-103" r="10"/>
+          </g>
+          <g stroke="#a79b7d" stroke-width="2" opacity=".7">
+            <path d="M-5-151h10M170-103h10M240 0h10M170 103h10M-5 151h10M-180 103h10M-250 0h10M-180-103h10"/>
+          </g>
+          <path d="M-228-99C-142-181 64-191 181-133" fill="none" stroke="#f7d9a6" stroke-opacity=".58" stroke-width="3"/>
+          <path d="M-180 129C-58 200 138 157 224 67" fill="none" stroke="#d5bd92" stroke-opacity=".34" stroke-width="2"/>
+        </g>
+        <ellipse cx="1160" cy="647" rx="310" ry="29" fill="#bd9f6f" opacity=".12" filter="url(#blur12)"/>
+        <path d="M772 718c203-98 493-135 668-144" stroke="#dbc095" stroke-opacity=".12" stroke-width="2"/>
+        <!-- Atmospheric foreground -->
+        <rect x="0" y="0" width="1440" height="790" filter="url(#grain)" opacity=".055"/>
+      </svg>
+      <div class="hero-shade"></div>
+      <div class="hero-grain"></div>
+
+      <div class="container hero-content">
+        <div class="eyebrow">Built for the work behind the work</div>
+        <h1 id="hero-heading">Every part<br>has a story.<br><em>Know the whole one.</em></h1>
+        <p class="hero-copy">From the first specification to the final delivery, Acme gives your team one place to configure, order, and track custom widgets—with nothing left in the dark.</p>
+        <div class="hero-ctas">
+          <a class="button-primary" href="#book-demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+          <a class="text-link" href="#platform">Explore the platform <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="hero-bottom">
+        <div class="container hero-bottom-inner">
+          <p><strong>Made for manufacturers.</strong> Designed for the people who keep things moving.</p>
+          <div class="hero-index">01 <span></span> 03</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="intro" id="why-acme" aria-labelledby="intro-heading">
+      <div class="container intro-inner">
+        <div>
+          <div class="eyebrow">A clearer way forward</div>
+          <h2 id="intro-heading">Complex work deserves a simpler view.</h2>
+        </div>
+        <div class="intro-right">
+          <p>Custom components come with moving specifications, multiple suppliers, and a thousand small decisions. Acme brings the details together, so your operations team can move with confidence instead of chasing updates.</p>
+          <a href="#how-it-works">See how Acme works <span class="arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="platform" id="platform" aria-labelledby="platform-heading">
+      <div class="container">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow">The platform</div>
+            <h2 id="platform-heading">One place for every<br>moving piece.</h2>
+          </div>
+          <p>Less time piecing together the picture. More time making the right call, at the right moment.</p>
+        </div>
+
+        <div class="workspace">
+          <div class="dashboard" aria-label="Preview of the Acme order dashboard">
+            <aside class="dash-sidebar">
+              <div class="dash-logo">
+                <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 2.5 29.5 26H2.5L16 2.5Z" stroke="#E7D4B5" stroke-width="2"/><path d="M16 12.5 23.5 26h-15L16 12.5Z" fill="#E7D4B5"/></svg>
+                acme
+              </div>
+              <div class="dash-menu-label">Workspace</div>
+              <div class="dash-menu-item active"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>Overview</div>
+              <div class="dash-menu-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><rect x="2" y="4" width="12" height="10"/><path d="M5 4V2h6v2M2 8h12"/></svg>Orders</div>
+              <div class="dash-menu-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M2 4h12M2 8h12M2 12h8"/><circle cx="12" cy="12" r="2"/></svg>Configurations</div>
+              <div class="dash-menu-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="8" r="2"/><circle cx="4" cy="12" r="2"/><path d="M6 5l4 2M10 9l-4 2"/></svg>Supply chain</div>
+              <div class="dash-profile"><span class="avatar">MC</span><span>Morgan Chen<br><span style="color:#89978a">Northline Mfg.</span></span></div>
+            </aside>
+            <div class="dash-main">
+              <div class="dash-head">
+                <div><span>Monday, September 21</span><strong>Good morning, Morgan.</strong></div>
+                <span class="dash-date">This month ⌄</span>
+              </div>
+              <div class="metrics">
+                <div class="metric"><span>Active orders</span><strong>24</strong><small>↗ 4 moving this week</small></div>
+                <div class="metric"><span>On-track deliveries</span><strong>96%</strong><small>✓ Across active orders</small></div>
+                <div class="metric"><span>Awaiting approval</span><strong>03</strong><small style="color:#987445">Review needed</small></div>
+              </div>
+              <div class="dash-table">
+                <div class="table-title">Recent orders <span>View all orders ↗</span></div>
+                <div class="table-row header"><span>Widget / order</span><span>Expected</span><span>Status</span></div>
+                <div class="table-row"><span><strong>Precision Housing W-42</strong><small>AC-2048 · 1,200 units</small></span><span>Oct 08</span><span><span class="status">In production</span></span></div>
+                <div class="table-row"><span><strong>Valve Assembly V-17</strong><small>AC-2047 · 800 units</small></span><span>Oct 12</span><span><span class="status amber">Quality check</span></span></div>
+                <div class="table-row"><span><strong>Mounting Bracket M-08</strong><small>AC-2043 · 2,400 units</small></span><span>Sep 29</span><span><span class="status">In transit</span></span></div>
+                <div class="table-row"><span><strong>Connector Sleeve C-31</strong><small>AC-2041 · 600 units</small></span><span>Sep 24</span><span><span class="status gray">Delivered</span></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="platform-side">
+            <article class="feature-card">
+              <span class="feature-number">01 / SPECIFY</span>
+              <svg class="feature-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M16 2 29 9v14l-13 7L3 23V9L16 2Z"/><path d="m3 9 13 7 13-7M16 16v14"/></svg>
+              <h3>Get it right from the start.</h3>
+              <p>Configure custom widgets with clear specifications your whole team can stand behind.</p>
+            </article>
+            <article class="feature-card">
+              <span class="feature-number">02 / SEE AHEAD</span>
+              <svg class="feature-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="16" cy="16" r="12"/><circle cx="16" cy="16" r="5"/><path d="M16 1v5M16 26v5M1 16h5M26 16h5"/></svg>
+              <h3>Stay close to every order.</h3>
+              <p>Follow progress across your supply chain without another spreadsheet or status chase.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="process" id="how-it-works" aria-labelledby="process-heading">
+      <div class="container">
+        <div class="section-top">
+          <div>
+            <div class="eyebrow">How it works</div>
+            <h2 id="process-heading">From what if<br>to on its way.</h2>
+          </div>
+          <p>A connected path from the first requirement to the final handoff.</p>
+        </div>
+        <div class="process-grid">
+          <article class="step">
+            <div class="step-number">01 — CONFIGURE</div>
+            <h3>Define the details.</h3>
+            <p>Build the widget you need, capture every requirement, and give everyone the same source of truth.</p>
+          </article>
+          <article class="step">
+            <div class="step-number">02 — ORDER</div>
+            <h3>Move with certainty.</h3>
+            <p>Turn approved configurations into orders without losing the context that matters.</p>
+          </article>
+          <article class="step">
+            <div class="step-number">03 — TRACK</div>
+            <h3>See the full journey.</h3>
+            <p>Know what is happening, what comes next, and where your attention is needed.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" id="book-demo" aria-labelledby="closing-heading">
+      <div class="container closing-inner">
+        <div>
+          <div class="eyebrow">See Acme in action</div>
+          <h2 id="closing-heading">Make room for<br>better decisions.</h2>
+          <p class="closing-copy">Tell us a little about your team. We’ll walk you through how Acme can bring clarity to your custom widget workflow.</p>
+        </div>
+        <form class="demo-form" id="demo-form">
+          <h3>Let's talk.</h3>
+          <p>Request a personal walkthrough of the platform.</p>
+          <div class="field">
+            <label for="demo-name">Full name</label>
+            <input id="demo-name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
+          </div>
+          <div class="field">
+            <label for="demo-email">Work email</label>
+            <input id="demo-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+          </div>
+          <div class="field">
+            <label for="demo-company">Company</label>
+            <input id="demo-company" name="company" type="text" autocomplete="organization" placeholder="Your company" required>
+          </div>
+          <button class="button-primary" type="submit">Request a demo <span class="arrow" aria-hidden="true">↗</span></button>
+          <p class="form-note">This opens your email app with your request ready to send.</p>
+          <p id="form-message" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-left">
+        <a class="brand" href="#top" aria-label="Acme home"><span class="brand-name">acme</span></a>
+        <p>Better visibility. Better momentum.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="mailto:hello@acme.com">Contact</a>
+        <a href="#top">Back to top ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("demo-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const name = document.getElementById("demo-name").value.trim();
+      const email = document.getElementById("demo-email").value.trim();
+      const company = document.getElementById("demo-company").value.trim();
+      if (!name || !email || !company) return;
+
+      const subject = encodeURIComponent("Acme demo request — " + company);
+      const body = encodeURIComponent(
+        "Hi Acme,\n\nI'd like to book a demo of the platform.\n\nName: " +
+        name + "\nWork email: " + email + "\nCompany: " + company +
+        "\n\nPlease get in touch to arrange a time.\n"
+      );
+      document.getElementById("form-message").textContent = "Your email app is opening with your request ready to send.";
+      window.location.href = "mailto:hello@acme.com?subject=" + subject + "&body=" + body;
+    });
+  </script>
+</body>
+</html>

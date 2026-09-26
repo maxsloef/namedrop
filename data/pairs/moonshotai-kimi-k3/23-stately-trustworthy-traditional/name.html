@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom Widgets, Ordered with Certainty</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Helvetica+Now+Display:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#C8102E;
+    --black:#111111;
+    --grey:#6B6B6B;
+    --rule:#D9D9D9;
+    --paper:#FFFFFF;
+    --off:#F5F4F2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:"Helvetica Neue",Helvetica,"Inter",Arial,sans-serif;
+    color:var(--black);
+    background:var(--paper);
+    -webkit-font-smoothing:antialiased;
+    font-size:16px;
+    line-height:1.5;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+  .grid-12{display:grid;grid-template-columns:repeat(12,1fr);column-gap:32px;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;top:0;z-index:100;
+    background:var(--paper);
+    border-bottom:1px solid var(--black);
+  }
+  .header-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    height:72px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:14px;
+    text-decoration:none;color:var(--black);
+  }
+  .brand-mark{width:26px;height:26px;background:var(--red);flex:none;}
+  .brand-name{font-weight:700;font-size:20px;letter-spacing:0.02em;}
+  nav{display:flex;align-items:center;gap:40px;}
+  nav a{
+    text-decoration:none;color:var(--black);font-size:14px;font-weight:500;
+    letter-spacing:0.06em;text-transform:uppercase;
+    border-bottom:2px solid transparent;padding:4px 0;
+    transition:border-color .2s;
+  }
+  nav a:hover{border-bottom-color:var(--red);}
+  .btn{
+    display:inline-block;background:var(--red);color:#fff;
+    font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+    padding:14px 32px;text-decoration:none;border:none;cursor:pointer;
+    transition:background .2s;
+  }
+  .btn:hover{background:var(--black);}
+  .btn.small{padding:10px 24px;}
+  .btn.ghost{background:transparent;color:var(--black);border:1px solid var(--black);}
+  .btn.ghost:hover{background:var(--black);color:#fff;}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:112px 0 96px;}
+  .kicker{
+    font-size:13px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;
+    color:var(--red);margin-bottom:32px;
+    display:flex;align-items:center;gap:16px;
+  }
+  .kicker::before{content:"";display:block;width:48px;height:2px;background:var(--red);}
+  h1{
+    font-size:84px;line-height:0.98;font-weight:700;letter-spacing:-0.02em;
+    grid-column:1/10;margin-bottom:48px;
+  }
+  h1 .r{color:var(--red);}
+  .hero-sub{
+    grid-column:1/7;
+    font-size:20px;line-height:1.6;color:var(--grey);
+    margin-bottom:56px;max-width:560px;
+  }
+  .hero-actions{grid-column:1/7;display:flex;gap:20px;align-items:center;}
+  .hero-note{grid-column:1/7;margin-top:28px;font-size:13px;color:var(--grey);letter-spacing:0.04em;}
+  .hero-fig{grid-column:8/13;display:flex;align-items:flex-end;justify-content:flex-end;}
+  .hero-fig svg{width:100%;max-width:420px;height:auto;}
+
+  /* ---------- Marquee strip ---------- */
+  .strip{
+    background:var(--black);color:#fff;overflow:hidden;white-space:nowrap;
+    padding:18px 0;
+  }
+  .strip-track{display:inline-block;animation:scroll 30s linear infinite;}
+  .strip span{
+    font-size:14px;font-weight:600;letter-spacing:0.24em;text-transform:uppercase;
+    padding:0 32px;
+  }
+  .strip .dot{color:var(--red);}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- Section base ---------- */
+  section{padding:120px 0;}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;border-top:3px solid var(--black);padding-top:24px;margin-bottom:72px;}
+  .sec-num{font-size:14px;font-weight:700;color:var(--red);letter-spacing:0.15em;}
+  h2{font-size:52px;font-weight:700;letter-spacing:-0.015em;line-height:1.05;}
+  .sec-label{font-size:13px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--grey);}
+
+  /* ---------- Problem ---------- */
+  .stat{border-left:1px solid var(--rule);padding-left:32px;grid-column:span 4;}
+  .stat .n{font-size:72px;font-weight:700;color:var(--red);line-height:1;letter-spacing:-0.02em;}
+  .stat .t{font-size:18px;font-weight:600;margin:16px 0 8px;}
+  .stat .d{font-size:15px;color:var(--grey);line-height:1.6;}
+
+  /* ---------- How it works ---------- */
+  .how{background:var(--off);}
+  .step{grid-column:span 4;border-top:3px solid var(--red);padding-top:28px;}
+  .step .sn{font-size:14px;font-weight:700;letter-spacing:0.2em;color:var(--red);margin-bottom:20px;}
+  .step h3{font-size:28px;font-weight:700;margin-bottom:16px;letter-spacing:-0.01em;}
+  .step p{color:var(--grey);line-height:1.65;font-size:15px;}
+
+  /* ---------- Features ---------- */
+  .feat-row{display:grid;grid-template-columns:repeat(12,1fr);column-gap:32px;border-top:1px solid var(--rule);padding:56px 0;align-items:center;}
+  .feat-row:last-child{border-bottom:1px solid var(--rule);}
+  .feat-idx{grid-column:1/2;font-size:15px;font-weight:700;color:var(--red);letter-spacing:0.1em;}
+  .feat-name{grid-column:2/6;font-size:30px;font-weight:700;letter-spacing:-0.01em;}
+  .feat-desc{grid-column:6/10;color:var(--grey);font-size:15px;line-height:1.65;}
+  .feat-link{grid-column:10/13;text-align:right;font-size:13px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--black);}
+  .feat-row:hover{background:var(--off);cursor:pointer;}
+  .feat-row:hover .feat-name{color:var(--red);}
+  .feat-row{transition:background .2s;}
+
+  /* ---------- Quote ---------- */
+  .quote{background:var(--black);color:#fff;}
+  .quote blockquote{grid-column:2/11;font-size:44px;font-weight:500;line-height:1.25;letter-spacing:-0.01em;}
+  .quote blockquote .r{color:var(--red);}
+  .quote cite{grid-column:2/11;display:block;margin-top:48px;font-style:normal;font-size:14px;letter-spacing:0.12em;text-transform:uppercase;color:#999;}
+  .quote cite b{color:#fff;}
+
+  /* ---------- CTA ---------- */
+  .cta{background:var(--red);color:#fff;text-align:left;}
+  .cta h2{font-size:68px;grid-column:1/9;line-height:1;}
+  .cta-right{grid-column:9/13;display:flex;flex-direction:column;justify-content:flex-end;gap:24px;}
+  .cta .btn{background:#fff;color:var(--red);align-self:flex-start;}
+  .cta .btn:hover{background:var(--black);color:#fff;}
+  .cta p{color:rgba(255,255,255,.85);font-size:15px;line-height:1.6;max-width:300px;}
+
+  /* ---------- Footer ---------- */
+  footer{border-top:3px solid var(--black);padding:64px 0 48px;}
+  .f-col{grid-column:span 3;}
+  .f-col h4{font-size:13px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:20px;}
+  .f-col a{display:block;text-decoration:none;color:var(--grey);font-size:14px;margin-bottom:10px;transition:color .2s;}
+  .f-col a:hover{color:var(--red);}
+  .f-bottom{display:flex;justify-content:space-between;margin-top:72px;padding-top:24px;border-top:1px solid var(--rule);font-size:13px;color:var(--grey);}
+
+  /* ---------- Reveal ---------- */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="wrap header-inner">
+    <a href="#" class="brand">
+      <span class="brand-mark"></span>
+      <span class="brand-name">Acme</span>
+    </a>
+    <nav>
+      <a href="#problem">Why Acme</a>
+      <a href="#how">How It Works</a>
+      <a href="#platform">Platform</a>
+      <a href="#demo" class="btn small">Book a Demo</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="wrap grid-12">
+    <div style="grid-column:1/13;" class="kicker reveal">Widget Procurement for Manufacturers</div>
+    <h1 class="reveal">Order custom widgets<br>with <span class="r">absolute</span> certainty.</h1>
+    <p class="hero-sub reveal">Acme is the platform operations teams use to configure, order, and track custom widgets across the supply chain — replacing spreadsheets, faxes, and guesswork with a single source of truth.</p>
+    <div class="hero-actions reveal">
+      <a href="#demo" class="btn">Book a Demo</a>
+      <a href="#how" class="btn ghost">See How It Works</a>
+    </div>
+    <p class="hero-note reveal">Trusted by 340+ mid-sized manufacturers across North America and Europe.</p>
+    <div class="hero-fig reveal">
+      <!-- Geometric composition: disciplined grid of squares and a circle -->
+      <svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="0" y="0" width="420" height="420" fill="none"/>
+        <rect x="0" y="0" width="140" height="140" fill="#111111"/>
+        <rect x="140" y="0" width="140" height="140" fill="#C8102E"/>
+        <rect x="280" y="0" width="140" height="140" fill="none" stroke="#111111" stroke-width="3"/>
+        <circle cx="70" cy="210" r="70" fill="none" stroke="#C8102E" stroke-width="3"/>
+        <rect x="140" y="140" width="140" height="140" fill="#F5F4F2" stroke="#111111" stroke-width="3"/>
+        <rect x="280" y="140" width="140" height="140" fill="#111111"/>
+        <rect x="0" y="280" width="140" height="140" fill="#F5F4F2" stroke="#111111" stroke-width="3"/>
+        <circle cx="350" cy="350" r="60" fill="#C8102E"/>
+        <line x1="140" y1="350" x2="280" y2="350" stroke="#111111" stroke-width="3"/>
+        <line x1="210" y1="280" x2="210" y2="420" stroke="#111111" stroke-width="3"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- Strip -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-track" id="stripTrack">
+    <span>Configure <i class="dot">●</i> Order <i class="dot">●</i> Track <i class="dot">●</i> Deliver <i class="dot">●</i> Configure <i class="dot">●</i> Order <i class="dot">●</i> Track <i class="dot">●</i> Deliver <i class="dot">●</i>&nbsp;</span>
+  </div>
+</div>
+
+<!-- Problem -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">01</div>
+        <h2>The old way is<br>costing you.</h2>
+      </div>
+      <div class="sec-label">Why Acme</div>
+    </div>
+    <div class="grid-12">
+      <div class="stat reveal">
+        <div class="n">11</div>
+        <div class="t">Days lost per order cycle</div>
+        <div class="d">The average mid-sized manufacturer spends nearly two working weeks chasing quotes, confirming specs, and re-keying orders for a single custom widget run.</div>
+      </div>
+      <div class="stat reveal">
+        <div class="n">6%</div>
+        <div class="t">Of orders ship with errors</div>
+        <div class="d">Specs buried in email threads and spreadsheets lead to wrong tolerances, wrong finishes, and costly rework on the production line.</div>
+      </div>
+      <div class="stat reveal">
+        <div class="n">0</div>
+        <div class="t">Visibility between PO and dock</div>
+        <div class="d">Once a purchase order leaves your desk, it disappears into a black box of phone calls and status meetings until the truck arrives — or doesn't.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">02</div>
+        <h2>Three steps.<br>No surprises.</h2>
+      </div>
+      <div class="sec-label">How It Works</div>
+    </div>
+    <div class="grid-12">
+      <div class="step reveal">
+        <div class="sn">STEP 01</div>
+        <h3>Configure</h3>
+        <p>Build your widget to spec in a guided configurator — dimensions, alloys, tolerances, finishes, certifications. Acme validates every parameter against manufacturability rules in real time, so a bad spec never leaves your desk.</p>
+      </div>
+      <div class="step reveal">
+        <div class="sn">STEP 02</div>
+        <h3>Order</h3>
+        <p>Receive binding quotes from vetted suppliers in hours, not weeks. Compare price, lead time, and capacity side by side. Place the order with one click; contracts, specs, and revisions are attached automatically.</p>
+      </div>
+      <div class="step reveal">
+        <div class="sn">STEP 03</div>
+        <h3>Track</h3>
+        <p>Follow every order from tooling to transit on a single timeline. Milestone alerts flag slippage before it becomes a line-down event, and your ERP stays in sync the whole way.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Platform -->
+<section id="platform">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <div class="sec-num">03</div>
+        <h2>One platform,<br>built for operations.</h2>
+      </div>
+      <div class="sec-label">Platform</div>
+    </div>
+
+    <div class="feat-row reveal">
+      <div class="feat-idx">A</div>
+      <div class="feat-name">Guided Configurator</div>
+      <div class="feat-desc">A rules-driven interface that turns tribal engineering knowledge into validated, manufacturable specifications — no CAD degree required.</div>
+      <div class="feat-link">In the demo →</div>
+    </div>
+    <div class="feat-row reveal">
+      <div class="feat-idx">B</div>
+      <div class="feat-name">Supplier Network</div>
+      <div class="feat-desc">Over 400 pre-qualified widget fabricators, scored on quality, on-time delivery, and capacity. You choose; we hold them accountable.</div>
+      <div class="feat-link">In the demo →</div>
+    </div>
+    <div class="feat-row reveal">
+      <div class="feat-idx">C</div>
+      <div class="feat-name">Live Order Tracking</div>
+      <div class="feat-desc">Milestone-level visibility from PO confirmation to final delivery, with predictive alerts when lead times drift.</div>
+      <div class="feat-link">In the demo →</div>
+    </div>
+    <div class="feat-row reveal">
+      <div class="feat-idx">D</div>
+      <div class="feat-name">ERP Integration</div>
+      <div class="feat-desc">Two-way sync with SAP, NetSuite, and Microsoft Dynamics. Orders, receipts, and invoices reconcile themselves.</div>
+      <div class="feat-link">In the demo →</div>
+    </div>
+  </div>
+</section>
+
+<!-- Quote -->
+<section class="quote">
+  <div class="wrap grid-12">
+    <blockquote class="reveal">“We cut our widget procurement cycle from <span class="r">three weeks to four days</span>. For the first time, I know where every order is without picking up the phone.”</blockquote>
+    <cite class="reveal"><b>Margaret Hollis</b> — Director of Operations, Whitfield Industrial Components</cite>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="demo">
+  <div class="wrap grid-12">
+    <h2 class="reveal">See it work<br>on your parts.</h2>
+    <div class="cta-right reveal">
+      <p>A 30-minute demo, tailored to your widget catalog and your supply chain. Bring a real part number — we'll configure it live.</p>
+      <a href="mailto:demo@acme.example?subject=Demo%20Request" class="btn" id="demoBtn">Book a Demo</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap">
+    <div class="grid-12">
+      <div class="f-col">
+        <h4>Acme</h4>
+        <a href="#problem">Why Acme</a>
+        <a href="#how">How It Works</a>
+        <a href="#platform">Platform</a>
+      </div>
+      <div class="f-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+      </div>
+      <div class="f-col">
+        <h4>Resources</h4>
+        <a href="#">Documentation</a>
+        <a href="#">Security</a>
+        <a href="#">Status</a>
+      </div>
+      <div class="f-col">
+        <h4>Contact</h4>
+        <a href="mailto:demo@acme.example">demo@acme.example</a>
+        <a href="tel:+18005550199">+1 800 555 0199</a>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>© 2025 Acme Widget Systems, Inc.</span>
+      <span>Form follows function.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Duplicate strip content for seamless loop
+  (function(){
+    var t = document.getElementById('stripTrack');
+    t.innerHTML += t.innerHTML;
+  })();
+
+  // Scroll reveal
+  (function(){
+    var els = document.querySelectorAll('.reveal');
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold: 0.12});
+    els.forEach(function(el){ io.observe(el); });
+  })();
+</script>
+</body>
+</html>

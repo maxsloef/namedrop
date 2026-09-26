@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, Sorted.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,700;0,800;0,900;1,900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111111;
+    --paper:#F4F1EA;
+    --red:#FF4B1F;
+    --blue:#2B4BF2;
+    --yellow:#FFD21F;
+    --green:#19C37D;
+    --pink:#FF9DE2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Archivo',sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--red);color:var(--paper);}
+  .mono{font-family:'Space Mono',monospace;}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 32px;height:72px;
+    background:var(--paper);
+    border-bottom:3px solid var(--ink);
+  }
+  .logo{
+    font-weight:900;font-size:28px;letter-spacing:-1px;
+    display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+  }
+  .logo .dot{
+    width:22px;height:22px;background:var(--red);border-radius:50%;
+    border:3px solid var(--ink);display:inline-block;
+    animation:spinBounce 4s ease-in-out infinite;
+  }
+  @keyframes spinBounce{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-4px) scale(1.15);}}
+  .nav-links{display:flex;gap:28px;align-items:center;}
+  .nav-links a{
+    color:var(--ink);text-decoration:none;font-weight:700;font-size:14px;
+    text-transform:uppercase;letter-spacing:1px;position:relative;
+  }
+  .nav-links a::after{
+    content:'';position:absolute;left:0;bottom:-4px;width:0;height:3px;
+    background:var(--red);transition:width .25s cubic-bezier(.65,0,.35,1);
+  }
+  .nav-links a:hover::after{width:100%;}
+  .btn{
+    display:inline-block;background:var(--ink);color:var(--paper);
+    font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;
+    padding:14px 28px;text-decoration:none;border:3px solid var(--ink);
+    box-shadow:5px 5px 0 var(--red);cursor:pointer;
+    transition:transform .15s, box-shadow .15s;
+    font-family:'Archivo',sans-serif;
+  }
+  .btn:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--red);}
+  .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--red);}
+  .btn--red{background:var(--red);box-shadow:5px 5px 0 var(--ink);}
+  .btn--red:hover{box-shadow:8px 8px 0 var(--ink);}
+  .btn--big{font-size:20px;padding:20px 44px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100vh;padding:150px 32px 80px;position:relative;
+    display:flex;flex-direction:column;justify-content:center;
+    border-bottom:3px solid var(--ink);
+    background:
+      radial-gradient(circle at 85% 20%, var(--yellow) 0 140px, transparent 141px),
+      var(--paper);
+    overflow:hidden;
+  }
+  .hero-grid-bg{
+    position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:
+      linear-gradient(var(--ink) 1px, transparent 1px),
+      linear-gradient(90deg, var(--ink) 1px, transparent 1px);
+    background-size:72px 72px;
+    mask-image:linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+    -webkit-mask-image:linear-gradient(to bottom, transparent, black 40%, black 60%, transparent);
+    opacity:.08;
+  }
+  .hero-tag{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
+    text-transform:uppercase;letter-spacing:2px;
+    background:var(--yellow);border:3px solid var(--ink);
+    padding:8px 16px;width:max-content;margin-bottom:28px;
+    box-shadow:4px 4px 0 var(--ink);
+    transform:rotate(-1.5deg);
+  }
+  .hero-tag .blink{width:10px;height:10px;background:var(--red);border-radius:50%;animation:blink 1.2s steps(2) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  h1{
+    font-size:clamp(64px,9.5vw,148px);
+    font-weight:900;line-height:.88;letter-spacing:-4px;
+    text-transform:uppercase;max-width:1200px;
+  }
+  h1 .outline{
+    color:transparent;-webkit-text-stroke:3px var(--ink);
+  }
+  h1 .red{color:var(--red);}
+  h1 .wiggle{display:inline-block;animation:wiggle 3s ease-in-out infinite;}
+  @keyframes wiggle{0%,100%{transform:rotate(0);}25%{transform:rotate(2deg);}75%{transform:rotate(-2deg);}}
+  .hero-sub{
+    margin-top:36px;font-size:22px;font-weight:500;max-width:560px;line-height:1.4;
+  }
+  .hero-sub strong{background:var(--pink);padding:0 6px;border:2px solid var(--ink);}
+  .hero-cta{margin-top:44px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+  .hero-note{font-family:'Space Mono',monospace;font-size:13px;max-width:200px;line-height:1.5;}
+
+  /* floating shapes */
+  .shape{position:absolute;pointer-events:none;}
+  .shape-gear{top:16%;right:9%;animation:spin 14s linear infinite;}
+  .shape-tri{bottom:14%;right:22%;animation:float 5s ease-in-out infinite;}
+  .shape-squig{top:58%;right:6%;animation:float 6s ease-in-out infinite reverse;}
+  .shape-plus{top:34%;right:32%;animation:spin 20s linear infinite reverse;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-18px) rotate(4deg);}}
+
+  /* ---------- MARQUEE ---------- */
+  .marquee{
+    background:var(--ink);color:var(--paper);
+    border-bottom:3px solid var(--ink);
+    overflow:hidden;padding:18px 0;white-space:nowrap;
+  }
+  .marquee--red{background:var(--red);}
+  .marquee-track{display:inline-flex;gap:0;animation:marquee 22s linear infinite;}
+  .marquee-track span{
+    font-weight:900;font-size:26px;text-transform:uppercase;letter-spacing:2px;
+    padding:0 24px;display:inline-flex;align-items:center;gap:24px;
+  }
+  .marquee-track .ast{color:var(--yellow);font-size:30px;}
+  @keyframes marquee{to{transform:translateX(-50%);}}
+
+  /* ---------- SECTIONS SHARED ---------- */
+  section{padding:110px 32px;position:relative;}
+  .wrap{max-width:1376px;margin:0 auto;position:relative;}
+  .sec-label{
+    font-family:'Space Mono',monospace;font-size:13px;font-weight:700;
+    text-transform:uppercase;letter-spacing:3px;margin-bottom:20px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .sec-label::before{content:'';width:40px;height:3px;background:var(--red);}
+  h2{
+    font-size:clamp(44px,5.5vw,84px);font-weight:900;
+    text-transform:uppercase;letter-spacing:-2px;line-height:.95;
+  }
+
+  /* ---------- PROBLEM ---------- */
+  .problem{background:var(--paper);border-bottom:3px solid var(--ink);}
+  .problem-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:80px;align-items:start;}
+  .pain-list{margin-top:48px;display:flex;flex-direction:column;gap:0;}
+  .pain{
+    display:flex;gap:24px;align-items:baseline;padding:26px 0;
+    border-top:3px solid var(--ink);font-size:24px;font-weight:700;
+    transition:padding-left .25s, background .25s;cursor:default;
+  }
+  .pain:last-child{border-bottom:3px solid var(--ink);}
+  .pain:hover{padding-left:20px;background:var(--yellow);}
+  .pain .num{font-family:'Space Mono',monospace;font-size:14px;color:var(--red);font-weight:700;}
+  .pain .x{margin-left:auto;font-weight:900;color:var(--red);font-size:28px;transform:rotate(0);transition:transform .3s;}
+  .pain:hover .x{transform:rotate(90deg);}
+  .problem-card{
+    background:var(--blue);color:var(--paper);border:3px solid var(--ink);
+    padding:48px;box-shadow:12px 12px 0 var(--ink);
+    transform:rotate(1.5deg);position:sticky;top:120px;
+  }
+  .problem-card .big{font-size:110px;font-weight:900;line-height:1;letter-spacing:-4px;}
+  .problem-card p{font-size:19px;line-height:1.5;margin-top:20px;font-weight:500;}
+  .problem-card .stamp{
+    position:absolute;top:-26px;right:-26px;width:104px;height:104px;
+    background:var(--yellow);border:3px solid var(--ink);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--ink);
+    text-transform:uppercase;transform:rotate(12deg);line-height:1.3;padding:10px;
+    animation:spin 16s linear infinite;
+  }
+
+  /* ---------- FEATURES ---------- */
+  .features{background:var(--yellow);border-bottom:3px solid var(--ink);}
+  .features h2 .hl{background:var(--paper);padding:0 12px;border:3px solid var(--ink);display:inline-block;transform:rotate(-1deg);}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:64px;}
+  .feat{
+    background:var(--paper);border:3px solid var(--ink);padding:36px;
+    box-shadow:8px 8px 0 var(--ink);position:relative;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .feat:hover{transform:translate(-4px,-4px) rotate(-.5deg);box-shadow:14px 14px 0 var(--ink);}
+  .feat:nth-child(2):hover{transform:translate(-4px,-4px) rotate(.5deg);}
+  .feat .icon{width:72px;height:72px;margin-bottom:24px;}
+  .feat h3{font-size:26px;font-weight:900;text-transform:uppercase;letter-spacing:-.5px;margin-bottom:14px;}
+  .feat p{font-size:16px;line-height:1.55;font-weight:500;}
+  .feat .idx{
+    position:absolute;top:20px;right:24px;font-family:'Space Mono',monospace;
+    font-size:13px;font-weight:700;color:var(--red);
+  }
+  .feat--blue{background:var(--blue);color:var(--paper);}
+  .feat--red{background:var(--red);color:var(--paper);}
+  .feat--pink{background:var(--pink);}
+  .feat--green{background:var(--green);}
+  .feat--blue .idx,.feat--red .idx{color:var(--yellow);}
+
+  /* ---------- STATS ---------- */
+  .stats{background:var(--ink);color:var(--paper);border-bottom:3px solid var(--ink);padding:90px 32px;}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;background:var(--paper);border:3px solid var(--paper);}
+  .stat{background:var(--ink);padding:44px 32px;transition:background .25s;}
+  .stat:hover{background:var(--red);}
+  .stat .n{font-size:72px;font-weight:900;letter-spacing:-3px;line-height:1;}
+  .stat .n em{font-style:normal;color:var(--yellow);}
+  .stat .l{font-family:'Space Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:2px;margin-top:14px;opacity:.85;}
+
+  /* ---------- HOW ---------- */
+  .how{background:var(--paper);border-bottom:3px solid var(--ink);}
+  .steps{margin-top:64px;display:flex;flex-direction:column;}
+  .step{
+    display:grid;grid-template-columns:120px 1fr 1fr;gap:40px;align-items:center;
+    padding:44px 0;border-top:3px solid var(--ink);
+  }
+  .step:last-child{border-bottom:3px solid var(--ink);}
+  .step .snum{
+    font-size:96px;font-weight:900;color:transparent;
+    -webkit-text-stroke:3px var(--ink);line-height:1;
+    transition:color .25s, -webkit-text-stroke-color .25s;
+  }
+  .step:hover .snum{color:var(--red);-webkit-text-stroke-color:var(--red);}
+  .step h3{font-size:34px;font-weight:900;text-transform:uppercase;letter-spacing:-1px;}
+  .step p{font-size:18px;line-height:1.55;font-weight:500;}
+  .step .pill{
+    display:inline-block;margin-top:14px;font-family:'Space Mono',monospace;
+    font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+    background:var(--green);border:2px solid var(--ink);padding:5px 12px;
+  }
+
+  /* ---------- TESTIMONIAL ---------- */
+  .quote{background:var(--blue);color:var(--paper);border-bottom:3px solid var(--ink);overflow:hidden;}
+  .quote blockquote{
+    font-size:clamp(32px,3.6vw,56px);font-weight:900;line-height:1.1;
+    letter-spacing:-1px;text-transform:uppercase;max-width:1100px;
+  }
+  .quote blockquote .q{color:var(--yellow);}
+  .quote blockquote mark{background:var(--red);color:var(--paper);padding:0 10px;}
+  .quote-who{margin-top:40px;display:flex;align-items:center;gap:20px;}
+  .avatar{
+    width:72px;height:72px;border-radius:50%;border:3px solid var(--paper);
+    background:var(--pink);display:flex;align-items:center;justify-content:center;
+    font-weight:900;font-size:26px;color:var(--ink);
+  }
+  .quote-who .name{font-weight:800;font-size:18px;}
+  .quote-who .role{font-family:'Space Mono',monospace;font-size:13px;opacity:.8;margin-top:4px;}
+  .quote .big-quote-mark{
+    position:absolute;right:40px;top:30px;font-size:300px;font-weight:900;
+    color:var(--yellow);opacity:.35;line-height:1;pointer-events:none;
+    font-family:'Archivo',sans-serif;
+  }
+
+  /* ---------- LOGOS ---------- */
+  .logos{background:var(--paper);border-bottom:3px solid var(--ink);padding:56px 32px;}
+  .logos-row{display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap;max-width:1376px;margin:0 auto;}
+  .logos-row .co{
+    font-weight:900;font-size:22px;text-transform:uppercase;letter-spacing:1px;
+    opacity:.45;transition:opacity .2s, transform .2s;display:flex;align-items:center;gap:8px;
+  }
+  .logos-row .co:hover{opacity:1;transform:rotate(-2deg) scale(1.06);}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    background:var(--red);color:var(--paper);text-align:center;
+    border-bottom:3px solid var(--ink);overflow:hidden;position:relative;
+  }
+  .cta h2{font-size:clamp(56px,7.5vw,120px);color:var(--paper);}
+  .cta h2 .stroke{color:transparent;-webkit-text-stroke:3px var(--paper);}
+  .cta p{font-size:21px;font-weight:500;margin:28px auto 44px;max-width:520px;}
+  .cta .btn{background:var(--paper);color:var(--ink);box-shadow:6px 6px 0 var(--ink);}
+  .cta .btn:hover{box-shadow:10px 10px 0 var(--ink);}
+  .cta-ring{
+    position:absolute;border:3px dashed var(--paper);border-radius:50%;
+    opacity:.35;pointer-events:none;animation:spin 30s linear infinite;
+  }
+  .r1{width:420px;height:420px;top:-160px;left:-120px;}
+  .r2{width:560px;height:560px;bottom:-260px;right:-160px;animation-direction:reverse;}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--ink);color:var(--paper);padding:64px 32px 32px;}
+  .foot-grid{max-width:1376px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;}
+  .foot-grid h4{font-family:'Space Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--yellow);margin-bottom:18px;}
+  .foot-grid a{display:block;color:var(--paper);text-decoration:none;font-weight:600;font-size:15px;margin-bottom:10px;opacity:.75;transition:opacity .2s, padding-left .2s;}
+  .foot-grid a:hover{opacity:1;padding-left:8px;color:var(--pink);}
+  .foot-logo{font-size:44px;font-weight:900;letter-spacing:-2px;}
+  .foot-bottom{
+    max-width:1376px;margin:56px auto 0;padding-top:24px;
+    border-top:1px solid rgba(244,241,234,.25);
+    display:flex;justify-content:space-between;
+    font-family:'Space Mono',monospace;font-size:12px;opacity:.6;
+  }
+
+  /* reveal on scroll */
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);}
+  .reveal.in{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#"><span class="dot"></span>ACME</a>
+  <div class="nav-links">
+    <a href="#platform">Platform</a>
+    <a href="#how">How it works</a>
+    <a href="#results">Results</a>
+    <a class="btn" href="#demo">Book a demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-grid-bg"></div>
+
+  <svg class="shape shape-gear" width="150" height="150" viewBox="0 0 100 100">
+    <path fill="#2B4BF2" stroke="#111" stroke-width="3" d="M50 8l6 10 11-3 2 11 11 2-3 11 10 6-6 10 8 8-10 6 3 11-11 2-2 11-11-3-6 10-6-10-11 3-2-11-11-2 3-11-10-6 6-10-8-8 10-6-3-11 11-2 2-11 11 3z"/>
+    <circle cx="50" cy="50" r="14" fill="#F4F1EA" stroke="#111" stroke-width="3"/>
+  </svg>
+  <svg class="shape shape-tri" width="120" height="110" viewBox="0 0 100 90">
+    <polygon points="50,5 95,85 5,85" fill="#FF4B1F" stroke="#111" stroke-width="4"/>
+    <circle cx="50" cy="60" r="10" fill="#FFD21F" stroke="#111" stroke-width="3"/>
+  </svg>
+  <svg class="shape shape-squig" width="170" height="60" viewBox="0 0 170 60">
+    <path d="M5 30 Q 25 5, 45 30 T 85 30 T 125 30 T 165 30" fill="none" stroke="#111" stroke-width="6" stroke-linecap="round"/>
+  </svg>
+  <svg class="shape shape-plus" width="80" height="80" viewBox="0 0 80 80">
+    <rect x="30" y="5" width="20" height="70" fill="#19C37D" stroke="#111" stroke-width="3"/>
+    <rect x="5" y="30" width="70" height="20" fill="#19C37D" stroke="#111" stroke-width="3"/>
+  </svg>
+
+  <div class="hero-tag"><span class="blink"></span>Now shipping · Widget OS v4.2</div>
+  <h1>
+    Configure.<br>
+    <span class="outline">Order.</span> <span class="red wiggle">Track.</span><br>
+    Widgets, sorted.
+  </h1>
+  <p class="hero-sub">
+    Acme is the operations platform for mid-sized manufacturers. Spec custom widgets,
+    route them across your supply chain, and know where every unit is — <strong>without a single spreadsheet.</strong>
+  </p>
+  <div class="hero-cta">
+    <a class="btn btn--red btn--big" href="#demo">Book a demo →</a>
+    <p class="hero-note">30 minutes. Your actual widget catalog. Zero sales fluff.</p>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track" id="mq1"></div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="wrap problem-grid">
+    <div class="reveal">
+      <div class="sec-label">The mess you're in</div>
+      <h2>Your widget pipeline is held together with tape.</h2>
+      <div class="pain-list">
+        <div class="pain"><span class="num">01</span>Specs buried in 47-email threads<span class="x">✕</span></div>
+        <div class="pain"><span class="num">02</span>Suppliers quoting from outdated drawings<span class="x">✕</span></div>
+        <div class="pain"><span class="num">03</span>"Where's my order?" answered with a shrug<span class="x">✕</span></div>
+        <div class="pain"><span class="num">04</span>Reorder points discovered after the line stops<span class="x">✕</span></div>
+      </div>
+    </div>
+    <div class="problem-card reveal">
+      <div class="stamp">Sound familiar?</div>
+      <div class="big">$2.4M</div>
+      <p>That's what the average mid-sized manufacturer loses annually to misconfigured parts, stalled orders, and invisible inventory. We counted. Then we built the fix.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="platform">
+  <div class="wrap">
+    <div class="sec-label reveal">The platform</div>
+    <h2 class="reveal">One tool. <span class="hl">Every widget.</span><br>Total control.</h2>
+    <div class="feat-grid">
+      <div class="feat reveal">
+        <span class="idx">/01</span>
+        <svg class="icon" viewBox="0 0 72 72"><rect x="8" y="8" width="56" height="56" fill="#2B4BF2" stroke="#111" stroke-width="3"/><rect x="20" y="20" width="32" height="8" fill="#F4F1EA"/><rect x="20" y="34" width="24" height="8" fill="#F4F1EA"/><rect x="20" y="48" width="28" height="8" fill="#FFD21F"/></svg>
+        <h3>Visual Configurator</h3>
+        <p>Build custom widget specs with a drag-and-drop rule engine. Tolerances, materials, finishes — validated in real time against what your suppliers can actually make.</p>
+      </div>
+      <div class="feat feat--blue reveal">
+        <span class="idx">/02</span>
+        <svg class="icon" viewBox="0 0 72 72"><circle cx="36" cy="36" r="28" fill="#FFD21F" stroke="#111" stroke-width="3"/><path d="M36 18v18l13 8" stroke="#111" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+        <h3>Instant RFQs</h3>
+        <p>One click sends your spec to every qualified supplier. Quotes land in a single comparable view — no reformatting, no chasing, no "per my last email."</p>
+      </div>
+      <div class="feat feat--red reveal">
+        <span class="idx">/03</span>
+        <svg class="icon" viewBox="0 0 72 72"><path d="M8 52 L24 30 L36 42 L52 16 L64 28" fill="none" stroke="#F4F1EA" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="64" cy="28" r="6" fill="#FFD21F" stroke="#111" stroke-width="3"/></svg>
+        <h3>Live Tracking</h3>
+        <p>Every order, every unit, every milestone — on one map. ETA drift triggers alerts before it becomes a line-down event, not after.</p>
+      </div>
+      <div class="feat feat--pink reveal">
+        <span class="idx">/04</span>
+        <svg class="icon" viewBox="0 0 72 72"><rect x="8" y="40" width="14" height="24" fill="#2B4BF2" stroke="#111" stroke-width="3"/><rect x="29" y="26" width="14" height="38" fill="#FF4B1F" stroke="#111" stroke-width="3"/><rect x="50" y="12" width="14" height="52" fill="#19C37D" stroke="#111" stroke-width="3"/></svg>
+        <h3>Demand Forecasting</h3>
+        <p>Acme learns your consumption patterns and flags reorder points weeks early. Safety stock stops being a guess and starts being a number.</p>
+      </div>
+      <div class="feat feat--green reveal">
+        <span class="idx">/05</span>
+        <svg class="icon" viewBox="0 0 72 72"><circle cx="22" cy="22" r="12" fill="#F4F1EA" stroke="#111" stroke-width="3"/><circle cx="50" cy="22" r="12" fill="#F4F1EA" stroke="#111" stroke-width="3"/><rect x="10" y="42" width="52" height="20" fill="#111"/><rect x="16" y="48" width="40" height="8" fill="#FFD21F"/></svg>
+        <h3>Supplier Scorecards</h3>
+        <p>On-time rate, defect rate, quote responsiveness — scored automatically on every order. Renegotiate with receipts, not vibes.</p>
+      </div>
+      <div class="feat reveal">
+        <span class="idx">/06</span>
+        <svg class="icon" viewBox="0 0 72 72"><rect x="10" y="10" width="24" height="24" fill="#FF4B1F" stroke="#111" stroke-width="3"/><rect x="38" y="10" width="24" height="24" fill="#2B4BF2" stroke="#111" stroke-width="3"/><rect x="10" y="38" width="24" height="24" fill="#FFD21F" stroke="#111" stroke-width="3"/><circle cx="50" cy="50" r="14" fill="#19C37D" stroke="#111" stroke-width="3"/></svg>
+        <h3>ERP Sync</h3>
+        <p>Two-way integrations with SAP, NetSuite, and Odoo out of the box. Your system of record stays your system of record — just finally accurate.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats" id="results">
+  <div class="wrap">
+    <div class="stats-grid reveal">
+      <div class="stat"><div class="n" data-count="38"><span class="val">0</span><em>%</em></div><div class="l">Faster quote-to-order</div></div>
+      <div class="stat"><div class="n" data-count="99"><span class="val">0</span><em>%</em></div><div class="l">Order visibility uptime</div></div>
+      <div class="stat"><div class="n" data-count="12"><span class="val">0</span><em>hrs</em></div><div class="l">Saved per buyer, weekly</div></div>
+      <div class="stat"><div class="n" data-count="214"><span class="val">0</span><em>+</em></div><div class="l">Manufacturers on Acme</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="sec-label reveal">How it works</div>
+    <h2 class="reveal">Live in three steps.<br>No six-month rollout.</h2>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="snum">1</div>
+        <div><h3>Import your catalog</h3><span class="pill">Day 1</span></div>
+        <p>Drop in your existing part numbers, drawings, and supplier list. Acme structures it automatically — most teams are fully imported before lunch.</p>
+      </div>
+      <div class="step reveal">
+        <div class="snum">2</div>
+        <div><h3>Configure & quote</h3><span class="pill">Week 1</span></div>
+        <p>Build your first custom widget spec in the configurator and fire RFQs to your supplier network. Watch comparable quotes roll in within hours.</p>
+      </div>
+      <div class="step reveal">
+        <div class="snum">3</div>
+        <div><h3>Track everything</h3><span class="pill">Forever</span></div>
+        <p>From PO to delivery dock, every unit reports its position. Your ops team stops asking "where is it?" and starts asking "what's next?"</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote">
+  <div class="big-quote-mark">"</div>
+  <div class="wrap reveal">
+    <blockquote>
+      <span class="q">"</span>We used to lose two days a week chasing widget orders. Now I check one dashboard with my coffee and <mark>get on with my life.</mark><span class="q">"</span>
+    </blockquote>
+    <div class="quote-who">
+      <div class="avatar">MK</div>
+      <div>
+        <div class="name">Marta Kowalski</div>
+        <div class="role">VP Operations, Hartwell Fabrication — 340 employees, 4 plants</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos">
+  <div class="logos-row">
+    <span class="co">◆ Hartwell</span>
+    <span class="co">● Ostrander Mfg</span>
+    <span class="co">▲ Beacon & Sons</span>
+    <span class="co">■ Kessler Works</span>
+    <span class="co">✚ Polaris Metals</span>
+    <span class="co">◐ VanDoren Industrial</span>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta" id="demo">
+  <div class="cta-ring r1"></div>
+  <div class="cta-ring r2"></div>
+  <div class="wrap reveal">
+    <h2>Stop guessing.<br><span class="stroke">Start shipping.</span></h2>
+    <p>Book a 30-minute demo. Bring your messiest widget spec — we'll configure it live, on the call, in front of you.</p>
+    <a class="btn btn--big" href="#" id="demoBtn">Book your demo →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-logo">ACME<span style="color:var(--red)">.</span></div>
+      <p style="opacity:.7;font-size:15px;margin-top:14px;max-width:280px;line-height:1.5;">The widget operations platform for manufacturers who'd rather build things than chase them.</p>
+    </div>
+    <div>
+      <h4>Product</h4>
+      <a href="#platform">Configurator</a><a href="#platform">RFQs</a><a href="#platform">Tracking</a><a href="#platform">Integrations</a>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <a href="#">About</a><a href="#">Careers</a><a href="#">Press kit</a><a href="#">Contact</a>
+    </div>
+    <div>
+      <h4>Resources</h4>
+      <a href="#">Widget ROI calculator</a><a href="#">Ops benchmark report</a><a href="#">Help center</a><a href="#">API docs</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2025 Acme Widget Systems, Inc.</span>
+    <span>Made with ♥ and exactly zero spreadsheets</span>
+  </div>
+</footer>
+
+<script>
+  // Marquee content (duplicated for seamless loop)
+  const items = ['Configure','Order','Track','Repeat','No spreadsheets','No surprises','Widgets, sorted'];
+  const mq = document.getElementById('mq1');
+  let html = '';
+  for (let r = 0; r < 2; r++) {
+    items.forEach(t => { html += `<span>${t}<span class="ast">✺</span></span>`; });
+  }
+  mq.innerHTML = html;
+
+  // Scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Animated counters
+  const statIO = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = +el.dataset.count;
+      const span = el.querySelector('.val');
+      const dur = 1400, start = performance.now();
+      (function tick(now) {
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        span.textContent = Math.round(target * eased);
+        if (p < 1) requestAnimationFrame(tick);
+      })(start);
+      statIO.unobserve(el);
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('[data-count]').forEach(el => statIO.observe(el));
+
+  // Playful demo button wobble
+  document.getElementById('demoBtn').addEventListener('click', e => {
+    e.preventDefault();
+    const b = e.currentTarget;
+    b.textContent = '✓ Nice. Check your inbox.';
+    b.style.background = 'var(--green)';
+    b.style.color = 'var(--ink)';
+  });
+</script>
+</body>
+</html>

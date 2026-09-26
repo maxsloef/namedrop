@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme — Custom widgets, configured, ordered, tracked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f3f1ec;
+    --ink:#111111;
+    --grey:#6b6a66;
+    --rule:#cfccc4;
+    --red:#e2231a;
+    --margin:48px;
+    --gap:24px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:17px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+  .wrap{padding:0 var(--margin)}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);column-gap:var(--gap)}
+  .rule{border-top:1px solid var(--ink)}
+  .rule-light{border-top:1px solid var(--rule)}
+
+  /* Header */
+  header{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:1px solid var(--ink)}
+  header .grid{height:64px;align-items:center}
+  .logo{grid-column:1/4;font-weight:800;font-size:22px;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
+  .logo i{width:14px;height:14px;background:var(--red);display:inline-block;border-radius:50%}
+  nav{grid-column:4/10;display:flex;gap:36px;font-size:15px;font-weight:500}
+  nav a{position:relative}
+  nav a:hover{color:var(--red)}
+  .hdr-cta{grid-column:10/13;justify-self:end}
+  .btn{display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:var(--paper);padding:13px 20px;font-weight:600;font-size:15px;border:0;cursor:pointer;font-family:inherit;transition:background .15s}
+  .btn:hover{background:var(--red)}
+  .btn .arr{display:inline-block;transition:transform .2s}
+  .btn:hover .arr{transform:translateX(4px)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:var(--paper)}
+
+  /* Hero */
+  .hero{padding-top:40px;padding-bottom:0}
+  .hero-meta{grid-column:1/13;display:flex;justify-content:space-between;padding-bottom:40px;color:var(--grey)}
+  .hero h1{
+    grid-column:1/10;
+    font-size:132px;line-height:.9;letter-spacing:-.055em;font-weight:700;
+  }
+  .hero h1 span{display:block}
+  .hero h1 .red{color:var(--red)}
+  .hero-side{grid-column:10/13;align-self:end;padding-bottom:12px}
+  .hero-side p{font-size:18px;margin-bottom:28px}
+  .hero-lower{margin-top:64px;border-top:1px solid var(--ink)}
+  .hero-lower .grid{min-height:420px}
+  .hero-caption{grid-column:1/4;padding-top:20px;display:flex;flex-direction:column;justify-content:space-between;padding-bottom:28px}
+  .hero-caption p{font-size:15px;color:var(--grey);max-width:260px}
+  .hero-caption .big{font-size:15px;color:var(--ink);font-weight:500}
+  .hero-art{grid-column:4/13;border-left:1px solid var(--ink);position:relative;overflow:hidden}
+  .hero-art svg{display:block;width:100%;height:100%}
+
+  /* Stats */
+  .stats{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+  .stat{grid-column:span 3;padding:32px 0 36px;border-left:1px solid var(--rule);padding-left:20px}
+  .stat:first-child{border-left:0;padding-left:0}
+  .stat .n{font-size:76px;font-weight:600;letter-spacing:-.05em;line-height:1}
+  .stat .n sup{font-size:32px;vertical-align:top;position:relative;top:8px;margin-left:2px}
+  .stat p{margin-top:14px;font-size:15px;max-width:240px}
+  .stats-note{grid-column:1/13;padding:12px 0;color:var(--grey);border-top:1px solid var(--rule)}
+
+  /* Section */
+  section.block{padding:120px 0 0}
+  .sec-label{grid-column:1/4;padding-top:8px}
+  .sec-label .num{font-size:15px;font-weight:600}
+  .sec-label .num b{color:var(--red);font-weight:600}
+  .sec-head{grid-column:4/12}
+  .sec-head h2{font-size:64px;line-height:.98;letter-spacing:-.045em;font-weight:600}
+  .sec-head p{font-size:20px;margin-top:28px;max-width:620px;color:#2b2a28}
+
+  /* Features */
+  .features{margin-top:80px;border-top:1px solid var(--ink)}
+  .feat{grid-column:span 4;padding:24px 24px 48px 0;border-right:1px solid var(--rule);min-height:460px;display:flex;flex-direction:column}
+  .feat:last-child{border-right:0}
+  .feat+.feat{padding-left:24px}
+  .feat .top{display:flex;justify-content:space-between;align-items:baseline}
+  .feat .idx{font-size:15px;font-weight:600}
+  .feat .fig{height:170px;margin:36px 0 36px}
+  .feat h3{font-size:30px;letter-spacing:-.03em;font-weight:600;line-height:1.05;margin-bottom:14px}
+  .feat p{font-size:16px;color:#2b2a28}
+  .feat ul{list-style:none;margin-top:auto;padding-top:28px}
+  .feat li{border-top:1px solid var(--rule);padding:9px 0;font-size:14px;display:flex;justify-content:space-between}
+  .feat li span:last-child{color:var(--grey)}
+
+  /* Product */
+  .product{margin-top:80px}
+  .console{grid-column:1/13;border:1px solid var(--ink);background:#fbfaf7}
+  .console-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--ink)}
+  .console-bar .t{font-weight:600;font-size:15px}
+  .console-bar .tabs{display:flex;gap:24px;font-size:14px;color:var(--grey)}
+  .console-bar .tabs .on{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--red);padding-bottom:3px}
+  .live{display:flex;align-items:center;gap:8px}
+  .live i{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .console-body{display:grid;grid-template-columns:3fr 9fr}
+  .console-side{border-right:1px solid var(--ink);padding:20px}
+  .console-side .kpi{padding:14px 0;border-bottom:1px solid var(--rule)}
+  .console-side .kpi:first-child{padding-top:0}
+  .console-side .kpi .v{font-size:40px;font-weight:600;letter-spacing:-.04em;line-height:1.05}
+  .console-side .kpi .l{font-size:13px;color:var(--grey)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-weight:500;padding:12px 16px;border-bottom:1px solid var(--ink)}
+  td{padding:14px 16px;border-bottom:1px solid var(--rule);vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  td.id{font-family:"IBM Plex Mono",monospace;font-size:13px}
+  .track{position:relative;height:6px;background:#e4e1da;width:100%}
+  .track b{position:absolute;left:0;top:0;bottom:0;background:var(--ink);transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+  .track.late b{background:var(--red)}
+  .track .dots{position:absolute;inset:0;display:flex;justify-content:space-between}
+  .track .dots s{width:1px;background:var(--paper);height:100%}
+  .stage{display:flex;justify-content:space-between;font-size:11px;color:var(--grey);margin-top:6px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase}
+  .pill{display:inline-block;font-size:12px;font-weight:600;padding:3px 8px;border:1px solid var(--ink)}
+  .pill.r{border-color:var(--red);color:var(--red)}
+  .pill.f{background:var(--ink);color:var(--paper)}
+  .console-cap{grid-column:1/13;display:flex;justify-content:space-between;padding-top:12px;color:var(--grey)}
+
+  /* Process */
+  .steps{margin-top:80px}
+  .step{grid-column:span 3;border-top:4px solid var(--ink);padding-top:18px}
+  .step:nth-child(1){border-color:var(--red)}
+  .step .d{font-size:96px;font-weight:600;letter-spacing:-.06em;line-height:.9;margin-bottom:24px}
+  .step h4{font-size:20px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px}
+  .step p{font-size:15px;color:#2b2a28;max-width:280px}
+
+  /* Quote */
+  .quote{margin-top:120px;background:var(--ink);color:var(--paper);padding:96px 0 72px}
+  .quote .mark{grid-column:1/4;font-size:220px;line-height:.7;color:var(--red);font-weight:700}
+  .quote blockquote{grid-column:4/12;font-size:46px;line-height:1.1;letter-spacing:-.035em;font-weight:500}
+  .quote .who{grid-column:4/13;margin-top:56px;display:grid;grid-template-columns:repeat(9,1fr);column-gap:var(--gap);border-top:1px solid #444;padding-top:18px;font-size:15px}
+  .quote .who div:nth-child(1){grid-column:span 3}
+  .quote .who div:nth-child(2){grid-column:span 3;color:#a9a7a1}
+  .quote .who div:nth-child(3){grid-column:span 3;color:#a9a7a1}
+  .logos{grid-column:1/13;display:flex;justify-content:space-between;align-items:center;margin-top:88px;border-top:1px solid #444;padding-top:28px;color:#8d8b85;font-weight:700;font-size:22px;letter-spacing:-.02em}
+  .logos span:first-child{font-size:12px;font-weight:400;letter-spacing:.04em;font-family:"IBM Plex Mono",monospace;text-transform:uppercase}
+
+  /* Demo */
+  #demo{padding:120px 0 120px}
+  .demo-left{grid-column:1/6}
+  .demo-left h2{font-size:88px;line-height:.92;letter-spacing:-.055em;font-weight:700}
+  .demo-left h2 em{font-style:normal;color:var(--red)}
+  .demo-left p{font-size:19px;margin-top:32px;max-width:440px}
+  .agenda{margin-top:48px;list-style:none;max-width:460px}
+  .agenda li{display:grid;grid-template-columns:70px 1fr;border-top:1px solid var(--ink);padding:14px 0;font-size:15px}
+  .agenda li:last-child{border-bottom:1px solid var(--ink)}
+  .agenda li span{font-weight:600}
+  form{grid-column:7/13;border-top:4px solid var(--ink);padding-top:28px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+  .field{margin-bottom:26px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+  .field input,.field select,.field textarea{
+    width:100%;background:transparent;border:0;border-bottom:1px solid var(--ink);
+    font-family:inherit;font-size:19px;padding:8px 0 10px;color:var(--ink);outline:none;border-radius:0;appearance:none;
+  }
+  .field textarea{resize:none;height:84px}
+  .field select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(-45deg,transparent 50%,var(--ink) 50%);background-position:calc(100% - 12px) 55%,calc(100% - 6px) 55%;background-size:6px 6px;background-repeat:no-repeat;cursor:pointer}
+  .field input:focus,.field select:focus,.field textarea:focus{border-bottom:2px solid var(--red);padding-bottom:9px}
+  .field.err input,.field.err select{border-bottom-color:var(--red)}
+  .field .msg{font-size:12px;color:var(--red);margin-top:6px;min-height:0;display:none}
+  .field.err .msg{display:block}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .chips input{display:none}
+  .chips label{font-size:14px;font-weight:500;border:1px solid var(--ink);padding:8px 14px;cursor:pointer;margin:0}
+  .chips input:checked+label{background:var(--ink);color:var(--paper)}
+  .form-foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .form-foot small{font-size:13px;color:var(--grey);max-width:300px}
+  .success{display:none;border-top:4px solid var(--red);padding-top:28px;grid-column:7/13}
+  .success h3{font-size:44px;letter-spacing:-.04em;font-weight:600;line-height:1}
+  .success p{margin-top:20px;font-size:18px;max-width:480px}
+
+  footer{border-top:1px solid var(--ink);padding:40px 0 32px}
+  footer .f1{grid-column:1/4;font-weight:800;font-size:22px;letter-spacing:-.03em}
+  footer .col{grid-column:span 2;font-size:14px}
+  footer .col h5{font-size:13px;font-weight:600;margin-bottom:12px}
+  footer .col a{display:block;color:var(--grey);margin-bottom:6px}
+  footer .col a:hover{color:var(--red)}
+  footer .base{grid-column:1/13;display:flex;justify-content:space-between;margin-top:64px;color:var(--grey);border-top:1px solid var(--rule);padding-top:16px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap grid">
+    <a href="#" class="logo"><i></i>Acme</a>
+    <nav>
+      <a href="#platform">Platform</a>
+      <a href="#console">Tracking</a>
+      <a href="#process">Onboarding</a>
+      <a href="#customers">Customers</a>
+    </nav>
+    <div class="hdr-cta"><a href="#demo" class="btn">Book a demo <span class="arr">→</span></a></div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap grid">
+      <div class="hero-meta mono"><span>Widget procurement platform</span><span>For mid-sized manufacturers</span><span>Est. 2016 — Rotterdam / Chicago</span></div>
+      <h1><span>Configure.</span><span>Order.</span><span class="red">Track.</span></h1>
+      <div class="hero-side">
+        <p>Acme gives operations teams one system to specify custom widgets, place orders with qualified suppliers, and follow every unit from the machine shop to the line.</p>
+        <a href="#demo" class="btn">Book a 30-minute demo <span class="arr">→</span></a>
+      </div>
+    </div>
+    <div class="hero-lower">
+      <div class="wrap grid">
+        <div class="hero-caption">
+          <span class="mono">Fig. 1</span>
+          <div>
+            <p class="big">One specification.</p>
+            <p>Every dimension, tolerance and finish lives in a single versioned record, shared by engineering, purchasing and your suppliers.</p>
+          </div>
+        </div>
+        <div class="hero-art">
+          <svg viewBox="0 0 1000 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <g stroke="#cfccc4" stroke-width="1">
+              <line x1="0" y1="105" x2="1000" y2="105"/><line x1="0" y1="210" x2="1000" y2="210"/><line x1="0" y1="315" x2="1000" y2="315"/>
+              <line x1="125" y1="0" x2="125" y2="420"/><line x1="250" y1="0" x2="250" y2="420"/><line x1="375" y1="0" x2="375" y2="420"/>
+              <line x1="500" y1="0" x2="500" y2="420"/><line x1="625" y1="0" x2="625" y2="420"/><line x1="750" y1="0" x2="750" y2="420"/><line x1="875" y1="0" x2="875" y2="420"/>
+            </g>
+            <!-- widget: flange + hub -->
+            <circle cx="375" cy="210" r="168" fill="#111"/>
+            <circle cx="375" cy="210" r="96" fill="#f3f1ec"/>
+            <circle cx="375" cy="210" r="40" fill="#e2231a" id="hub"/>
+            <g fill="#f3f1ec">
+              <circle cx="375" cy="74" r="14"/><circle cx="375" cy="346" r="14"/>
+              <circle cx="239" cy="210" r="14"/><circle cx="511" cy="210" r="14"/>
+            </g>
+            <!-- side profile -->
+            <rect x="625" y="42" width="62" height="336" fill="#111"/>
+            <rect x="687" y="114" width="125" height="192" fill="#111"/>
+            <rect x="812" y="170" width="188" height="80" fill="#e2231a"/>
+            <!-- dimension lines -->
+            <g stroke="#111" stroke-width="1" fill="none">
+              <line x1="207" y1="400" x2="543" y2="400"/>
+              <line x1="207" y1="392" x2="207" y2="408"/><line x1="543" y1="392" x2="543" y2="408"/>
+              <line x1="840" y1="42" x2="840" y2="140"/>
+              <line x1="832" y1="42" x2="848" y2="42"/>
+              <line x1="625" y1="20" x2="812" y2="20"/>
+              <line x1="625" y1="12" x2="625" y2="28"/><line x1="812" y1="12" x2="812" y2="28"/>
+            </g>
+            <g font-family="IBM Plex Mono, monospace" font-size="12" fill="#111">
+              <text x="358" y="395">Ø 336.0</text>
+              <text x="690" y="15">L 187.5 ±0.05</text>
+              <text x="852" y="95">REV C</text>
+              <text x="852" y="112">6061-T6</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="wrap grid">
+      <div class="stat"><div class="n">41<sup>%</sup></div><p>fewer orders returned for specification errors in the first year.</p></div>
+      <div class="stat"><div class="n">11<sup>d</sup></div><p>shorter median lead time on custom widget orders.</p></div>
+      <div class="stat"><div class="n">1,240</div><p>qualified suppliers across machining, casting, molding and finishing.</p></div>
+      <div class="stat"><div class="n">99.2<sup>%</sup></div><p>of in-flight units with a confirmed location at any given hour.</p></div>
+      <div class="stats-note mono">Median across 186 customer sites, fiscal year 2024</div>
+    </div>
+  </div>
+
+  <section class="block" id="platform">
+    <div class="wrap grid">
+      <div class="sec-label"><div class="num"><b>01</b> — Platform</div></div>
+      <div class="sec-head">
+        <h2>Custom parts shouldn’t need a custom process every time.</h2>
+        <p>Most manufacturers run widget procurement on spreadsheets, email threads and supplier portals that don’t talk to each other. Acme replaces all three with a single workflow your whole operations team can follow.</p>
+      </div>
+    </div>
+    <div class="features">
+      <div class="wrap grid">
+        <div class="feat">
+          <div class="top"><span class="idx">1.1</span><span class="mono">Configure</span></div>
+          <svg class="fig" viewBox="0 0 300 170" aria-hidden="true">
+            <rect x="0" y="0" width="170" height="170" fill="#111"/>
+            <rect x="40" y="40" width="90" height="90" fill="#f3f1ec"/>
+            <rect x="190" y="0" width="110" height="80" fill="none" stroke="#111"/>
+            <rect x="190" y="90" width="110" height="80" fill="#e2231a"/>
+          </svg>
+          <h3>Build the spec once, with guardrails.</h3>
+          <p>A parametric configurator checks every dimension, material and tolerance against what your suppliers can actually make, before anyone clicks order.</p>
+          <ul><li><span>Version-controlled specs</span><span>Rev A → Z</span></li><li><span>CAD import</span><span>STEP, IGES, DXF</span></li><li><span>Manufacturability checks</span><span>Real time</span></li></ul>
+        </div>
+        <div class="feat">
+          <div class="top"><span class="idx">1.2</span><span class="mono">Order</span></div>
+          <svg class="fig" viewBox="0 0 300 170" aria-hidden="true">
+            <rect x="0" y="130" width="60" height="40" fill="#111"/>
+            <rect x="80" y="90" width="60" height="80" fill="#111"/>
+            <rect x="160" y="50" width="60" height="120" fill="#111"/>
+            <rect x="240" y="0" width="60" height="170" fill="#e2231a"/>
+          </svg>
+          <h3>Quote, compare and commit in hours.</h3>
+          <p>Send a spec to pre-qualified suppliers, see quotes side by side on price, lead time and capacity, and route approvals through the rules you already follow.</p>
+          <ul><li><span>Supplier network</span><span>1,240 vetted</span></li><li><span>Approval chains</span><span>By value, plant, SKU</span></li><li><span>ERP sync</span><span>SAP, Oracle, NetSuite</span></li></ul>
+        </div>
+        <div class="feat">
+          <div class="top"><span class="idx">1.3</span><span class="mono">Track</span></div>
+          <svg class="fig" viewBox="0 0 300 170" aria-hidden="true">
+            <line x1="0" y1="85" x2="300" y2="85" stroke="#111" stroke-width="2"/>
+            <circle cx="20" cy="85" r="20" fill="#111"/>
+            <circle cx="110" cy="85" r="20" fill="#111"/>
+            <circle cx="200" cy="85" r="20" fill="#e2231a"/>
+            <circle cx="280" cy="85" r="19" fill="#f3f1ec" stroke="#111" stroke-width="2"/>
+          </svg>
+          <h3>Know where every unit is, and when it lands.</h3>
+          <p>Production milestones, inspection results and carrier scans flow into one timeline. When an order slips, you find out days earlier — not when the line stops.</p>
+          <ul><li><span>Milestone tracking</span><span>7 stages</span></li><li><span>Delay prediction</span><span>Avg. 4.2 days notice</span></li><li><span>Quality records</span><span>Per lot</span></li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="console">
+    <div class="wrap grid">
+      <div class="sec-label"><div class="num"><b>02</b> — Tracking</div></div>
+      <div class="sec-head">
+        <h2>Every open order, on one screen.</h2>
+        <p>The order board shows each widget order by stage, supplier and expected arrival. Exceptions surface in red. Everything else stays quiet.</p>
+      </div>
+    </div>
+    <div class="wrap grid product">
+      <div class="console">
+        <div class="console-bar">
+          <span class="t">Order board — Plant 2, Dayton OH</span>
+          <div class="tabs"><span class="on">In flight</span><span>Awaiting approval</span><span>Received</span><span>Archive</span></div>
+          <span class="live mono"><i></i>Live</span>
+        </div>
+        <div class="console-body">
+          <div class="console-side">
+            <div class="kpi"><div class="v">64</div><div class="l">Orders in flight</div></div>
+            <div class="kpi"><div class="v">58</div><div class="l">On schedule</div></div>
+            <div class="kpi"><div class="v" style="color:var(--red)">3</div><div class="l">At risk of delay</div></div>
+            <div class="kpi"><div class="v">$1.84M</div><div class="l">Committed spend, Q3</div></div>
+          </div>
+          <table>
+            <thead><tr><th style="width:14%">Order</th><th style="width:22%">Widget</th><th style="width:16%">Supplier</th><th style="width:30%">Stage</th><th style="width:10%">ETA</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td class="id">AC-40817</td><td>Flange hub, 6061-T6, Rev C</td><td>Brenner Machining</td><td><div class="track"><b data-w="71"></b></div><div class="stage"><span>Spec</span><span>Make</span><span>QA</span><span>Ship</span></div></td><td>Aug 14</td><td><span class="pill">On track</span></td></tr>
+              <tr><td class="id">AC-40822</td><td>Drive coupler, 4140 steel</td><td>Norhaven Cast</td><td><div class="track late"><b data-w="44"></b></div><div class="stage"><span>Spec</span><span>Make</span><span>QA</span><span>Ship</span></div></td><td>Aug 19</td><td><span class="pill r">+3 days</span></td></tr>
+              <tr><td class="id">AC-40831</td><td>Sensor bracket, anodized</td><td>Kessler &amp; Sons</td><td><div class="track"><b data-w="92"></b></div><div class="stage"><span>Spec</span><span>Make</span><span>QA</span><span>Ship</span></div></td><td>Aug 09</td><td><span class="pill">In transit</span></td></tr>
+              <tr><td class="id">AC-40836</td><td>Seal ring, EPDM 70A</td><td>Polyform Molding</td><td><div class="track"><b data-w="100"></b></div><div class="stage"><span>Spec</span><span>Make</span><span>QA</span><span>Ship</span></div></td><td>Aug 07</td><td><span class="pill f">Delivered</span></td></tr>
+              <tr><td class="id">AC-40840</td><td>Idler shaft, 17-4 PH</td><td>Brenner Machining</td><td><div class="track"><b data-w="18"></b></div><div class="stage"><span>Spec</span><span>Make</span><span>QA</span><span>Ship</span></div></td><td>Aug 28</td><td><span class="pill">On track</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="console-cap mono"><span>Fig. 2 — Order board, representative data</span><span>Updates every 60 seconds</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="process">
+    <div class="wrap grid">
+      <div class="sec-label"><div class="num"><b>03</b> — Onboarding</div></div>
+      <div class="sec-head">
+        <h2>Live in weeks, not quarters.</h2>
+        <p>A dedicated implementation lead works with your team from first call to first order. No rip-and-replace. Acme sits alongside the ERP you already run.</p>
+      </div>
+    </div>
+    <div class="wrap grid steps">
+      <div class="step"><div class="d">01</div><h4>Discovery call</h4><p>We map your current widget catalog, supplier list and approval rules. Thirty minutes.</p></div>
+      <div class="step"><div class="d">02</div><h4>Catalog import</h4><p>Existing specs and drawings move into Acme as versioned configurations. Week one.</p></div>
+      <div class="step"><div class="d">03</div><h4>Connect systems</h4><p>ERP, MRP and your existing suppliers are linked and tested against live orders. Weeks two to four.</p></div>
+      <div class="step"><div class="d">04</div><h4>First plant live</h4><p>Your team places real orders with support on call. Additional plants follow at your pace.</p></div>
+    </div>
+  </section>
+
+  <section class="quote" id="customers">
+    <div class="wrap grid">
+      <div class="mark">“</div>
+      <blockquote>We used to find out a coupler was late when the line went quiet. Now we see it four days out, and we’ve already rerouted the order.</blockquote>
+      <div class="who"><div>Dana Whitlock</div><div>VP Operations, Harlan Fluid Systems</div><div>Customer since 2021 — 3 plants</div></div>
+      <div class="logos"><span>Trusted by operations teams at</span><span>Harlan</span><span>Voss&nbsp;Industrie</span><span>Meridian&nbsp;Pumps</span><span>Oakline</span><span>Tessaro</span><span>Brightwater&nbsp;Mfg</span></div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap grid">
+      <div class="demo-left">
+        <span class="mono" style="display:block;margin-bottom:28px"><b style="color:var(--red)">04</b> — Book a demo</span>
+        <h2>See your widgets in Acme<em>.</em></h2>
+        <p>Thirty minutes with a product specialist, using parts from your own catalog. No slides, no obligation.</p>
+        <ul class="agenda">
+          <li><span>00:00</span>Your current process and where it breaks</li>
+          <li><span>00:08</span>Configure one of your widgets, live</li>
+          <li><span>00:18</span>Order routing and supplier quotes</li>
+          <li><span>00:25</span>Tracking, pricing and next steps</li>
+        </ul>
+      </div>
+      <form id="demoForm" novalidate>
+        <div class="row">
+          <div class="field"><label for="name">Full name</label><input id="name" name="name" autocomplete="name"><div class="msg">Please enter your name.</div></div>
+          <div class="field"><label for="email">Work email</label><input id="email" name="email" type="email" autocomplete="email"><div class="msg">Please use a valid work email.</div></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="company">Company</label><input id="company" name="company" autocomplete="organization"><div class="msg">Please enter your company.</div></div>
+          <div class="field"><label for="role">Role</label>
+            <select id="role" name="role"><option value="">Select</option><option>Operations / Plant management</option><option>Procurement / Purchasing</option><option>Supply chain</option><option>Engineering</option><option>Executive</option></select>
+            <div class="msg">Please select a role.</div></div>
+        </div>
+        <div class="field"><label>Number of plants</label>
+          <div class="chips">
+            <input type="radio" name="plants" id="p1" value="1" checked><label for="p1">1</label>
+            <input type="radio" name="plants" id="p2" value="2-5"><label for="p2">2–5</label>
+            <input type="radio" name="plants" id="p3" value="6-15"><label for="p3">6–15</label>
+            <input type="radio" name="plants" id="p4" value="16+"><label for="p4">16+</label>
+          </div>
+        </div>
+        <div class="field"><label for="notes">What would you like to see? <span style="font-weight:400;color:var(--grey)">(optional)</span></label><textarea id="notes" name="notes" placeholder="e.g. Tracking castings across two suppliers"></textarea></div>
+        <div class="form-foot">
+          <small>We’ll reply within one business day with times that suit you. We never share your details.</small>
+          <button type="submit" class="btn">Request demo <span class="arr">→</span></button>
+        </div>
+      </form>
+      <div class="success" id="success">
+        <span class="mono" style="display:block;margin-bottom:24px;color:var(--red)">Request received</span>
+        <h3>Thank you, <span id="sName"></span>.</h3>
+        <p>A product specialist will email <b id="sEmail"></b> within one business day to schedule your demo. To make it count, have a drawing or spec for one of your current widgets ready.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap grid">
+    <div class="f1">Acme</div>
+    <div class="col" style="grid-column:5/7"><h5>Platform</h5><a href="#platform">Configure</a><a href="#platform">Order</a><a href="#console">Track</a><a href="#process">Integrations</a></div>
+    <div class="col"><h5>Company</h5><a href="#">About</a><a href="#">Careers</a><a href="#">Press</a><a href="#">Contact</a></div>
+    <div class="col"><h5>Resources</h5><a href="#">Case studies</a><a href="#">Documentation</a><a href="#">Security</a><a href="#">Status</a></div>
+    <div class="col"><h5>Offices</h5><a>Rotterdam, NL</a><a>Chicago, IL</a><a>hello@acme.example</a></div>
+    <div class="base mono"><span>© 2025 Acme Widget Systems B.V.</span><span>SOC 2 Type II · ISO 27001</span><span>Privacy · Terms</span></div>
+  </div>
+</footer>
+
+<script>
+  // Animate tracking bars when visible
+  const bars = document.querySelectorAll('.track b');
+  bars.forEach(b => b.style.width = '0%');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.track b').forEach((b, i) => {
+          setTimeout(() => b.style.width = b.dataset.w + '%', i * 120);
+        });
+        io.disconnect();
+      }
+    });
+  }, {threshold: .3});
+  io.observe(document.querySelector('.console'));
+
+  // Slowly nudge an in-flight order forward to suggest live data
+  setInterval(() => {
+    const b = document.querySelector('.track b[data-w="18"]');
+    if (!b) return;
+    let w = parseFloat(b.dataset.w);
+    if (w < 30) { w += 1; b.dataset.w = w; b.style.width = w + '%'; }
+  }, 4000);
+
+  // Form
+  const form = document.getElementById('demoForm');
+  const free = /@(gmail|yahoo|hotmail|outlook|icloud|aol)\./i;
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true;
+    const check = (id, valid) => {
+      const f = document.getElementById(id).closest('.field');
+      f.classList.toggle('err', !valid);
+      if (!valid) ok = false;
+    };
+    const v = id => document.getElementById(id).value.trim();
+    check('name', v('name').length > 1);
+    check('email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('email')) && !free.test(v('email')));
+    check('company', v('company').length > 1);
+    check('role', v('role') !== '');
+    if (!ok) { form.querySelector('.err input, .err select')?.focus(); return; }
+    document.getElementById('sName').textContent = v('name').split(' ')[0];
+    document.getElementById('sEmail').textContent = v('email');
+    form.style.display = 'none';
+    document.getElementById('success').style.display = 'block';
+  });
+  form.querySelectorAll('input,select').forEach(el =>
+    el.addEventListener('input', () => el.closest('.field')?.classList.remove('err')));
+</script>
+</body>
+</html>

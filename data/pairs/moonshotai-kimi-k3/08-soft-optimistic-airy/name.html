@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom Widgets, Configured. Ordered. Tracked.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2b2340;
+    --ink-soft:#5c5478;
+    --paper:#f6f1ec;
+    --peach:#ffd9c4;
+    --rose:#f4b8c9;
+    --lav:#c9b8ee;
+    --sky:#bcd6f2;
+    --mint:#c4e6d4;
+    --glow:#ff9e7a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--lav);color:var(--ink)}
+
+  /* ---------- ambient light field ---------- */
+  .light-field{
+    position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(1200px 800px at 78% -10%, rgba(255,158,122,.55), transparent 60%),
+      radial-gradient(1000px 900px at 8% 30%, rgba(201,184,238,.5), transparent 65%),
+      radial-gradient(1100px 800px at 90% 75%, rgba(188,214,242,.45), transparent 60%),
+      radial-gradient(900px 700px at 30% 95%, rgba(196,230,212,.4), transparent 60%),
+      var(--paper);
+    animation:breathe 14s ease-in-out infinite alternate;
+  }
+  @keyframes breathe{
+    0%{filter:saturate(1) brightness(1)}
+    100%{filter:saturate(1.12) brightness(1.03)}
+  }
+  .grain{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 56px;
+    transition:background .4s, backdrop-filter .4s, box-shadow .4s;
+  }
+  nav.scrolled{
+    background:rgba(246,241,236,.72);
+    backdrop-filter:blur(18px);
+    box-shadow:0 1px 0 rgba(43,35,64,.06);
+  }
+  .logo{
+    font-family:'Instrument Serif',serif;font-size:26px;letter-spacing:.5px;
+    display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+  }
+  .logo .dot{
+    width:14px;height:14px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ffe3d2, var(--glow));
+    box-shadow:0 0 18px rgba(255,158,122,.8);
+  }
+  .nav-links{display:flex;gap:34px;align-items:center}
+  .nav-links a{
+    text-decoration:none;color:var(--ink-soft);font-size:14px;font-weight:500;
+    letter-spacing:.2px;transition:color .25s;
+  }
+  .nav-links a:hover{color:var(--ink)}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:14px 30px;border-radius:999px;border:none;cursor:pointer;
+    font-family:'Inter',sans-serif;font-size:15px;font-weight:600;letter-spacing:.2px;
+    text-decoration:none;transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  }
+  .btn-primary{
+    color:#fff;
+    background:linear-gradient(120deg,#ff9e7a,#e88bb4 55%,#a48fe0);
+    box-shadow:0 8px 30px rgba(232,139,180,.45), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(232,139,180,.55)}
+  .btn-small{padding:10px 22px;font-size:13.5px}
+  .btn-ghost{
+    color:var(--ink);background:rgba(255,255,255,.5);
+    border:1px solid rgba(43,35,64,.14);backdrop-filter:blur(6px);
+  }
+  .btn-ghost:hover{transform:translateY(-2px);background:rgba(255,255,255,.75)}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    padding:140px 40px 80px;position:relative;
+  }
+  .aperture{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);
+    width:min(760px,70vw);aspect-ratio:1.35;z-index:-1;
+    border-radius:28px;
+    background:linear-gradient(160deg,#ffd9c4 0%,#f4b8c9 34%,#c9b8ee 68%,#bcd6f2 100%);
+    box-shadow:
+      0 0 90px 30px rgba(244,184,201,.5),
+      0 0 200px 80px rgba(201,184,238,.35),
+      inset 0 0 60px rgba(255,255,255,.55);
+    animation:apertureShift 18s ease-in-out infinite alternate;
+  }
+  .aperture::after{
+    content:'';position:absolute;inset:14%;border-radius:20px;
+    background:linear-gradient(200deg, rgba(255,255,255,.75), rgba(255,255,255,0) 60%);
+    filter:blur(6px);
+  }
+  @keyframes apertureShift{
+    0%{filter:hue-rotate(0deg) brightness(1)}
+    100%{filter:hue-rotate(-14deg) brightness(1.06)}
+  }
+  .eyebrow{
+    font-size:12.5px;font-weight:600;letter-spacing:3.5px;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:28px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .eyebrow::before,.eyebrow::after{
+    content:'';width:36px;height:1px;background:rgba(43,35,64,.3);
+  }
+  h1{
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:clamp(52px,6.4vw,92px);line-height:1.04;letter-spacing:-.5px;
+    max-width:900px;
+  }
+  h1 em{
+    font-style:italic;
+    background:linear-gradient(100deg,#e8774f,#c86bb0 60%,#7d6fd0);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p{
+    margin-top:30px;font-size:18.5px;line-height:1.65;font-weight:300;
+    color:var(--ink-soft);max-width:560px;
+  }
+  .hero-cta{margin-top:44px;display:flex;gap:16px;align-items:center}
+  .hero-note{margin-top:20px;font-size:13px;color:var(--ink-soft);opacity:.75}
+
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- logos ---------- */
+  .trusted{
+    padding:34px 56px 70px;text-align:center;
+  }
+  .trusted span{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-soft);opacity:.7}
+  .logo-row{
+    margin-top:24px;display:flex;justify-content:center;gap:64px;flex-wrap:wrap;
+    font-family:'Instrument Serif',serif;font-size:22px;color:var(--ink-soft);opacity:.65;
+  }
+  .logo-row div{transition:opacity .3s, transform .3s}
+  .logo-row div:hover{opacity:1;transform:translateY(-2px)}
+
+  /* ---------- sections ---------- */
+  section{padding:110px 56px;max-width:1240px;margin:0 auto}
+  .section-head{max-width:640px;margin-bottom:64px}
+  .section-head h2{
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:clamp(36px,3.6vw,52px);line-height:1.12;letter-spacing:-.3px;
+  }
+  .section-head p{margin-top:18px;font-size:17px;line-height:1.65;color:var(--ink-soft);font-weight:300}
+  .kicker{font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#c86bb0;margin-bottom:16px;display:block}
+
+  /* ---------- feature cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+  .card{
+    border-radius:24px;padding:40px 34px 44px;position:relative;overflow:hidden;
+    background:rgba(255,255,255,.55);backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.8);
+    box-shadow:0 10px 40px rgba(43,35,64,.06);
+    transition:transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(43,35,64,.12)}
+  .card .halo{
+    position:absolute;top:-70px;right:-70px;width:200px;height:200px;border-radius:50%;
+    filter:blur(10px);opacity:.8;transition:transform .5s;
+  }
+  .card:hover .halo{transform:scale(1.25)}
+  .card:nth-child(1) .halo{background:radial-gradient(circle,#ffd9c4,transparent 70%)}
+  .card:nth-child(2) .halo{background:radial-gradient(circle,#c9b8ee,transparent 70%)}
+  .card:nth-child(3) .halo{background:radial-gradient(circle,#bcd6f2,transparent 70%)}
+  .card .num{
+    font-family:'Instrument Serif',serif;font-style:italic;font-size:15px;color:var(--ink-soft);opacity:.7;
+  }
+  .card h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:27px;margin:14px 0 14px;position:relative}
+  .card p{font-size:15px;line-height:1.7;color:var(--ink-soft);font-weight:300;position:relative}
+
+  /* ---------- widget visual + stats ---------- */
+  .split{display:grid;grid-template-columns:1.05fr .95fr;gap:80px;align-items:center}
+  .ganzfeld{
+    position:relative;border-radius:32px;aspect-ratio:1/1.05;overflow:hidden;
+    background:linear-gradient(200deg,#ffe9dc,#f4b8c9 45%,#a48fe0);
+    box-shadow:0 30px 80px rgba(164,143,224,.35), inset 0 0 80px rgba(255,255,255,.4);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .glow-ring{
+    position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.5);
+    animation:ringPulse 7s ease-in-out infinite;
+  }
+  .glow-ring.r1{width:55%;height:55%}
+  .glow-ring.r2{width:75%;height:75%;animation-delay:1.4s;opacity:.6}
+  .glow-ring.r3{width:95%;height:95%;animation-delay:2.8s;opacity:.35}
+  @keyframes ringPulse{
+    0%,100%{transform:scale(1);opacity:.7}
+    50%{transform:scale(1.04);opacity:.35}
+  }
+  .widget{
+    width:34%;aspect-ratio:1;position:relative;z-index:2;
+    filter:drop-shadow(0 24px 40px rgba(43,35,64,.35));
+    animation:float 6s ease-in-out infinite;
+  }
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-16px) rotate(2deg)}}
+  .track-label{
+    position:absolute;bottom:26px;left:0;right:0;text-align:center;z-index:2;
+    font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.9);
+  }
+  .stats{display:flex;flex-direction:column;gap:0}
+  .stat{
+    padding:34px 0;border-bottom:1px solid rgba(43,35,64,.1);
+    display:flex;align-items:baseline;gap:26px;
+  }
+  .stat:first-child{border-top:1px solid rgba(43,35,64,.1)}
+  .stat .val{
+    font-family:'Instrument Serif',serif;font-size:56px;min-width:190px;
+    background:linear-gradient(100deg,#e8774f,#a48fe0);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .stat .desc{font-size:15px;line-height:1.6;color:var(--ink-soft);font-weight:300}
+
+  /* ---------- quote ---------- */
+  .quote-wrap{max-width:900px;margin:0 auto;text-align:center;padding:130px 56px}
+  .quote-wrap blockquote{
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:clamp(28px,3vw,40px);line-height:1.35;letter-spacing:-.2px;
+  }
+  .quote-wrap blockquote em{font-style:italic;color:#c86bb0}
+  .quote-attr{margin-top:32px;font-size:14px;color:var(--ink-soft)}
+  .quote-attr strong{color:var(--ink);font-weight:600}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    margin:40px 56px 110px;border-radius:36px;position:relative;overflow:hidden;
+    padding:110px 60px;text-align:center;
+    background:linear-gradient(150deg,#ffd9c4,#f4b8c9 40%,#c9b8ee 75%,#bcd6f2);
+    box-shadow:0 40px 100px rgba(201,184,238,.4), inset 0 0 100px rgba(255,255,255,.4);
+  }
+  .cta::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(600px 300px at 50% 110%, rgba(255,255,255,.6), transparent 70%);
+  }
+  .cta h2{
+    font-family:'Instrument Serif',serif;font-weight:400;position:relative;
+    font-size:clamp(38px,4.2vw,58px);line-height:1.1;letter-spacing:-.4px;
+  }
+  .cta p{position:relative;margin:22px auto 0;max-width:480px;font-size:17px;line-height:1.6;color:rgba(43,35,64,.75);font-weight:300}
+  .cta .btn{position:relative;margin-top:40px;font-size:16px;padding:17px 40px}
+
+  footer{
+    padding:44px 56px;display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid rgba(43,35,64,.08);font-size:13.5px;color:var(--ink-soft);
+  }
+  footer a{color:var(--ink-soft);text-decoration:none;margin-left:26px;transition:color .25s}
+  footer a:hover{color:var(--ink)}
+
+  @media (max-width:900px){
+    .cards{grid-template-columns:1fr}
+    .split{grid-template-columns:1fr;gap:50px}
+    nav{padding:18px 24px}
+    .nav-links a:not(.btn){display:none}
+    section{padding:80px 24px}
+    .cta{margin:20px 24px 80px;padding:80px 28px}
+  }
+</style>
+</head>
+<body>
+
+<div class="light-field"></div>
+<div class="grain"></div>
+
+<nav id="nav">
+  <a class="logo" href="#"><span class="dot"></span>Acme</a>
+  <div class="nav-links">
+    <a href="#platform">Platform</a>
+    <a href="#results">Results</a>
+    <a href="#customers">Customers</a>
+    <a href="#demo" class="btn btn-primary btn-small">Book a demo</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="aperture"></div>
+  <div class="eyebrow reveal">Widget operations, clarified</div>
+  <h1 class="reveal">Custom widgets, <em>without the fog.</em></h1>
+  <p class="reveal">Acme gives operations teams at mid-sized manufacturers one calm place to configure, order, and track custom widgets across every supplier in the chain.</p>
+  <div class="hero-cta reveal">
+    <a href="#demo" class="btn btn-primary">Book a demo</a>
+    <a href="#platform" class="btn btn-ghost">See how it works</a>
+  </div>
+  <div class="hero-note reveal">30-minute walkthrough · No procurement required</div>
+</header>
+
+<div class="trusted reveal">
+  <span>Trusted by operations teams at</span>
+  <div class="logo-row">
+    <div>Halcyon Metals</div>
+    <div>Northbrook Fabrication</div>
+    <div>Verdana Plastics</div>
+    <div>Corwin &amp; Sons</div>
+    <div>Atlas Components</div>
+  </div>
+</div>
+
+<section id="platform">
+  <div class="section-head reveal">
+    <span class="kicker">The platform</span>
+    <h2>Three quiet motions. One clear supply chain.</h2>
+    <p>Every custom widget order moves through the same luminous path — configured to spec, placed with the right supplier, and watched until it arrives.</p>
+  </div>
+  <div class="cards">
+    <div class="card reveal">
+      <div class="halo"></div>
+      <span class="num">01</span>
+      <h3>Configure</h3>
+      <p>Build widget specs from guided templates — dimensions, tolerances, materials, finishes. Acme validates every configuration against supplier capability before you commit, so a bad spec never leaves the building.</p>
+    </div>
+    <div class="card reveal">
+      <div class="halo"></div>
+      <span class="num">02</span>
+      <h3>Order</h3>
+      <p>Route each order to the right supplier automatically, based on capacity, price, and past performance. Approvals, POs, and confirmations live in one thread — not scattered across inboxes.</p>
+    </div>
+    <div class="card reveal">
+      <div class="halo"></div>
+      <span class="num">03</span>
+      <h3>Track</h3>
+      <p>Follow every widget from work order to dock. Live status, exception alerts, and landed-cost rollups give your team a single, truthful picture of what's coming and when.</p>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="split">
+    <div class="ganzfeld reveal">
+      <div class="glow-ring r1"></div>
+      <div class="glow-ring r2"></div>
+      <div class="glow-ring r3"></div>
+      <svg class="widget" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fff5ee"/>
+            <stop offset=".5" stop-color="#ffd0b8"/>
+            <stop offset="1" stop-color="#e88bb4"/>
+          </linearGradient>
+        </defs>
+        <rect x="18" y="18" width="64" height="64" rx="16" fill="url(#wg)"/>
+        <circle cx="50" cy="50" r="16" fill="none" stroke="#fff" stroke-width="5" opacity=".9"/>
+        <circle cx="50" cy="50" r="5" fill="#fff"/>
+      </svg>
+      <div class="track-label">Widget AX-204 · In transit · ETA Tue</div>
+    </div>
+    <div class="reveal">
+      <div class="section-head" style="margin-bottom:36px">
+        <span class="kicker">Results</span>
+        <h2>Less chasing. More making.</h2>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="val" data-count="42" data-suffix="%">0%</div>
+          <div class="desc">Average reduction in expediting hours — time your team gets back every single week.</div>
+        </div>
+        <div class="stat">
+          <div class="val" data-count="9" data-suffix=" days">0 days</div>
+          <div class="desc">Median improvement in quoted-to-received lead time across custom widget orders.</div>
+        </div>
+        <div class="stat">
+          <div class="val" data-count="98" data-suffix=".4%">0%</div>
+          <div class="desc">Spec accuracy on first submission, thanks to capability-checked configuration.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="quote-wrap reveal" id="customers">
+  <blockquote>"We used to manage widget orders across four spreadsheets and a lot of hope. Acme replaced all of it with <em>one calm screen.</em> I check it with my morning coffee and I'm done."</blockquote>
+  <div class="quote-attr"><strong>Marta Ellison</strong> · Director of Operations, Northbrook Fabrication</div>
+</div>
+
+<section class="cta reveal" id="demo" style="max-width:1328px">
+  <h2>See your supply chain<br>in a softer light.</h2>
+  <p>Book a 30-minute demo. We'll configure a real widget from your catalog, live, and show you exactly how it moves through Acme.</p>
+  <a href="mailto:demo@acme.example?subject=Demo%20request" class="btn btn-primary">Book your demo →</a>
+</section>
+
+<footer>
+  <div>© 2025 Acme Widget Systems, Inc.</div>
+  <div>
+    <a href="#">Security</a>
+    <a href="#">Careers</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // Nav background on scroll
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', scrollY > 40);
+  }, {passive:true});
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Count-up stats
+  const statIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      statIO.unobserve(e.target);
+      const el = e.target;
+      const target = parseFloat(el.dataset.count);
+      const suffix = el.dataset.suffix || '';
+      const decimal = suffix.includes('.') ? 1 : 0;
+      const t0 = performance.now(), dur = 1600;
+      (function tick(t){
+        const p = Math.min((t - t0) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = (target * eased).toFixed(decimal) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  }, {threshold:.6});
+  document.querySelectorAll('.stat .val').forEach(el => statIO.observe(el));
+
+  // Gentle parallax on the hero aperture
+  const aperture = document.querySelector('.aperture');
+  addEventListener('mousemove', e => {
+    const x = (e.clientX / innerWidth - .5) * 18;
+    const y = (e.clientY / innerHeight - .5) * 12;
+    aperture.style.transform = `translate(calc(-50% + ${x}px), calc(-54% + ${y}px))`;
+  }, {passive:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme: Widget operations, reduced to what matters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ECEAE4;
+    --panel:#F5F4F0;
+    --panel-2:#E3E1DA;
+    --line:#D3D0C8;
+    --line-2:#BFBCB3;
+    --ink:#1D1D1B;
+    --ink-2:#4A4945;
+    --mute:#8A8881;
+    --orange:#E3561B;
+    --orange-d:#C5470F;
+    --green:#5E8A5A;
+    --display:#1F201D;
+    --mono:'JetBrains Mono', ui-monospace, monospace;
+    --sans:'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 40px}
+  .mono{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  .label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(236,234,228,.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;height:68px;gap:48px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:18px;letter-spacing:-.02em}
+  .logo-mark{width:22px;height:22px;border-radius:50%;background:var(--ink);position:relative}
+  .logo-mark::after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:var(--orange);top:4px;right:4px}
+  .nav-links{display:flex;gap:32px;font-size:14px;color:var(--ink-2)}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-right{margin-left:auto;display:flex;align-items:center;gap:24px}
+  .status{display:flex;align-items:center;gap:8px}
+  .led{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px rgba(94,138,90,.18)}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:12px;
+    height:44px;padding:0 22px;border-radius:22px;
+    font-size:14px;font-weight:500;letter-spacing:-.005em;
+    transition:transform .08s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary{background:var(--orange);color:#fff;box-shadow:0 1px 0 var(--orange-d), 0 2px 6px rgba(227,86,27,.25)}
+  .btn-primary:hover{background:#EA5F22}
+  .btn-primary:active{transform:translateY(1px);box-shadow:0 0 0 var(--orange-d)}
+  .btn-ghost{background:var(--panel);border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{background:#fff}
+  .btn-ghost:active{transform:translateY(1px)}
+  .btn .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.9}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:88px 0 96px;border-bottom:1px solid var(--line)}
+  .hero .wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center}
+  .hero-copy{grid-column:1 / span 6}
+  .eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+  .eyebrow .bar{width:24px;height:2px;background:var(--orange)}
+  h1{
+    font-size:68px;line-height:1.02;font-weight:500;letter-spacing:-.035em;
+    margin-bottom:28px;
+  }
+  h1 .soft{color:var(--mute)}
+  .lede{font-size:19px;line-height:1.55;color:var(--ink-2);max-width:500px;margin-bottom:40px}
+  .hero-cta{display:flex;gap:12px;align-items:center;margin-bottom:56px}
+  .hero-spec{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);max-width:520px}
+  .hero-spec div{padding:16px 0 0}
+  .hero-spec strong{display:block;font-size:22px;font-weight:500;letter-spacing:-.02em}
+
+  .hero-device-col{grid-column:8 / span 5;display:flex;justify-content:flex-end}
+
+  /* Device */
+  .device{
+    width:500px;background:var(--panel);border-radius:26px;padding:28px;
+    box-shadow:
+      0 1px 0 #fff inset,
+      0 -1px 0 rgba(0,0,0,.04) inset,
+      0 30px 60px -30px rgba(40,36,28,.35),
+      0 2px 4px rgba(40,36,28,.08);
+    border:1px solid #DEDBD3;
+    position:relative;
+  }
+  .device-top{display:grid;grid-template-columns:150px 1fr;gap:20px;margin-bottom:24px}
+  .grille{
+    height:150px;border-radius:12px;
+    background-image:radial-gradient(circle, #3A3935 2.2px, transparent 2.6px);
+    background-size:12px 12px;background-position:3px 3px;
+    background-color:var(--panel-2);
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.08);
+  }
+  .screen{
+    background:var(--display);border-radius:12px;padding:16px 18px;color:#E9E7E0;
+    display:flex;flex-direction:column;justify-content:space-between;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.5);
+    position:relative;overflow:hidden;
+  }
+  .screen::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg, rgba(255,255,255,.06), transparent 45%);pointer-events:none}
+  .screen-head{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#8D8B84}
+  .screen-main{font-family:var(--mono);font-size:22px;letter-spacing:.02em;line-height:1.2;margin:10px 0 4px;transition:opacity .15s}
+  .screen-sub{font-family:var(--mono);font-size:11px;color:#A9A7A0;letter-spacing:.04em;transition:opacity .15s}
+  .screen .fade{opacity:0}
+  .segs{display:flex;gap:3px;margin-top:12px}
+  .segs i{flex:1;height:6px;border-radius:1px;background:#34352F;transition:background .2s}
+  .segs i.on{background:var(--orange)}
+
+  .device-bottom{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center}
+  .dial-wrap{position:relative;width:200px;height:200px}
+  .dial-ticks{position:absolute;inset:0}
+  .dial-label{
+    position:absolute;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--mute);
+    cursor:pointer;transition:color .15s;user-select:none;
+  }
+  .dial-label.active{color:var(--ink)}
+  .knob{
+    position:absolute;left:50%;top:50%;width:112px;height:112px;margin:-56px 0 0 -56px;border-radius:50%;
+    background:radial-gradient(circle at 50% 35%, #FBFAF7, #E4E1D9 70%);
+    box-shadow:0 1px 0 #fff inset, 0 8px 16px -6px rgba(40,36,28,.35), 0 0 0 1px #D4D1C8;
+    cursor:grab;touch-action:none;
+    transition:transform .28s cubic-bezier(.3,1.4,.5,1);
+  }
+  .knob.dragging{transition:none;cursor:grabbing}
+  .knob::before{content:"";position:absolute;inset:14px;border-radius:50%;
+    background:repeating-conic-gradient(from 0deg, rgba(0,0,0,.035) 0 4deg, transparent 4deg 8deg);}
+  .knob-mark{position:absolute;left:50%;top:10px;width:4px;height:18px;margin-left:-2px;border-radius:2px;background:var(--orange)}
+
+  .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 12px}
+  .key{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .key button{
+    width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(#EFEDE8,#DEDBD3);
+    box-shadow:0 1px 0 #fff inset, 0 3px 0 #C9C6BD, 0 5px 8px -2px rgba(40,36,28,.2);
+    transition:transform .06s ease, box-shadow .06s ease;
+    font-family:var(--mono);font-size:13px;color:var(--ink-2);
+  }
+  .key button:active, .key button.pressed{transform:translateY(3px);box-shadow:0 1px 0 #fff inset, 0 0 0 #C9C6BD, 0 1px 2px rgba(40,36,28,.2)}
+  .key button.orange{background:linear-gradient(#EC6429,#D9500F);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.3) inset, 0 3px 0 #B5420C, 0 5px 8px -2px rgba(227,86,27,.35)}
+  .key button.orange:active, .key button.orange.pressed{box-shadow:0 1px 0 rgba(255,255,255,.3) inset, 0 0 0 #B5420C}
+  .key button.dark{background:linear-gradient(#3A3A36,#262623);color:#E9E7E0;box-shadow:0 1px 0 rgba(255,255,255,.1) inset, 0 3px 0 #111, 0 5px 8px -2px rgba(0,0,0,.35)}
+  .key button.dark:active, .key button.dark.pressed{box-shadow:0 0 0 #111}
+  .key span{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--mute)}
+  .device-foot{display:flex;justify-content:space-between;align-items:center;margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+  .device-foot .brand{font-weight:600;letter-spacing:-.02em;font-size:14px}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:120px 0;border-bottom:1px solid var(--line)}
+  .sec-head{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-bottom:64px}
+  .sec-num{grid-column:1 / span 2;padding-top:10px}
+  .sec-title{grid-column:3 / span 6}
+  .sec-aside{grid-column:10 / span 3;padding-top:12px;color:var(--ink-2);font-size:15px}
+  h2{font-size:48px;line-height:1.06;font-weight:500;letter-spacing:-.03em}
+  h2 .soft{color:var(--mute)}
+  h3{font-size:20px;font-weight:500;letter-spacing:-.015em;margin-bottom:10px}
+
+  /* Principles */
+  .principles{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ink);}
+  .principle{padding:28px 32px 36px 0;border-bottom:1px solid var(--line);position:relative}
+  .principle:not(:nth-child(3n+1)){padding-left:32px;border-left:1px solid var(--line)}
+  .principle .n{font-family:var(--mono);font-size:12px;color:var(--orange);margin-bottom:28px;display:block}
+  .principle p{color:var(--ink-2);font-size:15px;max-width:340px}
+
+  /* Configurator */
+  .cfg{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .cfg-panel{
+    grid-column:1 / span 7;background:var(--panel);border:1px solid #DEDBD3;border-radius:20px;padding:36px;
+    box-shadow:0 1px 0 #fff inset, 0 20px 40px -30px rgba(40,36,28,.3);
+  }
+  .cfg-row{display:grid;grid-template-columns:140px 1fr;gap:24px;align-items:center;padding:22px 0;border-bottom:1px solid var(--line)}
+  .cfg-row:first-child{padding-top:0}
+  .cfg-row:last-child{border-bottom:0;padding-bottom:0}
+  .seg{display:flex;background:var(--panel-2);border-radius:12px;padding:4px;gap:4px;box-shadow:inset 0 1px 2px rgba(0,0,0,.06)}
+  .seg button{
+    flex:1;height:40px;border-radius:9px;font-size:14px;color:var(--ink-2);
+    transition:background .15s, color .15s, box-shadow .15s;
+  }
+  .seg button:hover{color:var(--ink)}
+  .seg button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 0 #fff inset, 0 1px 3px rgba(40,36,28,.18)}
+  .seg button.on::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--orange);margin-right:8px;vertical-align:middle;position:relative;top:-1px}
+
+  .fader{position:relative;padding:10px 0}
+  .fader-scale{display:flex;justify-content:space-between;margin-top:10px}
+  .fader-scale span{font-family:var(--mono);font-size:10px;color:var(--mute)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--ink) 0 var(--p,30%), var(--line-2) var(--p,30%) 100%)}
+  input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--line-2)}
+  input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:var(--ink)}
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:22px;height:34px;border-radius:5px;margin-top:-14px;
+    background:linear-gradient(90deg,#E6E3DC 0 45%,var(--orange) 45% 55%,#E6E3DC 55%);
+    box-shadow:0 0 0 1px #C3C0B7, 0 3px 6px rgba(40,36,28,.25);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:22px;height:34px;border-radius:5px;border:0;
+    background:linear-gradient(90deg,#E6E3DC 0 45%,var(--orange) 45% 55%,#E6E3DC 55%);
+    box-shadow:0 0 0 1px #C3C0B7, 0 3px 6px rgba(40,36,28,.25);
+  }
+  .qty-read{font-family:var(--mono);font-size:13px;color:var(--ink);float:right}
+
+  .switches{display:flex;gap:28px}
+  .switch{display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;font-size:14px;color:var(--ink-2)}
+  .switch input{display:none}
+  .switch .track{width:44px;height:24px;border-radius:12px;background:var(--line-2);position:relative;transition:background .15s;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+  .switch .track::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;top:2px;left:2px;background:#FAF9F6;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s cubic-bezier(.3,1.4,.5,1)}
+  .switch input:checked + .track{background:var(--ink)}
+  .switch input:checked + .track::after{transform:translateX(20px)}
+
+  .cfg-out{grid-column:8 / span 5;display:flex;flex-direction:column;gap:24px}
+  .readout{
+    background:var(--display);color:#E9E7E0;border-radius:20px;padding:32px;
+    box-shadow:inset 0 2px 8px rgba(0,0,0,.5);
+  }
+  .readout .pn{font-family:var(--mono);font-size:13px;letter-spacing:.08em;color:var(--orange);margin-bottom:24px;display:flex;justify-content:space-between}
+  .readout .pn span:last-child{color:#8D8B84}
+  .readout-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#383934;border-radius:10px;overflow:hidden}
+  .readout-grid div{background:var(--display);padding:18px 0 18px 0}
+  .readout-grid div:nth-child(even){padding-left:20px}
+  .readout-grid .k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#8D8B84;text-transform:uppercase}
+  .readout-grid .v{font-family:var(--mono);font-size:26px;letter-spacing:-.01em;margin-top:6px}
+  .readout-total{margin-top:24px;padding-top:20px;border-top:1px solid #383934;display:flex;justify-content:space-between;align-items:baseline}
+  .readout-total .v{font-family:var(--mono);font-size:34px}
+  .cfg-note{font-size:14px;color:var(--ink-2);padding:0 8px}
+  .cfg-note strong{font-weight:500;color:var(--ink)}
+
+  /* Tracking */
+  .track-wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .orders{grid-column:1 / span 5;background:var(--panel);border:1px solid #DEDBD3;border-radius:20px;overflow:hidden}
+  .orders-head{display:grid;grid-template-columns:1.1fr 1.4fr 1fr;padding:16px 24px;border-bottom:1px solid var(--line)}
+  .order{display:grid;grid-template-columns:1.1fr 1.4fr 1fr;padding:18px 24px;border-bottom:1px solid var(--line);cursor:pointer;align-items:center;font-size:14px;transition:background .12s;position:relative}
+  .order:last-child{border-bottom:0}
+  .order:hover{background:#FAF9F6}
+  .order.on{background:#fff}
+  .order.on::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--orange)}
+  .order .id{font-family:var(--mono);font-size:13px}
+  .order .st{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+  .order .st i{width:7px;height:7px;border-radius:50%;background:var(--mute)}
+  .order .st i.g{background:var(--green)}
+  .order .st i.o{background:var(--orange)}
+
+  .timeline{grid-column:6 / span 7;background:var(--panel);border:1px solid #DEDBD3;border-radius:20px;padding:36px}
+  .tl-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:48px}
+  .tl-head .t{font-size:22px;font-weight:500;letter-spacing:-.02em}
+  .tl-head .eta{text-align:right}
+  .tl-head .eta strong{font-family:var(--mono);font-size:22px;font-weight:500;display:block}
+  .rail{position:relative;height:40px;margin:0 12px 16px}
+  .rail-line{position:absolute;left:0;right:0;top:19px;height:2px;background:var(--line-2)}
+  .rail-fill{position:absolute;left:0;top:19px;height:2px;background:var(--ink);width:0;transition:width .6s cubic-bezier(.6,0,.2,1)}
+  .node{position:absolute;top:10px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:var(--panel);border:2px solid var(--line-2);transition:all .25s .2s}
+  .node.done{background:var(--ink);border-color:var(--ink)}
+  .node.now{background:var(--orange);border-color:var(--orange);box-shadow:0 0 0 6px rgba(227,86,27,.15)}
+  .stages{display:grid;grid-template-columns:repeat(6,1fr);margin:0 -24px}
+  .stages div{text-align:center;font-size:13px;color:var(--mute);transition:color .2s}
+  .stages div.done{color:var(--ink)}
+  .stages div small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--mute);margin-top:2px}
+  .tl-meta{display:grid;grid-template-columns:repeat(3,1fr);margin-top:44px;border-top:1px solid var(--line)}
+  .tl-meta div{padding:18px 0 0}
+  .tl-meta div + div{padding-left:24px;border-left:1px solid var(--line)}
+  .tl-meta strong{display:block;font-weight:500;font-size:15px;margin-top:4px}
+
+  /* Metrics */
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink)}
+  .metric{padding:32px 32px 8px 0}
+  .metric + .metric{padding-left:32px;border-left:1px solid var(--line)}
+  .metric .v{font-size:64px;font-weight:500;letter-spacing:-.04em;line-height:1;margin:20px 0 16px;font-variant-numeric:tabular-nums}
+  .metric .v sup{font-size:26px;letter-spacing:0;vertical-align:top;position:relative;top:8px;margin-left:2px;color:var(--mute)}
+  .metric p{font-size:14px;color:var(--ink-2);max-width:230px}
+
+  .quote{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-top:112px}
+  .quote blockquote{grid-column:3 / span 8;font-size:32px;line-height:1.3;letter-spacing:-.02em;font-weight:400}
+  .quote blockquote::before{content:"";display:block;width:32px;height:3px;background:var(--orange);margin-bottom:32px}
+  .quote cite{display:flex;align-items:center;gap:16px;font-style:normal;margin-top:36px}
+  .avatar{width:44px;height:44px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line-2);display:grid;place-items:center;font-family:var(--mono);font-size:12px}
+  .quote cite strong{display:block;font-size:15px;font-weight:500}
+  .quote cite span{font-size:14px;color:var(--mute)}
+
+  /* Demo */
+  .demo{border-bottom:0}
+  .demo-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+  .demo-left{grid-column:1 / span 5}
+  .demo-left h2{margin:24px 0 24px}
+  .demo-left > p{color:var(--ink-2);font-size:17px;max-width:420px;margin-bottom:48px}
+  .steps{border-top:1px solid var(--line)}
+  .step{display:grid;grid-template-columns:48px 1fr;padding:20px 0;border-bottom:1px solid var(--line)}
+  .step .n{font-family:var(--mono);font-size:12px;color:var(--orange);padding-top:3px}
+  .step strong{font-weight:500;display:block;margin-bottom:2px}
+  .step p{font-size:14px;color:var(--ink-2)}
+
+  .form-panel{
+    grid-column:7 / span 6;background:var(--panel);border:1px solid #DEDBD3;border-radius:26px;padding:40px;
+    box-shadow:0 1px 0 #fff inset, 0 30px 60px -36px rgba(40,36,28,.35);
+    position:relative;
+  }
+  .form-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+  .form-top .mini-grille{width:90px;height:22px;background-image:radial-gradient(circle,#3A3935 1.6px,transparent 2px);background-size:9px 9px;opacity:.8}
+  .field{margin-bottom:22px}
+  .field label{display:block;margin-bottom:8px}
+  .field input{
+    width:100%;height:50px;border-radius:12px;border:1px solid var(--line);background:#FBFAF7;
+    padding:0 16px;font:inherit;font-size:15px;color:var(--ink);
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.05);transition:border-color .15s, box-shadow .15s;
+  }
+  .field input:focus{outline:0;border-color:var(--ink);box-shadow:0 0 0 3px rgba(29,29,27,.08)}
+  .field.err input{border-color:var(--orange)}
+  .field .msg{font-size:12px;color:var(--orange);margin-top:6px;display:none}
+  .field.err .msg{display:block}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .form-foot{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
+  .form-foot p{font-size:13px;color:var(--mute);max-width:260px}
+  .btn-lg{height:54px;padding:0 28px;border-radius:27px;font-size:15px}
+
+  .success{display:none;text-align:left}
+  .success .screen{min-height:200px;margin-bottom:28px}
+  .success h3{font-size:24px}
+  .success p{color:var(--ink-2)}
+  .form-panel.sent form{display:none}
+  .form-panel.sent .success{display:block}
+
+  footer{padding:48px 0;border-top:1px solid var(--line)}
+  footer .wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:start}
+  footer .logo{grid-column:1 / span 3}
+  .foot-col{grid-column:span 2;font-size:14px;color:var(--ink-2);display:flex;flex-direction:column;gap:8px}
+  .foot-col .label{margin-bottom:6px}
+  .foot-legal{grid-column:10 / span 3;text-align:right;font-size:13px;color:var(--mute)}
+
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo"><span class="logo-mark"></span>Acme</a>
+    <div class="nav-links">
+      <a href="#principles">Approach</a>
+      <a href="#configure">Configure</a>
+      <a href="#track">Track</a>
+      <a href="#results">Results</a>
+    </div>
+    <div class="nav-right">
+      <div class="status"><span class="led"></span><span class="label">All systems normal</span></div>
+      <a href="#demo" class="btn btn-primary">Book a demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="bar"></span><span class="label">Widget operations platform</span></div>
+      <h1>Every widget.<br>Configured, ordered,<br><span class="soft">accounted for.</span></h1>
+      <p class="lede">Acme gives operations teams at mid-sized manufacturers one quiet, precise place to specify custom widgets, release orders to suppliers, and follow each part from quote to receiving dock.</p>
+      <div class="hero-cta">
+        <a href="#demo" class="btn btn-primary btn-lg"><span class="dot"></span>Book a 30-minute demo</a>
+        <a href="#configure" class="btn btn-ghost btn-lg">Try the configurator</a>
+      </div>
+      <div class="hero-spec">
+        <div><span class="label">Plants live</span><strong>412</strong></div>
+        <div><span class="label">Widgets tracked</span><strong>18.6M</strong></div>
+        <div><span class="label">Median setup</span><strong>11 days</strong></div>
+      </div>
+    </div>
+
+    <div class="hero-device-col">
+      <div class="device" id="device">
+        <div class="device-top">
+          <div class="grille"></div>
+          <div class="screen">
+            <div class="screen-head"><span id="scrMode">MODE 01 / CONFIGURE</span><span>ACME</span></div>
+            <div>
+              <div class="screen-main" id="scrMain">HSG-AL6061</div>
+              <div class="screen-sub" id="scrSub">500 PCS · BEAD-BLASTED · REV C</div>
+              <div class="segs" id="segs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="device-bottom">
+          <div class="dial-wrap" id="dialWrap">
+            <svg class="dial-ticks" viewBox="0 0 200 200" aria-hidden="true" id="ticks"></svg>
+            <span class="dial-label" data-i="0" style="left:6px;top:34px">CFG</span>
+            <span class="dial-label" data-i="1" style="left:50%;top:-2px;transform:translateX(-50%)">ORD</span>
+            <span class="dial-label" data-i="2" style="right:4px;top:34px">TRK</span>
+            <div class="knob" id="knob" role="slider" aria-label="Mode selector" tabindex="0"><span class="knob-mark"></span></div>
+          </div>
+          <div class="keys">
+            <div class="key"><button data-mode="0">C</button><span>CONFIG</span></div>
+            <div class="key"><button data-mode="1">O</button><span>ORDER</span></div>
+            <div class="key"><button data-mode="2">T</button><span>TRACK</span></div>
+            <div class="key"><button class="dark" id="keyPrev">−</button><span>PREV</span></div>
+            <div class="key"><button class="dark" id="keyNext">+</button><span>NEXT</span></div>
+            <div class="key"><button class="orange" id="keyGo">↵</button><span>DEMO</span></div>
+          </div>
+        </div>
+        <div class="device-foot">
+          <span class="brand">Acme</span>
+          <span class="label">Turn the dial · Model W-1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PRINCIPLES -->
+<section id="principles">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num label">01 — Approach</div>
+      <div class="sec-title"><h2>Good widget software is <span class="soft">as little software as possible.</span></h2></div>
+      <div class="sec-aside">We removed every screen, field, and notification that didn't help a planner get the right part to the right line on time.</div>
+    </div>
+    <div class="principles reveal">
+      <div class="principle"><span class="n">01</span><h3>Useful</h3><p>Built around the three things your team actually does: specify a widget, release an order, and confirm it arrived. Nothing competes with that.</p></div>
+      <div class="principle"><span class="n">02</span><h3>Understandable</h3><p>A new buyer can configure a stainless coupling and release a PO on their first morning. No certification courses, no consultants.</p></div>
+      <div class="principle"><span class="n">03</span><h3>Honest</h3><p>Prices, lead times, and supplier performance are shown as they are, including when a supplier is running late. Especially then.</p></div>
+      <div class="principle"><span class="n">04</span><h3>Unobtrusive</h3><p>Acme sits alongside your ERP and syncs POs both ways. Your planners keep their workflow; the paperwork simply disappears.</p></div>
+      <div class="principle"><span class="n">05</span><h3>Thorough</h3><p>Every revision, drawing, and inspection record is attached to the part number that produced it. Audit trails are built in, not bolted on.</p></div>
+      <div class="principle"><span class="n">06</span><h3>Long-lasting</h3><p>Customers from our first year are still here. Configurations saved in 2017 reorder in two clicks today, with the same revision history.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIGURE -->
+<section id="configure">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num label">02 — Configure</div>
+      <div class="sec-title"><h2>Specify a widget in seconds. <span class="soft">Know the price before you ask.</span></h2></div>
+      <div class="sec-aside">Configurations are validated against your approved suppliers' capabilities as you build them. Try it: this is the real interface, simplified.</div>
+    </div>
+
+    <div class="cfg reveal">
+      <div class="cfg-panel">
+        <div class="cfg-row">
+          <span class="label">Widget type</span>
+          <div class="seg" data-group="type">
+            <button data-v="BR" class="on">Bracket</button>
+            <button data-v="CP">Coupling</button>
+            <button data-v="HS">Housing</button>
+            <button data-v="FS">Fastener</button>
+          </div>
+        </div>
+        <div class="cfg-row">
+          <span class="label">Material</span>
+          <div class="seg" data-group="mat">
+            <button data-v="A6" class="on">Aluminium 6061</button>
+            <button data-v="S3">Stainless 316</button>
+            <button data-v="AC">Acetal</button>
+          </div>
+        </div>
+        <div class="cfg-row">
+          <span class="label">Finish</span>
+          <div class="seg" data-group="fin">
+            <button data-v="RW">Raw</button>
+            <button data-v="BB" class="on">Bead-blasted</button>
+            <button data-v="AN">Anodised</button>
+          </div>
+        </div>
+        <div class="cfg-row">
+          <span class="label">Quantity</span>
+          <div class="fader">
+            <span class="qty-read" id="qtyRead">1,000 pcs</span>
+            <div style="clear:both"></div>
+            <input type="range" id="qty" min="0" max="100" value="33" aria-label="Quantity">
+            <div class="fader-scale"><span>100</span><span>500</span><span>1K</span><span>2.5K</span><span>5K</span><span>10K</span></div>
+          </div>
+        </div>
+        <div class="cfg-row">
+          <span class="label">Requirements</span>
+          <div class="switches">
+            <label class="switch"><input type="checkbox" id="optCert"><span class="track"></span>Material certs</label>
+            <label class="switch"><input type="checkbox" id="optFai" checked><span class="track"></span>First article</label>
+            <label class="switch"><input type="checkbox" id="optRush"><span class="track"></span>Expedite</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-out">
+        <div class="readout">
+          <div class="pn"><span id="pn">ACM-BR-A6-BB-1000</span><span>REV A</span></div>
+          <div class="readout-grid">
+            <div><div class="k">Unit price</div><div class="v" id="unit">$3.41</div></div>
+            <div><div class="k">Lead time</div><div class="v" id="lead">14 d</div></div>
+            <div><div class="k">Qualified suppliers</div><div class="v" id="sup">6</div></div>
+            <div><div class="k">Ship by</div><div class="v" id="ship">—</div></div>
+          </div>
+          <div class="readout-total">
+            <span class="label" style="color:#8D8B84">Order total, est.</span>
+            <span class="v" id="total">$3,410</span>
+          </div>
+        </div>
+        <p class="cfg-note"><strong>Pricing reflects your negotiated rates.</strong> In your workspace, estimates are drawn from live supplier quotes and your contract terms, then released as a PO with one confirmation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRACK -->
+<section id="track">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num label">03 — Track</div>
+      <div class="sec-title"><h2>One line per order. <span class="soft">Nothing to chase.</span></h2></div>
+      <div class="sec-aside">Suppliers update status in Acme directly or by email reply. You see where every widget is without a single follow-up call.</div>
+    </div>
+
+    <div class="track-wrap reveal">
+      <div class="orders" id="orders">
+        <div class="orders-head label"><span>Order</span><span>Part</span><span>Status</span></div>
+      </div>
+      <div class="timeline">
+        <div class="tl-head">
+          <div><span class="label" id="tlId">PO-20418</span><div class="t" id="tlPart">Housing, Aluminium 6061</div></div>
+          <div class="eta"><span class="label">Expected</span><strong id="tlEta">Thu 14 Nov</strong></div>
+        </div>
+        <div class="rail" id="rail">
+          <div class="rail-line"></div>
+          <div class="rail-fill" id="railFill"></div>
+        </div>
+        <div class="stages" id="stages">
+          <div>Configured<small>Spec locked</small></div>
+          <div>Released<small>PO sent</small></div>
+          <div>Production<small>At supplier</small></div>
+          <div>Inspected<small>QC passed</small></div>
+          <div>Shipped<small>In transit</small></div>
+          <div>Received<small>At dock</small></div>
+        </div>
+        <div class="tl-meta">
+          <div><span class="label">Supplier</span><strong id="tlSup">Kessler Präzision</strong></div>
+          <div><span class="label">Quantity</span><strong id="tlQty">500 pcs</strong></div>
+          <div><span class="label">On-time record</span><strong id="tlOt">97.8%</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-num label">04 — Results</div>
+      <div class="sec-title"><h2>Measured in fewer surprises.</h2></div>
+      <div class="sec-aside">Median results across 140 customers in their first twelve months, compared with their prior year.</div>
+    </div>
+    <div class="metrics reveal">
+      <div class="metric"><span class="label">Expedited orders</span><div class="v" data-count="38">0<sup>%</sup></div><p>Fewer rush fees, because shortages are visible weeks before they reach the line.</p></div>
+      <div class="metric"><span class="label">Order cycle</span><div class="v" data-count="2.4" data-dec="1">0<sup>days</sup></div><p>Faster from approved spec to released PO, with no email threads in between.</p></div>
+      <div class="metric"><span class="label">Order accuracy</span><div class="v" data-count="99.2" data-dec="1">0<sup>%</sup></div><p>Of widgets received match spec and revision on the first delivery.</p></div>
+      <div class="metric"><span class="label">Planner hours</span><div class="v" data-count="9">0<sup>/wk</sup></div><p>Returned to each planner every week, previously spent reconciling spreadsheets.</p></div>
+    </div>
+
+    <div class="quote reveal">
+      <blockquote>
+        We used to run widget orders across four spreadsheets and a whiteboard. Acme replaced all of it in two weeks. Now I can answer "where are the couplings for line 3?" in about five seconds.
+        <cite>
+          <span class="avatar">MH</span>
+          <span><strong>Marta Halvorsen</strong><span>Director of Operations, Halvorsen Pumps · 3 plants</span></span>
+        </cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="demo-grid">
+      <div class="demo-left reveal">
+        <span class="label">05 — Book a demo</span>
+        <h2>See your own widgets in Acme. <span class="soft">Thirty minutes.</span></h2>
+        <p>Bring a part number or two. We'll configure them live, walk through ordering and tracking with your suppliers in mind, and tell you honestly whether Acme fits.</p>
+        <div class="steps">
+          <div class="step"><span class="n">01</span><div><strong>A short call with a product specialist</strong><p>Not a sales script. Someone who has run a planning desk.</p></div></div>
+          <div class="step"><span class="n">02</span><div><strong>Your top three widgets, configured live</strong><p>With realistic pricing and lead times for your region.</p></div></div>
+          <div class="step"><span class="n">03</span><div><strong>A written pilot plan within 48 hours</strong><p>Scope, timeline, and cost for one plant. No obligation.</p></div></div>
+        </div>
+      </div>
+
+      <div class="form-panel reveal" id="formPanel">
+        <form id="demoForm" novalidate>
+          <div class="form-top">
+            <span class="label">Demo request · Form D-30</span>
+            <span class="mini-grille"></span>
+          </div>
+          <div class="two">
+            <div class="field"><label class="label" for="fName">Full name</label><input id="fName" name="name" autocomplete="name" placeholder="Marta Halvorsen"><div class="msg">Please enter your name.</div></div>
+            <div class="field"><label class="label" for="fCo">Company</label><input id="fCo" name="company" autocomplete="organization" placeholder="Halvorsen Pumps"><div class="msg">Please enter your company.</div></div>
+          </div>
+          <div class="field"><label class="label" for="fEmail">Work email</label><input id="fEmail" name="email" type="email" autocomplete="email" placeholder="marta@halvorsenpumps.com"><div class="msg">Please enter a valid work email.</div></div>
+          <div class="field">
+            <span class="label" style="display:block;margin-bottom:8px">Number of plants</span>
+            <div class="seg" data-group="plants">
+              <button type="button" data-v="1">1</button>
+              <button type="button" data-v="2–5" class="on">2–5</button>
+              <button type="button" data-v="6–20">6–20</button>
+              <button type="button" data-v="20+">20+</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="label" style="display:block;margin-bottom:8px">Main priority</span>
+            <div class="seg" data-group="prio">
+              <button type="button" data-v="Configure" class="on">Configuring</button>
+              <button type="button" data-v="Order">Ordering</button>
+              <button type="button" data-v="Track">Tracking</button>
+            </div>
+          </div>
+          <div class="form-foot">
+            <p>We reply within one business day. Your details are used only to arrange this demo.</p>
+            <button type="submit" class="btn btn-primary btn-lg"><span class="dot"></span>Request demo</button>
+          </div>
+        </form>
+        <div class="success">
+          <div class="screen">
+            <div class="screen-head"><span>REQUEST RECEIVED</span><span>ACME</span></div>
+            <div>
+              <div class="screen-main" id="okMain">DEMO-00000</div>
+              <div class="screen-sub" id="okSub">CONFIRMATION SENT</div>
+              <div class="segs"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+            </div>
+          </div>
+          <h3>Thank you. We'll be in touch shortly.</h3>
+          <p id="okText">A product specialist will email you within one business day to find a time that suits.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="#" class="logo"><span class="logo-mark"></span>Acme</a>
+    <div class="foot-col"><span class="label">Product</span><a href="#configure">Configure</a><a href="#track">Track</a><a href="#principles">Integrations</a></div>
+    <div class="foot-col"><span class="label">Company</span><a href="#">About</a><a href="#">Careers</a><a href="#">Security</a></div>
+    <div class="foot-col"><span class="label">Contact</span><a href="#demo">Book a demo</a><a href="#">hello@acme.co</a></div>
+    <div class="foot-legal">© 2025 Acme Widget Systems, Inc.<br>Designed to be used, not noticed.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ---------- Dial ticks ---------- */
+  const ticks = document.getElementById('ticks');
+  let svg = '';
+  for(let a=-90;a<=90;a+=7.5){
+    const major = a % 45 === 0 && a!==90 && a!==-90 ? false : false;
+    const det = (a===-60||a===0||a===60);
+    const r1 = det?78:82, r2 = 90;
+    const rad = (a-90)*Math.PI/180;
+    const x1=100+r1*Math.cos(rad), y1=100+r1*Math.sin(rad);
+    const x2=100+r2*Math.cos(rad), y2=100+r2*Math.sin(rad);
+    svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${det?'#1D1D1B':'#B5B2A9'}" stroke-width="${det?2:1}" stroke-linecap="round"/>`;
+  }
+  ticks.innerHTML = svg;
+
+  /* ---------- Device modes ---------- */
+  const modes = [
+    {mode:'MODE 01 / CONFIGURE', screens:[
+      ['HSG-AL6061','500 PCS · BEAD-BLASTED · REV C',4],
+      ['CPL-SS316','2,000 PCS · PASSIVATED · REV A',4],
+      ['BRK-AL6061','1,200 PCS · ANODISED · REV F',4]]},
+    {mode:'MODE 02 / ORDER', screens:[
+      ['PO-20418','RELEASED TO 3 SUPPLIERS',8],
+      ['PO-20419','AWAITING APPROVAL · $6,840',7],
+      ['PO-20420','CONFIRMED · KESSLER',8]]},
+    {mode:'MODE 03 / TRACK', screens:[
+      ['ETA THU 14','72% COMPLETE · IN PRODUCTION',9],
+      ['ETA MON 18','QC PASSED · READY TO SHIP',11],
+      ['RECEIVED','DOCK 4 · 500/500 PCS',12]]}
+  ];
+  const angles = [-60,0,60];
+  let mode = 0, sub = 0;
+  const knob = document.getElementById('knob');
+  const scrMode = document.getElementById('scrMode'), scrMain = document.getElementById('scrMain'), scrSub = document.getElementById('scrSub');
+  const segs = [...document.querySelectorAll('#segs i')];
+  const labels = [...document.querySelectorAll('.dial-label')];
+  const keysMode = [...document.querySelectorAll('.key button[data-mode]')];
+
+  function render(){
+    const s = modes[mode].screens[sub];
+    scrMain.classList.add('fade'); scrSub.classList.add('fade');
+    setTimeout(()=>{
+      scrMode.textContent = modes[mode].mode;
+      scrMain.textContent = s[0]; scrSub.textContent = s[1];
+      scrMain.classList.remove('fade'); scrSub.classList.remove('fade');
+    },120);
+    segs.forEach((el,i)=>el.classList.toggle('on', i < s[2]));
+    labels.forEach((l,i)=>l.classList.toggle('active', i===mode));
+  }
+  function setMode(m){
+    mode = (m+3)%3; sub = 0;
+    knob.style.transform = `rotate(${angles[mode]}deg)`;
+    render();
+  }
+  keysMode.forEach(b=>b.addEventListener('click',()=>setMode(+b.dataset.mode)));
+  labels.forEach(l=>l.addEventListener('click',()=>setMode(+l.dataset.i)));
+  document.getElementById('keyNext').addEventListener('click',()=>{sub=(sub+1)%3;render()});
+  document.getElementById('keyPrev').addEventListener('click',()=>{sub=(sub+2)%3;render()});
+  document.getElementById('keyGo').addEventListener('click',()=>{setTimeout(()=>document.getElementById('demo').scrollIntoView({behavior:'smooth'}),150)});
+
+  // Drag knob
+  let dragging=false, moved=false, center;
+  knob.addEventListener('pointerdown',e=>{
+    dragging=true;moved=false;knob.setPointerCapture(e.pointerId);knob.classList.add('dragging');
+    const r=knob.getBoundingClientRect();center={x:r.left+r.width/2,y:r.top+r.height/2};
+  });
+  knob.addEventListener('pointermove',e=>{
+    if(!dragging)return;moved=true;
+    let a = Math.atan2(e.clientY-center.y, e.clientX-center.x)*180/Math.PI+90;
+    if(a>180)a-=360;
+    a=Math.max(-75,Math.min(75,a));
+    knob.style.transform=`rotate(${a}deg)`;
+    knob.dataset.a=a;
+  });
+  knob.addEventListener('pointerup',()=>{
+    if(!dragging)return;dragging=false;knob.classList.remove('dragging');
+    if(!moved){setMode(mode+1);return;}
+    const a=+knob.dataset.a||0;
+    let best=0;angles.forEach((v,i)=>{if(Math.abs(v-a)<Math.abs(angles[best]-a))best=i});
+    setMode(best);
+  });
+  knob.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowUp'){setMode(Math.min(2,mode+1));e.preventDefault()}
+    if(e.key==='ArrowLeft'||e.key==='ArrowDown'){setMode(Math.max(0,mode-1));e.preventDefault()}
+  });
+  setMode(0);
+
+  // Gentle idle cycle until user interacts
+  let idle = setInterval(()=>{sub=(sub+1)%3;render()},3200);
+  document.getElementById('device').addEventListener('pointerdown',()=>clearInterval(idle),{once:true});
+
+  /* ---------- Segmented controls ---------- */
+  const state = {type:'BR',mat:'A6',fin:'BB',plants:'2–5',prio:'Configure'};
+  document.querySelectorAll('.seg').forEach(seg=>{
+    seg.addEventListener('click',e=>{
+      const b=e.target.closest('button');if(!b)return;
+      seg.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      state[seg.dataset.group]=b.dataset.v;
+      calc();
+    });
+  });
+
+  /* ---------- Configurator ---------- */
+  const qty = document.getElementById('qty');
+  const base = {BR:3.20,CP:5.80,HS:14.50,FS:0.42};
+  const baseLead = {BR:10,CP:14,HS:21,FS:7};
+  const matMul = {A6:1,S3:1.65,AC:0.72};
+  const matLead = {A6:0,S3:4,AC:-2};
+  const finMul = {RW:1,BB:1.08,AN:1.15};
+  const finLead = {RW:0,BB:1,AN:3};
+  const supplierCount = {BR:{A6:9,S3:6,AC:4},CP:{A6:7,S3:6,AC:3},HS:{A6:5,S3:3,AC:4},FS:{A6:11,S3:12,AC:5}};
+  const fmt = n => n.toLocaleString('en-US');
+  const money = (n,d=2) => '$'+n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  function qtyFromSlider(v){ // log scale 100 → 10,000
+    const raw = 100*Math.pow(100, v/100);
+    const step = raw<1000?50:raw<5000?100:500;
+    return Math.round(raw/step)*step;
+  }
+  function calc(){
+    const q = qtyFromSlider(+qty.value);
+    qty.style.setProperty('--p', qty.value+'%');
+    document.getElementById('qtyRead').textContent = fmt(q)+' pcs';
+    const disc = 1 - Math.min(0.32, Math.log10(q/100)*0.16);
+    let unit = base[state.type]*matMul[state.mat]*finMul[state.fin]*disc;
+    const cert = document.getElementById('optCert').checked;
+    const fai = document.getElementById('optFai').checked;
+    const rush = document.getElementById('optRush').checked;
+    if(cert) unit*=1.03;
+    if(rush) unit*=1.22;
+    let lead = baseLead[state.type]+matLead[state.mat]+finLead[state.fin]+Math.floor(q/2500)+(fai?2:0);
+    if(rush) lead = Math.max(4, Math.round(lead*0.55));
+    const total = unit*q + (fai?180:0);
+    document.getElementById('unit').textContent = money(unit, unit<1?3:2);
+    document.getElementById('lead').textContent = lead+' d';
+    document.getElementById('sup').textContent = Math.max(2, supplierCount[state.type][state.mat] - (rush?2:0));
+    document.getElementById('total').textContent = money(total,0);
+    const d = new Date(); d.setDate(d.getDate()+lead);
+    document.getElementById('ship').textContent = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}).toUpperCase();
+    const qCode = q>=1000 ? (q/1000)+'K' : String(q);
+    document.getElementById('pn').textContent = `ACM-${state.type}-${state.mat}-${state.fin}-${qCode}${rush?'-X':''}`;
+  }
+  qty.addEventListener('input',calc);
+  ['optCert','optFai','optRush'].forEach(id=>document.getElementById(id).addEventListener('change',calc));
+  calc();
+
+  /* ---------- Tracking ---------- */
+  const orders = [
+    {id:'PO-20418',part:'Housing, Al 6061',full:'Housing, Aluminium 6061',stage:2,eta:'Thu 14 Nov',sup:'Kessler Präzision',qty:'500 pcs',ot:'97.8%',st:'Production',c:'o'},
+    {id:'PO-20411',part:'Coupling, SS 316',full:'Coupling, Stainless 316',stage:4,eta:'Mon 11 Nov',sup:'Dunmore Castings',qty:'2,000 pcs',ot:'95.1%',st:'In transit',c:'o'},
+    {id:'PO-20402',part:'Bracket, Al 6061',full:'Bracket, Aluminium 6061',stage:5,eta:'Received 06 Nov',sup:'Ridgeway Metalworks',qty:'1,200 pcs',ot:'99.0%',st:'Received',c:'g'},
+    {id:'PO-20425',part:'Fastener, SS 316',full:'Fastener, Stainless 316',stage:1,eta:'Fri 22 Nov',sup:'Brandt & Söhne',qty:'10,000 pcs',ot:'98.4%',st:'Released',c:''},
+    {id:'PO-20397',part:'Housing, Acetal',full:'Housing, Acetal',stage:3,eta:'Wed 13 Nov',sup:'Polyform Technik',qty:'750 pcs',ot:'96.6%',st:'Inspected',c:'o'}
+  ];
+  const ordersEl = document.getElementById('orders');
+  const rail = document.getElementById('rail');
+  const nodes = [];
+  for(let i=0;i<6;i++){const n=document.createElement('span');n.className='node';n.style.left=(i/5*100)+'%';rail.appendChild(n);nodes.push(n)}
+  const stageEls=[...document.querySelectorAll('#stages div')];
+  orders.forEach((o,i)=>{
+    const row=document.createElement('div');row.className='order';
+    row.innerHTML=`<span class="id">${o.id}</span><span>${o.part}</span><span class="st"><i class="${o.c}"></i>${o.st}</span>`;
+    row.addEventListener('click',()=>selectOrder(i));
+    ordersEl.appendChild(row);
+  });
+  function selectOrder(i){
+    const o=orders[i];
+    [...ordersEl.querySelectorAll('.order')].forEach((r,j)=>r.classList.toggle('on',j===i));
+    document.getElementById('tlId').textContent=o.id;
+    document.getElementById('tlPart').textContent=o.full;
+    document.getElementById('tlEta').textContent=o.eta;
+    document.getElementById('tlSup').textContent=o.sup;
+    document.getElementById('tlQty').textContent=o.qty;
+    document.getElementById('tlOt').textContent=o.ot;
+    document.getElementById('railFill').style.width=(o.stage/5*100)+'%';
+    nodes.forEach((n,j)=>{
+      n.classList.toggle('done', j<o.stage || (j===o.stage && o.stage===5));
+      n.classList.toggle('now', j===o.stage && o.stage!==5);
+    });
+    stageEls.forEach((s,j)=>s.classList.toggle('done', j<=o.stage));
+  }
+  selectOrder(0);
+
+  /* ---------- Form ---------- */
+  const form=document.getElementById('demoForm');
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    const f={name:document.getElementById('fName'),co:document.getElementById('fCo'),email:document.getElementById('fEmail')};
+    let ok=true;
+    const check=(el,valid)=>{el.parentElement.classList.toggle('err',!valid);if(!valid)ok=false;};
+    check(f.name, f.name.value.trim().length>1);
+    check(f.co, f.co.value.trim().length>1);
+    check(f.email, /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim()));
+    if(!ok)return;
+    const ref='DEMO-'+String(Math.floor(10000+Math.random()*89999));
+    document.getElementById('okMain').textContent=ref;
+    document.getElementById('okSub').textContent=(state.plants+' PLANTS · '+state.prio.toUpperCase()).replace('1 PLANTS','1 PLANT');
+    const first=f.name.value.trim().split(' ')[0];
+    document.getElementById('okText').textContent=`Thanks, ${first}. A product specialist will email ${f.email.value.trim()} within one business day to arrange a time. Have a part number or two ready for ${f.co.value.trim()}.`;
+    document.getElementById('formPanel').classList.add('sent');
+  });
+  form.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>i.parentElement.classList.remove('err')));
+
+  /* ---------- Reveal & counters ---------- */
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(!en.isIntersecting)return;
+      en.target.classList.add('in');
+      en.target.querySelectorAll('[data-count]').forEach(countUp);
+      io.unobserve(en.target);
+    });
+  },{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  function countUp(el){
+    const target=+el.dataset.count, dec=+(el.dataset.dec||0);
+    const sup=el.querySelector('sup').outerHTML;
+    const t0=performance.now(), dur=1100;
+    (function step(t){
+      const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3);
+      el.innerHTML=(target*e).toFixed(dec)+sup;
+      if(p<1)requestAnimationFrame(step);
+    })(t0);
+  }
+})();
+</script>
+</body>
+</html>

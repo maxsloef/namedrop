@@ -1,0 +1,7 @@
+{
+  "model": "gpt-6-sol",
+  "stop_reason": "end_turn",
+  "input_tokens": 176,
+  "output_tokens": 10300,
+  "cost": 0.103352
+}

@@ -1,0 +1,23 @@
+[project]
+name = "namedrop"
+version = "1.0.0"
+license = "MIT"
+description = "Do models design better when they name their own visual reference?"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=1.8.0",
+    "openai>=3.19.0",
+    "pillow>=11.0",
+    "playwright>=1.63.0",
+]
+
+[project.optional-dependencies]
+probe = ["open-clip-torch>=3.0", "scikit-learn>=1.6", "torch>=2.8"]
+
+[project.scripts]
+namedrop = "namedrop.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom Widgets, Configured & Tracked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12213a;
+    --ink-soft:#4a5a75;
+    --ink-faint:#7a8aa5;
+    --bg:#fdfcf9;
+    --bg-tint:#f4f7fb;
+    --brand:#2f6bff;
+    --brand-dark:#1e4fd6;
+    --brand-soft:#e7eeff;
+    --sun:#ffc93c;
+    --mint:#3ecf9a;
+    --coral:#ff7a59;
+    --line:#e4e9f2;
+    --radius:18px;
+    --shadow:0 20px 50px -20px rgba(18,33,58,.18);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif;line-height:1.12;letter-spacing:-.01em}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+  a{text-decoration:none;color:inherit}
+  img{max-width:100%}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-weight:600;font-size:15px;font-family:'Inter',sans-serif;
+    padding:14px 26px;border-radius:12px;border:none;cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .btn-primary{background:var(--brand);color:#fff;box-shadow:0 10px 24px -8px rgba(47,107,255,.55)}
+  .btn-primary:hover{background:var(--brand-dark);transform:translateY(-2px);box-shadow:0 16px 30px -8px rgba(47,107,255,.6)}
+  .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--brand);color:var(--brand);transform:translateY(-2px)}
+  .btn .arrow{transition:transform .18s ease}
+  .btn:hover .arrow{transform:translateX(3px)}
+
+  /* ---------- Nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(253,252,249,.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid transparent;transition:border-color .3s;
+  }
+  nav.scrolled{border-bottom-color:var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em}
+  .logo-mark{width:34px;height:34px;flex:none}
+  .nav-links{display:flex;gap:34px;font-size:14.5px;font-weight:500;color:var(--ink-soft)}
+  .nav-links a{position:relative;transition:color .15s}
+  .nav-links a:hover{color:var(--brand)}
+  .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;background:var(--brand);border-radius:2px;transition:width .2s}
+  .nav-links a:hover::after{width:100%}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+  .nav-cta .login{font-size:14.5px;font-weight:600;color:var(--ink-soft)}
+  .nav-cta .login:hover{color:var(--brand)}
+  .btn-sm{padding:10px 20px;font-size:14px}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;padding:88px 0 110px;overflow:hidden}
+  .hero-blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;pointer-events:none}
+  .blob-1{width:520px;height:520px;background:#cfe0ff;top:-160px;right:-120px}
+  .blob-2{width:380px;height:380px;background:#ffe9b8;bottom:-180px;left:-140px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;position:relative}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--brand-soft);color:var(--brand-dark);
+    font-size:13px;font-weight:600;padding:7px 14px;border-radius:100px;margin-bottom:24px;
+  }
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--mint);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(62,207,154,.5)}50%{box-shadow:0 0 0 6px rgba(62,207,154,0)}}
+  .hero h1{font-size:60px;font-weight:700;margin-bottom:22px}
+  .hero h1 em{font-style:normal;color:var(--brand);position:relative;white-space:nowrap}
+  .hero h1 em svg{position:absolute;left:0;bottom:-8px;width:100%;height:12px}
+  .hero p.lede{font-size:19px;color:var(--ink-soft);max-width:520px;margin-bottom:34px}
+  .hero-actions{display:flex;gap:14px;align-items:center;margin-bottom:26px}
+  .hero-note{font-size:13.5px;color:var(--ink-faint);display:flex;align-items:center;gap:8px}
+  .hero-note svg{flex:none}
+
+  /* Hero visual: CSS dashboard card */
+  .hero-visual{position:relative}
+  .dash{
+    background:#fff;border:1px solid var(--line);border-radius:22px;
+    box-shadow:var(--shadow);padding:22px;position:relative;z-index:2;
+    transform:rotate(1.2deg);
+  }
+  .dash-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .dash-title{font-weight:700;font-size:15px}
+  .dash-pill{font-size:11.5px;font-weight:600;color:#0f9d6c;background:#e2f8ef;padding:4px 10px;border-radius:100px}
+  .dash-row{display:flex;align-items:center;gap:14px;padding:12px 10px;border-radius:12px;transition:background .2s}
+  .dash-row:hover{background:var(--bg-tint)}
+  .dash-row + .dash-row{border-top:1px solid #f0f3f8}
+  .wicon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;flex:none}
+  .dash-row .meta{flex:1;min-width:0}
+  .dash-row .meta b{display:block;font-size:13.5px}
+  .dash-row .meta span{font-size:12px;color:var(--ink-faint)}
+  .status{font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:100px;white-space:nowrap}
+  .st-ship{background:#e7eeff;color:var(--brand-dark)}
+  .st-prod{background:#fff3d6;color:#a97b00}
+  .st-del{background:#e2f8ef;color:#0f9d6c}
+  .progress-track{height:6px;background:#eef1f7;border-radius:6px;margin-top:16px;overflow:hidden}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--mint));border-radius:6px;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+  .progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-faint);margin-top:8px}
+  .float-card{
+    position:absolute;background:#fff;border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 14px 34px -14px rgba(18,33,58,.22);padding:14px 18px;z-index:3;
+    display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600;
+  }
+  .float-1{top:-26px;right:-14px;animation:floaty 5s ease-in-out infinite}
+  .float-2{bottom:-24px;left:-30px;animation:floaty 6s ease-in-out infinite reverse}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .float-card .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none}
+  .float-card small{display:block;font-weight:500;color:var(--ink-faint);font-size:11.5px}
+
+  /* ---------- Logos ---------- */
+  .logos{padding:34px 0 10px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fff}
+  .logos p{text-align:center;font-size:12.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:22px}
+  .logo-row{display:flex;justify-content:center;gap:56px;flex-wrap:wrap;align-items:center;padding-bottom:26px}
+  .logo-row span{font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:#a7b3c8;display:flex;align-items:center;gap:8px;transition:color .2s}
+  .logo-row span:hover{color:var(--ink-soft)}
+
+  /* ---------- Sections ---------- */
+  section{padding:96px 0}
+  .sec-head{max-width:640px;margin:0 auto 60px;text-align:center}
+  .sec-head .kicker{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:14px;display:block}
+  .sec-head h2{font-size:42px;margin-bottom:16px}
+  .sec-head p{font-size:17.5px;color:var(--ink-soft)}
+
+  /* Features */
+  .features{background:var(--bg-tint)}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+  .feat{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:32px 28px;transition:transform .22s ease, box-shadow .22s ease;
+  }
+  .feat:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+  .feat .fic{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;margin-bottom:20px}
+  .feat h3{font-size:21px;margin-bottom:10px}
+  .feat p{font-size:15px;color:var(--ink-soft)}
+  .feat a.more{display:inline-flex;align-items:center;gap:6px;margin-top:16px;font-size:14px;font-weight:600;color:var(--brand)}
+  .feat a.more:hover{gap:10px}
+  .feat a.more{transition:gap .18s}
+
+  /* How it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;counter-reset:step}
+  .step{position:relative;padding:34px 28px;border-radius:var(--radius);border:1.5px dashed var(--line);background:#fff}
+  .step .num{
+    width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+    font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:#fff;margin-bottom:20px;
+  }
+  .step:nth-child(1) .num{background:var(--brand)}
+  .step:nth-child(2) .num{background:var(--coral)}
+  .step:nth-child(3) .num{background:var(--mint)}
+  .step h3{font-size:20px;margin-bottom:10px}
+  .step p{font-size:15px;color:var(--ink-soft)}
+  .step .connector{position:absolute;top:56px;right:-26px;width:26px;color:#c6d0e0}
+  .step:last-child .connector{display:none}
+
+  /* Stats band */
+  .stats{background:var(--ink);color:#fff;border-radius:28px;padding:64px 56px;display:grid;grid-template-columns:repeat(4,1fr);gap:32px;position:relative;overflow:hidden}
+  .stats::before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:rgba(47,107,255,.35);filter:blur(90px);top:-140px;right:-80px}
+  .stat{position:relative}
+  .stat .val{font-family:'Fraunces',serif;font-size:46px;font-weight:700;line-height:1}
+  .stat .val span{color:var(--sun)}
+  .stat .lbl{font-size:14px;color:#aebbd4;margin-top:10px}
+
+  /* Testimonial */
+  .testi{background:var(--bg-tint)}
+  .testi-card{
+    max-width:820px;margin:0 auto;background:#fff;border:1px solid var(--line);
+    border-radius:24px;padding:52px 56px;box-shadow:var(--shadow);position:relative;
+  }
+  .testi-card .quote-mark{position:absolute;top:-24px;left:48px;width:52px;height:52px;border-radius:14px;background:var(--sun);display:grid;place-items:center}
+  .testi-card blockquote{font-family:'Fraunces',serif;font-size:26px;line-height:1.4;margin-bottom:28px}
+  .testi-who{display:flex;align-items:center;gap:14px}
+  .avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#7aa5ff);display:grid;place-items:center;color:#fff;font-weight:700;font-size:17px}
+  .testi-who b{display:block;font-size:15px}
+  .testi-who span{font-size:13.5px;color:var(--ink-faint)}
+
+  /* CTA */
+  .cta-panel{
+    background:linear-gradient(135deg,var(--brand) 0%,#5b8bff 100%);
+    border-radius:28px;padding:72px 64px;color:#fff;position:relative;overflow:hidden;
+    display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:center;
+  }
+  .cta-panel::before,.cta-panel::after{content:"";position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.18)}
+  .cta-panel::before{width:300px;height:300px;top:-120px;right:-60px}
+  .cta-panel::after{width:200px;height:200px;bottom:-100px;right:160px}
+  .cta-panel h2{font-size:40px;margin-bottom:14px}
+  .cta-panel p{font-size:17px;color:#dbe6ff;max-width:440px}
+  .cta-form{background:#fff;border-radius:18px;padding:26px;position:relative;z-index:2;box-shadow:0 24px 50px -20px rgba(0,20,80,.4)}
+  .cta-form label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px}
+  .cta-form input{
+    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;
+    font-family:'Inter',sans-serif;font-size:14.5px;margin-bottom:14px;color:var(--ink);
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .cta-form input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(47,107,255,.15)}
+  .cta-form .btn{width:100%;justify-content:center}
+  .cta-form .fine{font-size:12px;color:var(--ink-faint);text-align:center;margin-top:12px}
+  .form-success{display:none;text-align:center;padding:28px 8px}
+  .form-success .check{width:58px;height:58px;border-radius:50%;background:#e2f8ef;display:grid;place-items:center;margin:0 auto 16px}
+  .form-success h3{font-size:22px;margin-bottom:8px}
+  .form-success p{font-size:14.5px;color:var(--ink-soft)}
+
+  /* Footer */
+  footer{background:var(--ink);color:#aebbd4;padding:64px 0 36px;margin-top:96px}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+  .foot-grid .logo{color:#fff;margin-bottom:14px}
+  .foot-grid p{font-size:14px;max-width:280px}
+  .foot-grid h4{color:#fff;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;font-family:'Inter',sans-serif}
+  .foot-grid ul{list-style:none}
+  .foot-grid li{margin-bottom:10px}
+  .foot-grid ul a{font-size:14.5px;transition:color .15s}
+  .foot-grid ul a:hover{color:#fff}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:26px;display:flex;justify-content:space-between;font-size:13px}
+
+  /* Reveal animation */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease, transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}
+
+  @media (max-width:900px){
+    .hero-grid,.cta-panel{grid-template-columns:1fr}
+    .feat-grid,.steps{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .nav-links{display:none}
+    .hero h1{font-size:44px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav id="nav">
+  <div class="wrap nav-inner">
+    <a href="#" class="logo">
+      <svg class="logo-mark" viewBox="0 0 34 34" fill="none">
+        <rect x="2" y="2" width="30" height="30" rx="9" fill="#2f6bff"/>
+        <path d="M11 23 L17 10 L23 23" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="19" r="2.4" fill="#ffc93c"/>
+      </svg>
+      Acme
+    </a>
+    <div class="nav-links">
+      <a href="#features">Platform</a>
+      <a href="#how">How it works</a>
+      <a href="#results">Results</a>
+      <a href="#customers">Customers</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="login">Log in</a>
+      <a href="#demo" class="btn btn-primary btn-sm">Book a demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-blob blob-1"></div>
+  <div class="hero-blob blob-2"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow"><span class="dot"></span> Now with real-time supplier tracking</span>
+      <h1>Custom widgets, <em>without<svg viewBox="0 0 120 12" preserveAspectRatio="none"><path d="M2 9 Q 60 -2 118 8" stroke="#ffc93c" stroke-width="5" fill="none" stroke-linecap="round"/></svg></em> the chaos.</h1>
+      <p class="lede">Acme gives operations teams at mid-sized manufacturers one place to configure, order, and track custom widgets across every supplier — so nothing slips, stalls, or surprises you.</p>
+      <div class="hero-actions">
+        <a href="#demo" class="btn btn-primary">Book a demo <span class="arrow">→</span></a>
+        <a href="#how" class="btn btn-ghost">See how it works</a>
+      </div>
+      <div class="hero-note">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3ecf9a" stroke-width="1.6"/><path d="M5.2 8.2l1.8 1.8 3.8-3.8" stroke="#3ecf9a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        30-minute walkthrough · No credit card · Live in under two weeks
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="float-card float-1">
+        <div class="ic" style="background:#e2f8ef">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9.5l4 4 8-9" stroke="#0f9d6c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>PO #4821 approved<small>2 minutes ago</small></div>
+      </div>
+      <div class="float-card float-2">
+        <div class="ic" style="background:#fff3d6">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v7l4.5 2.5" stroke="#d99a00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="9" r="7.5" stroke="#d99a00" stroke-width="1.8"/></svg>
+        </div>
+        <div>Shipment arrives Thu<small>Cleveland plant · Dock 3</small></div>
+      </div>
+      <div class="dash">
+        <div class="dash-head">
+          <span class="dash-title">Active widget orders</span>
+          <span class="dash-pill">All suppliers synced</span>
+        </div>
+        <div class="dash-row">
+          <div class="wicon" style="background:#e7eeff"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="13" height="13" rx="3" stroke="#2f6bff" stroke-width="1.8"/><circle cx="9" cy="9" r="2.6" fill="#2f6bff"/></svg></div>
+          <div class="meta"><b>Torque Widget T-40</b><span>2,400 units · Meridian Fabrication</span></div>
+          <span class="status st-ship">In transit</span>
+        </div>
+        <div class="dash-row">
+          <div class="wicon" style="background:#fff3d6"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l6 3.5v7L9 16l-6-3.5v-7L9 2z" stroke="#d99a00" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+          <div class="meta"><b>Hex Coupler HC-12</b><span>850 units · Great Lakes Tooling</span></div>
+          <span class="status st-prod">In production</span>
+        </div>
+        <div class="dash-row">
+          <div class="wicon" style="background:#e2f8ef"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="#0f9d6c" stroke-width="1.8"/><path d="M9 5.5V9l2.4 1.6" stroke="#0f9d6c" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="meta"><b>Flange Widget FW-7</b><span>5,000 units · Cascade Metals</span></div>
+          <span class="status st-del">Delivered</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="heroProgress"></div></div>
+        <div class="progress-label"><span>Q3 order fulfillment</span><span id="heroPct">0%</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LOGOS ============ -->
+<div class="logos">
+  <div class="wrap">
+    <p>Trusted by operations teams at</p>
+    <div class="logo-row">
+      <span>◆ Meridian Fabrication</span>
+      <span>▲ Cascade Metals</span>
+      <span>● Great Lakes Tooling</span>
+      <span>■ Hartwell Industries</span>
+      <span>✚ Northstar Mfg.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FEATURES ============ -->
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">The platform</span>
+      <h2>Everything your widget orders need, in one tab</h2>
+      <p>Stop juggling spreadsheets, email threads, and supplier portals. Acme brings the whole lifecycle together.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal">
+        <div class="fic" style="background:#e7eeff"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 7l8-4 8 4-8 4-8-4z" stroke="#2f6bff" stroke-width="1.8" stroke-linejoin="round"/><path d="M4 7v10l8 4 8-4V7" stroke="#2f6bff" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 11v10" stroke="#2f6bff" stroke-width="1.8"/></svg></div>
+        <h3>Visual configuration</h3>
+        <p>Build custom widget specs with a guided configurator — materials, tolerances, finishes, and quantities — with instant pricing and lead-time estimates.</p>
+        <a class="more" href="#demo">Explore configuration →</a>
+      </div>
+      <div class="feat reveal d1">
+        <div class="fic" style="background:#fff3d6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l3-8 4 16 3-8h4" stroke="#d99a00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Live order tracking</h3>
+        <p>See every order's status across every supplier in real time. Get proactive alerts the moment a shipment risks slipping — not after it already has.</p>
+        <a class="more" href="#demo">See tracking in action →</a>
+      </div>
+      <div class="feat reveal d2">
+        <div class="fic" style="background:#e2f8ef"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17 8a5 5 0 10-10 0c0 5-2 6-2 6h14s-2-1-2-6z" stroke="#0f9d6c" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 18a2.2 2.2 0 004 0" stroke="#0f9d6c" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Approvals that move</h3>
+        <p>Route purchase orders to the right approver automatically. One-click sign-off from email or mobile keeps procurement moving at line speed.</p>
+        <a class="more" href="#demo">Automate approvals →</a>
+      </div>
+      <div class="feat reveal">
+        <div class="fic" style="background:#ffe9e2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ff7a59" stroke-width="1.8"/><path d="M12 3v9l6 3" stroke="#ff7a59" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Supplier scorecards</h3>
+        <p>On-time rates, defect counts, and cost trends for every supplier — updated automatically, so sourcing decisions are based on data, not gut feel.</p>
+        <a class="more" href="#demo">View a scorecard →</a>
+      </div>
+      <div class="feat reveal d1">
+        <div class="fic" style="background:#e7eeff"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="3" stroke="#2f6bff" stroke-width="1.8"/><path d="M3 9h18M8 14h5" stroke="#2f6bff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>ERP-ready sync</h3>
+        <p>Two-way integrations with NetSuite, SAP Business One, and Epicor keep inventory, invoicing, and receipts perfectly in step — no double entry.</p>
+        <a class="more" href="#demo">See integrations →</a>
+      </div>
+      <div class="feat reveal d2">
+        <div class="fic" style="background:#fff3d6"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z" stroke="#d99a00" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#d99a00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Audit trail, built in</h3>
+        <p>Every spec change, approval, and delivery is logged automatically. Walk into any audit — internal or customer — with confidence.</p>
+        <a class="more" href="#demo">Review the trail →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">How it works</span>
+      <h2>From spec to dock in three steps</h2>
+      <p>Most teams place their first tracked order within days of onboarding.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="num">1</div>
+        <h3>Configure your widget</h3>
+        <p>Pick a base design, dial in specs, and get instant pricing from your approved supplier network. Save templates for the parts you reorder often.</p>
+        <svg class="connector" viewBox="0 0 26 12" fill="none"><path d="M1 6h22m0 0l-5-4.5M23 6l-5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="step reveal d1">
+        <div class="num">2</div>
+        <h3>Route & approve</h3>
+        <p>Acme sends the PO through your approval chain automatically. Approvers sign off in one click — from their inbox, no login required.</p>
+        <svg class="connector" viewBox="0 0 26 12" fill="none"><path d="M1 6h22m0 0l-5-4.5M23 6l-5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="step reveal d2">
+        <div class="num">3</div>
+        <h3>Track to the dock</h3>
+        <p>Follow production milestones and shipments in real time. If anything drifts, you hear it from Acme first — with a recommended fix.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section id="results" style="padding-top:0">
+  <div class="wrap">
+    <div class="stats reveal">
+      <div class="stat"><div class="val" data-count="38"><span>0</span>%</div><div class="lbl">Faster order cycle times on average</div></div>
+      <div class="stat"><div class="val" data-count="92"><span>0</span>%</div><div class="lbl">Of shipments arrive on or before promise date</div></div>
+      <div class="stat"><div class="val" data-count="11"><span>0</span> hrs</div><div class="lbl">Saved per ops team member, every week</div></div>
+      <div class="stat"><div class="val" data-count="240"><span>0</span>+</div><div class="lbl">Manufacturers running widget orders on Acme</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIAL ============ -->
+<section class="testi" id="customers" style="padding-top:0">
+  <div class="wrap">
+    <div class="testi-card reveal">
+      <div class="quote-mark"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 15c-1 0-2-1-2-3V7c0-2.8 2-5 5-5v3c-1.4 0-2 .8-2 2.5V9h3v6H4zm10 0c-1 0-2-1-2-3V7c0-2.8 2-5 5-5v3c-1.4 0-2 .8-2 2.5V9h3v6h-4z" fill="#12213a"/></svg></div>
+      <blockquote>"We used to find out about late widget shipments when the line stopped. Now Acme flags risk two weeks out, and we've cut expedite fees by more than half. It's the calmest our ops floor has ever been."</blockquote>
+      <div class="testi-who">
+        <div class="avatar">DK</div>
+        <div><b>Dana Kowalski</b><span>Director of Operations, Hartwell Industries</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section id="demo" style="padding-top:0">
+  <div class="wrap">
+    <div class="cta-panel reveal">
+      <div>
+        <h2>See your widget orders run themselves.</h2>
+        <p>Book a 30-minute demo and we'll walk through your actual ordering workflow — configured live, with your suppliers in mind.</p>
+      </div>
+      <div class="cta-form">
+        <form id="demoForm" novalidate>
+          <label for="name">Full name</label>
+          <input id="name" type="text" placeholder="Jordan Reyes" required>
+          <label for="email">Work email</label>
+          <input id="email" type="email" placeholder="jordan@yourcompany.com" required>
+          <label for="company">Company</label>
+          <input id="company" type="text" placeholder="YourCompany Manufacturing" required>
+          <button type="submit" class="btn btn-primary">Book my demo <span class="arrow">→</span></button>
+          <p class="fine">We'll reply within one business day. No spam, ever.</p>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <div class="check"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M5 13.5l5.5 5.5L21 8" stroke="#0f9d6c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>You're on the calendar!</h3>
+          <p>Thanks — our team will reach out shortly to confirm your demo time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="logo">
+          <svg class="logo-mark" viewBox="0 0 34 34" fill="none">
+            <rect x="2" y="2" width="30" height="30" rx="9" fill="#2f6bff"/>
+            <path d="M11 23 L17 10 L23 23" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="17" cy="19" r="2.4" fill="#ffc93c"/>
+          </svg>
+          Acme
+        </a>
+        <p>The widget operations platform for mid-sized manufacturers. Configure, order, and track — all in one place.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul><li><a href="#features">Configuration</a></li><li><a href="#features">Tracking</a></li><li><a href="#features">Approvals</a></li><li><a href="#features">Integrations</a></li></ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#">Blog</a></li><li><a href="#">Press</a></li></ul>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul><li><a href="#">Help center</a></li><li><a href="#">API docs</a></li><li><a href="#">Security</a></li><li><a href="#">Status</a></li></ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2025 Acme Widget Systems, Inc. All rights reserved.</span>
+      <span>Privacy · Terms · SOC 2 Type II</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Sticky nav border
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8), {passive:true});
+
+  // Scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Hero progress bar
+  const fill = document.getElementById('heroProgress'), pct = document.getElementById('heroPct');
+  setTimeout(() => {
+    fill.style.width = '78%';
+    let n = 0;
+    const t = setInterval(() => { n++; pct.textContent = n + '%'; if (n >= 78) clearInterval(t); }, 18);
+  }, 500);
+
+  // Animated stat counters
+  const statIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      statIO.unobserve(e.target);
+      const target = +e.target.dataset.count, span = e.target.querySelector('span');
+      const start = performance.now(), dur = 1400;
+      (function tick(now){
+        const p = Math.min((now - start) / dur, 1);
+        span.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(tick);
+      })(start);
+    });
+  }, {threshold:.4});
+  document.querySelectorAll('.stat .val').forEach(el => statIO.observe(el));
+
+  // Demo form
+  document.getElementById('demoForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const form = e.target;
+    let valid = true;
+    form.querySelectorAll('input').forEach(inp => {
+      const ok = inp.type === 'email' ? /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(inp.value) : inp.value.trim().length > 1;
+      inp.style.borderColor = ok ? '' : '#ff7a59';
+      if (!ok) valid = false;
+    });
+    if (!valid) return;
+    form.style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  });
+</script>
+</body>
+</html>

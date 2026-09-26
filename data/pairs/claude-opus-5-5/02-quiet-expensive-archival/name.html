@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — A Typology of Custom Widgets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ecebe6;
+    --paper-2:#e4e3dd;
+    --ink:#1c1c1a;
+    --ink-2:#3a3936;
+    --grey:#6f6e69;
+    --rule:#c9c8c1;
+    --serif:"Newsreader", Georgia, serif;
+    --mono:"IBM Plex Mono", ui-monospace, monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--serif);
+    font-size:19px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 64px}
+  .label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--grey);
+  }
+  hr.rule{border:0;border-top:1px solid var(--rule)}
+
+  /* Header */
+  header{border-bottom:1px solid var(--rule)}
+  .masthead{display:flex;align-items:center;justify-content:space-between;height:76px}
+  .wordmark{font-family:var(--serif);font-size:24px;letter-spacing:.18em;text-transform:uppercase;text-decoration:none}
+  nav{display:flex;gap:40px;align-items:center}
+  nav a{font-family:var(--mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;text-decoration:none;color:var(--ink-2)}
+  nav a:hover{color:var(--ink)}
+  .btn{
+    display:inline-block;
+    font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    text-decoration:none;
+    padding:15px 26px;
+    background:var(--ink);color:var(--paper);
+    border:1px solid var(--ink);
+    cursor:pointer;
+    transition:background .3s, color .3s;
+  }
+  .btn:hover{background:transparent;color:var(--ink)}
+  .btn.ghost{background:transparent;color:var(--ink)}
+  .btn.ghost:hover{background:var(--ink);color:var(--paper)}
+  nav .btn{padding:11px 18px;color:var(--paper)}
+  nav .btn:hover{color:var(--ink)}
+
+  /* Hero */
+  .hero{padding:88px 0 112px}
+  .hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 600px;gap:88px;align-items:start}
+  .hero-text{position:sticky;top:48px;padding-top:8px}
+  .hero h1{
+    font-weight:300;
+    font-size:74px;
+    line-height:1.02;
+    letter-spacing:-.018em;
+    margin:28px 0 36px;
+  }
+  .hero h1 em{font-style:italic}
+  .hero p.lede{font-size:21px;line-height:1.55;color:var(--ink-2);max-width:470px;font-weight:300}
+  .hero .actions{margin-top:44px;display:flex;gap:16px;align-items:center}
+  .hero .aside{margin-top:64px;padding-top:20px;border-top:1px solid var(--rule);display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:470px}
+  .hero .aside strong{display:block;font-family:var(--serif);font-weight:300;font-size:30px;color:var(--ink);letter-spacing:0;text-transform:none;margin-bottom:4px}
+
+  .typology{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 18px}
+  .plate{margin:0}
+  .plate svg{display:block;width:100%;height:auto;background:#d4d4cf}
+  .plate figcaption{margin-top:9px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--grey);text-transform:uppercase}
+  .typology .plate{opacity:0;animation:develop 1.6s ease forwards}
+  @keyframes develop{from{opacity:0;filter:brightness(1.25) contrast(.7)}to{opacity:1;filter:none}}
+  .plate-note{margin-top:30px;font-size:15px;line-height:1.5;color:var(--grey);font-style:italic;max-width:520px}
+
+  /* Section heads */
+  section.block{padding:120px 0;border-top:1px solid var(--rule)}
+  .section-head{display:grid;grid-template-columns:260px 1fr;gap:64px;margin-bottom:80px}
+  .section-head h2{font-weight:300;font-size:52px;line-height:1.08;letter-spacing:-.012em;max-width:760px}
+  .section-head p{margin-top:24px;font-size:20px;font-weight:300;color:var(--ink-2);max-width:640px}
+
+  /* Method */
+  .method{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+  .method .plate figcaption{margin-top:12px}
+  .method h3{font-weight:400;font-size:28px;line-height:1.2;margin:32px 0 14px;letter-spacing:-.005em}
+  .method h3 span{font-family:var(--mono);font-size:11px;letter-spacing:.09em;color:var(--grey);display:block;margin-bottom:12px;font-weight:400}
+  .method p{font-size:17px;color:var(--ink-2);font-weight:300}
+  .entries{list-style:none;margin-top:24px;border-top:1px solid var(--rule)}
+  .entries li{font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--ink-2);padding:10px 0;border-bottom:1px solid var(--rule);display:flex;gap:14px}
+  .entries li b{font-weight:400;color:var(--grey);min-width:28px}
+
+  /* Figures */
+  .figures{width:100%;border-collapse:collapse}
+  .figures td{padding:30px 0;border-bottom:1px solid var(--rule);vertical-align:baseline}
+  .figures tr:first-child td{border-top:1px solid var(--ink)}
+  .figures .no{width:260px;font-family:var(--mono);font-size:11px;letter-spacing:.09em;color:var(--grey);text-transform:uppercase}
+  .figures .val{width:340px;font-weight:300;font-size:64px;line-height:1;letter-spacing:-.02em}
+  .figures .desc{font-size:18px;color:var(--ink-2);font-weight:300;max-width:440px}
+  .figures-note{margin-top:22px}
+
+  /* Testimony */
+  .testimony{display:grid;grid-template-columns:260px 1fr;gap:64px}
+  blockquote{font-weight:300;font-size:40px;line-height:1.28;letter-spacing:-.01em;max-width:880px;text-indent:-.4em}
+  .attrib{margin-top:40px;display:flex;gap:48px;align-items:baseline}
+  .attrib .who{font-size:18px}
+  .attrib .who span{display:block;color:var(--grey);font-size:16px;font-style:italic;font-weight:300}
+
+  /* Record list */
+  .record{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--ink)}
+  .record div{padding:28px 28px 32px 0;border-right:1px solid var(--rule)}
+  .record div:not(:first-child){padding-left:28px}
+  .record div:last-child{border-right:0}
+  .record h4{font-weight:400;font-size:21px;margin:18px 0 10px}
+  .record p{font-size:16px;font-weight:300;color:var(--ink-2)}
+
+  /* Demo */
+  .demo{background:var(--paper-2)}
+  .demo-grid{display:grid;grid-template-columns:1fr 520px;gap:112px}
+  .demo h2{font-weight:300;font-size:64px;line-height:1.02;letter-spacing:-.018em;margin:28px 0 28px}
+  .demo .intro{font-size:20px;font-weight:300;color:var(--ink-2);max-width:500px}
+  .steps{list-style:none;margin-top:52px;max-width:520px;counter-reset:s}
+  .steps li{display:grid;grid-template-columns:64px 1fr;padding:20px 0;border-top:1px solid var(--rule);font-size:17px;font-weight:300;color:var(--ink-2)}
+  .steps li:last-child{border-bottom:1px solid var(--rule)}
+  .steps li::before{counter-increment:s;content:"0" counter(s);font-family:var(--mono);font-size:11px;letter-spacing:.09em;color:var(--grey);padding-top:5px}
+  .steps li strong{font-weight:400;color:var(--ink);display:block;margin-bottom:2px}
+
+  form.card{background:var(--paper);border:1px solid var(--rule);padding:44px 44px 40px}
+  .card-head{display:flex;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--ink);margin-bottom:10px}
+  .field{display:block;padding:18px 0 10px;border-bottom:1px solid var(--rule)}
+  .field .label{display:block;margin-bottom:6px}
+  .field input,.field select{
+    width:100%;border:0;background:transparent;
+    font-family:var(--serif);font-size:20px;font-weight:300;color:var(--ink);
+    padding:4px 0;outline:none;appearance:none;border-radius:0;
+  }
+  .field select{cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--grey) 50%),linear-gradient(135deg,var(--grey) 50%,transparent 50%);background-position:calc(100% - 10px) 55%,calc(100% - 5px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+  .field:focus-within{border-bottom-color:var(--ink)}
+  .field input::placeholder{color:#a6a59f}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  form.card .btn{width:100%;margin-top:34px;padding:18px}
+  .fine{margin-top:18px;font-size:14px;color:var(--grey);font-style:italic;font-weight:300;line-height:1.45}
+  .error{color:#7a2d22;font-family:var(--mono);font-size:11px;letter-spacing:.05em;margin-top:14px;min-height:14px}
+  .receipt{display:none}
+  .receipt.show{display:block}
+  .receipt h3{font-weight:300;font-size:34px;line-height:1.15;margin:26px 0 18px}
+  .receipt p{font-size:17px;font-weight:300;color:var(--ink-2)}
+  .receipt dl{margin-top:28px;border-top:1px solid var(--ink)}
+  .receipt dl div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+  .receipt dt{color:var(--grey);text-transform:uppercase;font-size:11px;letter-spacing:.09em}
+
+  footer{padding:72px 0 64px;border-top:1px solid var(--rule)}
+  .foot{display:grid;grid-template-columns:260px 1fr 1fr 1fr;gap:64px}
+  .foot p,.foot li{font-size:15px;color:var(--ink-2);font-weight:300;line-height:1.7}
+  .foot ul{list-style:none;margin-top:14px}
+  .foot a{text-decoration:none}
+  .foot a:hover{text-decoration:underline}
+  .colophon{margin-top:72px;padding-top:20px;border-top:1px solid var(--rule);display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<!-- Shared photographic defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dcdcd8"/>
+      <stop offset=".7" stop-color="#d2d2cd"/>
+      <stop offset="1" stop-color="#c7c7c1"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8e8d87"/>
+      <stop offset=".15" stop-color="#7d7c77"/>
+      <stop offset="1" stop-color="#6a6964"/>
+    </linearGradient>
+    <linearGradient id="cyl" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5f5e5a"/>
+      <stop offset=".3" stop-color="#9d9c96"/>
+      <stop offset=".48" stop-color="#a9a8a2"/>
+      <stop offset=".7" stop-color="#7f7e79"/>
+      <stop offset="1" stop-color="#3b3a37"/>
+    </linearGradient>
+    <linearGradient id="cylDark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3d3c39"/>
+      <stop offset=".35" stop-color="#6c6b66"/>
+      <stop offset="1" stop-color="#2a2927"/>
+    </linearGradient>
+    <radialGradient id="sph" cx=".38" cy=".34" r=".72">
+      <stop offset="0" stop-color="#b5b4ae"/>
+      <stop offset=".55" stop-color="#83827d"/>
+      <stop offset="1" stop-color="#3a3936"/>
+    </radialGradient>
+    <radialGradient id="vig" cx=".5" cy=".48" r=".78">
+      <stop offset=".55" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".22"/>
+    </radialGradient>
+    <radialGradient id="shadow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#000" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".92" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 .55"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+</svg>
+
+<header>
+  <div class="wrap masthead">
+    <a href="#" class="wordmark">Acme</a>
+    <nav>
+      <a href="#method">Method</a>
+      <a href="#figures">Figures</a>
+      <a href="#record">The Record</a>
+      <a href="#demo" class="btn">Book a demo</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <div class="label">Acme · Widget operations platform · Est. 2016</div>
+        <h1>Every widget, <em>specified once</em> and accounted for.</h1>
+        <p class="lede">Acme is where operations teams at mid-sized manufacturers configure custom widgets, order them from approved suppliers, and follow each unit through every plant it passes. One record per part. Nothing lost between the drawing and the dock.</p>
+        <div class="actions">
+          <a href="#demo" class="btn">Book a demo</a>
+          <a href="#method" class="btn ghost">Read the method</a>
+        </div>
+        <div class="aside label">
+          <div><strong>412</strong>Manufacturers on record</div>
+          <div><strong>2.8M</strong>Widgets tracked to date</div>
+        </div>
+      </div>
+      <div>
+        <div class="typology" id="typology"></div>
+        <p class="plate-note">Plates 1–9. Housing assemblies configured on Acme by customers between 2021 and 2024, drawn frontally under even light. Each is a custom part. Each has exactly one specification.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="method">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="label">§ 01 — Method</div>
+        <div>
+          <h2>Three disciplines, practised the same way at every plant.</h2>
+          <p>Custom widgets fail quietly: a revision that never reached the supplier, a purchase order raised twice, a pallet no one can place. Acme replaces the spreadsheets and email threads with a single, patient record.</p>
+        </div>
+      </div>
+      <div class="method" id="method-grid"></div>
+    </div>
+  </section>
+
+  <section class="block" id="figures">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="label">§ 02 — Figures</div>
+        <div>
+          <h2>What changes in the first year.</h2>
+        </div>
+      </div>
+      <table class="figures">
+        <tr><td class="no">Fig. 1</td><td class="val">−31%</td><td class="desc">Expedited orders, as fewer parts are discovered missing the week they are needed.</td></tr>
+        <tr><td class="no">Fig. 2</td><td class="val">9 days</td><td class="desc">Median reduction in lead time for custom widgets, from specification to receipt.</td></tr>
+        <tr><td class="no">Fig. 3</td><td class="val">0.4%</td><td class="desc">Orders placed against a superseded revision, down from an industry norm near six percent.</td></tr>
+        <tr><td class="no">Fig. 4</td><td class="val">6 weeks</td><td class="desc">Typical time from signed agreement to the first plant running entirely on Acme.</td></tr>
+      </table>
+      <p class="label figures-note">Source: Acme customer cohort, n = 118 manufacturers, first twelve months after rollout. Figures reviewed annually.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap testimony">
+      <div class="label">§ 03 — Testimony</div>
+      <div>
+        <blockquote>“We used to keep four versions of the truth about every bracket we bought. Now there is one, and my buyers stopped calling suppliers to ask where things are. They already know.”</blockquote>
+        <div class="attrib">
+          <div class="who">Margaret Oyelaran<span>Vice President of Operations, Hollis &amp; Reed Fabrication — five plants, Ohio and Indiana</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="record">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="label">§ 04 — The Record</div>
+        <div>
+          <h2>Built to be kept, not merely used.</h2>
+          <p>Every configuration, approval, order and movement is written to an append-only history. Years from now, you will still know why a part was made the way it was.</p>
+        </div>
+      </div>
+      <div class="record">
+        <div><span class="label">Entry A</span><h4>ERP-native</h4><p>Two-way sync with SAP Business One, NetSuite, Epicor Kinetic and Infor SyteLine. No double entry.</p></div>
+        <div><span class="label">Entry B</span><h4>Supplier portal</h4><p>Suppliers confirm, reschedule and ship from their own view. No logins to chase, no attachments to reconcile.</p></div>
+        <div><span class="label">Entry C</span><h4>Audit-ready</h4><p>SOC 2 Type II and ISO 27001. Full revision lineage exportable for ISO 9001 and customer audits.</p></div>
+        <div><span class="label">Entry D</span><h4>Plant by plant</h4><p>Roll out one facility at a time. Permissions, approvers and units of measure set per site.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block demo" id="demo">
+    <div class="wrap demo-grid">
+      <div>
+        <div class="label">§ 05 — Request</div>
+        <h2>See your own widgets in Acme.</h2>
+        <p class="intro">A demo is a working session, not a presentation. Send us a sample of your parts list beforehand and we will show it to you configured, ordered and tracked.</p>
+        <ol class="steps">
+          <li><div><strong>A short call, twenty minutes.</strong>We learn how many plants you run, who orders what, and where parts go missing today.</div></li>
+          <li><div><strong>We load your catalogue.</strong>Twenty to fifty of your real widgets, with their revisions and approved suppliers.</div></li>
+          <li><div><strong>A working session, forty-five minutes.</strong>Your operations and purchasing leads walk through a full order, from drawing to dock.</div></li>
+        </ol>
+      </div>
+      <div>
+        <form class="card" id="demo-form" novalidate>
+          <div class="card-head"><span class="label">Form D-1 · Demonstration request</span><span class="label" id="form-date"></span></div>
+          <label class="field"><span class="label">Full name</span><input name="name" type="text" placeholder="Jane Whitcombe" autocomplete="name" required></label>
+          <label class="field"><span class="label">Work email</span><input name="email" type="email" placeholder="jane@company.com" autocomplete="email" required></label>
+          <div class="row2">
+            <label class="field"><span class="label">Company</span><input name="company" type="text" placeholder="Whitcombe Tooling" autocomplete="organization" required></label>
+            <label class="field"><span class="label">Role</span><input name="role" type="text" placeholder="Director of Operations"></label>
+          </div>
+          <label class="field"><span class="label">Number of plants</span>
+            <select name="plants">
+              <option>1</option>
+              <option selected>2 – 4</option>
+              <option>5 – 10</option>
+              <option>More than 10</option>
+            </select>
+          </label>
+          <div class="error" id="form-error" role="alert"></div>
+          <button type="submit" class="btn">Book a demo</button>
+          <p class="fine">We reply within one business day. Your details are used only to arrange the session.</p>
+        </form>
+        <div class="card receipt" id="receipt" style="background:var(--paper);border:1px solid var(--rule);padding:44px">
+          <div class="card-head" style="display:flex;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--ink)"><span class="label">Receipt</span><span class="label" id="r-date"></span></div>
+          <h3>Received and filed.</h3>
+          <p>A member of our solutions team will write to you within one business day to schedule the first call.</p>
+          <dl>
+            <div><dt>Reference</dt><dd id="r-ref"></dd></div>
+            <div><dt>Name</dt><dd id="r-name"></dd></div>
+            <div><dt>Company</dt><dd id="r-company"></dd></div>
+            <div><dt>Plants</dt><dd id="r-plants"></dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div><a href="#" class="wordmark">Acme</a></div>
+      <div><span class="label">Office</span><p style="margin-top:14px">Acme Systems, Inc.<br>220 North Green Street<br>Chicago, Illinois 60607</p></div>
+      <div><span class="label">Platform</span><ul><li><a href="#method">Configure</a></li><li><a href="#method">Order</a></li><li><a href="#method">Track</a></li><li><a href="#record">Integrations</a></li></ul></div>
+      <div><span class="label">Contact</span><ul><li><a href="mailto:demo@acme.example">demo@acme.example</a></li><li>+1 312 555 0142</li><li><a href="#demo">Book a demo</a></li></ul></div>
+    </div>
+    <div class="colophon label">
+      <span>© 2025 Acme Systems, Inc.</span>
+      <span>Plates drawn frontally, overcast light, no retouching.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const G = 330, CX = 150;
+  const f = n => Math.round(n*10)/10;
+
+  function cylinder(x,y,w,h,fill,seams){
+    let s = `<ellipse cx="${f(x+w/2)}" cy="${f(y+h)}" rx="${f(w/2)}" ry="${f(w*.07)}" fill="${fill}"/>`;
+    s += `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" fill="${fill}"/>`;
+    for(let i=1;i<=seams;i++){
+      const yy = y + h*i/(seams+1);
+      s += `<path d="M${f(x)} ${f(yy)} Q${f(x+w/2)} ${f(yy+w*.07)} ${f(x+w)} ${f(yy)}" stroke="rgba(20,20,18,.28)" stroke-width=".7" fill="none"/>`;
+    }
+    return s;
+  }
+
+  function legs(tb,p){
+    const n = p.n||4, sb = p.tw*(p.splay||1.1), st = p.tw*.8;
+    let s = '';
+    // riser pipe
+    s += `<rect x="${CX-3.5}" y="${tb}" width="7" height="${G-tb}" fill="url(#cylDark)"/>`;
+    const lx = y => { const t=(G-y)/(G-tb); return CX - (sb/2)*(1-t) - (st/2)*t; };
+    const rx = y => 2*CX - lx(y);
+    const lv = p.lv||3;
+    for(let k=0;k<lv;k++){
+      const y0 = G - (G-tb)*k/lv, y1 = G - (G-tb)*(k+1)/lv;
+      s += `<line x1="${f(lx(y1))}" y1="${f(y1)}" x2="${f(rx(y1))}" y2="${f(y1)}" stroke="#34332f" stroke-width="1.6"/>`;
+      s += `<line x1="${f(lx(y0))}" y1="${f(y0)}" x2="${f(rx(y1))}" y2="${f(y1)}" stroke="#3a3935" stroke-width=".9"/>`;
+      s += `<line x1="${f(rx(y0))}" y1="${f(y0)}" x2="${f(lx(y1))}" y2="${f(y1)}" stroke="#3a3935" stroke-width=".9"/>`;
+    }
+    for(let i=0;i<n;i++){
+      const t = i/(n-1);
+      const xb = CX - sb/2 + t*sb, xt = CX - st/2 + t*st;
+      const w = (i===0||i===n-1)?3.4:2.4;
+      s += `<line x1="${f(xb)}" y1="${G}" x2="${f(xt)}" y2="${tb}" stroke="#2b2a27" stroke-width="${w}"/>`;
+      s += `<rect x="${f(xb-5)}" y="${G-3}" width="10" height="5" fill="#595853"/>`;
+    }
+    return s;
+  }
+
+  function column(tb,p){
+    const cw = p.cw;
+    let s = `<rect x="${CX-cw/2-8}" y="${G-10}" width="${cw+16}" height="10" fill="#6d6c67"/>`;
+    s += `<rect x="${f(CX-cw/2)}" y="${tb}" width="${cw}" height="${G-10-tb}" fill="url(#cyl)"/>`;
+    const lx = CX+cw/2+4;
+    s += `<line x1="${lx}" y1="${G-10}" x2="${lx}" y2="${tb}" stroke="#34332f" stroke-width=".8"/>`;
+    s += `<line x1="${lx+6}" y1="${G-10}" x2="${lx+6}" y2="${tb}" stroke="#34332f" stroke-width=".8"/>`;
+    for(let y=G-14;y>tb;y-=5) s += `<line x1="${lx}" y1="${y}" x2="${lx+6}" y2="${y}" stroke="#44433f" stroke-width=".5"/>`;
+    // door
+    s += `<rect x="${CX-6}" y="${G-34}" width="12" height="24" fill="#34332f"/>`;
+    return s;
+  }
+
+  function lattice(tb,p){
+    const bw = p.tw*1.25, tw = p.tw*.55, lv = p.lv||6;
+    const lx = y => { const t=(G-y)/(G-tb); return CX - (bw/2)*(1-t) - (tw/2)*t; };
+    const rx = y => 2*CX - lx(y);
+    let s = '';
+    for(let k=0;k<lv;k++){
+      const y0 = G-(G-tb)*k/lv, y1 = G-(G-tb)*(k+1)/lv;
+      s += `<line x1="${f(lx(y0))}" y1="${f(y0)}" x2="${f(rx(y1))}" y2="${f(y1)}" stroke="#34332f" stroke-width=".9"/>`;
+      s += `<line x1="${f(rx(y0))}" y1="${f(y0)}" x2="${f(lx(y1))}" y2="${f(y1)}" stroke="#34332f" stroke-width=".9"/>`;
+      s += `<line x1="${f(lx(y1))}" y1="${f(y1)}" x2="${f(rx(y1))}" y2="${f(y1)}" stroke="#2f2e2b" stroke-width="1.3"/>`;
+    }
+    s += `<line x1="${f(lx(G))}" y1="${G}" x2="${f(lx(tb))}" y2="${tb}" stroke="#262523" stroke-width="3"/>`;
+    s += `<line x1="${f(rx(G))}" y1="${G}" x2="${f(rx(tb))}" y2="${tb}" stroke="#262523" stroke-width="3"/>`;
+    s += `<line x1="${CX}" y1="${G}" x2="${CX}" y2="${tb}" stroke="#3b3a36" stroke-width="1.6"/>`;
+    return s;
+  }
+
+  function tank(tb,p){
+    const tw = p.tw, th = p.th||0;
+    let s = '', top = tb;
+    switch(p.tank){
+      case 'cyl': case 'drum':
+        top = tb - th;
+        s += cylinder(CX-tw/2, top, tw, th, 'url(#cyl)', p.seams ?? (p.tank==='drum'?2:3));
+        break;
+      case 'cone': {
+        const ch = th*.45, yh = th - ch;
+        s += `<polygon points="${f(CX-tw/2)},${f(tb-ch)} ${f(CX+tw/2)},${f(tb-ch)} ${f(CX+tw*.1)},${tb} ${f(CX-tw*.1)},${tb}" fill="url(#cyl)"/>`;
+        top = tb - th;
+        s += cylinder(CX-tw/2, top, tw, yh, 'url(#cyl)', 2);
+        break;
+      }
+      case 'sphere': {
+        const r = tw/2, cy = tb - r*.6;
+        s += `<circle cx="${CX}" cy="${f(cy)}" r="${f(r)}" fill="url(#sph)"/>`;
+        s += `<path d="M${f(CX-r)} ${f(cy)} Q${CX} ${f(cy+r*.18)} ${f(CX+r)} ${f(cy)}" stroke="rgba(20,20,18,.3)" stroke-width=".8" fill="none"/>`;
+        top = cy - r;
+        break;
+      }
+      case 'onion': {
+        s += `<path d="M${f(CX-tw*.12)} ${tb} C${f(CX-tw*.7)} ${f(tb-th*.3)}, ${f(CX-tw*.55)} ${f(tb-th*.8)}, ${CX} ${f(tb-th)} C${f(CX+tw*.55)} ${f(tb-th*.8)}, ${f(CX+tw*.7)} ${f(tb-th*.3)}, ${f(CX+tw*.12)} ${tb} Z" fill="url(#cyl)"/>`;
+        top = tb - th;
+        break;
+      }
+    }
+    if(p.gallery){
+      const gw = tw + 16, gy = (p.tank==='cone') ? tb - th*.45 : tb;
+      s += `<rect x="${f(CX-gw/2)}" y="${f(gy-1)}" width="${f(gw)}" height="3" fill="#2d2c29"/>`;
+      s += `<line x1="${f(CX-gw/2)}" y1="${f(gy-10)}" x2="${f(CX+gw/2)}" y2="${f(gy-10)}" stroke="#2d2c29" stroke-width=".8"/>`;
+      for(let x=CX-gw/2;x<=CX+gw/2+.1;x+=gw/12) s += `<line x1="${f(x)}" y1="${f(gy-10)}" x2="${f(x)}" y2="${f(gy)}" stroke="#2d2c29" stroke-width=".6"/>`;
+    }
+    if(p.roof==='cone'){
+      s += `<polygon points="${f(CX-tw/2-3)},${f(top)} ${f(CX+tw/2+3)},${f(top)} ${CX},${f(top-tw*.26)}" fill="url(#cylDark)"/>`;
+      top -= tw*.26;
+    } else if(p.roof==='dome'){
+      s += `<path d="M${f(CX-tw/2)} ${f(top)} A${f(tw/2)} ${f(tw*.2)} 0 0 1 ${f(CX+tw/2)} ${f(top)} Z" fill="url(#cylDark)"/>`;
+      top -= tw*.2;
+    } else if(p.roof==='flat'){
+      s += `<rect x="${f(CX-tw/2-4)}" y="${f(top-4)}" width="${tw+8}" height="4" fill="#3a3936"/>`;
+      top -= 4;
+    }
+    s += `<line x1="${CX}" y1="${f(top)}" x2="${CX}" y2="${f(top-11)}" stroke="#2b2a27" stroke-width="1.2"/>`;
+    s += `<circle cx="${CX}" cy="${f(top-12)}" r="1.8" fill="#2b2a27"/>`;
+    return s;
+  }
+
+  function plateSVG(p, label){
+    const tb = G - p.h;
+    let s = `<svg viewBox="0 0 300 375" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">`;
+    s += `<rect width="300" height="375" fill="url(#sky)"/>`;
+    s += `<path d="M0 ${G-4} L60 ${G-7} L110 ${G-5} L170 ${G-8} L230 ${G-5} L300 ${G-6} L300 ${G} L0 ${G} Z" fill="#b3b2ac" opacity=".7"/>`;
+    s += `<rect y="${G}" width="300" height="${375-G}" fill="url(#ground)"/>`;
+    s += `<ellipse cx="${CX}" cy="${G+4}" rx="${p.tw*.9}" ry="7" fill="url(#shadow)"/>`;
+    if(p.sup==='legs') s += legs(tb,p);
+    else if(p.sup==='column') s += column(tb,p);
+    else s += lattice(tb,p);
+    s += tank(tb,p);
+    s += `<rect width="300" height="375" fill="url(#vig)"/>`;
+    s += `<rect width="300" height="375" filter="url(#grain)" opacity=".32"/>`;
+    s += `</svg>`;
+    return s;
+  }
+
+  const plates = [
+    {sup:'legs',n:4,h:170,tank:'cyl',tw:92,th:70,roof:'cone',gallery:1,lv:3, t:'HA-04', loc:'Dayton, OH'},
+    {sup:'column',cw:26,h:150,tank:'cone',tw:118,th:90,roof:'dome', t:'HA-11', loc:'Racine, WI'},
+    {sup:'legs',n:4,h:150,tank:'sphere',tw:110,lv:3, t:'SP-02', loc:'Greenville, SC'},
+    {sup:'column',cw:36,h:180,tank:'onion',tw:120,th:80, t:'CN-07', loc:'Wichita, KS'},
+    {sup:'legs',n:5,h:120,tank:'drum',tw:150,th:60,roof:'cone',lv:2,gallery:1, t:'DR-03', loc:'Erie, PA'},
+    {sup:'lattice',h:170,tank:'cyl',tw:78,th:84,roof:'dome',lv:6, t:'HA-19', loc:'Fort Wayne, IN'},
+    {sup:'column',cw:20,h:185,tank:'sphere',tw:96, t:'SP-08', loc:'Peoria, IL'},
+    {sup:'legs',n:3,h:170,tank:'cone',tw:100,th:84,roof:'flat',lv:4, t:'CN-12', loc:'Rockford, IL'},
+    {sup:'lattice',h:140,tank:'drum',tw:130,th:70,roof:'cone',lv:5,gallery:1, t:'LT-01', loc:'Chattanooga, TN'},
+    {sup:'column',cw:54,h:120,tank:'cyl',tw:110,th:110,roof:'dome',seams:5, t:'HA-22', loc:'Toledo, OH'},
+    {sup:'legs',n:4,h:180,tank:'onion',tw:112,th:80,lv:4, t:'CN-15', loc:'Grand Rapids, MI'},
+    {sup:'lattice',h:190,tank:'sphere',tw:88,lv:7, t:'SP-14', loc:'Cedar Rapids, IA'}
+  ];
+
+  const typ = document.getElementById('typology');
+  plates.slice(0,9).forEach((p,i)=>{
+    const fig = document.createElement('figure');
+    fig.className = 'plate';
+    fig.style.animationDelay = (0.15 + i*0.12) + 's';
+    fig.innerHTML = plateSVG(p, `Plate ${i+1}, widget type ${p.t}`) +
+      `<figcaption><span>${String(i+1).padStart(2,'0')} · ${p.t}</span><span>${p.loc}</span></figcaption>`;
+    typ.appendChild(fig);
+  });
+
+  const method = [
+    {n:'I', k:'Configure', h:'Describe the part once.',
+     b:'Build each widget from your own parameters — material, tolerance, finish, fastener pattern — with rules that stop impossible combinations before they reach a supplier. Revisions are versioned and signed off, never overwritten.',
+     e:['Parametric templates per widget family','Engineering approval, logged by name','Drawings and CAD attached to each revision']},
+    {n:'II', k:'Order', h:'Order from anyone approved.',
+     b:'Raise orders against the current revision only, routed to suppliers you have qualified for that part. Acme compares quoted lead times and prices side by side and writes the purchase order back to your ERP.',
+     e:['Approved-supplier lists per part','Quote comparison across vendors','Purchase orders synced to your ERP']},
+    {n:'III', k:'Track', h:'Follow every unit.',
+     b:'Each widget carries its specification from supplier floor to receiving dock to line-side bin. See what is in transit, what is late, and what has been received against which order, across every plant.',
+     e:['Shipment status from supplier portal','Receiving against revision and PO','Plant-level inventory, reconciled daily']}
+  ];
+  const mg = document.getElementById('method-grid');
+  method.forEach((m,i)=>{
+    const p = plates[9+i];
+    const d = document.createElement('div');
+    d.innerHTML = `<figure class="plate">${plateSVG(p, `Plate ${10+i}, widget type ${p.t}`)}<figcaption><span>Plate ${10+i} · ${p.t}</span><span>${p.loc}</span></figcaption></figure>
+      <h3><span>${m.n} · ${m.k.toUpperCase()}</span>${m.h}</h3>
+      <p>${m.b}</p>
+      <ul class="entries">${m.e.map((x,j)=>`<li><b>${m.n}.${j+1}</b>${x}</li>`).join('')}</ul>`;
+    mg.appendChild(d);
+  });
+
+  // Form
+  const now = new Date();
+  const ds = now.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'2-digit'}).toUpperCase();
+  document.getElementById('form-date').textContent = ds;
+  document.getElementById('r-date').textContent = ds;
+
+  const form = document.getElementById('demo-form');
+  const err = document.getElementById('form-error');
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(form));
+    if(!d.name.trim() || !d.company.trim()){ err.textContent = 'Please enter your name and company.'; return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email.trim())){ err.textContent = 'Please enter a valid work email.'; return; }
+    err.textContent = '';
+    const ref = 'D-' + now.getFullYear() + '-' + String(Math.floor(1000 + Math.random()*9000));
+    document.getElementById('r-ref').textContent = ref;
+    document.getElementById('r-name').textContent = d.name.trim();
+    document.getElementById('r-company').textContent = d.company.trim();
+    document.getElementById('r-plants').textContent = d.plants;
+    form.style.display = 'none';
+    document.getElementById('receipt').classList.add('show');
+  });
+})();
+</script>
+</body>
+</html>

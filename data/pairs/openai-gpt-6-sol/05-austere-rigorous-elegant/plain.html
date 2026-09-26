@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f6f2">
+  <meta name="description" content="Acme gives manufacturing operations teams one place to configure, order, and track custom widgets.">
+  <title>Acme — Custom widgets. Complete control.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f6f6f2;
+      --white: #ffffff;
+      --ink: #172723;
+      --muted: #64716b;
+      --line: #d8ded7;
+      --green: #1c3931;
+      --accent: #ce6448;
+      --mono: "IBM Plex Mono", monospace;
+      --sans: "DM Sans", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: #cddbd0; }
+    .container { width: min(1320px, calc(100% - 96px)); margin-inline: auto; }
+    .mono { font-family: var(--mono); }
+
+    /* Header */
+    .site-header { border-bottom: 1px solid var(--line); }
+    .header-inner {
+      height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-size: 25px; font-weight: 700; letter-spacing: -.095em; }
+    .brand-mark { width: 29px; height: 29px; display: block; }
+    .desktop-nav { display: flex; align-items: center; gap: 39px; margin-left: auto; margin-right: 47px; }
+    .desktop-nav a { font-size: 13px; font-weight: 600; color: #43534c; transition: color .2s; }
+    .desktop-nav a:hover, .footer-links a:hover { color: var(--accent); }
+    .header-cta {
+      min-height: 41px;
+      padding: 0 17px;
+      border: 1px solid var(--ink);
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .2s, color .2s;
+    }
+    .header-cta:hover { background: var(--ink); color: white; }
+    .menu-button { display: none; border: 0; background: none; padding: 8px; color: var(--ink); }
+
+    /* Hero */
+    .hero { padding: 76px 0 58px; }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .105em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 19px; height: 1px; background: var(--accent); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(350px, .6fr); gap: 58px; align-items: end; margin-top: 25px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      margin-bottom: 0;
+      font-size: clamp(64px, 6.1vw, 91px);
+      line-height: .995;
+      letter-spacing: -.082em;
+      font-weight: 500;
+    }
+    h1 span { color: #84938a; }
+    .hero-aside { padding-bottom: 5px; }
+    .hero-aside p { max-width: 395px; color: #4f5d56; font-size: 17px; line-height: 1.65; letter-spacing: -.018em; margin-bottom: 27px; }
+    .primary-button {
+      border: 1px solid var(--green);
+      background: var(--green);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 42px;
+      min-width: 190px;
+      height: 51px;
+      padding: 0 18px 0 20px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background .2s, transform .2s;
+    }
+    .primary-button:hover { background: #2f5345; transform: translateY(-2px); }
+    .button-arrow { font-size: 19px; font-weight: 400; line-height: 1; }
+
+    /* Product illustration */
+    .preview-section { padding-bottom: 78px; }
+    .preview-caption {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--line);
+      padding: 15px 0 13px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #637168;
+    }
+    .preview-caption strong { color: var(--ink); font-weight: 500; }
+    .product-frame {
+      border: 1px solid #cbd3ca;
+      padding: 11px;
+      background: #e6eae3;
+      box-shadow: 0 28px 55px -42px #17292380;
+    }
+    .app {
+      height: 485px;
+      display: grid;
+      grid-template-columns: 209px minmax(0, 1fr);
+      overflow: hidden;
+      background: #fbfcfa;
+      border: 1px solid #cfd7ce;
+      font-size: 12px;
+    }
+    .app-sidebar { background: #1b302a; color: #e9eee8; padding: 23px 15px; display: flex; flex-direction: column; }
+    .app-brand { display: flex; align-items: center; gap: 9px; padding: 1px 10px 29px; font-size: 17px; font-weight: 700; letter-spacing: -.075em; }
+    .app-brand svg { width: 20px; height: 20px; }
+    .sidebar-label { font: 9px var(--mono); letter-spacing: .1em; color: #90a69a; padding: 0 11px; margin: 0 0 13px; }
+    .sidebar-item {
+      height: 37px; display: flex; align-items: center; gap: 12px; padding: 0 11px;
+      color: #afbeb3; font-size: 11px; font-weight: 500; margin-bottom: 3px;
+    }
+    .sidebar-item svg { width: 15px; height: 15px; flex: none; opacity: .8; }
+    .sidebar-item.active { background: #355347; color: white; }
+    .sidebar-item.active svg { opacity: 1; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-bottom { border-top: 1px solid #40554b; padding: 17px 10px 0; display: flex; align-items: center; gap: 9px; color: #bdc9be; font-size: 10px; }
+    .avatar { display: grid; place-items: center; width: 27px; height: 27px; background: #b8c9ac; color: var(--green); font: 10px var(--mono); }
+    .app-main { min-width: 0; display: flex; flex-direction: column; }
+    .app-topbar {
+      height: 52px; border-bottom: 1px solid #e0e5de; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 29px; background: white; flex: none;
+    }
+    .breadcrumbs { color: #829087; font-size: 10px; }
+    .breadcrumbs strong { color: #293a30; font-weight: 600; }
+    .topbar-right { display: flex; align-items: center; gap: 18px; color: #738278; font: 10px var(--mono); }
+    .live-dot { width: 6px; height: 6px; background: #79a88a; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    .app-content { padding: 24px 29px; min-width: 0; overflow: hidden; }
+    .app-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .app-heading h3 { margin: 0 0 5px; font-size: 22px; letter-spacing: -.055em; font-weight: 600; }
+    .app-heading p { margin: 0; color: #89958b; font-size: 10px; }
+    .app-action { border: 1px solid #ced8ce; padding: 9px 12px; background: white; font: 10px var(--mono); color: #344c3b; }
+    .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 17px; }
+    .metric { background: white; border: 1px solid #e0e5de; padding: 13px 15px 12px; min-width: 0; }
+    .metric-label { display: block; font: 9px var(--mono); color: #859287; white-space: nowrap; margin-bottom: 12px; }
+    .metric strong { font-size: 25px; line-height: 1; letter-spacing: -.055em; font-weight: 600; }
+    .metric small { color: #859287; font: 9px var(--mono); margin-left: 5px; }
+    .metric .positive { color: #477f59; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(220px, .8fr); gap: 13px; }
+    .panel { border: 1px solid #e0e5de; background: white; min-width: 0; }
+    .panel-head { padding: 16px 17px 14px; display: flex; align-items: start; justify-content: space-between; gap: 8px; }
+    .panel-title { font-size: 11px; font-weight: 700; }
+    .panel-sub { font-size: 9px; color: #89958b; margin-top: 4px; }
+    .panel-link { color: #426c52; font: 9px var(--mono); white-space: nowrap; }
+    .table { width: 100%; border-collapse: collapse; text-align: left; }
+    .table th { background: #f6f8f5; color: #87948a; font: 9px var(--mono); font-weight: 400; padding: 10px 17px; white-space: nowrap; }
+    .table td { border-top: 1px solid #edf0eb; padding: 12px 17px; font-size: 10px; color: #526259; white-space: nowrap; }
+    .table td:first-child { color: #263b2e; font: 10px var(--mono); }
+    .status { display: inline-block; padding: 5px 7px; background: #eaf3e9; color: #438056; font: 9px var(--mono); }
+    .status.transit { background: #edf0e7; color: #6e8052; }
+    .status.review { background: #f6f0e5; color: #9c7440; }
+    .flow-inner { padding: 4px 18px 13px; }
+    .flow-step { display: flex; gap: 11px; min-height: 48px; position: relative; }
+    .flow-step:not(:last-child)::before { content: ""; position: absolute; left: 5px; top: 15px; bottom: -1px; width: 1px; background: #c8d9c8; }
+    .flow-node { position: relative; z-index: 1; flex: none; width: 11px; height: 11px; border: 2px solid #5a936c; background: white; border-radius: 50%; margin-top: 2px; }
+    .flow-step:first-child .flow-node { background: #5a936c; }
+    .flow-step:last-child .flow-node { border-color: #cbd5c9; }
+    .flow-text strong { display: block; font-size: 10px; font-weight: 600; margin-bottom: 4px; }
+    .flow-text span { font: 9px var(--mono); color: #87948a; }
+    .flow-footer { border-top: 1px solid #edf0eb; padding: 12px 17px; color: #677c6c; font: 9px var(--mono); }
+
+    /* Content sections */
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 50px; margin: 22px 0 47px; }
+    .section-heading h2 { max-width: 670px; margin: 0; font-size: clamp(42px, 4.4vw, 64px); line-height: 1.07; letter-spacing: -.07em; font-weight: 500; }
+    .section-heading p { max-width: 325px; margin: 0 0 7px; color: var(--muted); line-height: 1.65; font-size: 15px; }
+    .features { padding: 24px 0 116px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--ink); }
+    .feature { padding: 25px 36px 0 0; min-height: 218px; }
+    .feature + .feature { border-left: 1px solid var(--line); padding-left: 36px; }
+    .feature-number { font: 11px var(--mono); color: var(--accent); }
+    .feature h3 { font-size: 24px; letter-spacing: -.05em; font-weight: 500; margin: 36px 0 11px; }
+    .feature p { max-width: 335px; font-size: 14px; line-height: 1.65; color: var(--muted); margin-bottom: 0; }
+    .principle-section { background: #e9eee8; padding: 85px 0; border-top: 1px solid #d9e0d8; }
+    .principle-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 12%; align-items: start; }
+    .principle-layout h2 { font-size: clamp(43px, 4.2vw, 61px); line-height: 1.08; letter-spacing: -.07em; font-weight: 500; margin: 27px 0 0; }
+    .principle-copy { padding-top: 38px; }
+    .principle-copy p { font-size: 17px; line-height: 1.7; color: #4d6254; max-width: 510px; margin: 0 0 29px; }
+    .text-link { display: inline-flex; align-items: center; gap: 21px; border-bottom: 1px solid var(--ink); padding-bottom: 7px; font-size: 13px; font-weight: 700; }
+    .text-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    .final-cta { background: var(--green); color: #f7f8f3; padding: 81px 0 88px; }
+    .final-inner { display: flex; align-items: end; justify-content: space-between; gap: 45px; }
+    .final-cta .eyebrow { color: #a9c0ae; }
+    .final-cta h2 { font-size: clamp(54px, 5.6vw, 80px); line-height: 1.02; letter-spacing: -.075em; font-weight: 500; margin: 30px 0 0; }
+    .final-cta h2 span { color: #aac1ae; }
+    .light-button { background: #f4f5ed; color: var(--ink); border-color: #f4f5ed; margin-bottom: 7px; }
+    .light-button:hover { background: white; }
+    .site-footer { background: #162e27; color: #c3d1c4; border-top: 1px solid #3a5546; }
+    .footer-inner { min-height: 88px; display: flex; justify-content: space-between; align-items: center; gap: 25px; font-size: 11px; }
+    .footer-brand { color: white; font-size: 20px; font-weight: 700; letter-spacing: -.09em; }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a { transition: color .2s; }
+
+    /* Demo dialog */
+    .modal[hidden] { display: none; }
+    .modal { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; }
+    .modal-backdrop { position: absolute; inset: 0; background: #0c1b16b8; }
+    .modal-card { position: relative; width: min(100%, 500px); background: var(--paper); padding: 35px; box-shadow: 0 30px 100px #0004; }
+    .modal-close { position: absolute; top: 16px; right: 18px; border: 0; background: none; font-size: 27px; line-height: 1; color: var(--ink); }
+    .modal-card h2 { margin: 23px 0 10px; font-size: 43px; font-weight: 500; letter-spacing: -.065em; }
+    .modal-card > p { color: var(--muted); line-height: 1.55; font-size: 14px; margin-bottom: 25px; }
+    .demo-form { display: grid; gap: 15px; }
+    .demo-form label { display: grid; gap: 7px; font-size: 12px; font-weight: 700; }
+    .demo-form input, .demo-form select { width: 100%; height: 44px; border: 1px solid #cdd6cc; background: white; color: var(--ink); padding: 0 12px; border-radius: 0; outline: none; }
+    .demo-form input:focus, .demo-form select:focus { border-color: var(--green); box-shadow: 0 0 0 2px #1c393120; }
+    .demo-form .primary-button { width: 100%; margin-top: 6px; }
+    .form-note { font-size: 11px; line-height: 1.5; color: var(--muted); margin: 0; }
+
+    @media (max-width: 1050px) {
+      .container { width: min(100% - 56px, 1320px); }
+      .hero-grid { grid-template-columns: 1.2fr .8fr; gap: 25px; }
+      h1 { font-size: clamp(58px, 7vw, 80px); }
+      .app { grid-template-columns: 170px minmax(0, 1fr); }
+      .app-content { padding: 22px 18px; }
+      .table th, .table td { padding-left: 10px; padding-right: 10px; }
+      .metric { padding-inline: 10px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: calc(100% - 40px); }
+      .header-inner { height: 68px; }
+      .desktop-nav, .header-cta { display: none; }
+      .menu-button { display: block; }
+      .mobile-nav { display: grid; gap: 0; padding: 5px 20px 20px; border-top: 1px solid var(--line); }
+      .mobile-nav[hidden] { display: none; }
+      .mobile-nav a, .mobile-nav button { padding: 13px 0; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: none; font-size: 15px; font-weight: 600; }
+      .hero { padding: 59px 0 46px; }
+      .hero-grid, .section-heading, .principle-layout { display: block; }
+      h1 { font-size: clamp(55px, 12vw, 82px); }
+      .hero-aside { margin-top: 29px; }
+      .hero-aside p { font-size: 16px; }
+      .preview-section { overflow: hidden; padding-bottom: 75px; }
+      .preview-caption span:last-child { display: none; }
+      .product-frame { width: 850px; max-width: none; transform-origin: top left; }
+      .app { grid-template-columns: 170px 1fr; }
+      .section-heading h2 { margin-bottom: 19px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature, .feature + .feature { border-left: 0; border-bottom: 1px solid var(--line); padding: 24px 0 29px; min-height: 0; }
+      .feature h3 { margin-top: 25px; }
+      .features { padding-bottom: 76px; }
+      .principle-section { padding: 69px 0; }
+      .principle-copy { padding-top: 23px; }
+      .final-cta { padding: 70px 0; }
+      .final-inner { display: block; }
+      .final-cta h2 { margin-bottom: 35px; }
+      .footer-inner { flex-wrap: wrap; padding: 25px 0; }
+    }
+    @media (max-width: 480px) {
+      .product-frame { transform: scale(.72); margin-bottom: -143px; }
+      .preview-section { padding-bottom: 65px; }
+      .modal-card { padding: 27px 22px; }
+    }
+    @media (min-width: 481px) and (max-width: 760px) {
+      .product-frame { transform: scale(.82); margin-bottom: -95px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#" aria-label="Acme, home">
+        <svg class="brand-mark" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+          <rect width="30" height="30" fill="#1C3931"/>
+          <path d="M5 23 14.8 6 25 23h-6.1l-4.1-7.2L10.7 23H5Z" fill="#F6F6F2"/>
+        </svg>
+        acme
+      </a>
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#why-acme">Why Acme</a>
+      </nav>
+      <button class="header-cta" type="button" data-open-demo>Book a demo <span aria-hidden="true">↗</span></button>
+      <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" aria-hidden="true"><path d="M3 8h19M3 17h19" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden>
+      <a href="#platform">Platform</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#why-acme">Why Acme</a>
+      <button type="button" data-open-demo>Book a demo ↗</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero container" aria-labelledby="hero-title">
+      <div class="eyebrow">The operating system for custom widgets</div>
+      <div class="hero-grid">
+        <h1 id="hero-title">Custom widgets.<br><span>Complete control.</span></h1>
+        <div class="hero-aside">
+          <p>Configure, order, and track every custom widget in one place. Built for the operations teams keeping production moving.</p>
+          <button class="primary-button" type="button" data-open-demo>Book a demo <span class="button-arrow" aria-hidden="true">↗</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="preview-section container" id="platform" aria-label="A look inside the Acme platform">
+      <div class="preview-caption"><strong>One clear view of every moving part</strong><span>Acme platform / Operations overview</span></div>
+      <div class="product-frame">
+        <div class="app" role="img" aria-label="Illustration of the Acme operations dashboard, showing widget orders, delivery statuses, and a supply chain timeline">
+          <aside class="app-sidebar">
+            <div class="app-brand">
+              <svg viewBox="0 0 30 30" fill="none" aria-hidden="true"><rect width="30" height="30" fill="#F4F6EF"/><path d="M5 23 14.8 6 25 23h-6.1l-4.1-7.2L10.7 23H5Z" fill="#1C3931"/></svg>
+              acme
+            </div>
+            <div class="sidebar-label">WORKSPACE</div>
+            <div class="sidebar-item active"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2" y="2" width="5" height="5" stroke="currentColor"/><rect x="9" y="2" width="5" height="5" stroke="currentColor"/><rect x="2" y="9" width="5" height="5" stroke="currentColor"/><rect x="9" y="9" width="5" height="5" stroke="currentColor"/></svg>Overview</div>
+            <div class="sidebar-item"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3h10v10H3zM3 6h10M6 3v10" stroke="currentColor"/></svg>Configurations</div>
+            <div class="sidebar-item"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4h10v9H3zM5 2v4M11 2v4M3 8h10" stroke="currentColor"/></svg>Orders</div>
+            <div class="sidebar-item"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 11h12M3 11V5l5-3 5 3v6M6 8h4M8 8v3" stroke="currentColor"/></svg>Supply chain</div>
+            <div class="sidebar-item"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 3h10v10H3zM6 6h4M6 9h4" stroke="currentColor"/></svg>Documents</div>
+            <div class="sidebar-spacer"></div>
+            <div class="sidebar-bottom"><div class="avatar">MC</div><span>Meridian Components</span></div>
+          </aside>
+          <div class="app-main">
+            <div class="app-topbar">
+              <div class="breadcrumbs">Workspace &nbsp;/&nbsp; <strong>Overview</strong></div>
+              <div class="topbar-right"><span><span class="live-dot"></span> LIVE UPDATES</span><span>○ &nbsp; Help</span></div>
+            </div>
+            <div class="app-content">
+              <div class="app-heading">
+                <div><h3>Operations overview</h3><p>Everything in motion, all in one place.</p></div>
+                <div class="app-action">＋ &nbsp; New configuration</div>
+              </div>
+              <div class="metric-row">
+                <div class="metric"><span class="metric-label">ACTIVE ORDERS</span><strong>24</strong><small>across 6 sites</small></div>
+                <div class="metric"><span class="metric-label">IN PRODUCTION</span><strong>12</strong><small>on schedule</small></div>
+                <div class="metric"><span class="metric-label">IN TRANSIT</span><strong>08</strong><small>shipments</small></div>
+                <div class="metric"><span class="metric-label">ON-TIME RATE</span><strong>98<span style="font-size:16px">%</span></strong><small class="positive">↑ 3.2%</small></div>
+              </div>
+              <div class="workspace">
+                <div class="panel">
+                  <div class="panel-head">
+                    <div><div class="panel-title">Recent orders</div><div class="panel-sub">Track specifications through delivery</div></div>
+                    <span class="panel-link">View all →</span>
+                  </div>
+                  <table class="table">
+                    <thead><tr><th>ORDER</th><th>CONFIGURATION</th><th>ETA</th><th>STATUS</th></tr></thead>
+                    <tbody>
+                      <tr><td>AC-2048</td><td>Precision valve / V4</td><td>Oct 08</td><td><span class="status">In production</span></td></tr>
+                      <tr><td>AC-2047</td><td>Housing assembly / H2</td><td>Oct 04</td><td><span class="status transit">In transit</span></td></tr>
+                      <tr><td>AC-2046</td><td>Control fitting / C8</td><td>Oct 12</td><td><span class="status">In production</span></td></tr>
+                      <tr><td>AC-2045</td><td>Mounting bracket / M3</td><td>Oct 16</td><td><span class="status review">Spec review</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="panel">
+                  <div class="panel-head">
+                    <div><div class="panel-title">Order journey</div><div class="panel-sub">AC-2048 · Precision valve / V4</div></div>
+                  </div>
+                  <div class="flow-inner">
+                    <div class="flow-step"><div class="flow-node"></div><div class="flow-text"><strong>Specification approved</strong><span>SEP 18 · 09:42</span></div></div>
+                    <div class="flow-step"><div class="flow-node"></div><div class="flow-text"><strong>Production started</strong><span>SEP 20 · 14:15</span></div></div>
+                    <div class="flow-step"><div class="flow-node"></div><div class="flow-text"><strong>Quality inspection</strong><span>EXPECTED OCT 02</span></div></div>
+                    <div class="flow-step"><div class="flow-node"></div><div class="flow-text"><strong>Delivery to site</strong><span>ESTIMATED OCT 08</span></div></div>
+                  </div>
+                  <div class="flow-footer">◎ &nbsp; All milestones on schedule</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features container" id="how-it-works">
+      <div class="eyebrow">01 / The platform</div>
+      <div class="section-heading">
+        <h2>From first spec to final delivery.</h2>
+        <p>One connected workflow replaces scattered requests, uncertain timelines, and the constant need to follow up.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature"><span class="feature-number">01 — CONFIGURE</span><h3>Get the details right.</h3><p>Define requirements and keep every custom specification organized before an order is placed.</p></article>
+        <article class="feature"><span class="feature-number">02 — ORDER</span><h3>Move with confidence.</h3><p>Turn approved configurations into orders with a clear record of what was requested and when.</p></article>
+        <article class="feature"><span class="feature-number">03 — TRACK</span><h3>Know what comes next.</h3><p>Follow progress across production and delivery, with the visibility to plan around real timelines.</p></article>
+      </div>
+    </section>
+
+    <section class="principle-section" id="why-acme">
+      <div class="container principle-layout">
+        <div><div class="eyebrow">02 / Built for operations</div><h2>Clarity is a<br>competitive advantage.</h2></div>
+        <div class="principle-copy">
+          <p>When a critical component is custom, there’s no room for ambiguity. Acme brings specifications, orders, and supply chain progress together so your team can spend less time chasing answers—and more time acting on them.</p>
+          <button class="text-link" type="button" data-open-demo>See Acme in action <span aria-hidden="true">↗</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="container final-inner">
+        <div><div class="eyebrow">A better way to stay ahead</div><h2>Make every widget<br><span>accountable.</span></h2></div>
+        <button class="primary-button light-button" type="button" data-open-demo>Book a demo <span class="button-arrow" aria-hidden="true">↗</span></button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <a class="footer-brand" href="#">acme</a>
+      <span>Custom widgets. Complete control.</span>
+      <div class="footer-links"><a href="#platform">Platform</a><a href="#how-it-works">How it works</a><a href="mailto:hello@acme.com">Contact</a></div>
+      <span>© <span id="year">2026</span> Acme</span>
+    </div>
+  </footer>
+
+  <div class="modal" id="demo-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-backdrop" data-close-demo></div>
+    <div class="modal-card">
+      <button class="modal-close" type="button" aria-label="Close" data-close-demo>×</button>
+      <div class="eyebrow">Let's talk operations</div>
+      <h2 id="modal-title">Book a demo.</h2>
+      <p>Tell us a little about your team. We’ll show you how Acme can bring clarity to your custom widget workflow.</p>
+      <form class="demo-form" id="demo-form">
+        <label>Your name<input name="name" type="text" autocomplete="name" required></label>
+        <label>Work email<input name="email" type="email" autocomplete="email" required></label>
+        <label>Company<input name="company" type="text" autocomplete="organization" required></label>
+        <button class="primary-button" type="submit">Prepare demo request <span class="button-arrow" aria-hidden="true">↗</span></button>
+        <p class="form-note">This opens your email app with your request ready to send. No information is submitted on this page.</p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const modal = document.getElementById('demo-modal');
+      const menuButton = document.querySelector('.menu-button');
+      const mobileNav = document.getElementById('mobile-nav');
+      let previousFocus;
+
+      function closeMenu() {
+        mobileNav.hidden = true;
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.setAttribute('aria-label', 'Open menu');
+      }
+      function openDemo() {
+        previousFocus = document.activeElement;
+        closeMenu();
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        modal.querySelector('input').focus();
+      }
+      function closeDemo() {
+        modal.hidden = true;
+        document.body.style.overflow = '';
+        previousFocus?.focus();
+      }
+
+      document.querySelectorAll('[data-open-demo]').forEach(button => button.addEventListener('click', openDemo));
+      document.querySelectorAll('[data-close-demo]').forEach(button => button.addEventListener('click', closeDemo));
+      document.querySelectorAll('.mobile-nav a').forEach(link => link.addEventListener('click', closeMenu));
+
+      menuButton.addEventListener('click', () => {
+        const opening = !mobileNav.hidden;
+        mobileNav.hidden = opening;
+        menuButton.setAttribute('aria-expanded', String(!opening));
+        menuButton.setAttribute('aria-label', opening ? 'Open menu' : 'Close menu');
+      });
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !modal.hidden) closeDemo();
+        if (event.key === 'Escape' && !mobileNav.hidden) closeMenu();
+        if (event.key === 'Tab' && !modal.hidden) {
+          const focusable = [...modal.querySelectorAll('button, input, select')];
+          const first = focusable[0], last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      });
+
+      document.getElementById('demo-form').addEventListener('submit', event => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        const subject = encodeURIComponent(`Acme demo request — ${data.get('company')}`);
+        const body = encodeURIComponent(`Hello Acme,\n\nI'd like to book a demo.\n\nName: ${data.get('name')}\nWork email: ${data.get('email')}\nCompany: ${data.get('company')}\n\nPlease let me know a good time to connect.`);
+        window.location.href = `mailto:hello@acme.com?subject=${subject}&body=${body}`;
+      });
+
+      document.getElementById('year').textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f2ec">
+  <title>Acme — Custom widgets, without the loose ends</title>
+  <meta name="description" content="Configure, order, and track custom widgets across your supply chain. See how Acme gives operations teams one clear view from specification to delivery.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f4f2ec;
+      --white: #fbfaf7;
+      --ink: #1c2526;
+      --muted: #66706e;
+      --line: #d4d8d2;
+      --orange: #ef603a;
+      --dark: #202b2d;
+      --mono: "IBM Plex Mono", monospace;
+      --display: "Space Grotesk", sans-serif;
+      --body: "DM Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: #f8b49e; color: var(--ink); }
+
+    .shell { width: min(100% - 112px, 1328px); margin-inline: auto; }
+    .eyebrow { font: 600 11px/1.5 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+    .orange-dash { display: inline-block; width: 20px; height: 3px; background: var(--orange); vertical-align: middle; margin-right: 11px; }
+
+    .topline { height: 34px; background: var(--ink); color: #c9d1cc; }
+    .topline .shell { height: 100%; display: flex; justify-content: space-between; align-items: center; font: 500 10px var(--mono); letter-spacing: .08em; }
+    .topline span:last-child { color: #f1a18b; }
+    .nav { height: 80px; border-bottom: 1px solid var(--line); background: var(--paper); }
+    .nav-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font: 700 29px/1 var(--display); letter-spacing: -.075em; }
+    .brand-mark { width: 30px; height: 30px; background: var(--orange); display: grid; place-items: center; transform: rotate(-45deg); }
+    .brand-mark::after { content: ""; width: 10px; height: 10px; border: 4px solid var(--paper); }
+    .brand-word { margin-left: 3px; }
+    .nav-links { display: flex; gap: 38px; align-items: center; margin-left: 90px; }
+    .nav-links a { font-size: 13px; font-weight: 700; transition: color .2s; }
+    .nav-links a:hover { color: var(--orange); }
+    .nav-actions { display: flex; align-items: center; gap: 24px; }
+    .nav-actions .login { font-size: 13px; font-weight: 700; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 21px; border: 1px solid var(--ink); padding: 15px 19px; min-height: 49px; background: var(--ink); color: white; font-size: 13px; font-weight: 700; transition: background .2s, border-color .2s, transform .2s; }
+    .button:hover { background: #344244; border-color: #344244; transform: translateY(-2px); }
+    .button svg { width: 15px; height: 15px; }
+    .button-orange { background: var(--orange); border-color: var(--orange); color: var(--ink); }
+    .button-orange:hover { background: #ff7953; border-color: #ff7953; }
+    .button-outline { background: transparent; color: var(--ink); }
+    .button-outline:hover { background: var(--ink); color: white; }
+
+    .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+    .hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), rgba(49,69,65,.055) calc(25% - 1px), rgba(49,69,65,.055) 25%); }
+    .hero-inner { position: relative; min-height: 654px; display: grid; grid-template-columns: 51% 49%; align-items: center; }
+    .hero-copy { padding: 64px 48px 65px 0; }
+    .hero-copy .eyebrow { color: #53615e; margin-bottom: 27px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font: 600 clamp(62px, 5.75vw, 86px)/.99 var(--display); letter-spacing: -.078em; margin-bottom: 28px; }
+    h1 .outline { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .hero-description { font-size: 18px; line-height: 1.6; color: #596461; max-width: 510px; margin-bottom: 32px; }
+    .hero-ctas { display: flex; align-items: center; gap: 26px; }
+    .hero-ctas .button { min-width: 174px; }
+    .text-link { font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--ink); padding-bottom: 5px; }
+    .text-link:hover { color: var(--orange); border-color: var(--orange); }
+    .hero-footnote { margin-top: 62px; display: flex; align-items: center; gap: 12px; font: 500 11px var(--mono); color: #707a77; }
+    .hero-footnote .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #7ca889; box-shadow: 0 0 0 4px #dce7da; }
+
+    .hero-art { height: 548px; position: relative; border: 1px solid #354245; background: var(--dark); color: #dbe2dc; box-shadow: 14px 14px 0 #d8dcd5; overflow: hidden; }
+    .hero-art::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(227,237,228,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(227,237,228,.055) 1px, transparent 1px); background-size: 28px 28px; }
+    .art-top { height: 57px; padding: 0 21px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #455154; position: relative; z-index: 2; background: #263234; font: 500 10px var(--mono); letter-spacing: .06em; }
+    .art-top-left { display: flex; align-items: center; gap: 12px; }
+    .art-icon { width: 22px; height: 22px; border: 1px solid #afbab4; display: grid; place-items: center; color: var(--orange); font-size: 17px; line-height: 1; }
+    .art-top-right { color: #9baaa4; }
+    .art-top-right b { color: #a9d1af; font-weight: 500; }
+    .art-body { position: relative; height: 409px; z-index: 1; }
+    .diagram { position: absolute; width: 100%; height: 100%; inset: 0; }
+    .diagram-label { position: absolute; z-index: 2; font: 500 10px var(--mono); letter-spacing: .045em; color: #c8d1cb; }
+    .diagram-label small { display: block; font-size: 9px; color: #82918e; margin-top: 5px; }
+    .label-a { top: 40px; left: 35px; }
+    .label-b { top: 90px; right: 24px; text-align: right; }
+    .label-c { bottom: 38px; left: 37px; }
+    .art-stamp { position: absolute; right: 24px; bottom: 22px; border: 1px solid #65736d; padding: 9px 11px; color: #aec6b6; font: 600 9px var(--mono); letter-spacing: .07em; transform: rotate(-5deg); }
+    .art-bottom { height: 82px; display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #455154; position: relative; z-index: 2; background: #263234; }
+    .art-spec { padding: 15px 19px; border-right: 1px solid #455154; }
+    .art-spec:last-child { border-right: 0; }
+    .art-spec span { display: block; color: #879893; font: 500 9px var(--mono); letter-spacing: .07em; margin-bottom: 8px; }
+    .art-spec strong { color: #f0f2ec; font: 500 12px var(--mono); white-space: nowrap; }
+    .art-spec strong i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #92c69f; margin-right: 7px; }
+
+    .proof { background: #e9ebe5; border-bottom: 1px solid var(--line); }
+    .proof-inner { min-height: 109px; display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; align-items: center; }
+    .proof-intro { color: #4b5955; font: 600 11px/1.6 var(--mono); letter-spacing: .055em; text-transform: uppercase; }
+    .proof-item { border-left: 1px solid #cbd0c9; padding-left: 36px; display: flex; align-items: baseline; gap: 11px; }
+    .proof-item strong { font: 600 31px var(--display); letter-spacing: -.055em; }
+    .proof-item span { font-size: 12px; line-height: 1.3; color: #68736f; max-width: 103px; }
+
+    .section { padding: 104px 0 112px; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 40px; margin-bottom: 46px; }
+    .section-heading .eyebrow { color: var(--orange); margin-bottom: 17px; }
+    h2 { font: 600 clamp(39px, 4vw, 56px)/1.08 var(--display); letter-spacing: -.065em; margin-bottom: 0; }
+    .section-heading > p { max-width: 335px; margin-bottom: 4px; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .step-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); background: var(--white); }
+    .step { min-height: 330px; padding: 29px 31px 30px; border-right: 1px solid var(--line); display: flex; flex-direction: column; transition: background .2s; }
+    .step:last-child { border-right: 0; }
+    .step:hover { background: #f0f2eb; }
+    .step-top { display: flex; justify-content: space-between; align-items: start; font: 500 11px var(--mono); color: #77827d; }
+    .step-top svg { width: 47px; height: 47px; }
+    .step-content { margin-top: auto; }
+    .step h3 { font: 600 27px var(--display); letter-spacing: -.045em; margin: 0 0 12px; }
+    .step p { color: #66716d; font-size: 14px; line-height: 1.65; margin: 0; max-width: 320px; }
+
+    .platform { background: var(--dark); color: #f1f2ec; padding: 100px 0 106px; overflow: hidden; }
+    .platform-layout { display: grid; grid-template-columns: 36% 64%; gap: 0; align-items: center; }
+    .platform-copy { padding-right: 70px; }
+    .platform-copy .eyebrow { color: #ff9678; margin-bottom: 21px; }
+    .platform-copy h2 { font-size: clamp(40px, 4vw, 55px); margin-bottom: 23px; }
+    .platform-copy > p { color: #aebbb5; font-size: 16px; line-height: 1.7; margin-bottom: 31px; }
+    .feature-list { border-top: 1px solid #4b5858; margin: 0; padding: 0; list-style: none; }
+    .feature-list li { border-bottom: 1px solid #4b5858; padding: 15px 0; display: flex; align-items: center; gap: 15px; font-size: 13px; font-weight: 600; }
+    .feature-list li span { color: #ff9678; font: 500 10px var(--mono); }
+
+    .app-window { border: 1px solid #72817b; background: #f8f8f4; color: var(--ink); box-shadow: 16px 16px 0 #344143; }
+    .app-bar { height: 45px; background: #e9ede7; border-bottom: 1px solid #cfd7cf; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font: 600 10px var(--mono); }
+    .app-brand { display: flex; align-items: center; gap: 8px; }
+    .app-brand i { width: 13px; height: 13px; background: var(--orange); transform: rotate(45deg); }
+    .app-controls { display: flex; gap: 5px; }
+    .app-controls i { display: block; width: 7px; height: 7px; border: 1px solid #85928c; border-radius: 50%; }
+    .app-main { display: grid; grid-template-columns: 145px 1fr; min-height: 378px; }
+    .app-sidebar { border-right: 1px solid #dbe0d9; padding: 22px 12px; background: #f0f2ed; }
+    .app-sidebar-label { color: #86938b; font: 600 9px var(--mono); margin: 0 9px 14px; }
+    .side-item { padding: 10px 9px; color: #65716b; font: 500 10px var(--mono); display: flex; gap: 9px; align-items: center; }
+    .side-item.active { background: #dde7dc; color: #25332d; }
+    .side-item b { font-size: 13px; font-weight: 400; }
+    .app-content { padding: 23px 24px; min-width: 0; }
+    .app-content-head { display: flex; justify-content: space-between; align-items: start; margin-bottom: 21px; }
+    .app-content-head small { display: block; color: #849087; font: 500 9px var(--mono); margin-bottom: 7px; }
+    .app-content-head h3 { font: 600 21px var(--display); letter-spacing: -.045em; margin: 0; }
+    .app-filter { border: 1px solid #cbd3ca; padding: 8px 10px; font: 500 9px var(--mono); color: #58655d; }
+    .app-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
+    .app-metric { border: 1px solid #d5dcd3; padding: 12px 13px; background: white; }
+    .app-metric small { display: block; font: 500 9px var(--mono); color: #7a887f; margin-bottom: 6px; }
+    .app-metric strong { font: 600 23px var(--display); letter-spacing: -.04em; }
+    .app-metric strong em { font: 500 9px var(--mono); color: #53936e; font-style: normal; margin-left: 5px; }
+    .table-title { font: 600 10px var(--mono); margin-bottom: 10px; }
+    .orders { width: 100%; border-collapse: collapse; font: 500 10px var(--mono); }
+    .orders th { color: #89958d; text-align: left; font-weight: 500; padding: 9px 7px; border-block: 1px solid #dce2da; white-space: nowrap; }
+    .orders td { padding: 12px 7px; border-bottom: 1px solid #e2e6df; white-space: nowrap; }
+    .orders th:last-child, .orders td:last-child { text-align: right; }
+    .pill { display: inline-block; padding: 5px 7px; background: #e2eee3; color: #477b54; font: 600 9px var(--mono); }
+    .pill.orange { background: #f9e7da; color: #aa6742; }
+    .pill.blue { background: #e4edf0; color: #547782; }
+
+    .cta-section { padding: 102px 0; }
+    .cta-panel { position: relative; overflow: hidden; background: #e7e9e2; border: 1px solid #cbd1c8; padding: 72px 74px; display: flex; align-items: center; justify-content: space-between; gap: 45px; }
+    .cta-panel::after { content: ""; position: absolute; width: 430px; height: 430px; border: 1px solid #c9d0c6; border-radius: 50%; right: 155px; top: -250px; box-shadow: 0 0 0 49px #e7e9e2, 0 0 0 50px #c9d0c6, 0 0 0 99px #e7e9e2, 0 0 0 100px #c9d0c6; pointer-events: none; }
+    .cta-panel > * { position: relative; z-index: 1; }
+    .cta-panel .eyebrow { color: #d75d3b; margin-bottom: 17px; }
+    .cta-panel h2 { max-width: 650px; margin-bottom: 14px; }
+    .cta-panel p { margin: 0; color: #62706a; font-size: 15px; }
+    .cta-panel .button { flex: 0 0 auto; min-width: 185px; }
+
+    footer { border-top: 1px solid var(--line); padding: 30px 0; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; }
+    footer .brand { font-size: 23px; }
+    footer .brand-mark { width: 23px; height: 23px; }
+    footer .brand-mark::after { width: 7px; height: 7px; border-width: 3px; }
+    .footer-note { color: #7a837f; font: 500 10px var(--mono); }
+    .footer-links { display: flex; gap: 26px; font-size: 12px; font-weight: 600; }
+    .footer-links a:hover { color: var(--orange); }
+
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 24, 24, .72); z-index: 20; display: none; align-items: center; justify-content: center; padding: 24px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { position: relative; width: min(100%, 500px); background: var(--paper); padding: 42px; box-shadow: 16px 16px 0 rgba(239, 96, 58, .55); }
+    .modal-close { position: absolute; top: 17px; right: 17px; width: 32px; height: 32px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 23px; line-height: 1; }
+    .modal .eyebrow { color: #d75d3b; margin-bottom: 16px; }
+    .modal h2 { font-size: 38px; margin-bottom: 10px; }
+    .modal p { color: var(--muted); line-height: 1.6; font-size: 14px; margin-bottom: 24px; }
+    .modal label { display: block; font: 600 11px var(--mono); margin: 16px 0 7px; }
+    .modal input, .modal select { display: block; width: 100%; height: 47px; padding: 0 13px; border: 1px solid #bbc5bc; border-radius: 0; background: var(--white); color: var(--ink); outline-color: var(--orange); }
+    .modal form .button { width: 100%; margin-top: 23px; }
+    .success { display: none; padding: 18px; border: 1px solid #92ae96; background: #e5eee3; font-size: 14px; line-height: 1.6; }
+    .success.show { display: block; }
+
+    @media (max-width: 1100px) {
+      .shell { width: min(100% - 64px, 1328px); }
+      .nav-links { gap: 22px; margin-left: 10px; }
+      .hero-inner { grid-template-columns: 48% 52%; }
+      h1 { font-size: clamp(58px, 6vw, 78px); }
+      .hero-art { height: 500px; }
+      .art-body { height: 361px; }
+      .proof-item { padding-left: 20px; }
+      .platform-layout { grid-template-columns: 34% 66%; }
+      .platform-copy { padding-right: 30px; }
+    }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 36px, 1328px); }
+      .topline span:first-child { display: none; }
+      .topline .shell { justify-content: center; }
+      .nav { height: 68px; }
+      .nav-links, .nav-actions .login { display: none; }
+      .nav-actions .button { padding: 11px 13px; min-height: 42px; }
+      .hero-inner { display: block; padding-block: 55px 62px; }
+      .hero-copy { padding: 0 0 43px; }
+      h1 { font-size: clamp(52px, 11vw, 76px); }
+      .hero-description { font-size: 16px; }
+      .hero-footnote { margin-top: 35px; }
+      .hero-art { height: 480px; box-shadow: 8px 8px 0 #d8dcd5; }
+      .art-body { height: 341px; }
+      .proof-inner { grid-template-columns: repeat(3, 1fr); padding: 24px 0; gap: 15px; }
+      .proof-intro { grid-column: 1/-1; }
+      .proof-item { padding-left: 12px; gap: 5px; flex-wrap: wrap; }
+      .proof-item strong { font-size: 25px; }
+      .proof-item span { font-size: 10px; }
+      .section, .platform, .cta-section { padding-block: 70px; }
+      .section-heading { display: block; }
+      .section-heading > p { margin-top: 19px; }
+      .step-grid { grid-template-columns: 1fr; }
+      .step { min-height: 235px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .step:last-child { border-bottom: 0; }
+      .platform-layout { display: block; }
+      .platform-copy { padding: 0 0 40px; }
+      .app-main { grid-template-columns: 105px 1fr; }
+      .app-sidebar { padding-inline: 5px; }
+      .app-content { padding: 18px 12px; overflow-x: auto; }
+      .orders { min-width: 430px; }
+      .cta-panel { padding: 43px 27px; display: block; }
+      .cta-panel .button { margin-top: 27px; }
+      .footer-inner { gap: 20px; flex-wrap: wrap; }
+    }
+    @media (max-width: 480px) {
+      .hero-ctas { gap: 17px; }
+      .hero-ctas .button { min-width: auto; }
+      .hero-art { height: 415px; }
+      .art-body { height: 276px; }
+      .diagram-label, .art-stamp { display: none; }
+      .art-spec { padding: 15px 8px; }
+      .art-spec strong { font-size: 9px; }
+      .app-sidebar { display: none; }
+      .app-main { display: block; }
+      .app-metric { padding: 10px 7px; }
+      .app-metric strong { font-size: 19px; }
+      .modal { padding: 34px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topline">
+    <div class="shell">
+      <span>BUILT FOR THE WAY MANUFACTURING ACTUALLY MOVES.</span>
+      <span>SPECIFICATION → DELIVERY, CONNECTED.</span>
+    </div>
+  </div>
+
+  <header class="nav">
+    <div class="shell nav-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <span class="brand-mark" aria-hidden="true"></span><span class="brand-word">acme.</span>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="#platform">Platform</a>
+        <a href="#why-acme">Why Acme</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="login" href="#platform">Explore the platform</a>
+        <button class="button js-demo" type="button">Book a demo <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.5"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="shell hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="orange-dash"></span>THE OPERATIONS PLATFORM FOR CUSTOM WIDGETS</div>
+          <h1 id="hero-title">Custom widgets.<br><span class="outline">Zero loose ends.</span></h1>
+          <p class="hero-description">From the first specification to the final shipment, Acme keeps every custom widget—and everyone responsible for it—moving in sync.</p>
+          <div class="hero-ctas">
+            <button class="button button-orange js-demo" type="button">Book a demo <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.5"/></svg></button>
+            <a class="text-link" href="#how-it-works">See how it works ↗</a>
+          </div>
+          <div class="hero-footnote"><span class="status-dot"></span> ONE SYSTEM. EVERY MOVING PART ACCOUNTED FOR.</div>
+        </div>
+
+        <div class="hero-art" role="img" aria-label="Technical drawing of a custom widget assembly with configuration specifications">
+          <div class="art-top">
+            <div class="art-top-left"><span class="art-icon">⌗</span><span>ACME / CONFIGURATION STUDIO</span></div>
+            <div class="art-top-right">ASSEMBLY 0042 &nbsp; <b>● APPROVED</b></div>
+          </div>
+          <div class="art-body">
+            <svg class="diagram" viewBox="0 0 630 409" preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a6b9ae"/><stop offset=".46" stop-color="#536e69"/><stop offset="1" stop-color="#263b3b"/></linearGradient>
+                <linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d5ded1"/><stop offset="1" stop-color="#667e73"/></linearGradient>
+                <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0v7" stroke="#aec2b4" stroke-opacity=".16" stroke-width="2"/></pattern>
+              </defs>
+              <!-- measurement lines -->
+              <g stroke="#82958e" stroke-width="1" opacity=".55">
+                <path d="M88 207h454M316 25v362" stroke-dasharray="3 6"/>
+                <path d="M154 78v242M475 78v242" stroke-dasharray="2 5"/>
+                <path d="M154 59h321m-321-5v10m321-10v10"/>
+                <path d="M103 113v192m-5-192h10m-10 192h10"/>
+                <path d="M523 144v126m-5-126h10m-10 126h10"/>
+              </g>
+              <g fill="#9aaca4" font-family="IBM Plex Mono, monospace" font-size="9">
+                <text x="284" y="49">146.00 MM</text>
+                <text x="48" y="211" transform="rotate(-90 48 211)">Ø 82.00 MM</text>
+                <text x="533" y="210" transform="rotate(-90 533 210)">TOL ±0.02</text>
+              </g>
+              <!-- exploded alignment rails -->
+              <g stroke="#f18a6b" stroke-width="1" stroke-dasharray="4 6" opacity=".8">
+                <path d="M153 153 469 117M153 260l316 37"/>
+                <path d="M239 100v219M393 91v232"/>
+              </g>
+              <!-- rear component -->
+              <g transform="translate(108 207)">
+                <ellipse cx="36" cy="0" rx="34" ry="95" fill="#243a3b" stroke="#a8b9ac" stroke-width="2"/>
+                <path d="M36-95l30 12v166L36 95" fill="#4b6762" stroke="#93a99c" stroke-width="1.5"/>
+                <ellipse cx="66" cy="0" rx="34" ry="83" fill="url(#steel)" stroke="#c0cfc0" stroke-width="2"/>
+                <ellipse cx="66" cy="0" rx="23" ry="61" fill="#2b4141" stroke="#b1c5b5" stroke-width="1.5"/>
+                <ellipse cx="66" cy="0" rx="12" ry="38" fill="#26393a" stroke="#6b887a"/>
+                <path d="M63-78v15m0 126v15" stroke="#d6e0d3" stroke-width="2"/>
+              </g>
+              <!-- main cylindrical body -->
+              <g transform="translate(224 207)">
+                <path d="M0-92 121-109v218L0 92Z" fill="url(#steel)" stroke="#bbcbbd" stroke-width="2"/>
+                <path d="M0-92 121-109v218L0 92Z" fill="url(#hatch)"/>
+                <path d="M20-94v187m23-190v194m32-199v203" stroke="#294643" stroke-width="3" opacity=".65"/>
+                <path d="M104-107v214" stroke="#d6e0d1" stroke-width="2"/>
+                <ellipse cx="0" cy="0" rx="38" ry="92" fill="#5f7a6e" stroke="#d3ddd0" stroke-width="2"/>
+                <ellipse cx="0" cy="0" rx="25" ry="72" fill="#273e3d" stroke="#adbdaf" stroke-width="2"/>
+                <ellipse cx="0" cy="0" rx="14" ry="49" fill="#1f3334" stroke="#829d8c"/>
+                <ellipse cx="121" cy="0" rx="42" ry="109" fill="url(#face)" stroke="#e0e6d8" stroke-width="2"/>
+                <ellipse cx="121" cy="0" rx="32" ry="87" fill="#547064" stroke="#253f3d" stroke-width="2"/>
+                <ellipse cx="121" cy="0" rx="23" ry="62" fill="#223939" stroke="#b7c8b8" stroke-width="2"/>
+                <ellipse cx="121" cy="0" rx="11" ry="37" fill="#192f31" stroke="#a7baaa"/>
+                <g fill="#263e3c" stroke="#d0dccc" stroke-width="1.3">
+                  <circle cx="114" cy="-97" r="5"/><circle cx="146" cy="-64" r="5"/><circle cx="156" cy="0" r="5"/>
+                  <circle cx="146" cy="64" r="5"/><circle cx="114" cy="97" r="5"/><circle cx="91" cy="64" r="5"/>
+                  <circle cx="84" cy="0" r="5"/><circle cx="91" cy="-64" r="5"/>
+                </g>
+              </g>
+              <!-- front ring -->
+              <g transform="translate(467 207)">
+                <path d="M0-83 19-77v154L0 83" fill="#405d56" stroke="#b4c6b6" stroke-width="1.5"/>
+                <ellipse cx="0" cy="0" rx="34" ry="83" fill="#82998a" stroke="#d9e1d2" stroke-width="2"/>
+                <ellipse cx="19" cy="0" rx="34" ry="77" fill="url(#face)" stroke="#e1e7d9" stroke-width="2"/>
+                <ellipse cx="19" cy="0" rx="22" ry="58" fill="#263e3d" stroke="#c5d3c3" stroke-width="2"/>
+                <ellipse cx="19" cy="0" rx="13" ry="38" fill="#1e3435" stroke="#688c78"/>
+                <path d="M15-71v12m0 118v12" stroke="#f1f2e4" stroke-width="2"/>
+              </g>
+              <!-- callouts -->
+              <g stroke="#f18a6b" stroke-width="1.2">
+                <path d="M237 111 198 77h-70"/><circle cx="237" cy="111" r="3" fill="#f18a6b"/>
+                <path d="M380 133 421 82h78"/><circle cx="380" cy="133" r="3" fill="#f18a6b"/>
+                <path d="M262 292 213 351h-75"/><circle cx="262" cy="292" r="3" fill="#f18a6b"/>
+              </g>
+              <g fill="#f18a6b" font-family="IBM Plex Mono, monospace" font-size="10">
+                <text x="113" y="71">01</text><text x="503" y="85">02</text><text x="120" y="354">03</text>
+              </g>
+              <!-- corner registration marks -->
+              <g stroke="#81928b" opacity=".7"><path d="M19 19h18m-18 0v18M611 19h-18m18 0v18M19 390h18m-18 0v-18M611 390h-18m18 0v-18"/></g>
+            </svg>
+            <div class="diagram-label label-a">PRECISION FIT<small>CONFIGURABLE TOLERANCES</small></div>
+            <div class="diagram-label label-b">MODULAR CORE<small>REVISION 03 / LOCKED</small></div>
+            <div class="diagram-label label-c">MATERIAL: 316 STAINLESS</div>
+            <div class="art-stamp">READY FOR PRODUCTION</div>
+          </div>
+          <div class="art-bottom">
+            <div class="art-spec"><span>PART NUMBER</span><strong>AC-WG-042-B</strong></div>
+            <div class="art-spec"><span>CONFIGURATION</span><strong>REV 03 / CUSTOM</strong></div>
+            <div class="art-spec"><span>WORKFLOW STATUS</span><strong><i></i>ON TRACK</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="proof" id="why-acme" aria-label="Why operations teams choose Acme">
+      <div class="shell proof-inner">
+        <div class="proof-intro">LESS CHASING.<br>MORE MAKING.</div>
+        <div class="proof-item"><strong>01</strong><span>place for every specification</span></div>
+        <div class="proof-item"><strong>0</strong><span>mystery order statuses</span></div>
+        <div class="proof-item"><strong>∞</strong><span>ways to make it yours</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow"><span class="orange-dash"></span>A BETTER WAY TO BUILD</div>
+            <h2>Every step clicks<br>into place.</h2>
+          </div>
+          <p>Replace scattered spreadsheets, long email threads, and status guesswork with one connected workflow.</p>
+        </div>
+        <div class="step-grid">
+          <article class="step">
+            <div class="step-top">
+              <span>01 / CONFIGURE</span>
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="5" y="5" width="38" height="38" stroke="#A6B1A9"/><circle cx="24" cy="24" r="12" stroke="#243533" stroke-width="1.5"/><circle cx="24" cy="24" r="4" fill="#EF603A"/><path d="M24 2v8m0 28v8M2 24h8m28 0h8" stroke="#243533" stroke-width="1.5"/></svg>
+            </div>
+            <div class="step-content">
+              <h3>Get the spec right.</h3>
+              <p>Define dimensions, materials, and requirements in a guided configuration your whole team can trust.</p>
+            </div>
+          </article>
+          <article class="step">
+            <div class="step-top">
+              <span>02 / ORDER</span>
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M10 4h22l7 7v33H10V4Z" stroke="#243533" stroke-width="1.5"/><path d="M31 4v9h8M16 21h17M16 27h17M16 33h10" stroke="#A6B1A9" stroke-width="1.5"/><path d="m30 33 4 4 8-9" stroke="#EF603A" stroke-width="2"/></svg>
+            </div>
+            <div class="step-content">
+              <h3>Order with certainty.</h3>
+              <p>Turn approved designs into orders without re-entering details or losing the latest revision.</p>
+            </div>
+          </article>
+          <article class="step">
+            <div class="step-top">
+              <span>03 / TRACK</span>
+              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M5 35h38M8 35V22l11-7 10 7 11-12v25" stroke="#243533" stroke-width="1.5"/><circle cx="8" cy="22" r="3" fill="#F4F2EC" stroke="#243533" stroke-width="1.5"/><circle cx="19" cy="15" r="3" fill="#F4F2EC" stroke="#243533" stroke-width="1.5"/><circle cx="29" cy="22" r="3" fill="#F4F2EC" stroke="#243533" stroke-width="1.5"/><circle cx="40" cy="10" r="4" fill="#EF603A"/></svg>
+            </div>
+            <div class="step-content">
+              <h3>See what’s next.</h3>
+              <p>Follow every order through production and delivery, with the context to act before delays become surprises.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="platform" id="platform">
+      <div class="shell platform-layout">
+        <div class="platform-copy">
+          <div class="eyebrow"><span class="orange-dash"></span>CONTROL, WITHOUT THE CHAOS</div>
+          <h2>The whole picture.<br>One clear view.</h2>
+          <p>Know what’s specified, what’s in motion, and what needs attention. Acme gives operations a shared source of truth from request to receipt.</p>
+          <ul class="feature-list">
+            <li><span>01 ↗</span> Live order visibility</li>
+            <li><span>02 ↗</span> Revision history that stays put</li>
+            <li><span>03 ↗</span> Supply chain coordination</li>
+          </ul>
+        </div>
+        <div class="app-window" aria-label="Preview of the Acme order dashboard">
+          <div class="app-bar">
+            <div class="app-brand"><i aria-hidden="true"></i> acme. <span style="color:#9aa69e;font-weight:400;margin-left:8px">/ OPERATIONS</span></div>
+            <div class="app-controls" aria-hidden="true"><i></i><i></i><i></i></div>
+          </div>
+          <div class="app-main">
+            <div class="app-sidebar">
+              <div class="app-sidebar-label">WORKSPACE</div>
+              <div class="side-item"><b>▦</b> Overview</div>
+              <div class="side-item active"><b>▤</b> Orders</div>
+              <div class="side-item"><b>◇</b> Configurations</div>
+              <div class="side-item"><b>◷</b> Activity</div>
+            </div>
+            <div class="app-content">
+              <div class="app-content-head">
+                <div><small>WORKSPACE / ORDERS</small><h3>Order overview</h3></div>
+                <div class="app-filter">ALL ORDERS ▾</div>
+              </div>
+              <div class="app-metrics">
+                <div class="app-metric"><small>ACTIVE ORDERS</small><strong>24 <em>↗ 4</em></strong></div>
+                <div class="app-metric"><small>ON SCHEDULE</small><strong>96%</strong></div>
+                <div class="app-metric"><small>NEEDS REVIEW</small><strong>02</strong></div>
+              </div>
+              <div class="table-title">RECENT ACTIVITY <span style="float:right;color:#87958a;font-weight:400">VIEW ALL →</span></div>
+              <table class="orders">
+                <thead><tr><th>ORDER / PART</th><th>CONFIGURATION</th><th>EST. DELIVERY</th><th>STATUS</th></tr></thead>
+                <tbody>
+                  <tr><td>AC-1042 / Valve housing</td><td>Rev 03</td><td>Oct 14</td><td><span class="pill">In production</span></td></tr>
+                  <tr><td>AC-1038 / Mounting bracket</td><td>Rev 02</td><td>Oct 18</td><td><span class="pill blue">In transit</span></td></tr>
+                  <tr><td>AC-1034 / Coupling assembly</td><td>Rev 05</td><td>Oct 22</td><td><span class="pill orange">Awaiting approval</span></td></tr>
+                  <tr><td>AC-1029 / Spacer ring</td><td>Rev 01</td><td>Oct 26</td><td><span class="pill">In production</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="shell">
+        <div class="cta-panel">
+          <div>
+            <div class="eyebrow"><span class="orange-dash"></span>LET’S GET THINGS MOVING</div>
+            <h2>Make room for work that moves forward.</h2>
+            <p>See what a more connected widget workflow could look like for your team.</p>
+          </div>
+          <button class="button button-orange js-demo" type="button">Book your demo <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h11m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.5"/></svg></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <a class="brand" href="#" aria-label="Acme home"><span class="brand-mark" aria-hidden="true"></span><span class="brand-word">acme.</span></a>
+      <span class="footer-note">BUILT FOR BETTER OPERATIONS. © 2026 ACME.</span>
+      <div class="footer-links"><a href="#how-it-works">How it works</a><a href="#platform">Platform</a><a href="mailto:hello@acme.example">Contact</a></div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="demo-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal">
+      <button class="modal-close" type="button" aria-label="Close dialog">×</button>
+      <div class="eyebrow"><span class="orange-dash"></span>SEE ACME IN ACTION</div>
+      <h2 id="modal-title">Let’s talk widgets.</h2>
+      <p>Tell us a little about your team. We’ll follow up to find a time for a tailored walkthrough.</p>
+      <form id="demo-form">
+        <label for="demo-name">YOUR NAME</label>
+        <input id="demo-name" name="name" type="text" autocomplete="name" placeholder="Alex Morgan" required>
+        <label for="demo-email">WORK EMAIL</label>
+        <input id="demo-email" name="email" type="email" autocomplete="email" placeholder="alex@company.com" required>
+        <label for="demo-company">COMPANY</label>
+        <input id="demo-company" name="company" type="text" autocomplete="organization" placeholder="Your company" required>
+        <button class="button button-orange" type="submit">Request a demo <span aria-hidden="true">→</span></button>
+      </form>
+      <div class="success" id="demo-success" role="status">Thanks for reaching out. Your demo request is ready—connect this form to your scheduling or CRM service to deliver it to your team.</div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const modal = document.getElementById('demo-modal');
+      const form = document.getElementById('demo-form');
+      const closeButton = modal.querySelector('.modal-close');
+      let previousFocus;
+
+      function openModal() {
+        previousFocus = document.activeElement;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('demo-name').focus();
+      }
+      function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        if (previousFocus) previousFocus.focus();
+      }
+      document.querySelectorAll('.js-demo').forEach(button => button.addEventListener('click', openModal));
+      closeButton.addEventListener('click', closeModal);
+      modal.addEventListener('click', event => { if (event.target === modal) closeModal(); });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+      });
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        form.style.display = 'none';
+        document.getElementById('demo-success').classList.add('show');
+      });
+    })();
+  </script>
+</body>
+</html>

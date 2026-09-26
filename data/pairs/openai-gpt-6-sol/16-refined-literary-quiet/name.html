@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ee">
+  <meta name="description" content="Acme brings custom widget configuration, ordering, and supply-chain tracking into one clear workspace. Book a demo.">
+  <title>Acme — Every part, in its place.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f6f4ee;
+      --paper-deep: #eeebe2;
+      --ink: #242824;
+      --muted: #656961;
+      --line: #cbc9bf;
+      --red: #b54332;
+      --red-dark: #923525;
+      --sans: "IBM Plex Sans", Arial, sans-serif;
+      --serif: "Newsreader", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    ::selection { background: #d6a69a; color: var(--ink); }
+
+    .wrap { width: min(1288px, calc(100% - 112px)); margin-inline: auto; }
+    .eyebrow {
+      margin: 0;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .rule { border: 0; border-top: 1px solid var(--line); margin: 0; }
+
+    .site-header {
+      height: 86px;
+      border-bottom: 1px solid var(--line);
+    }
+    .header-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      font-size: 25px;
+      font-weight: 600;
+      letter-spacing: -.085em;
+      line-height: 1;
+    }
+    .brand-mark {
+      display: block;
+      width: 16px;
+      height: 16px;
+      background: var(--red);
+      transform: rotate(-18deg);
+    }
+    .header-right { display: flex; align-items: center; gap: 48px; }
+    .main-nav { display: flex; align-items: center; gap: 36px; }
+    .main-nav a {
+      color: #494d47;
+      font-size: 13px;
+      transition: color .2s ease;
+    }
+    .main-nav a:hover, .main-nav a:focus-visible { color: var(--red); }
+    .header-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 24px;
+      border-bottom: 1px solid var(--ink);
+      padding: 10px 0;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color .2s ease, border-color .2s ease;
+    }
+    .header-cta:hover { color: var(--red); border-color: var(--red); }
+    .arrow { font-size: 19px; font-weight: 400; line-height: .7; }
+
+    .hero { padding: 70px 0 58px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+      gap: 58px;
+      align-items: stretch;
+    }
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 16px 0 20px;
+    }
+    .hero-kicker { display: flex; align-items: center; gap: 14px; color: var(--red); }
+    .hero-kicker::before { content: ""; width: 25px; height: 1px; background: currentColor; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      margin: 61px 0 28px;
+      font-family: var(--serif);
+      font-size: clamp(70px, 6.7vw, 100px);
+      font-weight: 400;
+      line-height: .98;
+      letter-spacing: -.057em;
+    }
+    h1 em {
+      color: var(--red);
+      font-weight: 400;
+      white-space: nowrap;
+    }
+    .hero-description {
+      max-width: 475px;
+      margin: 0;
+      color: #515650;
+      font-size: 17px;
+      line-height: 1.75;
+    }
+    .hero-action { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-top: 42px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 58px;
+      min-height: 56px;
+      padding: 0 20px 0 24px;
+      background: var(--red);
+      border: 1px solid var(--red);
+      color: #fffaf4;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease;
+    }
+    .button:hover { background: var(--red-dark); transform: translateY(-2px); }
+    .button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 2px solid var(--red);
+      outline-offset: 4px;
+    }
+    .button .arrow { font-size: 22px; }
+    .action-note { color: var(--muted); font-size: 12px; }
+
+    .illustration {
+      position: relative;
+      min-height: 560px;
+      overflow: hidden;
+      background: var(--paper-deep);
+      border: 1px solid #e2ded4;
+    }
+    .illustration::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      width: 150px;
+      height: 150px;
+      right: -80px;
+      top: -79px;
+      border: 1px solid #c8bdb0;
+      transform: rotate(45deg);
+    }
+    .figure-top, .figure-bottom {
+      position: absolute;
+      z-index: 2;
+      right: 27px;
+      left: 27px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: #555b54;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+    .figure-top { top: 25px; }
+    .figure-bottom { bottom: 23px; align-items: end; }
+    .figure-bottom span:last-child { text-align: right; }
+    .figure-index { color: var(--red); }
+    .widget-drawing {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      max-width: 560px;
+      height: auto;
+      transform: translate(-50%, -48%);
+    }
+
+    .chapter-line {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--line);
+    }
+    .chapter-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      min-height: 81px;
+      padding: 0 24px;
+      font-size: 14px;
+    }
+    .chapter-item:first-child { padding-left: 0; }
+    .chapter-item + .chapter-item { border-left: 1px solid var(--line); }
+    .chapter-number { color: var(--red); font-family: var(--serif); font-size: 24px; }
+    .chapter-item .small-arrow { margin-left: auto; color: #8c9189; font-size: 19px; }
+
+    .section-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      padding: 122px 0 66px;
+    }
+    .section-intro .eyebrow { color: var(--red); }
+    .section-intro h2 {
+      max-width: 660px;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(48px, 5vw, 73px);
+      font-weight: 400;
+      line-height: 1.04;
+      letter-spacing: -.047em;
+    }
+    .section-intro h2 em { font-weight: 400; }
+    .section-intro-copy {
+      align-self: end;
+      max-width: 410px;
+      margin: 0 0 5px auto;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .features { border-top: 1px solid var(--ink); }
+    .feature {
+      display: grid;
+      grid-template-columns: 74px minmax(240px, .72fr) minmax(340px, 1fr) 30px;
+      gap: 25px;
+      align-items: start;
+      padding: 35px 0 39px;
+      border-bottom: 1px solid var(--line);
+    }
+    .feature-num { color: var(--red); font-family: var(--serif); font-size: 24px; line-height: 1.25; }
+    .feature h3 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: 35px;
+      font-weight: 400;
+      letter-spacing: -.035em;
+      line-height: 1.15;
+    }
+    .feature p {
+      max-width: 525px;
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+    .feature-glyph { color: var(--red); font-size: 22px; line-height: 1.1; }
+
+    .statement {
+      margin-top: 123px;
+      padding: 95px 0 105px;
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .statement-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 75px;
+    }
+    .statement .eyebrow { color: #d98977; padding-top: 10px; }
+    .statement blockquote {
+      margin: 0;
+      max-width: 850px;
+      font-family: var(--serif);
+      font-size: clamp(44px, 5vw, 72px);
+      line-height: 1.13;
+      letter-spacing: -.04em;
+    }
+    .statement blockquote em { color: #df9e8e; font-weight: 400; }
+    .statement-caption {
+      margin: 34px 0 0;
+      color: #bebfb7;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .demo { padding: 122px 0 133px; }
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; }
+    .demo .eyebrow { color: var(--red); }
+    .demo h2 {
+      max-width: 540px;
+      margin: 35px 0 20px;
+      font-family: var(--serif);
+      font-size: clamp(55px, 5vw, 75px);
+      font-weight: 400;
+      line-height: 1.03;
+      letter-spacing: -.045em;
+    }
+    .demo-copy > p:last-child {
+      max-width: 410px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+    .demo-form { padding-top: 12px; }
+    .form-row { margin-bottom: 25px; }
+    .form-row label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .form-row input {
+      display: block;
+      width: 100%;
+      height: 48px;
+      padding: 8px 0;
+      border: 0;
+      border-bottom: 1px solid #aeb1a8;
+      border-radius: 0;
+      outline: none;
+      background: transparent;
+      color: var(--ink);
+      font-size: 16px;
+    }
+    .form-row input::placeholder { color: #93978f; }
+    .form-row input:focus { border-bottom-color: var(--red); }
+    .form-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; margin-top: 35px; }
+    .form-note { max-width: 230px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .form-status { min-height: 22px; margin: 17px 0 0; color: var(--red-dark); font-size: 13px; }
+
+    .site-footer { border-top: 1px solid var(--ink); }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      min-height: 111px;
+    }
+    .footer-inner .brand { font-size: 21px; }
+    .footer-inner .brand-mark { width: 13px; height: 13px; }
+    .footer-note { color: var(--muted); font-size: 12px; }
+    .footer-link { font-size: 12px; border-bottom: 1px solid var(--ink); padding-bottom: 4px; }
+
+    @media (max-width: 1000px) {
+      .wrap { width: min(100% - 64px, 1288px); }
+      .hero-grid { gap: 28px; }
+      h1 { font-size: clamp(62px, 7vw, 86px); }
+      .illustration { min-height: 500px; }
+      .widget-drawing { width: 115%; }
+      .demo-grid { gap: 55px; }
+    }
+    @media (max-width: 700px) {
+      .wrap { width: calc(100% - 40px); }
+      .site-header { height: 72px; }
+      .header-right { gap: 0; }
+      .main-nav { display: none; }
+      .header-cta { gap: 12px; }
+      .hero { padding: 44px 0 48px; }
+      .hero-grid, .section-intro, .statement-grid, .demo-grid { grid-template-columns: 1fr; }
+      .hero-copy { padding: 0; }
+      h1 { margin: 39px 0 22px; font-size: clamp(60px, 12vw, 85px); }
+      h1 em { white-space: normal; }
+      .hero-description { font-size: 16px; }
+      .hero-action { margin-top: 30px; }
+      .illustration { min-height: 450px; margin-top: 20px; }
+      .widget-drawing { width: 100%; }
+      .chapter-line { grid-template-columns: 1fr; }
+      .chapter-item { min-height: 65px; padding: 0 4px; }
+      .chapter-item + .chapter-item { border-left: 0; border-top: 1px solid var(--line); }
+      .section-intro { gap: 23px; padding: 85px 0 42px; }
+      .section-intro h2 { font-size: 54px; }
+      .section-intro-copy { margin: 0; }
+      .feature { grid-template-columns: 42px 1fr 20px; gap: 14px; padding: 28px 0; }
+      .feature h3 { font-size: 30px; }
+      .feature p { grid-column: 2 / 3; margin-top: -2px; }
+      .feature-glyph { grid-column: 3; grid-row: 1; }
+      .statement { margin-top: 85px; padding: 75px 0 80px; }
+      .statement-grid { gap: 30px; }
+      .statement blockquote { font-size: clamp(43px, 8vw, 62px); }
+      .demo { padding: 85px 0 95px; }
+      .demo-grid { gap: 28px; }
+      .demo h2 { margin-top: 26px; font-size: 60px; }
+      .footer-inner { min-height: 100px; flex-wrap: wrap; padding: 25px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#top" aria-label="Acme, back to top"><span class="brand-mark" aria-hidden="true"></span>acme</a>
+      <div class="header-right">
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="#platform">The platform</a>
+          <a href="#approach">Our approach</a>
+        </nav>
+        <a class="header-cta" href="#demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow hero-kicker">A better way to make things happen</p>
+          <h1 id="hero-title">Every part,<br><em>in its place.</em></h1>
+          <p class="hero-description">Custom widgets have a way of creating complicated work. Acme brings configuration, ordering, and supply-chain tracking into one clear, considered workspace.</p>
+          <div class="hero-action">
+            <a class="button" href="#demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+            <span class="action-note">See the whole picture in 30 minutes.</span>
+          </div>
+        </div>
+
+        <div class="illustration" role="img" aria-label="An exploded technical drawing of a custom widget, with its components aligned from specification to assembly">
+          <div class="figure-top"><span>Figure 01 / A widget, considered</span><span class="figure-index">AC—01</span></div>
+          <svg class="widget-drawing" viewBox="0 0 560 540" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+                <line x1="0" y1="0" x2="0" y2="7" stroke="#c5c1b6" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <!-- Drawing guides -->
+            <path d="M280 61V471" stroke="#b9b9ad" stroke-width="1" stroke-dasharray="4 6"/>
+            <path d="M91 267H469" stroke="#d3d0c7" stroke-width="1" stroke-dasharray="3 6"/>
+            <circle cx="280" cy="268" r="189" stroke="#d5d1c7" stroke-width="1"/>
+            <circle cx="280" cy="268" r="155" stroke="#d5d1c7" stroke-width="1" stroke-dasharray="2 7"/>
+            <path d="M280 49v19m-9-10h18M280 461v19m-9-10h18" stroke="#b0b2a9"/>
+
+            <!-- Top floating cap -->
+            <ellipse cx="280" cy="135" rx="89" ry="28" fill="#f6f4ee" stroke="#3b433e" stroke-width="1.5"/>
+            <path d="M191 135v25c0 15 40 29 89 29s89-14 89-29v-25" fill="#e3dfd5" stroke="#3b433e" stroke-width="1.5"/>
+            <path d="M191 160c0 15 40 29 89 29s89-14 89-29" stroke="#3b433e" stroke-width="1.5"/>
+            <ellipse cx="280" cy="135" rx="51" ry="15" stroke="#788079" stroke-width="1"/>
+            <ellipse cx="280" cy="135" rx="23" ry="7" fill="#e3dfd5" stroke="#3b433e" stroke-width="1"/>
+            <path d="M204 146c21 12 49 18 76 18s55-6 76-18" stroke="#777e75" stroke-width=".8" stroke-dasharray="2 5"/>
+
+            <!-- Main assembly -->
+            <path d="M170 259c0-29 49-49 110-49s110 20 110 49v94c0 29-49 49-110 49s-110-20-110-49v-94Z" fill="#e2ded4" stroke="#3b433e" stroke-width="1.5"/>
+            <path d="M170 259c0 29 49 49 110 49s110-20 110-49" stroke="#3b433e" stroke-width="1.5"/>
+            <ellipse cx="280" cy="259" rx="110" ry="49" fill="#f2efe7" stroke="#3b433e" stroke-width="1.5"/>
+            <ellipse cx="280" cy="259" rx="80" ry="33" fill="url(#hatch)" stroke="#606960" stroke-width="1"/>
+            <ellipse cx="280" cy="259" rx="49" ry="19" fill="#e2ded4" stroke="#3b433e" stroke-width="1.3"/>
+            <ellipse cx="280" cy="259" rx="23" ry="9" fill="#f6f4ee" stroke="#3b433e" stroke-width="1"/>
+            <path d="M170 291c0 29 49 49 110 49s110-20 110-49M170 322c0 29 49 49 110 49s110-20 110-49" stroke="#777e75" stroke-width="1"/>
+            <path d="M183 368c17 19 53 33 97 33s80-14 97-33" stroke="#3b433e" stroke-width="1.5"/>
+            <path d="M197 285v85m166-85v85" stroke="#aaa99f" stroke-width=".8"/>
+
+            <!-- Fastening marks -->
+            <circle cx="205" cy="254" r="3" fill="#788079"/>
+            <circle cx="355" cy="254" r="3" fill="#788079"/>
+            <circle cx="280" cy="290" r="3" fill="#788079"/>
+
+            <!-- Annotation leaders -->
+            <path d="M366 139h73v-35" stroke="#ad4938" stroke-width="1"/>
+            <circle cx="366" cy="139" r="3" fill="#ad4938"/>
+            <text x="439" y="94" fill="#ad4938" font-family="IBM Plex Sans, Arial, sans-serif" font-size="10" letter-spacing="1.5" text-anchor="end">SPECIFY</text>
+            <path d="M177 280H98v-33" stroke="#ad4938" stroke-width="1"/>
+            <circle cx="177" cy="280" r="3" fill="#ad4938"/>
+            <text x="99" y="237" fill="#ad4938" font-family="IBM Plex Sans, Arial, sans-serif" font-size="10" letter-spacing="1.5">ORDER</text>
+            <path d="M377 362h79v40" stroke="#ad4938" stroke-width="1"/>
+            <circle cx="377" cy="362" r="3" fill="#ad4938"/>
+            <text x="456" y="419" fill="#ad4938" font-family="IBM Plex Sans, Arial, sans-serif" font-size="10" letter-spacing="1.5" text-anchor="end">TRACK</text>
+
+            <!-- Dimension marks -->
+            <path d="M145 207v194m-8-194h16m-16 194h16M145 207l-4 7m4-7 4 7m-4 187-4-7m4 7 4-7" stroke="#a3a79e" stroke-width="1"/>
+            <text x="133" y="305" fill="#727970" font-family="IBM Plex Sans, Arial, sans-serif" font-size="9" letter-spacing="1" transform="rotate(-90 133 305)">ONE CONTINUOUS VIEW</text>
+          </svg>
+          <div class="figure-bottom"><span>Built to specification.<br>Visible at every step.</span><span>CONFIGURE &nbsp;·&nbsp; ORDER &nbsp;·&nbsp; TRACK</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="wrap" aria-label="Platform stages">
+      <div class="chapter-line">
+        <div class="chapter-item"><span class="chapter-number">01</span><span>Configure with confidence</span><span class="small-arrow" aria-hidden="true">↗</span></div>
+        <div class="chapter-item"><span class="chapter-number">02</span><span>Order without ambiguity</span><span class="small-arrow" aria-hidden="true">↗</span></div>
+        <div class="chapter-item"><span class="chapter-number">03</span><span>Track the entire journey</span><span class="small-arrow" aria-hidden="true">↗</span></div>
+      </div>
+    </div>
+
+    <section class="wrap" id="platform" aria-labelledby="platform-title">
+      <div class="section-intro">
+        <div>
+          <p class="eyebrow">The platform</p>
+          <h2 id="platform-title">Complex work deserves a <em>simple view.</em></h2>
+        </div>
+        <p class="section-intro-copy">When specifications, orders, and updates live in different places, small uncertainties become expensive ones. Acme connects the work so your team can move forward with certainty.</p>
+      </div>
+
+      <div class="features">
+        <article class="feature">
+          <span class="feature-num">01 /</span>
+          <h3>Begin with the details.</h3>
+          <p>Build the widget you actually need. Give every configuration a clear specification that your team and suppliers can work from.</p>
+          <span class="feature-glyph" aria-hidden="true">↗</span>
+        </article>
+        <article class="feature">
+          <span class="feature-num">02 /</span>
+          <h3>Keep orders in order.</h3>
+          <p>Turn approved configurations into orders without losing the decisions behind them. Everything stays connected and easy to find.</p>
+          <span class="feature-glyph" aria-hidden="true">↗</span>
+        </article>
+        <article class="feature">
+          <span class="feature-num">03 /</span>
+          <h3>Know what comes next.</h3>
+          <p>Follow progress across your supply chain in one place, from the first handoff to the final delivery. Fewer status chases; more useful answers.</p>
+          <span class="feature-glyph" aria-hidden="true">↗</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="statement" id="approach" aria-labelledby="approach-title">
+      <div class="wrap statement-grid">
+        <p class="eyebrow" id="approach-title">A note on how we work</p>
+        <div>
+          <blockquote>Good operations rarely announce themselves. They make room for <em>everything else.</em></blockquote>
+          <p class="statement-caption">Less time reconciling information. More time making sound decisions, together.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo" id="demo" aria-labelledby="demo-title">
+      <div class="wrap demo-grid">
+        <div class="demo-copy">
+          <p class="eyebrow">An invitation</p>
+          <h2 id="demo-title">See how it all comes together.</h2>
+          <p>Tell us a little about your team. We’ll tailor a 30-minute walkthrough to the way you configure, order, and deliver custom widgets.</p>
+        </div>
+        <form class="demo-form" id="demo-form">
+          <div class="form-row">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" autocomplete="name" placeholder="Jane Smith" required>
+          </div>
+          <div class="form-row">
+            <label for="email">Work email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="jane@company.com" required>
+          </div>
+          <div class="form-row">
+            <label for="company">Company</label>
+            <input id="company" name="company" type="text" autocomplete="organization" placeholder="Your company" required>
+          </div>
+          <div class="form-footer">
+            <button class="button" type="submit">Request a demo <span class="arrow" aria-hidden="true">↗</span></button>
+            <p class="form-note">This prepares an email to our team in your email app.</p>
+          </div>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <a class="brand" href="#top" aria-label="Acme, back to top"><span class="brand-mark" aria-hidden="true"></span>acme</a>
+      <span class="footer-note">A clearer way to keep things moving.</span>
+      <a class="footer-link" href="mailto:hello@acme.com">hello@acme.com ↗</a>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("demo-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (!this.reportValidity()) return;
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const company = document.getElementById("company").value.trim();
+      const subject = encodeURIComponent("Acme demo request — " + company);
+      const body = encodeURIComponent(
+        "Hello Acme,\n\nI'd like to book a demo.\n\nName: " + name +
+        "\nWork email: " + email +
+        "\nCompany: " + company +
+        "\n\nPlease let me know what times are available.\n"
+      );
+
+      document.getElementById("form-status").textContent =
+        "Your email app will open with your request ready to send.";
+      window.location.href = "mailto:hello@acme.com?subject=" + subject + "&body=" + body;
+    });
+  </script>
+</body>
+</html>

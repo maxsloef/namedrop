@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — The widget order desk for modern manufacturers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400;1,9..144,600&family=Karla:wght@400;500;700&family=Courier+Prime:wght@400;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4ecdb;
+    --paper-2:#efe4cc;
+    --card:#fbf6ea;
+    --kraft:#cfae7d;
+    --kraft-dark:#b8935f;
+    --ink:#2d2118;
+    --ink-soft:#5a4838;
+    --rust:#b4472c;
+    --rust-dark:#8f3520;
+    --green:#2f4a3a;
+    --green-2:#3d5c48;
+    --mustard:#d9a441;
+    --blue-line:#9fb6c9;
+    --shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 2px 3px rgba(45,33,24,.12), 0 12px 28px -10px rgba(45,33,24,.35);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Karla',sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    font-size:18px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:100;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.25 0 0 0 0 0.17 0 0 0 0 0.1 0 0 0 .11 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode:multiply;
+  }
+  a{color:inherit}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 40px}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-.02em;line-height:1.05}
+  .eyebrow{
+    font-family:'Courier Prime',monospace;font-size:14px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--rust);display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;
+  }
+  .eyebrow::before{content:"";width:28px;height:2px;background:currentColor;display:inline-block}
+  .note{font-family:'Caveat',cursive;color:var(--rust);font-size:26px;line-height:1.1}
+
+  /* Buttons */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:'Karla',sans-serif;font-weight:700;font-size:17px;text-decoration:none;
+    padding:16px 26px;border-radius:10px;border:2px solid var(--ink);cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+    position:relative;
+  }
+  .btn-primary{background:var(--rust);color:#fff8ec;box-shadow:0 5px 0 var(--ink);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--ink)}
+  .btn-primary:active{transform:translateY(5px);box-shadow:0 0 0 var(--ink)}
+  .btn-ghost{background:var(--card);color:var(--ink);box-shadow:0 5px 0 var(--ink)}
+  .btn-ghost:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--ink)}
+  .btn-ghost:active{transform:translateY(5px);box-shadow:0 0 0 var(--ink)}
+  .btn svg{width:18px;height:18px}
+
+  /* Nav */
+  nav.top{
+    position:sticky;top:0;z-index:50;background:rgba(244,236,219,.94);
+    backdrop-filter:blur(6px);border-bottom:2px dashed rgba(45,33,24,.25);
+  }
+  nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:84px}
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .logo-stamp{
+    font-family:'Fraunces',serif;font-weight:800;font-size:26px;letter-spacing:.08em;color:var(--rust);
+    border:3px solid var(--rust);border-radius:8px;padding:0 12px;transform:rotate(-3deg);
+    box-shadow:inset 0 0 0 2px var(--paper), inset 0 0 0 4px var(--rust);line-height:1.5;
+  }
+  .logo small{font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);line-height:1.3}
+  .nav-links{display:flex;gap:36px;list-style:none;align-items:center}
+  .nav-links a{text-decoration:none;font-weight:500;color:var(--ink-soft);font-size:16px}
+  .nav-links a:hover{color:var(--rust)}
+  .nav-cta{padding:11px 20px;font-size:15px;box-shadow:0 4px 0 var(--ink)}
+
+  /* Hero */
+  .hero{padding:80px 0 110px;position:relative}
+  .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:70px;align-items:center}
+  .hero h1{font-size:78px;margin-bottom:28px}
+  .hero h1 em{font-style:italic;color:var(--rust);position:relative;white-space:nowrap}
+  .hero h1 em svg{position:absolute;left:0;bottom:-10px;width:100%;height:16px}
+  .hero p.lede{font-size:21px;color:var(--ink-soft);max-width:540px;margin-bottom:38px}
+  .hero-ctas{display:flex;gap:18px;align-items:center;margin-bottom:44px}
+  .hero-meta{display:flex;gap:28px;font-size:15px;color:var(--ink-soft)}
+  .hero-meta span{display:flex;align-items:center;gap:8px}
+  .hero-meta svg{width:18px;height:18px;color:var(--green-2)}
+
+  .ticket-stack{position:relative;height:560px}
+  .ticket-back{
+    position:absolute;inset:30px 10px 0 40px;background:var(--kraft);border-radius:6px;transform:rotate(5deg);
+    box-shadow:var(--shadow);
+  }
+  .ticket-back::after{
+    content:"";position:absolute;inset:0;border-radius:6px;
+    background:repeating-linear-gradient(90deg, rgba(0,0,0,.03) 0 2px, transparent 2px 7px);
+  }
+  .ticket{
+    position:absolute;inset:0 30px 30px 10px;background:var(--card);border-radius:6px;transform:rotate(-2deg);
+    box-shadow:var(--shadow);padding:34px 38px;font-family:'Courier Prime',monospace;font-size:15px;
+    background-image:linear-gradient(transparent 0 0);
+  }
+  .ticket::before{ /* perforation */
+    content:"";position:absolute;left:0;right:0;top:118px;border-top:2px dashed rgba(45,33,24,.25);
+  }
+  .clip{position:absolute;top:-26px;right:70px;width:34px;height:90px;z-index:3}
+  .ticket-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:46px}
+  .ticket-head h4{font-family:'Fraunces',serif;font-size:28px;font-weight:800;letter-spacing:.02em}
+  .ticket-head .no{color:var(--rust);font-weight:700;font-size:18px}
+  .ticket-head small{display:block;color:var(--ink-soft);letter-spacing:.1em;text-transform:uppercase;font-size:12px}
+  .ticket-body{display:grid;grid-template-columns:1fr 170px;gap:20px}
+  .t-row{display:flex;justify-content:space-between;border-bottom:1px solid rgba(45,33,24,.15);padding:9px 0}
+  .t-row b{font-weight:400;color:var(--ink-soft);text-transform:uppercase;font-size:12px;letter-spacing:.12em;padding-top:2px}
+  .t-row span{font-weight:700}
+  .blueprint{
+    background:#2d4a63;border-radius:4px;padding:10px;position:relative;
+    background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+    background-size:14px 14px;
+    box-shadow:inset 0 0 0 3px rgba(255,255,255,.1);
+  }
+  .blueprint p{color:#cfe0ef;font-size:11px;letter-spacing:.1em;text-align:center;margin-top:4px}
+  .ticket-progress{margin-top:30px}
+  .ticket-progress .lbl{display:flex;justify-content:space-between;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-bottom:8px}
+  .punch{display:flex;gap:8px}
+  .punch i{flex:1;height:18px;border-radius:9px;border:2px solid var(--ink);background:transparent}
+  .punch i.on{background:var(--green-2);border-color:var(--green-2)}
+  .stamp{
+    position:absolute;right:40px;bottom:46px;transform:rotate(-12deg);
+    font-family:'Fraunces',serif;font-weight:800;font-size:25px;letter-spacing:.12em;color:var(--rust);
+    border:4px double var(--rust);padding:6px 16px;border-radius:6px;opacity:.85;
+    mix-blend-mode:multiply;
+    -webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='r'><feTurbulence baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 1.7'/></filter><rect width='100%' height='100%' filter='url(%23r)'/></svg>");
+    mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='r'><feTurbulence baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.2 1.7'/></filter><rect width='100%' height='100%' filter='url(%23r)'/></svg>");
+  }
+  .hero .margin-note{position:absolute;right:-10px;bottom:-40px;transform:rotate(-4deg);display:flex;align-items:flex-end;gap:6px}
+
+  /* Logos */
+  .logos{padding:36px 0 40px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);background:var(--paper-2)}
+  .logos .wrap{display:flex;align-items:center;justify-content:space-between;gap:30px}
+  .logos p{font-family:'Courier Prime',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);max-width:180px;line-height:1.4}
+  .logo-list{display:flex;gap:48px;align-items:center;flex:1;justify-content:space-between}
+  .lg{font-family:'Fraunces',serif;color:var(--ink-soft);opacity:.8;font-size:22px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .lg svg{width:28px;height:28px}
+  .lg.a{font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:19px}
+  .lg.b{font-style:italic}
+  .lg.c{font-family:'Courier Prime',monospace;font-weight:700;letter-spacing:.1em;font-size:17px}
+
+  /* Problem */
+  section{position:relative}
+  .problem{padding:130px 0 120px}
+  .section-head{max-width:720px;margin-bottom:70px}
+  .section-head h2{font-size:58px;margin-bottom:22px}
+  .section-head p{font-size:20px;color:var(--ink-soft)}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+  .index-card{
+    background:var(--card);padding:44px 32px 34px;border-radius:3px;box-shadow:var(--shadow);position:relative;
+    background-image:
+      linear-gradient(to bottom, transparent 58px, rgba(180,71,44,.55) 58px, rgba(180,71,44,.55) 60px, transparent 60px),
+      repeating-linear-gradient(to bottom, transparent 0 31px, rgba(159,182,201,.55) 31px 32px);
+    background-position:0 0, 0 12px;
+    transition:transform .25s ease;
+  }
+  .index-card:nth-child(1){transform:rotate(-1.6deg)}
+  .index-card:nth-child(2){transform:rotate(1deg) translateY(14px)}
+  .index-card:nth-child(3){transform:rotate(-.6deg)}
+  .index-card:hover{transform:rotate(0) translateY(-6px)}
+  .index-card::before{
+    content:"";position:absolute;top:-14px;left:50%;width:110px;height:30px;margin-left:-55px;
+    background:rgba(217,164,65,.55);transform:rotate(-3deg);box-shadow:0 1px 2px rgba(0,0,0,.08);
+  }
+  .index-card h3{font-size:26px;margin-bottom:26px;line-height:1.2}
+  .index-card p{color:var(--ink-soft);font-size:17px;line-height:32px}
+  .index-card .tally{font-family:'Caveat',cursive;font-size:30px;color:var(--rust);margin-top:14px;display:block}
+
+  /* How */
+  .how{padding:120px 0 130px;background:var(--paper-2);border-top:2px solid var(--ink)}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--ink);border-radius:14px;background:var(--card);overflow:hidden;box-shadow:0 8px 0 var(--ink)}
+  .step{padding:44px 38px 46px;border-right:2px dashed rgba(45,33,24,.3);position:relative}
+  .step:last-child{border-right:0}
+  .pin{
+    width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin-bottom:26px;
+    font-family:'Fraunces',serif;font-weight:800;font-size:28px;color:#fff8ec;
+    background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.35), transparent 45%), var(--c,var(--rust));
+    box-shadow:inset 0 -4px 0 rgba(0,0,0,.2), 0 0 0 4px var(--card), 0 0 0 6px var(--ink);
+  }
+  .step h3{font-size:30px;margin-bottom:14px}
+  .step p{color:var(--ink-soft);font-size:17px;margin-bottom:22px}
+  .step ul{list-style:none;font-size:16px}
+  .step li{padding:6px 0 6px 30px;position:relative}
+  .step li::before{content:"";position:absolute;left:0;top:12px;width:16px;height:16px;border:2px solid var(--ink);border-radius:3px;background:var(--paper)}
+  .step li::after{content:"";position:absolute;left:4px;top:13px;width:8px;height:11px;border:solid var(--green-2);border-width:0 3px 3px 0;transform:rotate(40deg)}
+
+  /* Configurator */
+  .desk{padding:130px 0;background:var(--kraft);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);
+    background-image:repeating-linear-gradient(90deg, rgba(0,0,0,.025) 0 2px, transparent 2px 9px), repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 5px);}
+  .desk .section-head .eyebrow{color:var(--rust-dark)}
+  .desk .section-head p{color:#4a3826}
+  .config{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--card);border-radius:14px;border:2px solid var(--ink);box-shadow:0 10px 0 var(--ink), 0 30px 50px -20px rgba(0,0,0,.4);overflow:hidden}
+  .config-controls{padding:46px 48px;border-right:2px solid var(--ink)}
+  .ctrl{margin-bottom:34px}
+  .ctrl-label{font-family:'Courier Prime',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px;display:flex;justify-content:space-between}
+  .keys{display:flex;gap:10px;flex-wrap:wrap}
+  .key{
+    font-family:'Karla',sans-serif;font-weight:700;font-size:15px;padding:11px 18px;border-radius:8px;
+    background:var(--paper);border:2px solid var(--ink);box-shadow:0 4px 0 var(--ink);cursor:pointer;color:var(--ink);
+    transition:transform .08s, box-shadow .08s, background .15s;display:flex;align-items:center;gap:8px;
+  }
+  .key .sw{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--ink)}
+  .key:hover{background:#fff}
+  .key[aria-pressed="true"]{transform:translateY(4px);box-shadow:0 0 0 var(--ink);background:var(--mustard)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:12px;border-radius:6px;background:var(--paper);border:2px solid var(--ink);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--rust);border:3px solid var(--ink);cursor:grab;box-shadow:0 3px 0 var(--ink)}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--rust);border:3px solid var(--ink);cursor:grab}
+  .qty-val{font-family:'Fraunces',serif;font-size:22px;color:var(--ink);letter-spacing:0;text-transform:none;font-weight:600}
+  .config-view{padding:40px 48px;background:#2d4a63;color:#e8f0f6;position:relative;
+    background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
+    background-size:24px 24px;display:flex;flex-direction:column}
+  .config-view .vhead{font-family:'Courier Prime',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#b8cde0;display:flex;justify-content:space-between}
+  .widget-stage{flex:1;display:grid;place-items:center;padding:10px 0}
+  #widgetSvg{width:280px;height:280px;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}
+  #widgetSvg .body{transition:fill .35s}
+  .readout{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .readout div{background:rgba(251,246,234,.95);color:var(--ink);border-radius:8px;padding:14px 16px;border:2px solid var(--ink);box-shadow:0 3px 0 var(--ink)}
+  .readout b{display:block;font-family:'Courier Prime',monospace;font-weight:400;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+  .readout span{font-family:'Fraunces',serif;font-size:26px;font-weight:600}
+  .config-foot{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .config-foot small{font-size:14px;color:var(--ink-soft);max-width:300px;line-height:1.4}
+
+  /* Track */
+  .track{padding:130px 0;background:var(--green);color:#f1e8d4;
+    background-image:radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px);background-size:6px 6px}
+  .track .eyebrow{color:var(--mustard)}
+  .track-grid{display:grid;grid-template-columns:1fr 460px;gap:80px;align-items:center}
+  .track h2{font-size:56px;margin-bottom:24px}
+  .track p.lede{font-size:20px;color:#d5ccb6;margin-bottom:44px;max-width:560px}
+  .timeline{list-style:none;position:relative;padding-left:44px}
+  .timeline::before{content:"";position:absolute;left:13px;top:10px;bottom:10px;border-left:3px dotted rgba(241,232,212,.4)}
+  .timeline li{position:relative;padding:0 0 26px}
+  .timeline li::before{content:"";position:absolute;left:-44px;top:3px;width:26px;height:26px;border-radius:50%;background:var(--green);border:3px solid #f1e8d4;box-sizing:border-box}
+  .timeline li.done::before{background:var(--mustard);border-color:var(--mustard)}
+  .timeline li.now::before{background:var(--rust);border-color:#f1e8d4;box-shadow:0 0 0 6px rgba(180,71,44,.35);animation:pulse 2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 12px rgba(180,71,44,0)}}
+  .timeline h4{font-family:'Fraunces',serif;font-size:21px;font-weight:600}
+  .timeline small{font-family:'Courier Prime',monospace;font-size:14px;color:#bfb49a}
+  .tag{
+    background:var(--card);color:var(--ink);border-radius:10px 10px 10px 10px;padding:70px 36px 34px;position:relative;
+    transform:rotate(3deg);box-shadow:0 30px 60px -20px rgba(0,0,0,.6);
+    clip-path:polygon(18% 0,82% 0,100% 11%,100% 100%,0 100%,0 11%);
+  }
+  .tag::before{content:"";position:absolute;top:22px;left:50%;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:var(--green);box-shadow:0 0 0 7px var(--kraft)}
+  .tag h4{font-family:'Fraunces',serif;font-size:30px;font-weight:800;text-align:center;letter-spacing:.04em;margin-bottom:4px}
+  .tag .sub{text-align:center;font-family:'Courier Prime',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:24px}
+  .tag .t-row{font-family:'Courier Prime',monospace;font-size:15px}
+  .tag .eta{margin-top:22px;padding:16px;border:2px dashed var(--rust);border-radius:8px;text-align:center}
+  .tag .eta b{display:block;font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.16em;color:var(--rust);text-transform:uppercase}
+  .tag .eta span{font-family:'Fraunces',serif;font-size:34px;font-weight:800}
+  .barcode{height:44px;margin-top:22px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 4px,var(--ink) 4px 7px,transparent 7px 9px,var(--ink) 9px 10px,transparent 10px 14px)}
+  .string{position:absolute;top:-80px;right:170px;width:120px;height:120px}
+
+  /* Stats */
+  .stats{padding:110px 0 40px}
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+  .stat{padding:40px 28px;border-right:2px dashed rgba(45,33,24,.3)}
+  .stat:last-child{border-right:0}
+  .stat span{font-family:'Fraunces',serif;font-size:64px;font-weight:600;color:var(--rust);line-height:1;display:block;margin-bottom:10px;letter-spacing:-.03em}
+  .stat p{color:var(--ink-soft);font-size:16px;line-height:1.45}
+
+  /* Testimonial */
+  .quote{padding:100px 0 130px}
+  .postcard{
+    max-width:1040px;margin:0 auto;background:var(--card);border-radius:4px;box-shadow:var(--shadow);
+    display:grid;grid-template-columns:1.35fr 1fr;transform:rotate(-1deg);position:relative;
+  }
+  .postcard .left{padding:56px 54px;border-right:2px solid rgba(45,33,24,.15)}
+  .postcard blockquote{font-family:'Fraunces',serif;font-size:30px;line-height:1.35;font-weight:400;letter-spacing:-.01em}
+  .postcard blockquote::before{content:"“";font-size:90px;color:var(--rust);line-height:0;display:block;height:36px;margin-top:20px}
+  .postcard .sig{margin-top:30px;display:flex;align-items:center;gap:18px}
+  .avatar{width:58px;height:58px;border-radius:50%;background:var(--mustard);display:grid;place-items:center;font-family:'Fraunces',serif;font-weight:800;font-size:22px;border:2px solid var(--ink)}
+  .sig b{display:block;font-size:17px}
+  .sig small{color:var(--ink-soft);font-size:15px}
+  .postcard .right{padding:46px 44px;position:relative}
+  .postage{position:absolute;top:34px;right:38px;width:96px;height:116px;background:var(--rust);padding:7px;
+    -webkit-mask:radial-gradient(circle 5px at 5px 5px,transparent 98%,#000) -5px -5px/12px 12px;
+    mask:radial-gradient(circle 5px at 5px 5px,transparent 98%,#000) -5px -5px/12px 12px;}
+  .postage div{width:100%;height:100%;border:2px solid #f6e3c4;display:grid;place-items:center;color:#f6e3c4;text-align:center;font-family:'Fraunces',serif;font-weight:800;font-size:13px;letter-spacing:.1em}
+  .postmark{position:absolute;top:60px;right:100px;width:130px;height:130px;opacity:.6}
+  .address{margin-top:150px}
+  .address p{font-family:'Caveat',cursive;font-size:30px;border-bottom:1.5px solid rgba(45,33,24,.3);padding:4px 0;line-height:1.3;color:var(--ink)}
+
+  /* Demo */
+  .demo{padding:130px 0 140px;background:var(--paper-2);border-top:2px solid var(--ink)}
+  .demo-grid{display:grid;grid-template-columns:1fr 520px;gap:90px;align-items:start}
+  .demo h2{font-size:60px;margin-bottom:24px}
+  .demo .lede{font-size:20px;color:var(--ink-soft);margin-bottom:40px}
+  .agenda{list-style:none;counter-reset:a}
+  .agenda li{counter-increment:a;display:grid;grid-template-columns:70px 1fr;gap:16px;padding:18px 0;border-top:1px solid rgba(45,33,24,.2)}
+  .agenda li:last-child{border-bottom:1px solid rgba(45,33,24,.2)}
+  .agenda li::before{content:"0:" attr(data-m);font-family:'Courier Prime',monospace;font-weight:700;color:var(--rust);font-size:16px;padding-top:2px}
+  .agenda b{display:block;font-size:18px}
+  .agenda span{color:var(--ink-soft);font-size:16px}
+
+  .libcard{
+    background:#f7eed3;border-radius:6px;box-shadow:var(--shadow);position:relative;padding:40px 42px 38px;
+    border:1px solid rgba(45,33,24,.15);transform:rotate(.8deg);
+  }
+  .libcard::before{content:"";position:absolute;top:-1px;left:50%;width:60px;height:26px;margin-left:-30px;background:var(--paper-2);border-radius:0 0 30px 30px;box-shadow:inset 0 -2px 3px rgba(0,0,0,.08)}
+  .libcard h3{font-family:'Fraunces',serif;font-size:32px;text-align:center;font-weight:800;letter-spacing:.02em}
+  .libcard .sub{text-align:center;font-family:'Courier Prime',monospace;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin:6px 0 26px;padding-bottom:18px;border-bottom:3px double var(--rust)}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--rust-dark);margin-bottom:2px}
+  .field input,.field select{
+    width:100%;background:transparent;border:0;border-bottom:1.5px solid rgba(45,33,24,.45);padding:8px 2px;
+    font-family:'Courier Prime',monospace;font-size:18px;color:var(--ink);outline:none;border-radius:0;
+  }
+  .field input:focus,.field select:focus{border-bottom-color:var(--rust);background:rgba(217,164,65,.12)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .libcard .btn{width:100%;justify-content:center;margin-top:18px;font-size:18px}
+  .libcard .fine{text-align:center;font-size:14px;color:var(--ink-soft);margin-top:18px}
+  .done-stamp{
+    position:absolute;inset:0;display:none;place-items:center;background:rgba(247,238,211,.93);border-radius:6px;text-align:center;padding:40px
+  }
+  .done-stamp.show{display:grid}
+  .done-stamp .big{font-family:'Fraunces',serif;font-weight:800;font-size:44px;color:var(--rust);border:5px double var(--rust);padding:10px 26px;border-radius:8px;transform:rotate(-8deg);display:inline-block;margin-bottom:24px;animation:thunk .35s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes thunk{from{transform:rotate(-8deg) scale(2.2);opacity:0}}
+  .done-stamp p{font-size:18px;color:var(--ink-soft);max-width:340px;margin:0 auto}
+
+  /* FAQ */
+  .faq{padding:120px 0}
+  .faq-grid{display:grid;grid-template-columns:380px 1fr;gap:80px}
+  .faq h2{font-size:50px}
+  details{border-top:2px solid var(--ink);padding:22px 0}
+  details:last-child{border-bottom:2px solid var(--ink)}
+  summary{list-style:none;cursor:pointer;font-family:'Fraunces',serif;font-size:24px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-family:'Karla';font-weight:700;width:36px;height:36px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-size:22px;transition:transform .2s;flex-shrink:0;background:var(--card)}
+  details[open] summary::after{transform:rotate(45deg);background:var(--mustard)}
+  details p{color:var(--ink-soft);margin-top:14px;max-width:680px}
+
+  /* Footer */
+  footer{background:var(--ink);color:#d8ccb4;padding:80px 0 40px}
+  .foot-cta{display:flex;justify-content:space-between;align-items:center;padding-bottom:60px;border-bottom:1px dashed rgba(216,204,180,.3);margin-bottom:40px}
+  .foot-cta h3{font-size:46px;color:#f4ecdb;max-width:640px}
+  .foot-cta h3 em{color:var(--mustard)}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;font-size:15px}
+  .foot-bottom .logo-stamp{color:var(--mustard);border-color:var(--mustard);box-shadow:inset 0 0 0 2px var(--ink), inset 0 0 0 4px var(--mustard);font-size:22px}
+  .foot-links{display:flex;gap:30px}
+  .foot-links a{text-decoration:none;color:#d8ccb4}
+  .foot-links a:hover{color:var(--mustard)}
+
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <span class="logo-stamp">ACME</span>
+      <small>Widget<br>Order Desk</small>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#desk">Try the desk</a></li>
+      <li><a href="#track">Tracking</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#demo" class="btn btn-primary nav-cta">Book a demo</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">For plant & operations teams</div>
+      <h1>Custom widgets, ordered <em>without the
+        <svg viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10 C 50 3, 90 14, 140 8 S 240 4, 297 9" fill="none" stroke="#d9a441" stroke-width="5" stroke-linecap="round"/></svg></em> <em>runaround.</em></h1>
+      <p class="lede">Acme is the order desk your plant always deserved. Configure custom widgets to spec, send them to vetted shops, and watch every batch move from machining to your loading dock — all on one warm, well-kept ledger.</p>
+      <div class="hero-ctas">
+        <a href="#demo" class="btn btn-primary">Book a 30-minute demo
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#desk" class="btn btn-ghost">Try the order desk</a>
+      </div>
+      <div class="hero-meta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12l5 5L20 6"/></svg>Live in under two weeks</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12l5 5L20 6"/></svg>Works with your ERP</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12l5 5L20 6"/></svg>SOC 2 Type II</span>
+      </div>
+    </div>
+
+    <div class="ticket-stack" aria-hidden="true">
+      <div class="ticket-back"></div>
+      <div class="ticket">
+        <svg class="clip" viewBox="0 0 34 90"><path d="M10 80 V18 a7 7 0 0 1 14 0 V70 a4 4 0 0 1 -8 0 V26" fill="none" stroke="#8a8f94" stroke-width="3.5" stroke-linecap="round"/><path d="M10 80 V18 a7 7 0 0 1 14 0 V70" fill="none" stroke="#c9ced3" stroke-width="1.5" stroke-linecap="round" transform="translate(-1,-1)"/></svg>
+        <div class="ticket-head">
+          <div>
+            <small>Acme · Work Order</small>
+            <h4>Flanged Hex Widget</h4>
+          </div>
+          <div style="text-align:right">
+            <small>No.</small>
+            <div class="no">04817-B</div>
+          </div>
+        </div>
+        <div class="ticket-body">
+          <div>
+            <div class="t-row"><b>Spec</b><span>M12 · 6-lobe</span></div>
+            <div class="t-row"><b>Material</b><span>316 Stainless</span></div>
+            <div class="t-row"><b>Finish</b><span>Passivated</span></div>
+            <div class="t-row"><b>Qty</b><span>2,400 pcs</span></div>
+            <div class="t-row"><b>Ship to</b><span>Dayton Plant 2</span></div>
+            <div class="t-row"><b>Need by</b><span>Oct 14</span></div>
+          </div>
+          <div class="blueprint">
+            <svg viewBox="0 0 150 150" width="100%">
+              <g fill="none" stroke="#e5eef6" stroke-width="1.6">
+                <g transform="translate(75 72)">
+                  <polygon points="0,-46 40,-23 40,23 0,46 -40,23 -40,-23"/>
+                  <circle r="30"/>
+                  <circle r="13"/>
+                  <circle r="13" stroke-dasharray="3 3" transform="scale(1.35)"/>
+                </g>
+                <path d="M20 132 H130 M20 128 V136 M130 128 V136" stroke-width="1"/>
+              </g>
+              <text x="75" y="146" fill="#cfe0ef" font-family="Courier Prime" font-size="9" text-anchor="middle">Ø 24.0 mm</text>
+            </svg>
+            <p>REV C · SHEET 1/1</p>
+          </div>
+        </div>
+        <div class="ticket-progress">
+          <div class="lbl"><span>Progress</span><span>Machining · Day 4 of 7</span></div>
+          <div class="punch"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+        </div>
+        <div class="stamp">ON SCHEDULE</div>
+      </div>
+      <div class="margin-note">
+        <span class="note">no phone calls needed!</span>
+        <svg width="60" height="46" viewBox="0 0 60 46"><path d="M4 40 C 20 44, 40 30, 50 8 M50 8 L40 12 M50 8 L53 19" fill="none" stroke="#b4472c" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="logos">
+  <div class="wrap">
+    <p>Trusted on the floor at 140+ plants</p>
+    <div class="logo-list">
+      <span class="lg a"><svg viewBox="0 0 28 28"><polygon points="14,2 26,9 26,19 14,26 2,19 2,9" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>Harlow Valve</span>
+      <span class="lg b">Birchmont Fittings</span>
+      <span class="lg c">KESTREL/MFG</span>
+      <span class="lg a"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="14" cy="14" r="4" fill="currentColor"/></svg>Oakline</span>
+      <span class="lg b">Tillman &amp; Rowe</span>
+      <span class="lg c">NORTHGATE·AXLE</span>
+    </div>
+  </div>
+</div>
+
+<section class="problem">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Sound familiar?</div>
+      <h2>Spreadsheets, phone tag, and a fax machine everyone's afraid to unplug.</h2>
+      <p>Custom widgets keep your lines running, but ordering them still feels like 1987. Every order lives in somebody's inbox, and nobody knows where batch 12 is until it's late.</p>
+    </div>
+    <div class="cards">
+      <div class="index-card reveal">
+        <h3>Specs scattered everywhere</h3>
+        <p>Drawings in one folder, tolerances in an email thread, the latest revision on a sticky note by Frank's monitor.</p>
+        <span class="tally">~4 hrs lost per order</span>
+      </div>
+      <div class="index-card reveal">
+        <h3>"Let me call the shop"</h3>
+        <p>Your planners chase suppliers by phone to get a status update that's already out of date by the time they hang up.</p>
+        <span class="tally">23 calls a week, avg.</span>
+      </div>
+      <div class="index-card reveal">
+        <h3>Surprise expedite fees</h3>
+        <p>Without early warning, a two-day slip becomes an overnight freight bill and a very tense Monday meeting.</p>
+        <span class="tally">$61k/yr for a typical plant</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">How Acme works</div>
+      <h2>Three drawers. One tidy desk.</h2>
+      <p>Everything about a custom widget — the spec, the order, the journey — kept in one place your whole team can open.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="pin" style="--c:var(--rust)">1</div>
+        <h3>Configure</h3>
+        <p>Build widgets from your approved spec library. Acme checks tolerances and flags anything a shop can't make before it becomes a problem.</p>
+        <ul>
+          <li>Versioned drawings &amp; revisions</li>
+          <li>Material &amp; finish guardrails</li>
+          <li>Reusable part templates</li>
+        </ul>
+      </div>
+      <div class="step">
+        <div class="pin" style="--c:var(--mustard);color:var(--ink)">2</div>
+        <h3>Order</h3>
+        <p>Send to your preferred shops or our network of 900+ vetted suppliers. Compare quotes side-by-side and route approvals in a click.</p>
+        <ul>
+          <li>Instant multi-shop quotes</li>
+          <li>Approval rules by cost center</li>
+          <li>POs synced to your ERP</li>
+        </ul>
+      </div>
+      <div class="step">
+        <div class="pin" style="--c:var(--green-2)">3</div>
+        <h3>Track</h3>
+        <p>Watch every batch move from machining to QC to your dock. Get a heads-up days before a slip, not hours after.</p>
+        <ul>
+          <li>Live milestone updates</li>
+          <li>Early-warning delay alerts</li>
+          <li>Receiving &amp; QC sign-off</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="desk" id="desk">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Try the order desk</div>
+      <h2>Go ahead — press a few buttons.</h2>
+      <p>This is a pocket-sized version of the Acme configurator. Pick a material, finish, and batch size to see how quotes and lead times come together.</p>
+    </div>
+    <div class="config reveal">
+      <div class="config-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span>Material</span></div>
+          <div class="keys" data-group="material">
+            <button class="key" aria-pressed="true" data-v="steel"><span class="sw" style="background:#9aa3a8"></span>Stainless</button>
+            <button class="key" aria-pressed="false" data-v="brass"><span class="sw" style="background:#c9a043"></span>Brass</button>
+            <button class="key" aria-pressed="false" data-v="aluminum"><span class="sw" style="background:#cfd5d8"></span>Aluminum</button>
+            <button class="key" aria-pressed="false" data-v="nylon"><span class="sw" style="background:#efe7d2"></span>Nylon</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span>Finish</span></div>
+          <div class="keys" data-group="finish">
+            <button class="key" aria-pressed="true" data-v="raw">Mill / raw</button>
+            <button class="key" aria-pressed="false" data-v="powder">Powder coat</button>
+            <button class="key" aria-pressed="false" data-v="anodized">Anodized</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span>Profile</span></div>
+          <div class="keys" data-group="profile">
+            <button class="key" aria-pressed="true" data-v="hex">Hex flange</button>
+            <button class="key" aria-pressed="false" data-v="gear">Toothed</button>
+            <button class="key" aria-pressed="false" data-v="round">Round spacer</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span>Batch size</span><span class="qty-val" id="qtyVal">2,500 pcs</span></div>
+          <input type="range" id="qty" min="100" max="20000" step="100" value="2500" aria-label="Batch size">
+        </div>
+        <div class="config-foot">
+          <small>Illustrative numbers. Real quotes come straight from shops in your network.</small>
+          <a href="#demo" class="btn btn-primary">See the full desk</a>
+        </div>
+      </div>
+      <div class="config-view">
+        <div class="vhead"><span>Preview · Rev A</span><span id="partCode">AC-HX-SS-02500</span></div>
+        <div class="widget-stage">
+          <svg id="widgetSvg" viewBox="0 0 200 200" aria-label="Widget preview">
+            <defs>
+              <radialGradient id="shine" cx="35%" cy="30%" r="70%">
+                <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
+                <stop offset=".5" stop-color="#fff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <ellipse cx="100" cy="182" rx="62" ry="8" fill="rgba(0,0,0,.25)"/>
+            <g id="shapeHex">
+              <polygon class="body" points="100,20 169,60 169,140 100,180 31,140 31,60" fill="#9aa3a8" stroke="#1e2a33" stroke-width="4" stroke-linejoin="round"/>
+            </g>
+            <g id="shapeGear" style="display:none">
+              <path class="body" fill="#9aa3a8" stroke="#1e2a33" stroke-width="4" stroke-linejoin="round" d=""/>
+            </g>
+            <g id="shapeRound" style="display:none">
+              <circle class="body" cx="100" cy="100" r="78" fill="#9aa3a8" stroke="#1e2a33" stroke-width="4"/>
+            </g>
+            <circle cx="100" cy="100" r="50" fill="none" stroke="#1e2a33" stroke-width="3" opacity=".5"/>
+            <circle cx="100" cy="100" r="80" fill="url(#shine)" pointer-events="none"/>
+            <circle cx="100" cy="100" r="26" fill="#2d4a63" stroke="#1e2a33" stroke-width="4"/>
+            <circle cx="100" cy="100" r="26" fill="none" stroke="#1e2a33" stroke-width="1.5" stroke-dasharray="4 3" transform="translate(100 100) scale(1.25) translate(-100 -100)" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="readout">
+          <div><b>Unit price</b><span id="unit">$1.74</span></div>
+          <div><b>Lead time</b><span id="lead">10 days</span></div>
+          <div><b>Shops able</b><span id="shops">14</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="track" id="track">
+  <div class="wrap track-grid">
+    <div class="reveal">
+      <div class="eyebrow">Tracking</div>
+      <h2>Know where every batch is — before anyone asks.</h2>
+      <p class="lede">Shops update milestones right in Acme, so your team sees the same picture the machinist does. If something's drifting, you'll hear about it with days to spare.</p>
+      <ul class="timeline">
+        <li class="done"><h4>Order placed &amp; approved</h4><small>Mon, Oct 2 · 9:14 AM · approved by R. Patel</small></li>
+        <li class="done"><h4>Material received at shop</h4><small>Wed, Oct 4 · Kestrel Precision, Toledo OH</small></li>
+        <li class="now"><h4>Machining — 1,620 of 2,400 complete</h4><small>Today · on pace for Friday QC</small></li>
+        <li><h4>First-article inspection &amp; QC</h4><small>Scheduled Fri, Oct 13</small></li>
+        <li><h4>Delivered to Dayton Plant 2</h4><small>Expected Sat, Oct 14 · Dock 3</small></li>
+      </ul>
+    </div>
+    <div class="reveal" style="position:relative">
+      <svg class="string" viewBox="0 0 120 120" aria-hidden="true"><path d="M110 0 C 90 50, 40 60, 62 118" fill="none" stroke="#e7d7b3" stroke-width="3"/></svg>
+      <div class="tag">
+        <h4>SHIPPING TAG</h4>
+        <div class="sub">Batch 04817-B · 3 of 5</div>
+        <div class="t-row"><b>From</b><span>Kestrel Precision</span></div>
+        <div class="t-row"><b>To</b><span>Dayton Plant 2</span></div>
+        <div class="t-row"><b>Contents</b><span>2,400 × AC-HX-SS</span></div>
+        <div class="t-row"><b>Carrier</b><span>Buckeye Freight</span></div>
+        <div class="eta"><b>Estimated arrival</b><span>Oct 14 · 10 AM</span></div>
+        <div class="barcode"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat-row reveal">
+      <div class="stat"><span>38%</span><p>fewer expedited shipments in the first six months</p></div>
+      <div class="stat"><span>11 hrs</span><p>back per planner, every week, from status chasing</p></div>
+      <div class="stat"><span>2.4 days</span><p>shaved off average custom-part lead time</p></div>
+      <div class="stat"><span>900+</span><p>vetted machine shops and fabricators in network</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="quote">
+  <div class="wrap">
+    <div class="postcard reveal">
+      <div class="left">
+        <blockquote>We used to spend Monday mornings on the phone figuring out what was late. Now I open Acme with my coffee, and I already know. It's the first software my floor supervisors actually asked for.</blockquote>
+        <div class="sig">
+          <div class="avatar">DO</div>
+          <div><b>Denise Okafor</b><small>Director of Operations, Harlow Valve &amp; Fitting</small></div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="postage"><div>ACME<br>42¢</div></div>
+        <svg class="postmark" viewBox="0 0 130 130" aria-hidden="true">
+          <circle cx="65" cy="65" r="44" fill="none" stroke="#2d2118" stroke-width="2.5"/>
+          <circle cx="65" cy="65" r="34" fill="none" stroke="#2d2118" stroke-width="1.5"/>
+          <text x="65" y="62" text-anchor="middle" font-family="Courier Prime" font-size="11" fill="#2d2118">DAYTON</text>
+          <text x="65" y="76" text-anchor="middle" font-family="Courier Prime" font-size="10" fill="#2d2118">OCT 14</text>
+          <path d="M-10 50 q 10 -6 20 0 t 20 0 t 20 0 M-10 64 q 10 -6 20 0 t 20 0 t 20 0 M-10 78 q 10 -6 20 0 t 20 0 t 20 0" fill="none" stroke="#2d2118" stroke-width="2" transform="translate(-6 0)"/>
+        </svg>
+        <div class="address">
+          <p>To: every ops team</p>
+          <p>still living in spreadsheets</p>
+          <p>Anywhere, USA</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <div class="wrap demo-grid">
+    <div class="reveal">
+      <div class="eyebrow">Book a demo</div>
+      <h2>Pull up a chair. We'll walk you through it.</h2>
+      <p class="lede">A friendly, no-pressure 30 minutes with someone who's worked a plant floor. Bring a real part you order — we'll build it live.</p>
+      <ol class="agenda">
+        <li data-m="00"><div><b>Your current process</b><span>How widgets get specced, ordered, and chased today.</span></div></li>
+        <li data-m="08"><div><b>Build one of your parts</b><span>We configure a real widget from your spec, start to finish.</span></div></li>
+        <li data-m="18"><div><b>Tracking &amp; alerts</b><span>See how your team and shops share one live timeline.</span></div></li>
+        <li data-m="25"><div><b>Rollout plan</b><span>ERP connection, timeline, and pricing for your plant count.</span></div></li>
+      </ol>
+    </div>
+    <div class="reveal">
+      <form class="libcard" id="demoForm" novalidate>
+        <h3>DEMO REQUEST</h3>
+        <div class="sub">Acme Order Desk · Card No. 1</div>
+        <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" required autocomplete="name"></div>
+        <div class="field"><label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email"></div>
+        <div class="field-row">
+          <div class="field"><label for="f-co">Company</label><input id="f-co" name="company" required autocomplete="organization"></div>
+          <div class="field"><label for="f-role">Role</label><input id="f-role" name="role" placeholder="e.g. Ops Manager"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="f-plants">Plants</label>
+            <select id="f-plants" name="plants"><option>1</option><option selected>2–5</option><option>6–15</option><option>16+</option></select>
+          </div>
+          <div class="field"><label for="f-when">Best time</label>
+            <select id="f-when" name="when"><option>Mornings</option><option>Midday</option><option>Afternoons</option></select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Stamp it &amp; book my demo</button>
+        <p class="fine">We'll reply within one business day. No spam, ever.</p>
+        <div class="done-stamp" id="doneStamp">
+          <div>
+            <div class="big">RECEIVED</div>
+            <p id="doneMsg">Thanks! A real person from our team will email you within one business day to pick a time.</p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap faq-grid">
+    <div class="reveal">
+      <div class="eyebrow">Good questions</div>
+      <h2>Things folks usually ask.</h2>
+    </div>
+    <div class="reveal">
+      <details open><summary>Do we have to switch suppliers?</summary><p>Not at all. Invite the shops you already trust — they get a free supplier portal. Our vetted network is there when you need extra capacity or a second quote.</p></details>
+      <details><summary>Which ERPs do you connect with?</summary><p>SAP, Oracle NetSuite, Microsoft Dynamics, Epicor, Plex, and Infor out of the box, plus a REST API and flat-file sync for homegrown systems.</p></details>
+      <details><summary>How long does rollout take?</summary><p>Most single-plant teams are placing live orders within two weeks. We import your part library and drawings for you, so nobody retypes a spec.</p></details>
+      <details><summary>How is Acme priced?</summary><p>A flat annual subscription per plant, with unlimited users and suppliers. No per-order fees and no markup on parts. We'll share exact numbers on your demo.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-cta">
+      <h3>Your widgets deserve a <em>better desk.</em> Your team does too.</h3>
+      <a href="#demo" class="btn btn-primary" style="box-shadow:0 5px 0 #000">Book a demo</a>
+    </div>
+    <div class="foot-bottom">
+      <span class="logo-stamp">ACME</span>
+      <div class="foot-links">
+        <a href="#how">Product</a><a href="#track">Tracking</a><a href="#faq">FAQ</a><a href="#demo">Contact</a><a href="#">Privacy</a>
+      </div>
+      <span>© 2024 Acme Widget Co. Made with care in Columbus, Ohio.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Build gear path
+  const gearPath = (() => {
+    const cx=100, cy=100, teeth=12, rO=84, rI=68;
+    let d='';
+    for(let i=0;i<teeth;i++){
+      const a=(i/teeth)*Math.PI*2, step=Math.PI*2/teeth;
+      const pts=[[rI,a],[rO,a+step*.15],[rO,a+step*.45],[rI,a+step*.6]];
+      pts.forEach((p,j)=>{
+        const x=(cx+p[0]*Math.cos(p[1])).toFixed(1), y=(cy+p[0]*Math.sin(p[1])).toFixed(1);
+        d+=(i===0&&j===0?'M':'L')+x+' '+y+' ';
+      });
+    }
+    return d+'Z';
+  })();
+  document.querySelector('#shapeGear path').setAttribute('d', gearPath);
+
+  const state={material:'steel',finish:'raw',profile:'hex',qty:2500};
+  const matColor={steel:'#9aa3a8',brass:'#c9a043',aluminum:'#cfd5d8',nylon:'#efe7d2'};
+  const finishColor={powder:'#b4472c',anodized:{steel:'#5d6b8a',brass:'#8a6a2a',aluminum:'#3f6f8f',nylon:'#4b6b55'}};
+  const base={steel:1.62,brass:3.1,aluminum:1.18,nylon:.46};
+  const fMul={raw:1,powder:1.14,anodized:1.22};
+  const pMul={hex:1,gear:1.35,round:.72};
+  const leadBase={steel:8,brass:11,aluminum:7,nylon:5};
+  const fLead={raw:0,powder:3,anodized:4};
+  const codes={steel:'SS',brass:'BR',aluminum:'AL',nylon:'NY'};
+  const pcodes={hex:'HX',gear:'GR',round:'RS'};
+  let spin=0;
+
+  function color(){
+    if(state.finish==='raw') return matColor[state.material];
+    if(state.finish==='powder') return finishColor.powder;
+    return finishColor.anodized[state.material];
+  }
+  function render(){
+    ['Hex','Gear','Round'].forEach(n=>{
+      document.getElementById('shape'+n).style.display = state.profile===n.toLowerCase() ? '' : 'none';
+    });
+    document.querySelectorAll('#widgetSvg .body').forEach(b=>b.setAttribute('fill',color()));
+    const disc = Math.min(.38, Math.log10(state.qty/100)*.17);
+    const unit = base[state.material]*fMul[state.finish]*pMul[state.profile]*(1-disc);
+    const lead = leadBase[state.material]+fLead[state.finish]+(state.profile==='gear'?2:0)+Math.ceil(state.qty/4000);
+    let shops = {steel:18,brass:9,aluminum:21,nylon:12}[state.material] - (state.finish==='anodized'?5:state.finish==='powder'?3:0) - (state.profile==='gear'?4:0) - Math.floor(state.qty/8000);
+    shops=Math.max(3,shops);
+    document.getElementById('unit').textContent='$'+unit.toFixed(2);
+    document.getElementById('lead').textContent=lead+' days';
+    document.getElementById('shops').textContent=shops;
+    document.getElementById('qtyVal').textContent=state.qty.toLocaleString()+' pcs';
+    document.getElementById('partCode').textContent='AC-'+pcodes[state.profile]+'-'+codes[state.material]+'-'+String(state.qty).padStart(5,'0');
+  }
+  document.querySelectorAll('.keys').forEach(group=>{
+    group.addEventListener('click',e=>{
+      const k=e.target.closest('.key'); if(!k) return;
+      group.querySelectorAll('.key').forEach(b=>b.setAttribute('aria-pressed','false'));
+      k.setAttribute('aria-pressed','true');
+      state[group.dataset.group]=k.dataset.v;
+      spin+=60;
+      document.getElementById('widgetSvg').style.transform='rotate('+spin+'deg)';
+      render();
+    });
+  });
+  document.getElementById('qty').addEventListener('input',e=>{state.qty=+e.target.value;render();});
+  render();
+
+  // Form
+  const form=document.getElementById('demoForm');
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    let ok=true;
+    ['f-name','f-email','f-co'].forEach(id=>{
+      const el=document.getElementById(id);
+      const valid = el.value.trim() && (id!=='f-email' || /\S+@\S+\.\S+/.test(el.value));
+      el.style.borderBottomColor = valid ? '' : '#b4472c';
+      el.style.background = valid ? '' : 'rgba(180,71,44,.08)';
+      if(!valid) ok=false;
+    });
+    if(!ok) return;
+    const first=document.getElementById('f-name').value.trim().split(' ')[0];
+    document.getElementById('doneMsg').textContent='Thanks, '+first+'! A real person from our team will email you within one business day to pick a time that works.';
+    document.getElementById('doneStamp').classList.add('show');
+  });
+
+  // Reveal
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{ el.style.transitionDelay=(i%3)*80+'ms'; io.observe(el); });
+})();
+</script>
+</body>
+</html>

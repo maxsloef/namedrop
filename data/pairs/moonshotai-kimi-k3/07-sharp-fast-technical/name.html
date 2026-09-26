@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom Widgets, Configured. Ordered. Tracked.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #111111;
+    --white: #ffffff;
+    --red: #e32219;
+    --grey-1: #f4f4f2;
+    --grey-2: #d9d9d6;
+    --grey-3: #6b6b68;
+    --grid-line: 1px solid var(--grey-2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: var(--white);
+    color: var(--black);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--red); color: var(--white); }
+
+  .wrap { max-width: 1440px; margin: 0 auto; padding: 0 48px; }
+
+  /* ---------- HEADER ---------- */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--white);
+    border-bottom: var(--grid-line);
+    z-index: 100;
+  }
+  .nav {
+    max-width: 1440px; margin: 0 auto;
+    padding: 0 48px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+    font-weight: 800; font-size: 20px; letter-spacing: -0.03em;
+    text-decoration: none; color: var(--black);
+  }
+  .logo-mark {
+    width: 24px; height: 24px; background: var(--red);
+    display: inline-block;
+  }
+  .nav-links { display: flex; gap: 40px; align-items: center; }
+  .nav-links a {
+    text-decoration: none; color: var(--black);
+    font-size: 14px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    position: relative;
+  }
+  .nav-links a:hover { color: var(--red); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--black); color: var(--white);
+    font-size: 14px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 16px 32px;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .btn:hover { background: var(--red); }
+  .btn--red { background: var(--red); }
+  .btn--red:hover { background: var(--black); }
+  .btn--outline {
+    background: transparent; color: var(--black);
+    border: 1px solid var(--black);
+  }
+  .btn--outline:hover { background: var(--black); color: var(--white); }
+  .btn .arrow { transition: transform 0.2s ease; }
+  .btn:hover .arrow { transform: translateX(4px); }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    padding-top: 72px;
+    border-bottom: var(--grid-line);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    border-left: var(--grid-line);
+    border-right: var(--grid-line);
+  }
+  .hero-meta {
+    grid-column: 1 / 3;
+    border-right: var(--grid-line);
+    padding: 48px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .meta-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--grey-3);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+  .hero-body {
+    grid-column: 3 / 13;
+    padding: 80px 48px 64px;
+    position: relative;
+  }
+  .kicker {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--red);
+    margin-bottom: 40px;
+  }
+  .kicker::before {
+    content: ""; width: 48px; height: 2px; background: var(--red);
+  }
+  h1 {
+    font-size: 88px;
+    line-height: 0.98;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin-bottom: 40px;
+  }
+  h1 .thin { font-weight: 400; color: var(--grey-3); }
+  h1 .accent { color: var(--red); }
+  .hero-sub {
+    max-width: 560px;
+    font-size: 19px; line-height: 1.6;
+    color: var(--grey-3);
+    margin-bottom: 48px;
+  }
+  .hero-actions { display: flex; gap: 16px; align-items: center; }
+  .hero-foot {
+    grid-column: 1 / 13;
+    border-top: var(--grid-line);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .hero-foot > div {
+    padding: 20px 32px;
+    font-size: 12px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--grey-3);
+    border-right: var(--grid-line);
+  }
+  .hero-foot > div:last-child { border-right: none; }
+  .hero-foot strong { color: var(--black); font-weight: 700; }
+
+  /* Hero diagram */
+  .hero-diagram {
+    position: absolute;
+    right: 48px; top: 80px;
+  }
+
+  /* ---------- SECTION SHARED ---------- */
+  section { border-bottom: var(--grid-line); }
+  .section-head {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    border-left: var(--grid-line);
+    border-right: var(--grid-line);
+    padding: 0;
+  }
+  .section-head .num {
+    grid-column: 1 / 2;
+    border-right: var(--grid-line);
+    padding: 32px;
+    font-size: 13px; font-weight: 600;
+    color: var(--red);
+    letter-spacing: 0.1em;
+  }
+  .section-head h2 {
+    grid-column: 2 / 13;
+    padding: 24px 32px;
+    font-size: 48px; font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1.05;
+  }
+  .section-head h2 .thin { font-weight: 400; color: var(--grey-3); }
+
+  /* ---------- FEATURES ---------- */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-left: var(--grid-line);
+    border-right: var(--grid-line);
+    border-top: var(--grid-line);
+  }
+  .feature {
+    border-right: var(--grid-line);
+    padding: 48px 40px 56px;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.25s ease;
+  }
+  .feature:last-child { border-right: none; }
+  .feature:hover { background: var(--grey-1); }
+  .feature .f-num {
+    font-size: 13px; font-weight: 600; color: var(--red);
+    letter-spacing: 0.1em; margin-bottom: 32px;
+  }
+  .feature svg { margin-bottom: auto; }
+  .feature h3 {
+    font-size: 24px; font-weight: 700;
+    letter-spacing: -0.02em; margin: 32px 0 12px;
+  }
+  .feature p { font-size: 15px; line-height: 1.6; color: var(--grey-3); }
+
+  /* ---------- STATS ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-left: var(--grid-line);
+    border-right: var(--grid-line);
+    border-top: var(--grid-line);
+  }
+  .stat {
+    padding: 48px 32px;
+    border-right: var(--grid-line);
+  }
+  .stat:last-child { border-right: none; }
+  .stat .value {
+    font-size: 64px; font-weight: 800;
+    letter-spacing: -0.04em; line-height: 1;
+  }
+  .stat .value span { color: var(--red); }
+  .stat .label {
+    margin-top: 16px;
+    font-size: 12px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--grey-3);
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps { border-left: var(--grid-line); border-right: var(--grid-line); border-top: var(--grid-line); }
+  .step {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    border-bottom: var(--grid-line);
+  }
+  .step:last-child { border-bottom: none; }
+  .step .s-num {
+    grid-column: 1 / 3;
+    border-right: var(--grid-line);
+    padding: 40px 32px;
+    font-size: 56px; font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--grey-2);
+  }
+  .step .s-body {
+    grid-column: 3 / 9;
+    padding: 40px 48px;
+  }
+  .step .s-body h3 {
+    font-size: 28px; font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 12px;
+  }
+  .step .s-body p { font-size: 15px; color: var(--grey-3); max-width: 520px; }
+  .step .s-tag {
+    grid-column: 9 / 13;
+    border-left: var(--grid-line);
+    padding: 40px 32px;
+    display: flex; align-items: flex-start; justify-content: flex-end;
+  }
+  .tag {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    border: 1px solid var(--black);
+    padding: 6px 14px;
+  }
+  .step:hover .s-num { color: var(--red); }
+
+  /* ---------- QUOTE ---------- */
+  .quote-block {
+    border-left: var(--grid-line); border-right: var(--grid-line);
+    padding: 96px 48px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0;
+  }
+  .quote-mark {
+    grid-column: 1 / 3;
+    font-size: 160px; font-weight: 800; line-height: 0.7;
+    color: var(--red);
+  }
+  .quote-text { grid-column: 3 / 12; }
+  .quote-text blockquote {
+    font-size: 36px; font-weight: 600;
+    letter-spacing: -0.02em; line-height: 1.3;
+    margin-bottom: 32px;
+  }
+  .quote-text cite {
+    font-style: normal;
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--grey-3);
+  }
+  .quote-text cite strong { color: var(--black); }
+
+  /* ---------- CTA ---------- */
+  .cta {
+    background: var(--black);
+    color: var(--white);
+  }
+  .cta-inner {
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+    padding: 120px 48px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .cta-left { grid-column: 1 / 8; }
+  .cta h2 {
+    font-size: 72px; font-weight: 800;
+    letter-spacing: -0.04em; line-height: 1;
+    margin-bottom: 32px;
+  }
+  .cta h2 .accent { color: var(--red); }
+  .cta p {
+    font-size: 18px; color: #9a9a97;
+    max-width: 480px; margin-bottom: 48px;
+  }
+  .cta-right {
+    grid-column: 9 / 13;
+    border-left: 1px solid #333;
+    padding-left: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    justify-content: center;
+  }
+  .cta-fact {
+    font-size: 14px; color: #9a9a97;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #333;
+  }
+  .cta-fact:last-child { border-bottom: none; padding-bottom: 0; }
+  .cta-fact strong {
+    display: block; color: var(--white);
+    font-size: 20px; font-weight: 700;
+    letter-spacing: -0.01em; margin-bottom: 4px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer { background: var(--black); color: var(--white); border-top: 1px solid #333; }
+  .foot-grid {
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    padding: 64px 48px;
+  }
+  .foot-brand { grid-column: 1 / 5; }
+  .foot-brand .logo { color: var(--white); margin-bottom: 24px; }
+  .foot-brand p { font-size: 13px; color: #9a9a97; max-width: 280px; }
+  .foot-col { grid-column: span 2; }
+  .foot-col h4 {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: #9a9a97; margin-bottom: 20px;
+  }
+  .foot-col a {
+    display: block; color: var(--white);
+    text-decoration: none; font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .foot-col a:hover { color: var(--red); }
+  .foot-bottom {
+    border-top: 1px solid #333;
+    padding: 24px 48px;
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: #9a9a97;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+
+  /* Marquee */
+  .marquee {
+    overflow: hidden;
+    border-top: var(--grid-line);
+    background: var(--grey-1);
+    padding: 20px 0;
+    white-space: nowrap;
+  }
+  .marquee-track {
+    display: inline-flex; gap: 64px;
+    animation: scroll 30s linear infinite;
+    font-size: 13px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--grey-3);
+  }
+  .marquee-track span { display: inline-flex; align-items: center; gap: 64px; }
+  .marquee-track i {
+    width: 8px; height: 8px; background: var(--red);
+    display: inline-block;
+  }
+  @keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Reveal animation */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="#" class="logo"><span class="logo-mark"></span>ACME</a>
+    <div class="nav-links">
+      <a href="#platform">Platform</a>
+      <a href="#process">Process</a>
+      <a href="#results">Results</a>
+      <a href="#demo" class="btn btn--red">Book a Demo <span class="arrow">&rarr;</span></a>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-meta">
+        <span class="meta-label">Widget Operations Platform — Est. 2016</span>
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <rect x="0" y="0" width="22" height="22" fill="#111"/>
+          <rect x="26" y="0" width="22" height="22" fill="#e32219"/>
+          <rect x="0" y="26" width="22" height="22" fill="#e32219"/>
+          <rect x="26" y="26" width="22" height="22" fill="#111"/>
+        </svg>
+      </div>
+      <div class="hero-body">
+        <div class="kicker">For Operations Teams at Mid-Sized Manufacturers</div>
+        <h1>Custom widgets.<br><span class="thin">Configured, ordered,</span><br>tracked<span class="accent">.</span></h1>
+        <p class="hero-sub">Acme replaces spreadsheets, email chains, and phone-tag quoting with one system of record for every custom widget moving through your supply chain — from specification to dock receipt.</p>
+        <div class="hero-actions">
+          <a href="#demo" class="btn btn--red">Book a Demo <span class="arrow">&rarr;</span></a>
+          <a href="#platform" class="btn btn--outline">See the Platform</a>
+        </div>
+        <div class="hero-diagram">
+          <svg width="220" height="220" viewBox="0 0 220 220" fill="none">
+            <circle cx="110" cy="110" r="100" stroke="#d9d9d6" stroke-width="1"/>
+            <circle cx="110" cy="110" r="68" stroke="#111" stroke-width="1"/>
+            <circle cx="110" cy="110" r="36" fill="#e32219"/>
+            <line x1="110" y1="10" x2="110" y2="42" stroke="#111" stroke-width="2"/>
+            <line x1="110" y1="178" x2="110" y2="210" stroke="#111" stroke-width="2"/>
+            <line x1="10" y1="110" x2="42" y2="110" stroke="#111" stroke-width="2"/>
+            <line x1="178" y1="110" x2="210" y2="110" stroke="#111" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-foot">
+        <div><strong>2,400+</strong> manufacturers served</div>
+        <div><strong>38 hrs</strong> avg. quote-to-order, down from 3 weeks</div>
+        <div><strong>99.97%</strong> order accuracy across 1.2M widgets</div>
+        <div><strong>SOC 2 Type II</strong> certified &amp; ISO-ready reporting</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track" id="marquee">
+    <span><i></i>Configure <i></i>Order <i></i>Track <i></i>Receive <i></i>Reorder <i></i>Configure <i></i>Order <i></i>Track <i></i>Receive <i></i>Reorder</span>
+    <span><i></i>Configure <i></i>Order <i></i>Track <i></i>Receive <i></i>Reorder <i></i>Configure <i></i>Order <i></i>Track <i></i>Receive <i></i>Reorder</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="platform">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="num">01</div>
+      <h2>One platform. <span class="thin">Three jobs done properly.</span></h2>
+    </div>
+    <div class="features">
+      <div class="feature reveal">
+        <div class="f-num">01 / Configure</div>
+        <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
+          <rect x="8" y="8" width="36" height="36" stroke="#111" stroke-width="2"/>
+          <rect x="52" y="8" width="36" height="36" fill="#e32219"/>
+          <rect x="8" y="52" width="36" height="36" fill="#111"/>
+          <rect x="52" y="52" width="36" height="36" stroke="#111" stroke-width="2"/>
+        </svg>
+        <h3>Spec widgets in minutes, not meetings</h3>
+        <p>A parametric configurator with built-in engineering rules. Tolerances, materials, finishes, and certifications are validated as you type — impossible configurations can't be submitted.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="f-num">02 / Order</div>
+        <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
+          <line x1="8" y1="24" x2="88" y2="24" stroke="#111" stroke-width="2"/>
+          <line x1="8" y1="48" x2="64" y2="48" stroke="#111" stroke-width="2"/>
+          <line x1="8" y1="72" x2="76" y2="72" stroke="#111" stroke-width="2"/>
+          <rect x="72" y="36" width="16" height="16" fill="#e32219"/>
+        </svg>
+        <h3>Pricing and lead times in real time</h3>
+        <p>Every configuration returns a firm quote and committed ship date instantly. Approvals route automatically, and POs generate themselves when thresholds are met.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="f-num">03 / Track</div>
+        <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
+          <circle cx="48" cy="48" r="40" stroke="#111" stroke-width="2"/>
+          <circle cx="48" cy="48" r="8" fill="#e32219"/>
+          <line x1="48" y1="48" x2="76" y2="20" stroke="#111" stroke-width="2"/>
+        </svg>
+        <h3>Every widget, visible end to end</h3>
+        <p>Milestone-level tracking from machining to final mile. Exceptions surface before they become shortages, with automated alerts to the people who can act on them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="results">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="num">02</div>
+      <h2>Measured, <span class="thin">not promised.</span></h2>
+    </div>
+    <div class="stats">
+      <div class="stat reveal">
+        <div class="value" data-count="87"><span>−</span>0%</div>
+        <div class="label">Reduction in quoting cycle time</div>
+      </div>
+      <div class="stat reveal">
+        <div class="value" data-count="1.2" data-suffix="M">0</div>
+        <div class="label">Widgets tracked annually</div>
+      </div>
+      <div class="stat reveal">
+        <div class="value" data-count="31"><span>−</span>0%</div>
+        <div class="label">Average inventory carrying cost</div>
+      </div>
+      <div class="stat reveal">
+        <div class="value" data-count="4" data-prefix="&lt;">0</div>
+        <div class="label">Days to full team onboarding</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="num">03</div>
+      <h2>From spec to dock <span class="thin">in four steps.</span></h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="s-num">01</div>
+        <div class="s-body">
+          <h3>Import your widget catalog</h3>
+          <p>Upload drawings, CAD references, or existing part numbers. Acme normalizes them into configurable templates within one business day.</p>
+        </div>
+        <div class="s-tag"><span class="tag">Day 1</span></div>
+      </div>
+      <div class="step reveal">
+        <div class="s-num">02</div>
+        <div class="s-body">
+          <h3>Set rules and approvals</h3>
+          <p>Define who can configure what, spending limits, and routing logic. Engineering keeps control; purchasing keeps speed.</p>
+        </div>
+        <div class="s-tag"><span class="tag">Day 2</span></div>
+      </div>
+      <div class="step reveal">
+        <div class="s-num">03</div>
+        <div class="s-body">
+          <h3>Order with confidence</h3>
+          <p>Your team configures and orders against live capacity. Every order carries a firm price, a committed date, and a full audit trail.</p>
+        </div>
+        <div class="s-tag"><span class="tag">Day 3</span></div>
+      </div>
+      <div class="step reveal">
+        <div class="s-num">04</div>
+        <div class="s-body">
+          <h3>Track to receipt, then reorder</h3>
+          <p>Follow production milestones in real time. When stock runs low, reorder points trigger replenishment automatically.</p>
+        </div>
+        <div class="s-tag"><span class="tag">Ongoing</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section>
+  <div class="wrap">
+    <div class="quote-block reveal">
+      <div class="quote-mark">&ldquo;</div>
+      <div class="quote-text">
+        <blockquote>We went from chasing quotes over email to ordering validated widgets before lunch. Acme didn't just speed us up — it removed an entire category of errors.</blockquote>
+        <cite><strong>Marta Ellison</strong> — Director of Operations, Halvorsen Precision Components</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="demo">
+  <div class="wrap">
+    <div class="cta-inner">
+      <div class="cta-left">
+        <h2>See it on your<br>own widgets<span class="accent">.</span></h2>
+        <p>A 30-minute working session with an Acme operations engineer. Bring a real part number — we'll configure, price, and track it live on the call.</p>
+        <a href="mailto:demo@acme.example" class="btn btn--red">Book a Demo <span class="arrow">&rarr;</span></a>
+      </div>
+      <div class="cta-right">
+        <div class="cta-fact"><strong>30 minutes</strong>Live walkthrough on your real parts, not a slide deck.</div>
+        <div class="cta-fact"><strong>No commitment</strong>Keep the configured specs even if you don't buy.</div>
+        <div class="cta-fact"><strong>Same-week slots</strong>Demos available Tuesday through Friday, all time zones.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="logo"><span class="logo-mark"></span>ACME</a>
+        <p>The system of record for custom widget operations. Built in Detroit, deployed worldwide.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Platform</h4>
+        <a href="#platform">Configure</a>
+        <a href="#platform">Order</a>
+        <a href="#platform">Track</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+      </div>
+      <div class="foot-col">
+        <h4>Resources</h4>
+        <a href="#">Documentation</a>
+        <a href="#">API Reference</a>
+        <a href="#">Status</a>
+      </div>
+      <div class="foot-col">
+        <h4>Legal</h4>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2025 Acme Industries, Inc.</span>
+      <span>Zürich / Detroit / Osaka</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Animated stat counters
+  const animateValue = (el, target, prefix, suffix) => {
+    const isFloat = String(target).includes('.');
+    const duration = 1400;
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      let val = target * eased;
+      val = isFloat ? val.toFixed(1) : Math.round(val);
+      el.childNodes.forEach(n => { if (n.nodeType === 3) n.remove(); });
+      el.insertAdjacentText('beforeend', (prefix || '') + val + (suffix || '') + (isFloat || suffix ? '' : (target > 10 ? '' : '')));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  const statObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const target = parseFloat(el.dataset.count);
+        const hasMinus = el.querySelector('span');
+        const suffix = el.dataset.suffix || '';
+        const prefix = el.dataset.prefix || '';
+        // Preserve leading span (−)
+        if (hasMinus) {
+          animateValue(el, target, prefix, suffix);
+          // ensure minus stays first
+        } else {
+          animateValue(el, target, prefix, suffix);
+        }
+        statObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.stat .value').forEach(el => statObserver.observe(el));
+</script>
+</body>
+</html>

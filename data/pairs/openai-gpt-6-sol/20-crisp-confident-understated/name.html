@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4f0">
+  <meta name="description" content="Configure, order, and track custom widgets in one place. Acme gives manufacturing operations teams a clearer path from specification to delivery.">
+  <title>Acme — Custom widgets, under control.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f5f4f0;
+      --white: #fff;
+      --ink: #171917;
+      --muted: #656962;
+      --line: #d4d5cf;
+      --red: #df321f;
+      --mono: "IBM Plex Mono", monospace;
+      --sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font: inherit; }
+    button, a, input, select { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
+    ::selection { background: var(--red); color: white; }
+
+    .container { width: min(100% - 112px, 1328px); margin-inline: auto; }
+    .eyebrow { font: 500 11px/1.5 var(--mono); letter-spacing: .075em; text-transform: uppercase; }
+    .red { color: var(--red); }
+
+    .site-header { background: var(--paper); border-bottom: 1px solid var(--line); }
+    .header-inner { height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; white-space: nowrap; }
+    .brand-mark { width: 27px; height: 27px; background: var(--red); position: relative; display: block; }
+    .brand-mark::before, .brand-mark::after { content: ""; position: absolute; background: white; }
+    .brand-mark::before { width: 13px; height: 2px; left: 7px; top: 12px; }
+    .brand-mark::after { width: 2px; height: 13px; left: 12px; top: 7px; }
+    .brand-name { font-size: 27px; font-weight: 700; letter-spacing: -.065em; line-height: 1; }
+    .header-note { margin-left: 23px; padding-left: 23px; border-left: 1px solid var(--line); color: var(--muted); }
+    .brand-group { display: flex; align-items: center; }
+    .nav { display: flex; align-items: center; gap: 37px; }
+    .nav a:not(.nav-cta) { font-size: 13px; font-weight: 600; transition: color .2s; }
+    .nav a:not(.nav-cta):hover { color: var(--red); }
+    .nav-cta { display: inline-flex; align-items: center; justify-content: space-between; min-width: 156px; gap: 23px; border: 1px solid var(--ink); padding: 12px 14px; font-size: 13px; font-weight: 600; transition: background .2s, color .2s; }
+    .nav-cta:hover { background: var(--ink); color: white; }
+    .menu-toggle { display: none; border: 0; background: transparent; font: 600 12px var(--mono); cursor: pointer; }
+
+    .hero { padding: 33px 0 43px; }
+    .hero-topline { display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 14px; color: var(--muted); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.14fr) minmax(0, 1fr); gap: 54px; align-items: stretch; padding-top: 25px; }
+    .hero-copy { min-height: 536px; display: flex; flex-direction: column; align-items: flex-start; padding-top: 32px; }
+    .hero-copy .eyebrow { color: var(--red); }
+    h1 { margin: 43px 0 27px; max-width: 740px; font-size: clamp(64px, 6.5vw, 102px); line-height: .98; font-weight: 600; letter-spacing: -.077em; }
+    h1 span { display: block; }
+    .hero-description { max-width: 440px; margin: 0; font-size: 19px; line-height: 1.5; letter-spacing: -.016em; }
+    .hero-actions { display: flex; align-items: center; gap: 28px; margin-top: 34px; }
+    .button-primary { display: inline-flex; align-items: center; justify-content: space-between; min-width: 199px; min-height: 55px; gap: 35px; padding: 0 17px 0 20px; background: var(--red); color: white; font-size: 14px; font-weight: 600; border: 1px solid var(--red); cursor: pointer; transition: background .2s, border-color .2s, transform .2s; }
+    .button-primary:hover { background: #b92316; border-color: #b92316; transform: translateY(-2px); }
+    .button-primary .arrow { font-size: 22px; font-weight: 400; line-height: 1; }
+    .text-link { border-bottom: 1px solid var(--ink); padding-bottom: 4px; font-size: 13px; font-weight: 600; }
+    .text-link:hover { color: var(--red); border-color: var(--red); }
+    .hero-footnote { margin-top: auto; padding-top: 27px; font: 11px/1.6 var(--mono); text-transform: uppercase; letter-spacing: .045em; color: var(--muted); }
+
+    .diagram { position: relative; display: flex; flex-direction: column; min-height: 536px; overflow: hidden; background: #eaeae5; border: 1px solid #e2e2dc; }
+    .diagram::before { content: ""; position: absolute; inset: 0; opacity: .52; background-image: linear-gradient(to right, #d5d6d0 1px, transparent 1px), linear-gradient(to bottom, #d5d6d0 1px, transparent 1px); background-size: 66px 66px; pointer-events: none; }
+    .diagram-head, .diagram-bottom { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 22px 24px; }
+    .diagram-head { color: #484d48; }
+    .diagram-art { position: relative; z-index: 1; width: 100%; height: 380px; margin: auto 0; }
+    .diagram-art svg { display: block; width: 100%; height: 100%; }
+    .diagram-bottom { align-items: flex-end; border-top: 1px solid #c9cbc4; background: rgba(234,234,229,.88); }
+    .diagram-bottom strong { display: block; margin-top: 7px; font-size: 15px; font-weight: 600; letter-spacing: -.025em; }
+    .live-dot { display: inline-block; width: 7px; height: 7px; margin-right: 7px; background: var(--red); border-radius: 50%; vertical-align: 1px; }
+
+    .principle { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); background: var(--paper); }
+    .principle-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .principle-item { min-height: 188px; padding: 25px 36px 28px 0; }
+    .principle-item + .principle-item { border-left: 1px solid var(--line); padding-left: 36px; }
+    .principle-item h2 { margin: 19px 0 9px; font-size: 24px; font-weight: 600; letter-spacing: -.045em; }
+    .principle-item p { margin: 0; max-width: 310px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+
+    .platform { background: var(--ink); color: var(--paper); padding: 110px 0 115px; }
+    .section-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: end; margin-bottom: 75px; }
+    .section-heading h2 { margin: 22px 0 0; font-size: clamp(52px, 5vw, 76px); line-height: 1.02; font-weight: 500; letter-spacing: -.065em; }
+    .section-heading p { max-width: 430px; margin: 0 0 4px auto; color: #b9bbb4; font-size: 18px; line-height: 1.55; }
+    .platform-rows { border-top: 1px solid #555852; }
+    .platform-row { display: grid; grid-template-columns: 100px 1fr 1fr 32px; gap: 20px; align-items: start; padding: 30px 0 34px; border-bottom: 1px solid #555852; }
+    .platform-row .number { color: #a5a8a1; }
+    .platform-row h3 { margin: -5px 0 0; font-size: 32px; font-weight: 500; letter-spacing: -.045em; }
+    .platform-row p { max-width: 390px; margin: 0; color: #b9bbb4; font-size: 15px; line-height: 1.6; }
+    .row-symbol { color: var(--red); font-size: 25px; line-height: 1; text-align: right; }
+
+    .demo { padding: 110px 0 120px; }
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10%; }
+    .demo-copy h2 { margin: 25px 0 25px; max-width: 590px; font-size: clamp(54px, 5.2vw, 78px); line-height: 1.02; font-weight: 600; letter-spacing: -.07em; }
+    .demo-copy > p { max-width: 400px; margin: 0; font-size: 18px; line-height: 1.55; }
+    .demo-aside { margin-top: 80px; display: flex; align-items: flex-start; gap: 18px; color: var(--muted); }
+    .demo-aside .red-square { width: 27px; height: 27px; flex: none; background: var(--red); }
+    .demo-aside p { max-width: 270px; margin: 0; font: 11px/1.7 var(--mono); text-transform: uppercase; letter-spacing: .02em; }
+    .demo-form { padding-top: 5px; }
+    .form-heading { display: flex; justify-content: space-between; padding-bottom: 19px; border-bottom: 1px solid var(--ink); }
+    .form-heading strong { font-size: 19px; font-weight: 600; letter-spacing: -.03em; }
+    .form-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 25px 20px; margin-top: 29px; }
+    .field { display: flex; flex-direction: column; gap: 9px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font: 500 11px var(--mono); letter-spacing: .045em; text-transform: uppercase; }
+    .field input, .field select { width: 100%; height: 51px; padding: 0 14px; border: 1px solid #bbbeb6; border-radius: 0; background: transparent; color: var(--ink); font-size: 14px; outline: none; transition: border-color .2s; }
+    .field input:focus, .field select:focus { border-color: var(--red); }
+    .field input::placeholder { color: #92968f; }
+    .field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23171917' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
+    .form-submit { width: 100%; margin-top: 28px; }
+    .form-note { margin: 13px 0 0; color: var(--muted); font: 11px/1.6 var(--mono); }
+    .form-success { display: none; margin-top: 28px; padding: 25px; border-left: 3px solid var(--red); background: #eaeae5; }
+    .form-success strong { display: block; margin-bottom: 7px; font-size: 20px; }
+    .form-success p { margin: 0; color: var(--muted); line-height: 1.5; }
+
+    .footer { border-top: 1px solid var(--ink); }
+    .footer-inner { min-height: 123px; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+    .footer-right { display: flex; gap: 45px; align-items: center; color: var(--muted); }
+    .footer a:hover { color: var(--red); }
+
+    @media (max-width: 1050px) {
+      .container { width: min(100% - 64px, 1328px); }
+      .header-note { display: none; }
+      .hero-grid { gap: 30px; }
+      h1 { font-size: clamp(60px, 7vw, 86px); }
+      .hero-copy { min-height: 500px; }
+      .diagram { min-height: 500px; }
+      .diagram-art { height: 350px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 40px, 1328px); }
+      .header-inner { height: 72px; }
+      .menu-toggle { display: block; }
+      .nav { display: none; position: absolute; z-index: 10; top: 72px; left: 0; right: 0; padding: 22px 20px 26px; background: var(--paper); border-bottom: 1px solid var(--ink); flex-direction: column; align-items: stretch; gap: 22px; }
+      .nav.is-open { display: flex; }
+      .nav-cta { justify-content: space-between; }
+      .hero { padding-top: 25px; }
+      .hero-topline span:last-child { display: none; }
+      .hero-grid { display: flex; flex-direction: column; gap: 42px; }
+      .hero-copy { min-height: 0; padding-top: 20px; }
+      h1 { margin: 27px 0 22px; font-size: clamp(55px, 11vw, 82px); }
+      .hero-description { font-size: 17px; }
+      .hero-footnote { margin-top: 35px; }
+      .diagram { min-height: 450px; }
+      .diagram-art { height: 310px; }
+      .principle-grid { grid-template-columns: 1fr; }
+      .principle-item, .principle-item + .principle-item { min-height: 0; padding: 24px 0 27px; border-left: 0; }
+      .principle-item + .principle-item { border-top: 1px solid var(--line); }
+      .principle-item h2 { margin-top: 12px; }
+      .platform, .demo { padding: 76px 0 85px; }
+      .section-heading, .demo-grid { grid-template-columns: 1fr; gap: 30px; }
+      .section-heading { margin-bottom: 45px; }
+      .section-heading h2, .demo-copy h2 { font-size: clamp(49px, 9vw, 70px); }
+      .section-heading p { margin: 0; }
+      .platform-row { grid-template-columns: 50px 1fr 25px; gap: 12px; }
+      .platform-row h3 { font-size: 26px; }
+      .platform-row p { grid-column: 2 / 3; grid-row: 2; }
+      .row-symbol { grid-column: 3; grid-row: 1; }
+      .demo-aside { margin-top: 35px; }
+      .demo-form { margin-top: 20px; }
+      .footer-inner { padding: 28px 0; align-items: flex-start; flex-direction: column; }
+      .footer-right { flex-wrap: wrap; gap: 15px 25px; }
+    }
+    @media (max-width: 430px) {
+      .hero-actions { gap: 17px; }
+      .button-primary { min-width: 175px; }
+      .diagram-head, .diagram-bottom { padding: 17px; }
+      .diagram-head .eyebrow:last-child { display: none; }
+      .form-fields { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand-group">
+        <a class="brand" href="#" aria-label="Acme home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">acme</span>
+        </a>
+        <span class="header-note eyebrow">Widget operations, aligned.</span>
+      </div>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">MENU +</button>
+      <nav class="nav" id="main-nav" aria-label="Main navigation">
+        <a href="#platform">Platform</a>
+        <a href="#process">How it works</a>
+        <a href="#demo" class="nav-cta">Book a demo <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container">
+        <div class="hero-topline eyebrow">
+          <span>Made for manufacturing operations</span>
+          <span>Configure / Order / Track</span>
+        </div>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow">One platform. Every moving part.</div>
+            <h1 id="hero-title"><span>Custom</span><span>widgets,</span><span>under control<span class="red">.</span></span></h1>
+            <p class="hero-description">From the first specification to the final delivery, Acme gives your team one clear place to manage every custom widget order.</p>
+            <div class="hero-actions">
+              <a class="button-primary" href="#demo">Book a demo <span class="arrow" aria-hidden="true">↗</span></a>
+              <a class="text-link" href="#process">See how it works</a>
+            </div>
+            <div class="hero-footnote">Built for the people who keep production moving.</div>
+          </div>
+
+          <div class="diagram" role="img" aria-label="Technical illustration of a custom widget, with configuration and order status annotations">
+            <div class="diagram-head">
+              <span class="eyebrow">Fig. 01 / A clearer way to work</span>
+              <span class="eyebrow">AC—01</span>
+            </div>
+            <div class="diagram-art">
+              <svg viewBox="0 0 560 380" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <pattern id="fine-grid" width="16" height="16" patternUnits="userSpaceOnUse">
+                    <path d="M 16 0 L 0 0 0 16" fill="none" stroke="#d7d8d1" stroke-width=".65"/>
+                  </pattern>
+                </defs>
+                <circle cx="285" cy="190" r="153" fill="#df321f"/>
+                <circle cx="285" cy="190" r="118" fill="none" stroke="#f5f4f0" stroke-width="1" opacity=".62"/>
+                <circle cx="285" cy="190" r="84" fill="none" stroke="#f5f4f0" stroke-width="1" opacity=".62"/>
+                <path d="M285 15v350M91 190h388" stroke="#22241f" stroke-width="1" opacity=".55"/>
+                <path d="M117 58h336M117 322h336" stroke="#22241f" stroke-width="1" opacity=".5"/>
+                <path d="M117 53v10m336-10v10M117 317v10m336-10v10" stroke="#22241f" stroke-width="1"/>
+                <text x="116" y="45" fill="#171917" font-size="10" font-family="monospace" letter-spacing="1">SPECIFICATION / W-240</text>
+                <text x="393" y="344" fill="#171917" font-size="10" font-family="monospace" letter-spacing="1">SCALE 1:4</text>
+
+                <!-- A geometric, exploded-view widget assembly -->
+                <path d="M184 135 276 96 369 135 276 174Z" fill="#f5f4f0" stroke="#171917" stroke-width="2"/>
+                <path d="M184 135v105l92 42V174Z" fill="#ddded7" stroke="#171917" stroke-width="2"/>
+                <path d="M276 174v108l93-42V135Z" fill="#f5f4f0" stroke="#171917" stroke-width="2"/>
+                <path d="M204 145v82l72 32 73-32v-82" fill="none" stroke="#171917" stroke-width="1"/>
+                <path d="M276 174v85M204 145l72 31 73-31" fill="none" stroke="#171917" stroke-width="1"/>
+                <path d="M233 114 325 153M325 114 233 153" stroke="#171917" stroke-width="1"/>
+                <circle cx="276" cy="135" r="22" fill="#171917"/>
+                <circle cx="276" cy="135" r="9" fill="#f5f4f0"/>
+                <circle cx="221" cy="163" r="4" fill="#171917"/>
+                <circle cx="331" cy="163" r="4" fill="#171917"/>
+                <circle cx="224" cy="221" r="4" fill="#171917"/>
+                <circle cx="327" cy="221" r="4" fill="#171917"/>
+                <path d="M369 174h72v-42M184 218h-63v40" fill="none" stroke="#171917" stroke-width="1"/>
+                <circle cx="441" cy="132" r="3" fill="#171917"/>
+                <circle cx="121" cy="258" r="3" fill="#171917"/>
+                <rect x="374" y="91" width="111" height="29" fill="#f5f4f0" stroke="#171917"/>
+                <text x="383" y="110" fill="#171917" font-size="10" font-family="monospace">CONFIGURED ✓</text>
+                <rect x="55" y="270" width="119" height="29" fill="#f5f4f0" stroke="#171917"/>
+                <text x="64" y="289" fill="#171917" font-size="10" font-family="monospace">ONE SOURCE / 01</text>
+                <path d="M72 149h36m-18-18v36M461 258h36m-18-18v36" stroke="#171917" stroke-width="1"/>
+              </svg>
+            </div>
+            <div class="diagram-bottom">
+              <div>
+                <span class="eyebrow">The complete picture</span>
+                <strong>Every detail in its place.</strong>
+              </div>
+              <span class="eyebrow"><span class="live-dot"></span>From spec to delivery</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="principle" id="process" aria-label="How Acme works">
+      <div class="container principle-grid">
+        <div class="principle-item">
+          <div class="eyebrow red">01 / Configure</div>
+          <h2>Get the spec right.</h2>
+          <p>Define the widget you need with requirements your team and suppliers can work from.</p>
+        </div>
+        <div class="principle-item">
+          <div class="eyebrow red">02 / Order</div>
+          <h2>Move with certainty.</h2>
+          <p>Turn approved configurations into orders without losing details along the way.</p>
+        </div>
+        <div class="principle-item">
+          <div class="eyebrow red">03 / Track</div>
+          <h2>Know where things stand.</h2>
+          <p>Follow progress across your supply chain, from placement through delivery.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="platform" id="platform" aria-labelledby="platform-title">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow red">Built around the work</div>
+            <h2 id="platform-title">Less chasing.<br>More clarity.</h2>
+          </div>
+          <p>Custom work creates moving parts. Acme brings them together, so your operations team can spend less time finding answers and more time acting on them.</p>
+        </div>
+        <div class="platform-rows">
+          <div class="platform-row">
+            <span class="number eyebrow">01 —</span>
+            <h3>Specifications stay connected.</h3>
+            <p>Keep configuration decisions with the order they belong to. Everyone works from the same requirements.</p>
+            <span class="row-symbol" aria-hidden="true">↗</span>
+          </div>
+          <div class="platform-row">
+            <span class="number eyebrow">02 —</span>
+            <h3>Orders have a clear path.</h3>
+            <p>Give purchasing and operations a shared view of what was ordered, when, and for which need.</p>
+            <span class="row-symbol" aria-hidden="true">↗</span>
+          </div>
+          <div class="platform-row">
+            <span class="number eyebrow">03 —</span>
+            <h3>Progress is visible.</h3>
+            <p>See where each widget stands across the supply chain before a small question becomes a production delay.</p>
+            <span class="row-symbol" aria-hidden="true">↗</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo" id="demo" aria-labelledby="demo-title">
+      <div class="container demo-grid">
+        <div class="demo-copy">
+          <div class="eyebrow red">Let's make it simpler</div>
+          <h2 id="demo-title">See the whole<br>picture.</h2>
+          <p>Tell us a little about your operation. We'll show you how Acme can help your team configure, order, and track custom widgets with confidence.</p>
+          <div class="demo-aside">
+            <span class="red-square" aria-hidden="true"></span>
+            <p>A focused conversation about your workflow. No generic slide deck.</p>
+          </div>
+        </div>
+        <div class="demo-form">
+          <div class="form-heading">
+            <strong>Request a demo</strong>
+            <span class="eyebrow">01 / 01</span>
+          </div>
+          <form id="demo-request">
+            <div class="form-fields">
+              <div class="field">
+                <label for="first-name">First name</label>
+                <input id="first-name" name="firstName" type="text" autocomplete="given-name" placeholder="Your first name" required>
+              </div>
+              <div class="field">
+                <label for="last-name">Last name</label>
+                <input id="last-name" name="lastName" type="text" autocomplete="family-name" placeholder="Your last name" required>
+              </div>
+              <div class="field">
+                <label for="work-email">Work email</label>
+                <input id="work-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+              </div>
+              <div class="field">
+                <label for="company">Company</label>
+                <input id="company" name="company" type="text" autocomplete="organization" placeholder="Company name" required>
+              </div>
+              <div class="field full">
+                <label for="priority">What would you like to improve?</label>
+                <select id="priority" name="priority" required>
+                  <option value="" disabled selected>Select your main priority</option>
+                  <option value="Configuring custom widgets">Configuring custom widgets</option>
+                  <option value="Managing orders">Managing orders</option>
+                  <option value="Tracking supply chain progress">Tracking supply chain progress</option>
+                  <option value="The entire workflow">The entire workflow</option>
+                </select>
+              </div>
+            </div>
+            <button class="button-primary form-submit" type="submit">Request my demo <span class="arrow" aria-hidden="true">↗</span></button>
+            <p class="form-note">A member of our team will follow up to find a time that works.</p>
+          </form>
+          <div class="form-success" id="form-success" role="status" aria-live="polite">
+            <strong>Thanks for reaching out.</strong>
+            <p>Your demo request has been noted. We look forward to showing you Acme.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#" aria-label="Acme home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">acme</span>
+      </a>
+      <div class="footer-right eyebrow">
+        <span>Custom widgets. Clear operations.</span>
+        <a href="#hero-title">Back to top ↑</a>
+        <span>© <span id="year">2026</span> Acme</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const menuButton = document.querySelector(".menu-toggle");
+    const nav = document.querySelector(".nav");
+
+    menuButton.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("is-open");
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      menuButton.textContent = isOpen ? "CLOSE −" : "MENU +";
+    });
+
+    nav.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        nav.classList.remove("is-open");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.textContent = "MENU +";
+      });
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    document.getElementById("demo-request").addEventListener("submit", event => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      if (!form.reportValidity()) return;
+      form.style.display = "none";
+      document.getElementById("form-success").style.display = "block";
+    });
+  </script>
+</body>
+</html>

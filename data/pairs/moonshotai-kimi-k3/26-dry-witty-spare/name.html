@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, properly administered</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#e2001a;
+    --black:#111111;
+    --paper:#ffffff;
+    --grey:#f2f2f2;
+    --line:#111111;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',Helvetica,Arial,sans-serif;
+    background:var(--paper);
+    color:var(--black);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.4;
+  }
+  ::selection{background:var(--red);color:#fff;}
+
+  /* ---------- header ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:stretch;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    height:64px;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;
+    padding:0 24px;border-right:1px solid var(--line);
+    font-weight:900;font-size:20px;letter-spacing:-0.03em;
+    text-decoration:none;color:var(--black);
+  }
+  .logo-dot{width:14px;height:14px;background:var(--red);border-radius:50%;}
+  nav{display:flex;align-items:stretch;}
+  nav a{
+    display:flex;align-items:center;padding:0 22px;
+    font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;
+    text-decoration:none;color:var(--black);
+    border-left:1px solid var(--line);
+    transition:background .15s,color .15s;
+  }
+  nav a:hover{background:var(--grey);}
+  nav a.cta{background:var(--red);color:#fff;font-weight:700;}
+  nav a.cta:hover{background:var(--black);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:164px 24px 0 24px;
+    min-height:100vh;
+    display:flex;flex-direction:column;
+  }
+  .hero-meta{
+    display:flex;justify-content:space-between;
+    font-size:12px;text-transform:uppercase;letter-spacing:0.12em;
+    border-top:1px solid var(--line);
+    padding-top:10px;margin-bottom:40px;
+  }
+  h1{
+    font-size:clamp(56px,9.2vw,132px);
+    font-weight:900;letter-spacing:-0.045em;line-height:0.94;
+    text-transform:uppercase;
+  }
+  h1 .red{color:var(--red);}
+  h1 .outline{
+    color:transparent;
+    -webkit-text-stroke:2px var(--black);
+  }
+  .hero-sub{
+    display:grid;grid-template-columns:1fr 1fr;gap:24px;
+    margin-top:56px;padding-bottom:80px;
+    border-bottom:1px solid var(--line);
+  }
+  .hero-sub p{
+    font-size:19px;max-width:520px;font-weight:400;
+  }
+  .hero-sub p em{font-style:normal;color:var(--red);font-weight:700;}
+  .hero-actions{display:flex;gap:16px;align-items:flex-start;justify-content:flex-end;}
+  .btn{
+    display:inline-block;padding:18px 34px;
+    font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+    text-decoration:none;border:1px solid var(--black);
+    transition:all .15s;cursor:pointer;background:var(--paper);color:var(--black);
+    font-family:inherit;
+  }
+  .btn.primary{background:var(--red);border-color:var(--red);color:#fff;}
+  .btn.primary:hover{background:var(--black);border-color:var(--black);}
+  .btn.ghost:hover{background:var(--black);color:#fff;}
+
+  /* ---------- ticker ---------- */
+  .ticker{
+    border-bottom:1px solid var(--line);
+    overflow:hidden;white-space:nowrap;
+    background:var(--black);color:#fff;
+    padding:12px 0;
+  }
+  .ticker-inner{
+    display:inline-block;
+    animation:tick 28s linear infinite;
+    font-size:13px;font-weight:500;text-transform:uppercase;letter-spacing:0.15em;
+  }
+  .ticker-inner span{margin:0 28px;}
+  .ticker-inner .r{color:var(--red);}
+  @keyframes tick{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* ---------- section shell ---------- */
+  section{padding:0 24px;}
+  .sec-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:1px solid var(--line);
+    padding:64px 0 12px;margin-bottom:0;
+  }
+  .sec-head h2{
+    font-size:clamp(34px,4.4vw,64px);font-weight:900;
+    letter-spacing:-0.035em;text-transform:uppercase;line-height:1;
+  }
+  .sec-head .num{font-size:13px;font-weight:700;color:var(--red);letter-spacing:0.1em;}
+
+  /* ---------- problem ---------- */
+  .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);border-left:1px solid var(--line);}
+  .problem-cell{
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:36px 28px 64px;min-height:300px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    transition:background .2s;
+  }
+  .problem-cell:hover{background:var(--grey);}
+  .problem-cell .idx{font-size:12px;font-weight:700;color:var(--red);letter-spacing:0.12em;}
+  .problem-cell h3{font-size:24px;font-weight:700;letter-spacing:-0.02em;margin:20px 0 12px;text-transform:uppercase;}
+  .problem-cell p{font-size:15px;color:#444;max-width:320px;}
+
+  /* ---------- diagram ---------- */
+  .diagram-wrap{border-bottom:1px solid var(--line);padding:64px 0;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+  .diagram-copy p{font-size:19px;max-width:480px;margin-top:20px;}
+  .diagram-copy p+p{margin-top:16px;font-size:15px;color:#444;}
+  .diagram-copy h3{font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;}
+  svg text{font-family:'Inter',Helvetica,Arial,sans-serif;}
+
+  /* ---------- stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);border-left:1px solid var(--line);}
+  .stat{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:32px 28px 48px;}
+  .stat .big{font-size:clamp(48px,5.5vw,84px);font-weight:900;letter-spacing:-0.04em;line-height:1;}
+  .stat .big .red{color:var(--red);}
+  .stat .lbl{font-size:12px;text-transform:uppercase;letter-spacing:0.12em;margin-top:14px;color:#444;}
+
+  /* ---------- quote ---------- */
+  .quote{
+    border-bottom:1px solid var(--line);
+    padding:96px 24px;text-align:left;
+  }
+  .quote blockquote{
+    font-size:clamp(28px,3.4vw,52px);font-weight:700;letter-spacing:-0.03em;line-height:1.15;
+    max-width:1100px;
+  }
+  .quote blockquote .red{color:var(--red);}
+  .quote cite{
+    display:block;margin-top:32px;font-style:normal;
+    font-size:13px;text-transform:uppercase;letter-spacing:0.12em;color:#444;
+  }
+
+  /* ---------- pricing / honesty ---------- */
+  .honesty{display:grid;grid-template-columns:1fr 1fr;border-left:1px solid var(--line);}
+  .honesty>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:48px 32px;}
+  .honesty h3{font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;margin-bottom:24px;}
+  .honesty ul{list-style:none;}
+  .honesty li{
+    font-size:15px;padding:12px 0;border-top:1px solid #ddd;
+    display:flex;gap:12px;
+  }
+  .honesty li::before{content:"—";color:var(--red);font-weight:700;flex-shrink:0;}
+  .honesty .no li::before{content:"✕";}
+
+  /* ---------- final CTA ---------- */
+  .final{
+    background:var(--red);color:#fff;
+    padding:120px 24px;text-align:left;
+  }
+  .final h2{
+    font-size:clamp(48px,7.5vw,110px);font-weight:900;
+    letter-spacing:-0.045em;line-height:0.95;text-transform:uppercase;
+  }
+  .final p{font-size:19px;margin:32px 0 40px;max-width:560px;}
+  .final .btn{background:#fff;border-color:#fff;color:var(--red);}
+  .final .btn:hover{background:var(--black);border-color:var(--black);color:#fff;}
+  .final .fine{font-size:12px;text-transform:uppercase;letter-spacing:0.12em;margin-top:24px;opacity:0.85;}
+
+  /* ---------- footer ---------- */
+  footer{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:20px 24px;font-size:12px;text-transform:uppercase;letter-spacing:0.1em;
+    color:#666;
+  }
+  footer a{color:var(--black);text-decoration:none;font-weight:700;}
+  footer a:hover{color:var(--red);}
+
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(17,17,17,0.7);
+    display:none;align-items:center;justify-content:center;z-index:200;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:#fff;width:520px;max-width:92vw;
+    border:1px solid var(--black);
+    padding:40px;position:relative;
+  }
+  .modal h3{font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:-0.02em;margin-bottom:8px;}
+  .modal .sub{font-size:14px;color:#555;margin-bottom:28px;}
+  .modal label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin:18px 0 6px;}
+  .modal input,.modal select{
+    width:100%;padding:12px 14px;border:1px solid var(--black);
+    font-family:inherit;font-size:15px;background:#fff;
+  }
+  .modal input:focus,.modal select:focus{outline:2px solid var(--red);outline-offset:-1px;}
+  .modal .btn{width:100%;margin-top:28px;text-align:center;}
+  .modal-close{
+    position:absolute;top:0;right:0;width:48px;height:48px;
+    background:var(--black);color:#fff;border:none;font-size:18px;cursor:pointer;
+    font-family:inherit;
+  }
+  .modal-close:hover{background:var(--red);}
+  .modal-done{display:none;text-align:center;padding:24px 0 8px;}
+  .modal-done .check{
+    width:64px;height:64px;border-radius:50%;background:var(--red);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 24px;
+  }
+  .modal-done p{font-size:16px;}
+
+  @media(max-width:900px){
+    .hero-sub,.diagram-wrap,.honesty{grid-template-columns:1fr;}
+    .problem-grid,.stats{grid-template-columns:1fr 1fr;}
+    nav a:not(.cta){display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#top"><span class="logo-dot"></span>ACME</a>
+  <nav>
+    <a href="#problem">The Problem</a>
+    <a href="#how">The Method</a>
+    <a href="#numbers">The Numbers</a>
+    <a href="#honesty">The Fine Print</a>
+    <a href="#demo" class="cta" data-open-modal>Book a Demo</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-meta">
+    <span>Acme Widget Systems, Inc.</span>
+    <span>Est. 2014 — Rotterdam of the Midwest</span>
+    <span>B2B / SaaS / Widgets</span>
+  </div>
+  <h1>
+    Widgets,<br>
+    <span class="red">properly</span><br>
+    <span class="outline">administered.</span>
+  </h1>
+  <div class="hero-sub">
+    <p>Acme is the platform where operations teams at mid-sized manufacturers configure, order, and track custom widgets across the supply chain. It is not exciting. <em>That is the point.</em> Excitement is what happens when a shipment goes missing.</p>
+    <div class="hero-actions">
+      <a class="btn ghost" href="#how">See how it works</a>
+      <a class="btn primary" href="#demo" data-open-modal>Book a demo</a>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-inner" id="tickerInner">
+    <span>Configure</span><span class="r">●</span>
+    <span>Order</span><span class="r">●</span>
+    <span>Track</span><span class="r">●</span>
+    <span>Receive</span><span class="r">●</span>
+    <span>Repeat</span><span class="r">●</span>
+    <span>No spreadsheets were harmed</span><span class="r">●</span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="sec-head">
+    <h2>Your current system</h2>
+    <span class="num">01 / 04</span>
+  </div>
+  <div class="problem-grid">
+    <div class="problem-cell">
+      <span class="idx">A.</span>
+      <div>
+        <h3>The spreadsheet</h3>
+        <p>It has 14 tabs. Three of them are called "FINAL." One is called "FINAL_v2_USE_THIS." Nobody uses it.</p>
+      </div>
+    </div>
+    <div class="problem-cell">
+      <span class="idx">B.</span>
+      <div>
+        <h3>The email chain</h3>
+        <p>Forty-one replies deep. Somewhere in there is a torque specification. It will never be seen again.</p>
+      </div>
+    </div>
+    <div class="problem-cell">
+      <span class="idx">C.</span>
+      <div>
+        <h3>Dave</h3>
+        <p>Dave knows where everything is. Dave is on vacation. Dave's out-of-office reply is the single point of failure in your supply chain.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="sec-head">
+    <h2>Our system</h2>
+    <span class="num">02 / 04</span>
+  </div>
+  <div class="diagram-wrap">
+    <div class="diagram-copy">
+      <h3>Three steps. Zero drama.</h3>
+      <p>Configure the widget. Order the widget. Watch the widget move across your supply chain in real time, from foundry to loading dock.</p>
+      <p>Every spec, revision, and certificate lives in one place. When Dave goes on vacation, the widgets keep moving. Dave can finally relax. So can you.</p>
+    </div>
+    <svg viewBox="0 0 560 320" width="100%" role="img" aria-label="Diagram: configure, order, track">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#111"/>
+        </marker>
+      </defs>
+      <!-- boxes -->
+      <g>
+        <rect x="10" y="60" width="150" height="90" fill="#fff" stroke="#111" stroke-width="2"/>
+        <text x="85" y="100" text-anchor="middle" font-size="16" font-weight="900">CONFIGURE</text>
+        <text x="85" y="122" text-anchor="middle" font-size="11" fill="#666">specs · materials · tolerances</text>
+      </g>
+      <g>
+        <rect x="205" y="60" width="150" height="90" fill="#e2001a"/>
+        <text x="280" y="100" text-anchor="middle" font-size="16" font-weight="900" fill="#fff">ORDER</text>
+        <text x="280" y="122" text-anchor="middle" font-size="11" fill="#ffd6db">quote · approve · submit</text>
+      </g>
+      <g>
+        <rect x="400" y="60" width="150" height="90" fill="#fff" stroke="#111" stroke-width="2"/>
+        <text x="475" y="100" text-anchor="middle" font-size="16" font-weight="900">TRACK</text>
+        <text x="475" y="122" text-anchor="middle" font-size="11" fill="#666">live status · alerts · ETA</text>
+      </g>
+      <!-- arrows -->
+      <line x1="160" y1="105" x2="200" y2="105" stroke="#111" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="355" y1="105" x2="395" y2="105" stroke="#111" stroke-width="2" marker-end="url(#arrow)"/>
+      <!-- feedback loop -->
+      <path d="M475 150 L475 220 L85 220 L85 155" fill="none" stroke="#e2001a" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+      <text x="280" y="245" text-anchor="middle" font-size="11" font-weight="700" fill="#e2001a" letter-spacing="2">REORDER IN ONE CLICK</text>
+      <!-- widget glyph -->
+      <circle cx="280" cy="290" r="14" fill="none" stroke="#111" stroke-width="2"/>
+      <circle cx="280" cy="290" r="5" fill="#e2001a"/>
+      <text x="310" y="295" font-size="11" fill="#666">← a widget (artist's rendering)</text>
+    </svg>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section id="numbers">
+  <div class="sec-head">
+    <h2>The numbers</h2>
+    <span class="num">03 / 04</span>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="big" data-count="63" data-suffix="%">0%</div>
+      <div class="lbl">Fewer ordering errors</div>
+    </div>
+    <div class="stat">
+      <div class="big"><span data-count="11" data-suffix="">0</span><span class="red"> days</span></div>
+      <div class="lbl">Median time saved per quarter</div>
+    </div>
+    <div class="stat">
+      <div class="big" data-count="412" data-suffix="">0</div>
+      <div class="lbl">Manufacturers on Acme</div>
+    </div>
+    <div class="stat">
+      <div class="big"><span class="red">0</span></div>
+      <div class="lbl">Spreadsheets required</div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote">
+  <blockquote>"I used to spend Friday afternoons chasing purchase orders. Now I spend them doing my actual job. <span class="red">I almost miss the chaos. Almost.</span>"</blockquote>
+  <cite>— Operations Director, mid-sized manufacturer, Ohio (name withheld; Dave reads these)</cite>
+</div>
+
+<!-- HONESTY -->
+<section id="honesty">
+  <div class="sec-head">
+    <h2>The fine print</h2>
+    <span class="num">04 / 04</span>
+  </div>
+  <div class="honesty">
+    <div>
+      <h3>What Acme does</h3>
+      <ul>
+        <li>Guided widget configuration with validation, so impossible specs die at birth.</li>
+        <li>Instant quotes from your approved supplier network.</li>
+        <li>Live tracking from production line to receiving dock.</li>
+        <li>Full audit trail. Every revision, every approval, every time.</li>
+        <li>Integrates with your ERP. Yes, even that one.</li>
+      </ul>
+    </div>
+    <div class="no">
+      <h3>What Acme does not do</h3>
+      <ul>
+        <li>AI-powered synergy blockchain insights.</li>
+        <li>Gamification. Your widgets will not earn badges.</li>
+        <li>A metaverse presence.</li>
+        <li>Fix Dave's filing system. Some things are beyond software.</li>
+        <li>Require a 47-slide onboarding deck. The demo is 30 minutes. Bring coffee.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final" id="demo">
+  <h2>Book the<br>demo.</h2>
+  <p>Thirty minutes. Your actual widget catalog, not a canned sandbox. If we're not a fit, we'll say so and recommend a good spreadsheet template.</p>
+  <a class="btn" href="#" data-open-modal>Book a demo →</a>
+  <p class="fine">No commitment · No 47-slide deck · Dave approved</p>
+</div>
+
+<footer>
+  <span>© 2025 Acme Widget Systems, Inc.</span>
+  <span><a href="#top">Back to top ↑</a></span>
+  <span>Set in Inter. Rendered in HTML. Powered by restraint.</span>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    <div id="modalForm">
+      <h3 id="modalTitle">Book a demo</h3>
+      <p class="sub">Thirty minutes. We bring the platform, you bring the widgets.</p>
+      <form id="demoForm">
+        <label for="fName">Name</label>
+        <input id="fName" type="text" required placeholder="Not Dave (Dave is on vacation)">
+        <label for="fEmail">Work email</label>
+        <input id="fEmail" type="email" required placeholder="you@manufacturer.com">
+        <label for="fSize">Widgets per year</label>
+        <select id="fSize" required>
+          <option value="">Select a range</option>
+          <option>Under 10,000</option>
+          <option>10,000 – 100,000</option>
+          <option>100,000 – 1,000,000</option>
+          <option>We stopped counting in 2019</option>
+        </select>
+        <button type="submit" class="btn primary">Request demo</button>
+      </form>
+    </div>
+    <div class="modal-done" id="modalDone">
+      <div class="check">✓</div>
+      <h3>Received.</h3>
+      <p>A human being — an actual one — will reply within one business day. We told you this wasn't exciting.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Duplicate ticker content for seamless loop
+  (function(){
+    var t = document.getElementById('tickerInner');
+    t.innerHTML += t.innerHTML;
+  })();
+
+  // Animated counters
+  (function(){
+    var els = document.querySelectorAll('[data-count]');
+    var seen = new WeakSet();
+    function animate(el){
+      if(seen.has(el)) return;
+      seen.add(el);
+      var target = parseInt(el.dataset.count, 10);
+      var suffix = el.dataset.suffix || '';
+      var dur = 1200, start = null;
+      function step(ts){
+        if(!start) start = ts;
+        var p = Math.min((ts - start) / dur, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * eased) + suffix;
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting) animate(e.target); });
+    }, {threshold: 0.5});
+    els.forEach(function(el){ io.observe(el); });
+  })();
+
+  // Modal
+  (function(){
+    var overlay = document.getElementById('modalOverlay');
+    var form = document.getElementById('modalForm');
+    var done = document.getElementById('modalDone');
+    var demoForm = document.getElementById('demoForm');
+
+    function open(){
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function close(){
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+      // reset after close
+      setTimeout(function(){
+        form.style.display = '';
+        done.style.display = 'none';
+        demoForm.reset();
+      }, 200);
+    }
+    document.querySelectorAll('[data-open-modal]').forEach(function(el){
+      el.addEventListener('click', function(e){ e.preventDefault(); open(); });
+    });
+    document.getElementById('modalClose').addEventListener('click', close);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+
+    demoForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      form.style.display = 'none';
+      done.style.display = 'block';
+    });
+  })();
+</script>
+
+</body>
+</html>

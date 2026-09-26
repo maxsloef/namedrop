@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom widgets, quietly in order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gesso:#f7f3ec;
+    --gesso-2:#f2ede4;
+    --pink:#f2dfd8;
+    --blue:#dde6ea;
+    --yellow:#f4ecd4;
+    --sage:#e3e7da;
+    --graphite:#8a857e;
+    --line:rgba(120,114,106,.32);
+    --ink:#4d4944;
+    --ink-soft:#7b766f;
+    --accent:#b88f84;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--gesso);
+    color:var(--ink);
+    font-family:"Jost",system-ui,sans-serif;
+    font-weight:300;
+    font-size:18px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{width:1200px;margin:0 auto}
+  .label{
+    font-size:12px;letter-spacing:.32em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:400;
+  }
+  h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:300;color:var(--ink);letter-spacing:.005em}
+  h1{font-size:76px;line-height:1.04}
+  h2{font-size:52px;line-height:1.1}
+  h3{font-size:28px;line-height:1.2}
+  em{font-style:italic}
+
+  .btn{
+    display:inline-block;
+    font-family:"Jost",sans-serif;font-weight:400;
+    font-size:14px;letter-spacing:.2em;text-transform:uppercase;
+    padding:18px 34px;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    background:transparent;
+    cursor:pointer;
+    transition:background .5s ease,color .5s ease,border-color .5s ease;
+  }
+  .btn:hover,.btn:focus-visible{background:var(--ink);color:var(--gesso);outline:none}
+  .btn.soft{border-color:var(--line)}
+  .btn.soft:hover{background:var(--pink);color:var(--ink);border-color:var(--pink)}
+  .link{
+    font-size:14px;letter-spacing:.2em;text-transform:uppercase;font-weight:400;
+    border-bottom:1px solid var(--line);padding-bottom:4px;transition:border-color .4s;
+  }
+  .link:hover{border-color:var(--ink)}
+
+  /* NAV */
+  nav{padding:36px 0}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:14px;font-family:"Cormorant Garamond",serif;font-size:28px;letter-spacing:.06em}
+  .logo svg{display:block}
+  nav ul{display:flex;gap:44px;list-style:none;font-size:15px;color:var(--ink-soft)}
+  nav ul a:hover{color:var(--ink)}
+  nav .btn{padding:13px 24px;font-size:12px}
+
+  /* HERO */
+  .hero{padding:70px 0 140px}
+  .hero .wrap{display:grid;grid-template-columns:1fr 540px;gap:100px;align-items:center}
+  .hero h1{margin:28px 0 32px}
+  .hero p.lead{font-size:21px;color:var(--ink-soft);max-width:520px;margin-bottom:48px}
+  .hero .actions{display:flex;gap:36px;align-items:center}
+  .painting{
+    width:540px;height:540px;display:block;
+    box-shadow:0 1px 0 rgba(0,0,0,.02),0 30px 60px -40px rgba(90,80,70,.25);
+  }
+  .caption{margin-top:18px;font-size:13px;color:var(--ink-soft);letter-spacing:.06em;font-style:italic;font-family:"Cormorant Garamond",serif;font-size:17px}
+
+  .trust{margin-top:72px;display:flex;align-items:center;gap:40px;color:var(--ink-soft)}
+  .trust span.names{font-family:"Cormorant Garamond",serif;font-size:21px;letter-spacing:.06em;display:flex;gap:36px;color:#9a948c}
+
+  /* STATEMENT */
+  .statement{padding:140px 0;text-align:center;background:var(--gesso-2);position:relative}
+  .statement h2{max-width:900px;margin:30px auto 0;font-size:56px}
+  .statement p{max-width:640px;margin:36px auto 0;color:var(--ink-soft);font-size:20px}
+  .rule{width:1px;height:90px;background:var(--line);margin:0 auto}
+
+  /* FEATURES GRID */
+  .features{padding:150px 0}
+  .section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:80px}
+  .section-head h2{max-width:620px;margin-top:22px}
+  .section-head p{max-width:380px;color:var(--ink-soft)}
+  .grid{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    border-top:1px solid var(--line);border-left:1px solid var(--line);
+  }
+  .cell{
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:52px 44px 60px;min-height:340px;position:relative;
+    transition:background .8s ease;
+  }
+  .cell:hover{background:rgba(242,223,216,.35)}
+  .cell:nth-child(2):hover,.cell:nth-child(6):hover{background:rgba(221,230,234,.5)}
+  .cell:nth-child(3):hover,.cell:nth-child(4):hover{background:rgba(244,236,212,.55)}
+  .cell .num{font-family:"Cormorant Garamond",serif;font-size:18px;color:var(--graphite);font-style:italic}
+  .cell h3{margin:70px 0 16px}
+  .cell p{color:var(--ink-soft);font-size:17px}
+  .cell .mini{position:absolute;top:52px;right:44px}
+
+  /* BANDS / HOW */
+  .how .intro{padding:0 0 70px}
+  .band{padding:64px 0;border-top:1px solid rgba(120,114,106,.18)}
+  .band .wrap{display:grid;grid-template-columns:140px 360px 1fr;gap:60px;align-items:baseline}
+  .band .n{font-family:"Cormorant Garamond",serif;font-size:64px;font-weight:300;color:var(--graphite);line-height:1}
+  .band h3{font-size:36px}
+  .band p{color:var(--ink-soft);max-width:520px}
+  .band.b1{background:var(--pink)}
+  .band.b2{background:var(--gesso)}
+  .band.b3{background:var(--blue)}
+  .band.b4{background:var(--gesso)}
+  .band.b5{background:var(--yellow)}
+
+  /* NUMBERS */
+  .numbers{padding:150px 0}
+  .numbers .row{display:grid;grid-template-columns:repeat(4,1fr);border-left:1px solid var(--line)}
+  .stat{padding:10px 40px 20px;border-right:1px solid var(--line)}
+  .stat .big{font-family:"Cormorant Garamond",serif;font-size:80px;font-weight:300;line-height:1;color:var(--ink)}
+  .stat .big small{font-size:36px;color:var(--graphite)}
+  .stat p{margin-top:22px;color:var(--ink-soft);font-size:16px}
+
+  /* QUOTE */
+  .quote{padding:40px 0 160px}
+  .quote .wrap{display:grid;grid-template-columns:380px 1fr;gap:110px;align-items:center}
+  .quote canvas{width:380px;height:380px;display:block}
+  blockquote{font-family:"Cormorant Garamond",serif;font-size:40px;line-height:1.3;font-weight:300;color:var(--ink)}
+  blockquote::before{content:"“";display:block;font-size:80px;line-height:.6;color:var(--accent);margin-bottom:20px}
+  .cite{margin-top:40px;display:flex;gap:18px;align-items:center}
+  .cite .who{font-size:16px}
+  .cite .who strong{font-weight:400;display:block;color:var(--ink)}
+  .cite .who span{color:var(--ink-soft)}
+  .cite .dash{width:40px;height:1px;background:var(--graphite)}
+
+  /* DEMO */
+  .demo{background:var(--gesso-2);padding:150px 0;position:relative;overflow:hidden}
+  .demo .wrap{display:grid;grid-template-columns:1fr 520px;gap:120px;position:relative;z-index:1}
+  .demo h2{margin:24px 0 30px;font-size:60px}
+  .demo .copy p{color:var(--ink-soft);max-width:480px}
+  .demo ul{list-style:none;margin-top:44px}
+  .demo li{padding:18px 0;border-top:1px solid var(--line);display:flex;gap:22px;color:var(--ink);font-size:17px}
+  .demo li:last-child{border-bottom:1px solid var(--line)}
+  .demo li span{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--graphite);width:24px}
+  form{background:var(--gesso);padding:56px 52px;border:1px solid rgba(120,114,106,.2)}
+  .field{margin-bottom:30px}
+  .field label{display:block;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;font-weight:400}
+  .field input,.field select{
+    width:100%;border:none;border-bottom:1px solid var(--line);background:transparent;
+    font-family:"Jost",sans-serif;font-weight:300;font-size:18px;color:var(--ink);padding:8px 0 10px;
+    outline:none;transition:border-color .4s;border-radius:0;appearance:none;
+  }
+  .field select{cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--graphite) 50%),linear-gradient(135deg,var(--graphite) 50%,transparent 50%);background-position:calc(100% - 12px) 55%,calc(100% - 7px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+  .field input:focus,.field select:focus{border-color:var(--ink)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  form .btn{width:100%;margin-top:14px}
+  form .note{margin-top:20px;font-size:14px;color:var(--ink-soft);text-align:center}
+  .thanks{display:none;text-align:center;padding:60px 0}
+  .thanks h3{font-size:40px;margin:26px 0 16px}
+  .thanks p{color:var(--ink-soft)}
+  form.sent .fields{display:none}
+  form.sent .thanks{display:block}
+
+  footer{padding:80px 0 60px}
+  footer .top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:60px;border-bottom:1px solid var(--line)}
+  footer .cols{display:flex;gap:90px}
+  footer h4{font-size:11px;letter-spacing:.3em;text-transform:uppercase;font-weight:400;color:var(--ink-soft);margin-bottom:18px}
+  footer .cols a{display:block;font-size:15px;color:var(--ink);margin-bottom:8px}
+  footer .cols a:hover{color:var(--accent)}
+  footer .tag{margin-top:18px;color:var(--ink-soft);max-width:300px;font-size:16px}
+  footer .bottom{display:flex;justify-content:space-between;padding-top:28px;font-size:13px;color:var(--ink-soft);letter-spacing:.04em}
+
+  .fade{opacity:0;transform:translateY(14px);transition:opacity 1.4s ease,transform 1.4s ease}
+  .fade.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect x="0.5" y="0.5" width="29" height="29" fill="#f2dfd8" stroke="#8a857e" stroke-width=".6"/>
+        <line x1="0.5" y1="10" x2="29.5" y2="10" stroke="#8a857e" stroke-width=".5"/>
+        <line x1="0.5" y1="20" x2="29.5" y2="20" stroke="#8a857e" stroke-width=".5"/>
+        <rect x="0.5" y="10" width="29" height="10" fill="#dde6ea" opacity=".8"/>
+      </svg>
+      Acme
+    </a>
+    <ul>
+      <li><a href="#platform">Platform</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#customers">Customers</a></li>
+      <li><a href="#demo">Pricing</a></li>
+    </ul>
+    <a href="#demo" class="btn">Book a demo</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="label fade">Widget operations for manufacturers</div>
+      <h1 class="fade">Every widget,<br><em>quietly</em> in its place.</h1>
+      <p class="lead fade">Acme gives operations teams one calm place to configure custom widgets, place orders with suppliers, and see every unit move through the supply chain — without the spreadsheets, the email chains, or the 4pm scramble.</p>
+      <div class="actions fade">
+        <a href="#demo" class="btn">Book a 30-minute demo</a>
+        <a href="#how" class="link">See how it works</a>
+      </div>
+      <div class="trust fade">
+        <span class="label">Trusted by</span>
+        <span class="names"><span>Halden Works</span><span>Norcast</span><span>Pellew &amp; Sons</span></span>
+      </div>
+    </div>
+    <div class="fade">
+      <canvas class="painting" id="hero-canvas" width="540" height="540" aria-hidden="true"></canvas>
+      <div class="caption">Configure. Order. Track. — in soft, even measure.</div>
+    </div>
+  </div>
+</header>
+
+<section class="statement">
+  <div class="rule"></div>
+  <div class="wrap">
+    <h2 class="fade">Operations work should feel less like firefighting, and more like <em>a clear morning.</em></h2>
+    <p class="fade">Mid-sized manufacturers order thousands of custom widgets a year across dozens of suppliers. Acme holds every specification, every purchase order and every shipment in one steady view — so your team can stop chasing and start planning.</p>
+  </div>
+</section>
+
+<section class="features" id="platform">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="label">The platform</div>
+        <h2>Six simple tools, arranged with care.</h2>
+      </div>
+      <p>Each part of Acme does one thing well. Together they form a single, evenly-spaced grid for your entire widget supply chain.</p>
+    </div>
+    <div class="grid">
+      <div class="cell fade">
+        <div class="num">i.</div>
+        <svg class="mini" width="46" height="46" aria-hidden="true"><rect x=".5" y=".5" width="45" height="45" fill="#f2dfd8" stroke="#8a857e" stroke-width=".5"/><line x1="0" y1="15.5" x2="46" y2="15.5" stroke="#8a857e" stroke-width=".4"/><line x1="0" y1="30.5" x2="46" y2="30.5" stroke="#8a857e" stroke-width=".4"/></svg>
+        <h3>Configure</h3>
+        <p>Build widget specs from approved materials, tolerances and finishes. Acme flags conflicts before they reach the factory floor.</p>
+      </div>
+      <div class="cell fade">
+        <div class="num">ii.</div>
+        <svg class="mini" width="46" height="46" aria-hidden="true"><rect x=".5" y=".5" width="45" height="45" fill="#dde6ea" stroke="#8a857e" stroke-width=".5"/><line x1="15.5" y1="0" x2="15.5" y2="46" stroke="#8a857e" stroke-width=".4"/><line x1="30.5" y1="0" x2="30.5" y2="46" stroke="#8a857e" stroke-width=".4"/></svg>
+        <h3>Order</h3>
+        <p>Send purchase orders to any supplier in two clicks. Pricing, lead times and minimums are compared side by side.</p>
+      </div>
+      <div class="cell fade">
+        <div class="num">iii.</div>
+        <svg class="mini" width="46" height="46" aria-hidden="true"><rect x=".5" y=".5" width="45" height="45" fill="#f4ecd4" stroke="#8a857e" stroke-width=".5"/><g stroke="#8a857e" stroke-width=".35"><line x1="0" y1="9.5" x2="46" y2="9.5"/><line x1="0" y1="18.5" x2="46" y2="18.5"/><line x1="0" y1="27.5" x2="46" y2="27.5"/><line x1="0" y1="36.5" x2="46" y2="36.5"/></g></svg>
+        <h3>Track</h3>
+        <p>Follow every batch from mill to dock with live status from your suppliers and carriers. No more “just checking in” emails.</p>
+      </div>
+      <div class="cell fade">
+        <div class="num">iv.</div>
+        <svg class="mini" width="46" height="46" aria-hidden="true"><rect x=".5" y=".5" width="45" height="45" fill="#f4ecd4" stroke="#8a857e" stroke-width=".5"/><rect x=".5" y="23" width="45" height="22.5" fill="#f2dfd8"/><line x1="0" y1="23" x2="46" y2="23" stroke="#8a857e" stroke-width=".4"/></svg>
+        <h3>Forecast</h3>
+        <p>See demand three months ahead, drawn from your production schedule. Reorder points adjust themselves as plans change.</p>
+      </div>
+      <div class="cell fade">
+        <div class="num">v.</div>
+        <svg class="mini" width="46" height="46" aria-hidden="true"><rect x=".5" y=".5" width="45" height="45" fill="#e3e7da" stroke="#8a857e" stroke-width=".5"/><g stroke="#8a857e" stroke-width=".35"><line x1="11.5" y1="0" x2="11.5" y2="46"/><line x1="23" y1="0" x2="23" y2="46"/><line x1="34.5" y1="0" x2="34.5" y2="46"/><line x1="0" y1="23" x2="46" y2="23"/></g></svg>
+        <h3>Approve</h3>
+        <p>Route spend and spec changes to the right people with clear, gentle approval flows that fit the way your plant already works.</p>
+      </div>
+      <div class="cell fade">
+        <div class="num">vi.</div>
+        <svg class="mini" width="46" height="46" aria-hidden="true"><rect x=".5" y=".5" width="45" height="45" fill="#dde6ea" stroke="#8a857e" stroke-width=".5"/><rect x=".5" y="15.5" width="45" height="15" fill="#f7f3ec"/><g stroke="#8a857e" stroke-width=".4"><line x1="0" y1="15.5" x2="46" y2="15.5"/><line x1="0" y1="30.5" x2="46" y2="30.5"/></g></svg>
+        <h3>Integrate</h3>
+        <p>Connects to SAP, NetSuite, Oracle, Epicor and Microsoft Dynamics, so orders and inventory stay in sync with your ERP.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap intro">
+    <div class="label">How it works</div>
+    <h2 style="margin-top:22px;max-width:760px">From a first sketch to a delivered widget, in five even steps.</h2>
+  </div>
+  <div class="band b1"><div class="wrap"><div class="n">01</div><h3>Describe the widget</h3><p>Choose a base design or start fresh. Set dimensions, materials and finishes from your approved library — Acme checks every value against your engineering rules.</p></div></div>
+  <div class="band b2"><div class="wrap"><div class="n">02</div><h3>Compare suppliers</h3><p>Acme shows qualified suppliers with real quoted prices, capacity and on-time history, so choosing the right partner takes minutes, not days.</p></div></div>
+  <div class="band b3"><div class="wrap"><div class="n">03</div><h3>Place the order</h3><p>Purchase orders are generated, approved and sent automatically, with the full spec attached. Your ERP is updated the moment it goes out.</p></div></div>
+  <div class="band b4"><div class="wrap"><div class="n">04</div><h3>Watch it move</h3><p>Production milestones, quality checks and shipping updates appear on a single timeline. Delays surface early, while there’s still time to act.</p></div></div>
+  <div class="band b5"><div class="wrap"><div class="n">05</div><h3>Receive and learn</h3><p>Receiving closes the loop. Every order refines your forecasts, supplier scores and costs — so the next one is a little easier.</p></div></div>
+</section>
+
+<section class="numbers">
+  <div class="wrap">
+    <div class="label" style="margin-bottom:60px">What teams notice in the first year</div>
+    <div class="row">
+      <div class="stat fade"><div class="big">38<small>%</small></div><p>shorter lead times on custom widget orders</p></div>
+      <div class="stat fade"><div class="big">11<small>hrs</small></div><p>returned to each planner, every week</p></div>
+      <div class="stat fade"><div class="big">96<small>%</small></div><p>of shipments arriving on or before the promised date</p></div>
+      <div class="stat fade"><div class="big">6<small>wks</small></div><p>average time from signed contract to fully live</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="quote" id="customers">
+  <div class="wrap">
+    <canvas id="quote-canvas" width="380" height="380" aria-hidden="true"></canvas>
+    <div>
+      <blockquote class="fade">We used to spend Monday mornings reconciling three spreadsheets and a whiteboard. Now we open Acme, everything is where it should be, and we get on with making things.</blockquote>
+      <div class="cite">
+        <div class="dash"></div>
+        <div class="who"><strong>Maren Lindqvist</strong><span>Director of Operations, Halden Works</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="demo" id="demo">
+  <div class="wrap">
+    <div class="copy">
+      <div class="label">Book a demo</div>
+      <h2>See your own supply chain, <em>calmly.</em></h2>
+      <p>In thirty minutes, one of our operations specialists will walk through Acme using widgets like yours — then help you map what a first rollout could look like.</p>
+      <ul>
+        <li><span>i.</span>A tailored walkthrough built around your products</li>
+        <li><span>ii.</span>A rollout plan and honest timeline for your plant</li>
+        <li><span>iii.</span>Transparent pricing, with no pressure to decide</li>
+      </ul>
+    </div>
+    <form id="demo-form" novalidate>
+      <div class="fields">
+        <div class="two">
+          <div class="field"><label for="fn">First name</label><input id="fn" name="fn" required autocomplete="given-name"></div>
+          <div class="field"><label for="ln">Last name</label><input id="ln" name="ln" required autocomplete="family-name"></div>
+        </div>
+        <div class="field"><label for="em">Work email</label><input id="em" name="em" type="email" required autocomplete="email"></div>
+        <div class="field"><label for="co">Company</label><input id="co" name="co" required autocomplete="organization"></div>
+        <div class="field">
+          <label for="sz">Company size</label>
+          <select id="sz" name="sz" required>
+            <option value="">Select one</option>
+            <option>50 – 200 employees</option>
+            <option>200 – 500 employees</option>
+            <option>500 – 2,000 employees</option>
+            <option>2,000+ employees</option>
+          </select>
+        </div>
+        <button class="btn" type="submit">Request my demo</button>
+        <p class="note">We’ll reply within one business day. No spam, ever.</p>
+      </div>
+      <div class="thanks" role="status" aria-live="polite">
+        <svg width="60" height="60" aria-hidden="true"><rect x=".5" y=".5" width="59" height="59" fill="#f2dfd8" stroke="#8a857e" stroke-width=".5"/><rect x=".5" y="20" width="59" height="20" fill="#dde6ea"/><g stroke="#8a857e" stroke-width=".4"><line x1="0" y1="20" x2="60" y2="20"/><line x1="0" y1="40" x2="60" y2="40"/></g></svg>
+        <h3>Thank you<span id="thanks-name"></span>.</h3>
+        <p>We’ve received your request and will be in touch within one business day to find a time that suits you.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <a href="#" class="logo">
+          <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="0.5" y="0.5" width="29" height="29" fill="#f2dfd8" stroke="#8a857e" stroke-width=".6"/><rect x="0.5" y="10" width="29" height="10" fill="#dde6ea" opacity=".8"/><line x1="0.5" y1="10" x2="29.5" y2="10" stroke="#8a857e" stroke-width=".5"/><line x1="0.5" y1="20" x2="29.5" y2="20" stroke="#8a857e" stroke-width=".5"/></svg>
+          Acme
+        </a>
+        <p class="tag">The calm way for manufacturers to configure, order and track custom widgets.</p>
+      </div>
+      <div class="cols">
+        <div><h4>Platform</h4><a href="#platform">Configure</a><a href="#platform">Order</a><a href="#platform">Track</a><a href="#platform">Integrations</a></div>
+        <div><h4>Company</h4><a href="#">About</a><a href="#">Careers</a><a href="#customers">Customers</a><a href="#">Contact</a></div>
+        <div><h4>Resources</h4><a href="#">Guides</a><a href="#">Security</a><a href="#">Status</a><a href="#demo">Book a demo</a></div>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© 2025 Acme Widget Systems, Inc.</span>
+      <span>Privacy · Terms · SOC 2 Type II</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Seeded random so paintings are stable
+  function rng(seed){return function(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646;}}
+
+  function setup(c){
+    const dpr=window.devicePixelRatio||1;
+    const w=c.width,h=c.height;
+    c.width=w*dpr;c.height=h*dpr;
+    c.style.width=w+'px';c.style.height=h+'px';
+    const ctx=c.getContext('2d');ctx.scale(dpr,dpr);
+    return {ctx,w,h};
+  }
+
+  // A soft graphite line: many tiny segments with wobble and varying pressure
+  function pencil(ctx,x1,y1,x2,y2,r,alpha){
+    const len=Math.hypot(x2-x1,y2-y1);
+    const steps=Math.max(20,Math.floor(len/3));
+    const dx=(x2-x1)/steps,dy=(y2-y1)/steps;
+    let drift=0;
+    for(let pass=0;pass<2;pass++){
+      let px=x1,py=y1+(pass?0.35:0);
+      for(let i=1;i<=steps;i++){
+        drift+= (r()-.5)*.12; drift*=.92;
+        const nx=x1+dx*i+(dy?drift:0);
+        const ny=y1+dy*i+(dx?drift:0)+(pass?0.35:0);
+        const a=alpha*(0.45+r()*0.55)*(pass?0.5:1);
+        ctx.strokeStyle='rgba(95,90,84,'+a+')';
+        ctx.lineWidth=0.55+r()*0.35;
+        ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(nx,ny);ctx.stroke();
+        px=nx;py=ny;
+      }
+    }
+  }
+
+  // Wash of color with gentle, uneven density
+  function wash(ctx,x,y,w,h,color,r){
+    ctx.fillStyle=color;ctx.fillRect(x,y,w,h);
+    for(let i=0;i<260;i++){
+      const cx=x+r()*w, cy=y+r()*h, rad=10+r()*50;
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,rad);
+      const light=r()>.5;
+      g.addColorStop(0,light?'rgba(255,253,248,0.07)':'rgba(180,165,150,0.035)');
+      g.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=g;
+      ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+      ctx.fillRect(cx-rad,cy-rad,rad*2,rad*2);ctx.restore();
+    }
+  }
+
+  function grain(ctx,w,h,r){
+    const n=Math.floor(w*h/10);
+    for(let i=0;i<n;i++){
+      ctx.fillStyle=r()>.5?'rgba(255,255,255,0.12)':'rgba(120,110,100,0.05)';
+      ctx.fillRect(r()*w,r()*h,1,1);
+    }
+  }
+
+  function heroPainting(c){
+    const {ctx,w,h}=setup(c); const r=rng(7);
+    ctx.fillStyle='#f5f0e7';ctx.fillRect(0,0,w,h);
+    const m=22; const iw=w-m*2, ih=h-m*2;
+    const colors=['#f2dfd8','#f6f1e6','#dde6ea','#f6f1e6','#f4ecd4','#f6f1e6','#f2dfd8','#f6f1e6','#dde6ea'];
+    const bh=ih/colors.length;
+    colors.forEach((col,i)=>wash(ctx,m,m+i*bh,iw,bh,col,r));
+    // fine lines within bands
+    for(let i=0;i<=colors.length;i++){
+      pencil(ctx,m-4,m+i*bh,m+iw+4,m+i*bh,r,.55);
+    }
+    for(let i=0;i<colors.length;i++){
+      const y=m+i*bh;
+      pencil(ctx,m,y+bh*0.5,m+iw,y+bh*0.5,r,.18);
+    }
+    grain(ctx,w,h,r);
+  }
+
+  function gridPainting(c){
+    const {ctx,w,h}=setup(c); const r=rng(31);
+    ctx.fillStyle='#f5f0e7';ctx.fillRect(0,0,w,h);
+    const m=18; const iw=w-m*2, ih=h-m*2;
+    wash(ctx,m,m,iw,ih,'#f4ecd4',r);
+    wash(ctx,m,m+ih*.66,iw,ih*.34,'#f2dfd8',r);
+    const n=24; const s=iw/n;
+    for(let i=0;i<=n;i++){
+      pencil(ctx,m,m+i*s,m+iw,m+i*s,r,.28);
+      pencil(ctx,m+i*s,m,m+i*s,m+ih,r,.2);
+    }
+    grain(ctx,w,h,r);
+  }
+
+  heroPainting(document.getElementById('hero-canvas'));
+  gridPainting(document.getElementById('quote-canvas'));
+
+  // Gentle reveal
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.15});
+  document.querySelectorAll('.fade').forEach((el,i)=>{
+    el.style.transitionDelay=(i%6)*90+'ms';io.observe(el);
+  });
+
+  // Form
+  const form=document.getElementById('demo-form');
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    let ok=true;
+    form.querySelectorAll('[required]').forEach(f=>{
+      const valid=f.type==='email'?/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.value):f.value.trim()!=='';
+      f.style.borderBottomColor=valid?'':'#c08a7c';
+      if(!valid&&ok){f.focus();ok=false;}
+    });
+    if(!ok)return;
+    const name=document.getElementById('fn').value.trim();
+    document.getElementById('thanks-name').textContent=name?', '+name:'';
+    form.classList.add('sent');
+  });
+})();
+</script>
+</body>
+</html>

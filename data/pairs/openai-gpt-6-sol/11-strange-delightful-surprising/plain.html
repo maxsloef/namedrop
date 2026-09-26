@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f5ee" />
+  <title>Acme — Custom widgets, calm operations</title>
+  <meta name="description" content="Configure, order, and track custom widgets across your supply chain. Acme gives operations teams one delightful place to keep it all moving." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f7f5ee;
+      --ink: #18302f;
+      --muted: #64716b;
+      --line: #d5d9cd;
+      --orange: #f36b45;
+      --lime: #dff276;
+      --blue: #243d96;
+      --dark: #192e36;
+      --mono: "DM Mono", monospace;
+      --sans: "Space Grotesk", sans-serif;
+      --serif: "Instrument Serif", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: var(--sans); }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    svg { display: block; }
+    ::selection { background: var(--lime); color: var(--ink); }
+
+    .container { width: min(1312px, calc(100% - 96px)); margin-inline: auto; }
+    .mono { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; }
+    .announcement {
+      height: 32px; display: flex; justify-content: center; align-items: center;
+      gap: 12px; background: var(--ink); color: #ecf5dd;
+    }
+    .announcement .spark { color: var(--lime); font-size: 16px; line-height: 1; }
+
+    header { border-bottom: 1px solid var(--line); }
+    .nav { height: 82px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 9px; font-size: 29px; font-weight: 700; letter-spacing: -.085em; line-height: 1; }
+    .brand-mark { width: 32px; height: 32px; color: var(--orange); }
+    .nav-links { display: flex; align-items: center; gap: 38px; margin-left: auto; margin-right: 42px; }
+    .nav-links a { font-size: 14px; font-weight: 600; transition: color .2s; }
+    .nav-links a:hover { color: var(--orange); }
+    .button {
+      display: inline-flex; justify-content: center; align-items: center; gap: 19px;
+      min-height: 52px; padding: 0 23px; border: 1px solid var(--ink); border-radius: 100px;
+      background: var(--ink); color: white; font-size: 14px; font-weight: 700;
+      transition: transform .2s, background .2s, box-shadow .2s;
+    }
+    .button:hover { transform: translateY(-3px); background: #30504d; box-shadow: 0 7px 0 #d5d9cd; }
+    .button .arrow { font-size: 21px; line-height: 0; font-weight: 400; }
+    .button-light { background: var(--lime); color: var(--ink); border-color: var(--lime); }
+    .button-light:hover { background: #edff9b; box-shadow: 0 7px 0 rgba(0,0,0,.18); }
+    .nav-cta { min-height: 43px; padding: 0 19px; }
+
+    .hero { position: relative; overflow: hidden; }
+    .hero:before {
+      content: ""; position: absolute; width: 430px; height: 430px; border: 1px solid #e5e8db;
+      border-radius: 50%; left: -265px; top: 180px; pointer-events: none;
+    }
+    .hero-inner {
+      min-height: 676px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(500px, 610px);
+      align-items: center; gap: 54px; padding-block: 55px 66px;
+    }
+    .hero-copy { padding-bottom: 8px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 10px; color: #4e655f; }
+    .eyebrow:before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 4px #f9ded3; }
+    h1 { margin: 24px 0 24px; max-width: 640px; font-size: clamp(61px, 5.35vw, 79px); line-height: .99; letter-spacing: -.072em; font-weight: 600; }
+    h1 em { display: inline-block; color: var(--orange); font: italic 1.1em/.85 var(--serif); letter-spacing: -.055em; }
+    .hero-description { max-width: 490px; color: #52655f; font-size: 18px; line-height: 1.65; letter-spacing: -.018em; }
+    .hero-actions { display: flex; align-items: center; gap: 27px; margin-top: 34px; }
+    .hero-actions .button { min-height: 59px; padding-inline: 26px; }
+    .text-link { display: inline-flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--ink); padding-bottom: 4px; font-size: 14px; font-weight: 700; }
+    .text-link:hover { color: var(--orange); border-color: var(--orange); }
+    .hero-note { display: flex; align-items: center; gap: 10px; margin-top: 46px; color: #728078; }
+    .hero-note svg { width: 27px; color: var(--orange); }
+
+    .lab {
+      position: relative; height: 548px; overflow: hidden; background: var(--dark); color: white;
+      border-radius: 14px; box-shadow: 14px 14px 0 #e3e5d8;
+    }
+    .lab:before {
+      content: ""; position: absolute; inset: 0;
+      background-image: linear-gradient(#ffffff0b 1px, transparent 1px), linear-gradient(90deg, #ffffff0b 1px, transparent 1px);
+      background-size: 29px 29px; mask-image: linear-gradient(to bottom, black 85%, transparent);
+    }
+    .lab:after { content: ""; position: absolute; width: 395px; height: 395px; left: 105px; top: 64px; border: 1px solid #ffffff20; border-radius: 50%; pointer-events: none; }
+    .lab-top { position: relative; z-index: 2; height: 67px; margin: 0 25px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ffffff30; }
+    .lab-top .mono { color: #d1e0d8; }
+    .live { display: inline-flex; align-items: center; gap: 8px; color: var(--lime); }
+    .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 4px #dff27620; }
+    .lab-title { position: absolute; z-index: 2; top: 86px; left: 29px; font-size: 23px; font-weight: 600; letter-spacing: -.05em; }
+    .lab-title small { display: block; margin-top: 5px; color: #a7bab7; font: 10px var(--mono); letter-spacing: .04em; }
+    .lab-id { position: absolute; z-index: 2; right: 26px; top: 93px; color: #a7bab7; }
+    .widget-svg { position: absolute; z-index: 1; top: 115px; left: 50%; width: 500px; max-width: 100%; transform: translateX(-50%); overflow: visible; --widget-color: #f36b45; filter: drop-shadow(0 28px 20px #07171b75); }
+    .widget-main { fill: var(--widget-color); transition: fill .25s; }
+    .widget-side { fill: var(--widget-color); filter: brightness(.72); transition: fill .25s; }
+    .widget-side-dark { fill: var(--widget-color); filter: brightness(.55); transition: fill .25s; }
+    .lab-callout { position: absolute; z-index: 3; padding: 10px 13px; border: 1px solid #ffffff6b; background: #233d45e8; backdrop-filter: blur(8px); border-radius: 5px; color: #f3f6e9; }
+    .lab-callout .mono { color: #b4c7c0; font-size: 9px; }
+    .lab-callout strong { display: block; margin-top: 5px; font-size: 13px; letter-spacing: -.03em; }
+    .callout-a { left: 26px; top: 226px; transform: rotate(-4deg); }
+    .callout-b { right: 22px; top: 320px; transform: rotate(4deg); }
+    .lab-bottom {
+      position: absolute; z-index: 4; left: 20px; right: 20px; bottom: 19px;
+      display: grid; grid-template-columns: 1.12fr 1fr .82fr; align-items: center;
+      height: 92px; background: #f9f8f0; color: var(--ink); border-radius: 7px;
+      box-shadow: 0 9px 25px #0b1d2670;
+    }
+    .lab-field { height: 50px; padding: 0 18px; border-right: 1px solid #dce0d4; }
+    .lab-field:last-child { border: 0; }
+    .lab-field label { display: block; margin-bottom: 10px; color: #6b7970; font: 10px var(--mono); letter-spacing: .05em; text-transform: uppercase; }
+    .swatches, .materials { display: flex; align-items: center; gap: 10px; }
+    .swatch { width: 20px; height: 20px; border: 2px solid #f9f8f0; border-radius: 50%; padding: 0; outline: 1px solid transparent; }
+    .swatch[aria-pressed="true"] { outline-color: var(--ink); }
+    .swatch.orange { background: #f36b45; } .swatch.blue { background: #7592ec; } .swatch.lime { background: #dff276; }
+    .material { border: 0; padding: 3px 0; color: #89948c; background: none; font: 11px var(--mono); }
+    .material + .material:before { content: "/"; color: #bbc3b7; margin-right: 9px; }
+    .material[aria-pressed="true"] { color: var(--ink); font-weight: 500; }
+    .quantity { display: inline-flex; align-items: center; gap: 14px; font: 14px var(--mono); }
+    .quantity button { width: 21px; height: 21px; border: 1px solid #b9c2b5; border-radius: 50%; background: transparent; color: var(--ink); line-height: 16px; padding: 0; }
+
+    .ticker { border-block: 1px solid var(--line); background: #eeefe5; overflow: hidden; }
+    .ticker-inner { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .ticker-lead { color: #60736a; white-space: nowrap; }
+    .ticker-items { display: flex; align-items: center; gap: 37px; }
+    .ticker-items span { display: inline-flex; align-items: center; gap: 13px; font-size: 15px; font-weight: 600; letter-spacing: -.035em; white-space: nowrap; }
+    .ticker-items b { color: var(--orange); font-size: 23px; font-weight: 400; line-height: 0; }
+
+    section { scroll-margin-top: 30px; }
+    .section-heading { max-width: 760px; }
+    .section-kicker { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; color: #65766c; }
+    .section-kicker:before { content: ""; width: 22px; height: 1px; background: var(--orange); }
+    h2 { margin: 0; font-size: clamp(40px, 4.3vw, 62px); line-height: 1.07; letter-spacing: -.068em; font-weight: 600; }
+    h2 em { color: var(--orange); font: italic 1.13em/.8 var(--serif); }
+    .section-intro { margin: 21px 0 0; max-width: 560px; color: #607169; font-size: 17px; line-height: 1.6; }
+
+    .features { padding: 112px 0 121px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 54px; }
+    .feature-card { min-height: 428px; padding: 27px 28px 30px; border: 1px solid var(--line); border-radius: 9px; background: #fbfaf5; display: flex; flex-direction: column; }
+    .feature-card:nth-child(2) { background: #eef1e5; }
+    .feature-card:nth-child(3) { background: #f4ece5; }
+    .feature-card .card-number { color: #718078; }
+    .feature-art { position: relative; height: 177px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .feature-art svg { max-width: 100%; max-height: 165px; }
+    .feature-card h3 { margin: auto 0 11px; font-size: 25px; letter-spacing: -.055em; }
+    .feature-card p { margin: 0; max-width: 320px; color: #617168; font-size: 15px; line-height: 1.6; }
+
+    .workflow { background: var(--lime); padding: 100px 0 108px; overflow: hidden; }
+    .workflow-inner { display: grid; grid-template-columns: .85fr 1.15fr; gap: 90px; align-items: center; }
+    .workflow .section-kicker { color: #526347; }
+    .workflow .section-kicker:before { background: var(--ink); }
+    .workflow p { max-width: 415px; color: #516344; font-size: 17px; line-height: 1.65; }
+    .workflow .button { margin-top: 14px; }
+    .steps { border-top: 1px solid #81956380; }
+    .step { display: grid; grid-template-columns: 55px 1fr auto; gap: 15px; align-items: center; padding: 24px 0; border-bottom: 1px solid #81956380; }
+    .step-num { font: 12px var(--mono); }
+    .step h3 { margin: 0 0 5px; font-size: 22px; letter-spacing: -.05em; }
+    .step p { margin: 0; font-size: 14px; line-height: 1.45; }
+    .step-icon { display: grid; place-items: center; width: 51px; height: 51px; border: 1px solid #8ea16e; border-radius: 50%; font-size: 24px; }
+
+    .quote-section { padding: 110px 0; }
+    .quote-box { display: grid; grid-template-columns: 1fr 255px; gap: 60px; padding: 55px 62px; border-radius: 10px; background: var(--blue); color: white; }
+    .quote-mark { height: 52px; color: var(--lime); font: 86px/.9 var(--serif); }
+    blockquote { margin: 0; max-width: 790px; font-size: clamp(28px, 3vw, 42px); line-height: 1.22; letter-spacing: -.055em; }
+    blockquote em { color: var(--lime); font: italic 1.15em var(--serif); }
+    .quote-side { display: flex; flex-direction: column; justify-content: flex-end; border-left: 1px solid #ffffff55; padding-left: 35px; }
+    .quote-side .asterisk { color: var(--lime); font-size: 64px; line-height: 1; margin-bottom: auto; }
+    .quote-side strong { font-size: 15px; }
+    .quote-side span:last-child { color: #bdc7ec; margin-top: 5px; font-size: 13px; line-height: 1.5; }
+
+    .final-cta { text-align: center; padding: 9px 0 122px; }
+    .final-cta .mono { color: #708076; }
+    .final-cta h2 { max-width: 770px; margin: 20px auto 18px; }
+    .final-cta p { max-width: 450px; margin: 0 auto 27px; color: #607169; font-size: 17px; line-height: 1.6; }
+    .final-cta .button { min-height: 58px; padding-inline: 28px; }
+    footer { border-top: 1px solid var(--line); }
+    .footer-inner { min-height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 25px; }
+    .footer-inner .brand { font-size: 24px; }
+    .footer-inner .brand-mark { width: 26px; height: 26px; }
+    .footer-inner p { color: #728078; font-size: 13px; }
+    .footer-inner a:not(.brand) { font-size: 13px; font-weight: 600; }
+
+    .modal-backdrop { position: fixed; z-index: 20; inset: 0; display: none; place-items: center; padding: 20px; background: #102320bc; backdrop-filter: blur(5px); }
+    .modal-backdrop.open { display: grid; }
+    .modal { position: relative; width: min(100%, 490px); max-height: calc(100vh - 40px); overflow-y: auto; padding: 42px; border-radius: 13px; background: var(--paper); box-shadow: 12px 12px 0 var(--lime); }
+    .modal-close { position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 50%; background: transparent; font-size: 21px; line-height: 1; }
+    .modal h2 { margin: 15px 0 10px; font-size: 43px; }
+    .modal p { color: #617168; line-height: 1.55; }
+    .demo-form { display: grid; gap: 15px; margin-top: 24px; }
+    .demo-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 700; }
+    .demo-form input { width: 100%; height: 47px; padding: 0 13px; outline: none; border: 1px solid #c5cec2; border-radius: 5px; background: white; color: var(--ink); }
+    .demo-form input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #243d9620; }
+    .demo-form .button { margin-top: 8px; width: 100%; }
+    .success { display: none; padding: 20px 0 0; }
+    .success-icon { display: grid; place-items: center; width: 68px; height: 68px; border-radius: 50%; background: var(--lime); font-size: 32px; }
+    .success .button { margin-top: 12px; }
+
+    @media (max-width: 1100px) {
+      .hero-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+      h1 { font-size: clamp(54px, 5.8vw, 76px); }
+      .lab { height: 520px; }
+      .lab-bottom { left: 12px; right: 12px; }
+      .lab-field { padding-inline: 11px; }
+      .ticker-items { gap: 15px; }
+      .workflow-inner { gap: 45px; }
+    }
+    @media (max-width: 760px) {
+      .container { width: min(100% - 36px, 560px); }
+      .announcement { font-size: 9px; }
+      .nav { height: 68px; }
+      .nav-links { display: none; }
+      .brand { font-size: 26px; }
+      .nav-cta { min-height: 39px; font-size: 12px; padding-inline: 14px; }
+      .hero-inner { display: block; padding: 55px 0 60px; }
+      h1 { font-size: clamp(55px, 11.5vw, 75px); }
+      .hero-description { font-size: 16px; }
+      .hero-actions { gap: 17px; flex-wrap: wrap; }
+      .hero-note { margin: 33px 0; }
+      .lab { height: 520px; margin-top: 10px; }
+      .ticker-inner { min-height: 66px; }
+      .ticker-lead { display: none; }
+      .ticker-items { gap: 23px; overflow: auto; }
+      .ticker-items span { font-size: 13px; }
+      .features { padding: 79px 0 85px; }
+      .feature-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 35px; }
+      .feature-card { min-height: 365px; }
+      .feature-art { height: 150px; }
+      .workflow { padding: 77px 0 85px; }
+      .workflow-inner { grid-template-columns: 1fr; gap: 35px; }
+      .quote-section { padding: 75px 0; }
+      .quote-box { grid-template-columns: 1fr; gap: 30px; padding: 35px 30px; }
+      .quote-side { border-left: 0; border-top: 1px solid #ffffff55; padding: 20px 0 0; }
+      .quote-side .asterisk { display: none; }
+      .final-cta { padding-bottom: 85px; }
+      .footer-inner { flex-wrap: wrap; padding-block: 24px; }
+    }
+    @media (max-width: 430px) {
+      .lab { height: 465px; }
+      .widget-svg { top: 115px; width: 440px; }
+      .lab-callout { padding: 7px; }
+      .callout-a { left: 12px; top: 210px; }
+      .callout-b { right: 10px; top: 300px; }
+      .lab-bottom { height: 78px; bottom: 12px; }
+      .lab-field { height: 48px; padding-inline: 8px; }
+      .lab-field label { font-size: 8px; }
+      .materials { gap: 2px; }
+      .material { font-size: 9px; }
+      .material + .material:before { margin-right: 3px; }
+      .quantity { gap: 5px; font-size: 11px; }
+      .quantity button { width: 17px; height: 17px; line-height: 12px; }
+      .swatches { gap: 5px; }
+      .swatch { width: 17px; height: 17px; }
+      .modal { padding: 34px 25px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *:before, *:after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement mono"><span class="spark">✳</span> GOOD NEWS FOR THE PEOPLE WHO KEEP THINGS MOVING <span class="spark">✳</span></div>
+
+  <header>
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="currentColor" aria-hidden="true"><path d="M16 1h8v11.1l7.85-7.85 5.66 5.66L29.66 17.8H40v8H29.66l7.85 7.85-5.66 5.66L24 31.46V40h-8v-8.54l-7.85 7.85-5.66-5.66 7.85-7.85H0v-8h10.34L2.49 9.95l5.66-5.66L16 12.14V1Z" transform="translate(0 -1) scale(.98)"/></svg>
+        acme
+      </a>
+      <div class="nav-links">
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#why-acme">Why Acme</a>
+      </div>
+      <button class="button nav-cta" data-open-demo>Book a demo <span class="arrow" aria-hidden="true">↗</span></button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow mono">THE BETTER WAY TO WIDGET</div>
+          <h1 id="hero-heading">Custom widgets.<br /><em>Calm</em> operations.</h1>
+          <p class="hero-description">Configure, order, and track every custom widget in one place. No spreadsheet archaeology. No “just checking in” emails. Just the whole picture, beautifully clear.</p>
+          <div class="hero-actions">
+            <button class="button" data-open-demo>Book your demo <span class="arrow" aria-hidden="true">↗</span></button>
+            <a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="hero-note mono">
+            <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M4 15c4-8 10-9 15-4 3 3 3 8 0 10-4 3-9-1-6-5 2-2 5-1 5 1M21 24l5 3m-3-8 6-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            MORE MAKING THINGS. LESS CHASING THEM.
+          </div>
+        </div>
+
+        <div class="lab" aria-label="Interactive preview of a custom widget configuration">
+          <div class="lab-top">
+            <span class="mono">ACME / WIDGET STUDIO</span>
+            <span class="live mono"><i></i> LIVE PREVIEW</span>
+          </div>
+          <div class="lab-title">Make it yours.<small>SPEC IT. SEE IT. SEND IT.</small></div>
+          <div class="lab-id mono">FIG. 01 — THE GOOD STUFF</div>
+          <svg class="widget-svg" viewBox="0 0 500 330" role="img" aria-label="Illustration of a configurable industrial widget">
+            <defs>
+              <linearGradient id="metal" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#e6eee7"/><stop offset=".5" stop-color="#abbeb8"/><stop offset="1" stop-color="#718c88"/></linearGradient>
+              <linearGradient id="rim" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#f7fbef"/><stop offset="1" stop-color="#9db2a9"/></linearGradient>
+            </defs>
+            <ellipse cx="250" cy="285" rx="180" ry="29" fill="#091d22" opacity=".4"/>
+            <path d="M250 19 433 105 250 196 67 105Z" fill="#dce7dd" stroke="#eff7e8" stroke-width="3"/>
+            <path class="widget-side" d="M67 105 250 196v88L67 192Z"/>
+            <path class="widget-side-dark" d="M250 196 433 105v87l-183 92Z"/>
+            <path class="widget-main" d="M250 26 420 106 250 189 80 106Z"/>
+            <path d="M250 44 387 107 250 174 113 107Z" fill="#19343b" opacity=".13"/>
+            <path d="M250 52 371 107 250 166 129 107Z" fill="url(#metal)" stroke="#f3f7eb" stroke-width="3"/>
+            <path d="M250 64 346 107 250 153 154 107Z" fill="#29484d"/>
+            <path d="M250 75 323 107 250 141 177 107Z" fill="#b8cac0"/>
+            <path d="M250 81 309 107 250 135 191 107Z" fill="#263f46"/>
+            <path d="M250 90 290 108 250 127 210 108Z" fill="#dae8d7"/>
+            <path d="M250 98 271 108 250 118 229 108Z" fill="#526e6d"/>
+            <path d="M67 105 250 196l183-91" fill="none" stroke="#fff5" stroke-width="3"/>
+            <path d="M86 135v40l46 23m19 10 38 19m69-15v52m20-64 123-62" fill="none" stroke="#ffffff52" stroke-width="2"/>
+            <path d="M75 172 242 255m16-2 167-83" fill="none" stroke="#0c202655" stroke-width="2"/>
+            <g fill="#eaf2e5" stroke="#426161" stroke-width="2">
+              <ellipse cx="132" cy="106" rx="7" ry="4"/><ellipse cx="250" cy="51" rx="7" ry="4"/>
+              <ellipse cx="367" cy="106" rx="7" ry="4"/><ellipse cx="250" cy="162" rx="7" ry="4"/>
+            </g>
+            <path d="M73 224h76m-38-6v12M355 52h77m-38-6v12" stroke="#dff276" stroke-width="2" stroke-linecap="round"/>
+            <path d="M32 103h25m-12-12v24M445 106h25m-12-12v24" stroke="#dff276" stroke-width="2" stroke-linecap="round"/>
+            <path d="m282 278 34 17m-13-19 36 18" stroke="#dff276" stroke-width="2"/>
+          </svg>
+          <div class="lab-callout callout-a"><span class="mono">01 / FIT</span><strong>Exactly to spec ✓</strong></div>
+          <div class="lab-callout callout-b"><span class="mono">02 / STATUS</span><strong>Looking good ↗</strong></div>
+          <div class="lab-bottom">
+            <div class="lab-field">
+              <label>FINISH · <span id="finish-label">Sunset</span></label>
+              <div class="swatches" role="group" aria-label="Choose widget finish">
+                <button class="swatch orange" data-color="#f36b45" data-name="Sunset" aria-label="Sunset finish" aria-pressed="true"></button>
+                <button class="swatch blue" data-color="#7592ec" data-name="Bluebird" aria-label="Bluebird finish" aria-pressed="false"></button>
+                <button class="swatch lime" data-color="#dff276" data-name="Citron" aria-label="Citron finish" aria-pressed="false"></button>
+              </div>
+            </div>
+            <div class="lab-field">
+              <label>MATERIAL</label>
+              <div class="materials" role="group" aria-label="Choose widget material">
+                <button class="material" aria-pressed="true">Aluminum</button>
+                <button class="material" aria-pressed="false">Steel</button>
+              </div>
+            </div>
+            <div class="lab-field">
+              <label>QUANTITY</label>
+              <div class="quantity">
+                <button id="minus" aria-label="Decrease quantity">−</button>
+                <output id="qty">250</output>
+                <button id="plus" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker">
+      <div class="ticker-inner container">
+        <span class="ticker-lead mono">ONE PLACE FOR ALL THE MOVING PARTS</span>
+        <div class="ticker-items" aria-label="Acme capabilities">
+          <span><b>✳</b> Configure with confidence</span>
+          <span><b>✳</b> Order without the back-and-forth</span>
+          <span><b>✳</b> Track the whole journey</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="features container" id="platform">
+      <div class="section-heading">
+        <div class="section-kicker mono">YOUR WORKDAY, UNTANGLED</div>
+        <h2>Complex supply chain.<br /><em>Simple place to start.</em></h2>
+        <p class="section-intro">All the details your team needs, together at last. Acme turns a hundred little loose ends into one very satisfying workflow.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span class="card-number mono">01 / CONFIGURE</span>
+          <div class="feature-art">
+            <svg viewBox="0 0 300 165" fill="none" aria-hidden="true">
+              <path d="M63 45 151 8l88 37-88 39L63 45Z" fill="#F36B45" stroke="#18302F" stroke-width="2"/>
+              <path d="M63 45v74l88 38V84L63 45Z" fill="#C84F34" stroke="#18302F" stroke-width="2"/>
+              <path d="M151 84v73l88-38V45l-88 39Z" fill="#A94030" stroke="#18302F" stroke-width="2"/>
+              <path d="m111 45 40-17 40 17-40 18-40-18Z" fill="#F7F5EE" stroke="#18302F" stroke-width="2"/>
+              <path d="m127 45 24-10 24 10-24 11-24-11Z" fill="#18302F"/>
+              <circle cx="42" cy="42" r="15" fill="#DFF276" stroke="#18302F" stroke-width="2"/><path d="M42 34v16m-8-8h16" stroke="#18302F" stroke-width="2"/>
+              <path d="M250 24h24m-12-12v24M24 126h20" stroke="#F36B45" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3>Get the details right.</h3>
+          <p>Dial in the dimensions, materials, and finishes you need. Clear specs mean fewer surprises downstream.</p>
+        </article>
+        <article class="feature-card">
+          <span class="card-number mono">02 / ORDER</span>
+          <div class="feature-art">
+            <svg viewBox="0 0 300 165" fill="none" aria-hidden="true">
+              <rect x="68" y="19" width="151" height="125" rx="5" fill="#F7F5EE" stroke="#18302F" stroke-width="2" transform="rotate(-5 68 19)"/>
+              <path d="m90 49 29-3m-28 18 104-9M94 81l82-7M97 99l69-6" stroke="#9DAFA3" stroke-width="3" stroke-linecap="round"/>
+              <rect x="95" y="111" width="89" height="20" rx="3" fill="#DFF276" transform="rotate(-5 95 111)"/>
+              <path d="m190 26 36 30-20 25-37-31 21-24Z" fill="#F36B45" stroke="#18302F" stroke-width="2"/>
+              <path d="m180 49 21 17m-12-28 23 19" stroke="#18302F" stroke-width="2"/>
+              <circle cx="232" cy="122" r="24" fill="#243D96"/><path d="m221 122 8 8 15-17" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Send it, simply.</h3>
+          <p>Turn approved configurations into orders without rebuilding them in another tool—or another email thread.</p>
+        </article>
+        <article class="feature-card">
+          <span class="card-number mono">03 / TRACK</span>
+          <div class="feature-art">
+            <svg viewBox="0 0 300 165" fill="none" aria-hidden="true">
+              <path d="M24 104h252" stroke="#18302F" stroke-width="2" stroke-dasharray="5 7"/>
+              <circle cx="57" cy="104" r="13" fill="#DFF276" stroke="#18302F" stroke-width="2"/>
+              <circle cx="150" cy="104" r="13" fill="#DFF276" stroke="#18302F" stroke-width="2"/>
+              <circle cx="243" cy="104" r="17" fill="#F36B45" stroke="#18302F" stroke-width="2"/>
+              <path d="m236 104 5 5 9-11" stroke="#18302F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M55 85V48h80m15 37V28h77m16 54V56" stroke="#18302F" stroke-width="2"/>
+              <rect x="48" y="36" width="63" height="23" rx="3" fill="#F7F5EE" stroke="#18302F" stroke-width="2"/>
+              <rect x="135" y="18" width="76" height="23" rx="3" fill="#F7F5EE" stroke="#18302F" stroke-width="2"/>
+              <rect x="213" y="43" width="56" height="23" rx="3" fill="#F7F5EE" stroke="#18302F" stroke-width="2"/>
+              <path d="M63 48h33m54-19h45m33 25h25" stroke="#A5B4A8" stroke-width="3" stroke-linecap="round"/>
+              <path d="m36 137 7 6 12-13m69 7 7 6 12-13" stroke="#F36B45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Know where it stands.</h3>
+          <p>See order progress across your supply chain at a glance. The answer to “any update?” is already there.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="workflow" id="how-it-works">
+      <div class="container workflow-inner">
+        <div>
+          <div class="section-kicker mono">A NICER WAY THROUGH</div>
+          <h2>From “what if?”<br />to <em>on its way.</em></h2>
+          <p>Built for the operations teams who make manufacturing happen. Acme gives everyone a shared view from first spec to final delivery.</p>
+          <button class="button" data-open-demo>See Acme in action <span class="arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <span class="step-num">01</span>
+            <div><h3>Build your widget</h3><p>Choose the specifications that fit the job.</p></div>
+            <span class="step-icon" aria-hidden="true">✳</span>
+          </div>
+          <div class="step">
+            <span class="step-num">02</span>
+            <div><h3>Place your order</h3><p>Keep the details intact and the process moving.</p></div>
+            <span class="step-icon" aria-hidden="true">↗</span>
+          </div>
+          <div class="step">
+            <span class="step-num">03</span>
+            <div><h3>Follow it all the way</h3><p>See what’s happening without asking around.</p></div>
+            <span class="step-icon" aria-hidden="true">◎</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-section container" id="why-acme">
+      <div class="quote-box">
+        <div>
+          <div class="quote-mark" aria-hidden="true">“</div>
+          <blockquote>Imagine opening one tab and actually finding the widget, the spec, and the order status. <em>What a concept.</em></blockquote>
+        </div>
+        <div class="quote-side">
+          <span class="asterisk" aria-hidden="true">✳</span>
+          <strong>Less detective work.</strong>
+          <span>More time for the work only your team can do.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta container" id="demo">
+      <span class="mono">YOUR SUPPLY CHAIN CALLED. IT'S READY.</span>
+      <h2>Let’s make widgets the <em>easy part.</em></h2>
+      <p>Take a look around Acme with a real human. Bring your questions—and your trickiest widget.</p>
+      <button class="button" data-open-demo>Book a demo <span class="arrow" aria-hidden="true">↗</span></button>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner container">
+      <a class="brand" href="#" aria-label="Acme home">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="currentColor" aria-hidden="true"><path d="M16 1h8v11.1l7.85-7.85 5.66 5.66L29.66 17.8H40v8H29.66l7.85 7.85-5.66 5.66L24 31.46V40h-8v-8.54l-7.85 7.85-5.66-5.66 7.85-7.85H0v-8h10.34L2.49 9.95l5.66-5.66L16 12.14V1Z" transform="translate(0 -1) scale(.98)"/></svg>
+        acme
+      </a>
+      <p>Making room for less mayhem. © <span id="year">2026</span> Acme.</p>
+      <a href="mailto:hello@acme.example">Say hello ↗</a>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="demo-modal" role="presentation">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" id="modal-close" aria-label="Close demo form">×</button>
+      <div id="form-view">
+        <span class="mono">A VERY GOOD NEXT STEP</span>
+        <h2 id="modal-title">Let’s talk widgets.</h2>
+        <p>Tell us where to reach you. We’ll follow up to find a time for a personalized Acme demo.</p>
+        <form class="demo-form" id="demo-form">
+          <label>Your name <input name="name" type="text" autocomplete="name" placeholder="Your name" required /></label>
+          <label>Work email <input name="email" type="email" autocomplete="email" placeholder="you@company.com" required /></label>
+          <label>Company <input name="company" type="text" autocomplete="organization" placeholder="Your company" required /></label>
+          <button class="button" type="submit">Request my demo <span class="arrow" aria-hidden="true">↗</span></button>
+        </form>
+      </div>
+      <div class="success" id="success-view" role="status">
+        <div class="success-icon" aria-hidden="true">✓</div>
+        <h2>Well, hello there.</h2>
+        <p>Your demo request is ready. In a connected Acme site, this is where we’d send it to our team. Thanks for taking a look!</p>
+        <button class="button" id="success-close">Back to the page <span class="arrow" aria-hidden="true">↗</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const widget = document.querySelector(".widget-svg");
+    document.querySelectorAll(".swatch").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".swatch").forEach(item => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+        widget.style.setProperty("--widget-color", button.dataset.color);
+        document.getElementById("finish-label").textContent = button.dataset.name;
+      });
+    });
+
+    document.querySelectorAll(".material").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".material").forEach(item => item.setAttribute("aria-pressed", "false"));
+        button.setAttribute("aria-pressed", "true");
+      });
+    });
+
+    const quantity = document.getElementById("qty");
+    document.getElementById("minus").addEventListener("click", () => {
+      quantity.textContent = Math.max(50, Number(quantity.textContent) - 50);
+    });
+    document.getElementById("plus").addEventListener("click", () => {
+      quantity.textContent = Math.min(10000, Number(quantity.textContent) + 50);
+    });
+
+    const backdrop = document.getElementById("demo-modal");
+    const closeButton = document.getElementById("modal-close");
+    let previousFocus;
+    function openModal() {
+      previousFocus = document.activeElement;
+      document.getElementById("form-view").style.display = "block";
+      document.getElementById("success-view").style.display = "none";
+      document.getElementById("demo-form").reset();
+      backdrop.classList.add("open");
+      document.body.style.overflow = "hidden";
+      closeButton.focus();
+    }
+    function closeModal() {
+      backdrop.classList.remove("open");
+      document.body.style.overflow = "";
+      if (previousFocus) previousFocus.focus();
+    }
+    document.querySelectorAll("[data-open-demo]").forEach(button => button.addEventListener("click", openModal));
+    closeButton.addEventListener("click", closeModal);
+    document.getElementById("success-close").addEventListener("click", closeModal);
+    backdrop.addEventListener("click", event => { if (event.target === backdrop) closeModal(); });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && backdrop.classList.contains("open")) closeModal();
+      if (event.key === "Tab" && backdrop.classList.contains("open")) {
+        const focusable = [...backdrop.querySelectorAll("button, input")].filter(el => el.offsetParent !== null);
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
+    document.getElementById("demo-form").addEventListener("submit", event => {
+      event.preventDefault();
+      document.getElementById("form-view").style.display = "none";
+      document.getElementById("success-view").style.display = "block";
+      document.getElementById("success-close").focus();
+    });
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widget Systems for Manufacturing Operations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111111;
+    --paper:#f4f2ee;
+    --red:#e2001a;
+    --grey:#8a8a8a;
+    --line:#111111;
+    --gutter:24px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter','Helvetica Neue',Helvetica,Arial,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    font-size:16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--red);color:#fff;}
+
+  /* ---------- 12-column grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    column-gap:var(--gutter);
+    max-width:1360px;
+    margin:0 auto;
+    padding:0 40px;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    border-bottom:2px solid var(--line);
+    padding:28px 0 20px;
+  }
+  header .grid{align-items:baseline;}
+  .wordmark{
+    grid-column:1/4;
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:-0.02em;
+    text-transform:uppercase;
+  }
+  .wordmark span{color:var(--red);}
+  nav{
+    grid-column:4/10;
+    display:flex;
+    gap:32px;
+  }
+  nav a{
+    color:var(--ink);
+    text-decoration:none;
+    font-size:13px;
+    font-weight:500;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    position:relative;
+  }
+  nav a::after{
+    content:"";
+    position:absolute;
+    left:0;bottom:-4px;
+    width:0;height:2px;
+    background:var(--red);
+    transition:width .25s ease;
+  }
+  nav a:hover::after{width:100%;}
+  .header-cta{
+    grid-column:10/13;
+    text-align:right;
+  }
+  .btn{
+    display:inline-block;
+    background:var(--ink);
+    color:var(--paper);
+    text-decoration:none;
+    font-size:13px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    padding:14px 28px;
+    border:2px solid var(--ink);
+    transition:background .2s ease,color .2s ease;
+    cursor:pointer;
+  }
+  .btn:hover{background:var(--red);border-color:var(--red);color:#fff;}
+  .btn--outline{background:transparent;color:var(--ink);}
+  .btn--outline:hover{background:var(--ink);color:var(--paper);}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:96px 0 88px;
+    border-bottom:2px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-kicker{
+    grid-column:1/4;
+    font-size:13px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--red);
+    padding-top:14px;
+  }
+  .hero-kicker .rule{
+    display:block;
+    width:48px;height:4px;
+    background:var(--red);
+    margin-bottom:20px;
+  }
+  .hero h1{
+    grid-column:4/12;
+    font-size:88px;
+    line-height:0.98;
+    font-weight:700;
+    letter-spacing:-0.035em;
+    text-transform:uppercase;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--red);
+  }
+  .hero-sub{
+    grid-column:4/8;
+    margin-top:48px;
+    font-size:19px;
+    line-height:1.55;
+    max-width:460px;
+  }
+  .hero-actions{
+    grid-column:4/10;
+    margin-top:36px;
+    display:flex;
+    gap:16px;
+    align-items:center;
+  }
+  .hero-fig{
+    grid-column:9/13;
+    grid-row:1/4;
+    align-self:end;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .hero-fig svg{display:block;}
+
+  /* diagonal accent band */
+  .hero::after{
+    content:"";
+    position:absolute;
+    top:0;right:-140px;
+    width:6px;height:640px;
+    background:var(--red);
+    transform:rotate(24deg);
+    transform-origin:top right;
+  }
+
+  /* ---------- Section scaffolding ---------- */
+  section{padding:88px 0;}
+  .sec-label{
+    grid-column:1/4;
+    font-size:13px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--grey);
+  }
+  .sec-label .num{
+    display:block;
+    color:var(--red);
+    font-size:13px;
+    margin-bottom:8px;
+  }
+  .sec-title{
+    grid-column:4/11;
+    font-size:48px;
+    line-height:1.05;
+    font-weight:700;
+    letter-spacing:-0.03em;
+    text-transform:uppercase;
+    margin-bottom:56px;
+  }
+
+  /* ---------- Problem / proof strip ---------- */
+  .strip{
+    border-bottom:2px solid var(--line);
+    padding:0;
+  }
+  .strip .grid{padding-top:64px;padding-bottom:64px;}
+  .stat{border-left:2px solid var(--line);padding-left:24px;}
+  .stat:nth-of-type(1){grid-column:1/4;border-left:none;padding-left:0;}
+  .stat:nth-of-type(2){grid-column:4/7;}
+  .stat:nth-of-type(3){grid-column:7/10;}
+  .stat:nth-of-type(4){grid-column:10/13;}
+  .stat .big{
+    font-size:64px;
+    font-weight:700;
+    letter-spacing:-0.04em;
+    line-height:1;
+  }
+  .stat .big i{font-style:normal;color:var(--red);}
+  .stat p{
+    margin-top:14px;
+    font-size:14px;
+    line-height:1.5;
+    color:#333;
+    max-width:220px;
+  }
+
+  /* ---------- Platform (3 columns) ---------- */
+  .platform{border-bottom:2px solid var(--line);}
+  .cols{grid-column:4/13;display:grid;grid-template-columns:repeat(3,1fr);column-gap:var(--gutter);}
+  .col h3{
+    font-size:20px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:-0.01em;
+    border-top:6px solid var(--ink);
+    padding-top:20px;
+    margin-bottom:16px;
+  }
+  .col:nth-child(2) h3{border-top-color:var(--red);}
+  .col p{font-size:15px;line-height:1.6;color:#2b2b2b;}
+  .col .idx{
+    font-size:13px;
+    font-weight:600;
+    color:var(--grey);
+    letter-spacing:0.1em;
+    display:block;
+    margin-bottom:10px;
+  }
+
+  /* ---------- Process ---------- */
+  .process{border-bottom:2px solid var(--line);}
+  .steps{grid-column:4/13;}
+  .step{
+    display:grid;
+    grid-template-columns:120px 1fr 1fr;
+    column-gap:var(--gutter);
+    padding:28px 0;
+    border-top:1px solid #c9c6c0;
+    align-items:baseline;
+  }
+  .step:last-child{border-bottom:1px solid #c9c6c0;}
+  .step .n{
+    font-size:40px;
+    font-weight:700;
+    letter-spacing:-0.03em;
+    color:var(--red);
+  }
+  .step h4{
+    font-size:22px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:-0.01em;
+  }
+  .step p{font-size:15px;line-height:1.6;color:#2b2b2b;max-width:400px;}
+
+  /* ---------- Diagram section ---------- */
+  .diagram-sec{border-bottom:2px solid var(--line);}
+  .diagram{grid-column:4/13;}
+  .diagram svg{width:100%;height:auto;display:block;}
+  .diagram-caption{
+    grid-column:4/13;
+    margin-top:20px;
+    font-size:13px;
+    color:var(--grey);
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+  }
+
+  /* ---------- Quote ---------- */
+  .quote-sec{border-bottom:2px solid var(--line);}
+  blockquote{
+    grid-column:4/11;
+    font-size:36px;
+    line-height:1.3;
+    font-weight:500;
+    letter-spacing:-0.02em;
+  }
+  blockquote .mark{color:var(--red);font-weight:700;}
+  .attribution{
+    grid-column:4/11;
+    margin-top:32px;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--grey);
+  }
+  .attribution strong{color:var(--ink);}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    background:var(--ink);
+    color:var(--paper);
+    padding:112px 0;
+  }
+  .cta .sec-label{color:#777;}
+  .cta h2{
+    grid-column:4/12;
+    font-size:72px;
+    line-height:1;
+    font-weight:700;
+    letter-spacing:-0.035em;
+    text-transform:uppercase;
+  }
+  .cta h2 em{font-style:normal;color:var(--red);}
+  .cta p{
+    grid-column:4/8;
+    margin-top:32px;
+    font-size:17px;
+    line-height:1.6;
+    color:#bdb9b2;
+  }
+  .cta form{
+    grid-column:4/10;
+    margin-top:40px;
+    display:flex;
+    gap:0;
+  }
+  .cta input{
+    flex:1;
+    background:transparent;
+    border:2px solid var(--paper);
+    border-right:none;
+    color:var(--paper);
+    font-family:inherit;
+    font-size:15px;
+    padding:14px 20px;
+    outline:none;
+  }
+  .cta input::placeholder{color:#777;}
+  .cta input:focus{border-color:var(--red);}
+  .cta .btn{border-color:var(--paper);background:var(--paper);color:var(--ink);}
+  .cta .btn:hover{background:var(--red);border-color:var(--red);color:#fff;}
+  .cta .fine{
+    grid-column:4/10;
+    margin-top:16px;
+    font-size:12px;
+    color:#777;
+    letter-spacing:0.04em;
+  }
+  .form-note{
+    grid-column:4/10;
+    margin-top:16px;
+    font-size:14px;
+    color:var(--red);
+    font-weight:600;
+    display:none;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{padding:48px 0 40px;}
+  footer .grid{align-items:baseline;}
+  .f-left{grid-column:1/4;font-size:13px;color:var(--grey);}
+  .f-mid{grid-column:4/10;display:flex;gap:28px;}
+  .f-mid a{color:var(--grey);text-decoration:none;font-size:12px;text-transform:uppercase;letter-spacing:0.08em;}
+  .f-mid a:hover{color:var(--red);}
+  .f-right{grid-column:10/13;text-align:right;font-size:13px;color:var(--grey);}
+
+  /* reveal animation */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="grid">
+    <div class="wordmark">Acme<span>.</span></div>
+    <nav>
+      <a href="#platform">Platform</a>
+      <a href="#process">Process</a>
+      <a href="#customers">Customers</a>
+    </nav>
+    <div class="header-cta"><a class="btn" href="#demo">Book a Demo</a></div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="grid">
+    <div class="hero-kicker">
+      <span class="rule"></span>
+      Widget Procurement,<br>Engineered
+    </div>
+    <h1>Order custom widgets with <em>total</em> precision.</h1>
+    <p class="hero-sub">
+      Acme is the operations platform for mid-sized manufacturers. Configure
+      widget specifications, place orders across your supplier network, and
+      track every unit from foundry to loading dock — in one rigorous system
+      of record.
+    </p>
+    <div class="hero-actions">
+      <a class="btn" href="#demo">Book a Demo</a>
+      <a class="btn btn--outline" href="#platform">See the Platform</a>
+    </div>
+    <div class="hero-fig">
+      <!-- Constructivist widget diagram -->
+      <svg width="320" height="360" viewBox="0 0 320 360" fill="none" aria-hidden="true">
+        <rect x="60" y="60" width="200" height="200" stroke="#111" stroke-width="3"/>
+        <circle cx="160" cy="160" r="70" stroke="#111" stroke-width="3"/>
+        <circle cx="160" cy="160" r="14" fill="#e2001a"/>
+        <line x1="60" y1="60" x2="260" y2="260" stroke="#111" stroke-width="2"/>
+        <line x1="260" y1="60" x2="60" y2="260" stroke="#111" stroke-width="2"/>
+        <rect x="140" y="20" width="40" height="80" fill="#111"/>
+        <rect x="20" y="140" width="80" height="40" fill="#111"/>
+        <line x1="160" y1="260" x2="160" y2="340" stroke="#e2001a" stroke-width="4"/>
+        <line x1="260" y1="160" x2="310" y2="160" stroke="#111" stroke-width="2" stroke-dasharray="6 6"/>
+        <text x="268" y="150" font-family="Inter, Helvetica, sans-serif" font-size="11" fill="#111" letter-spacing="1">Ø 140</text>
+        <text x="20" y="345" font-family="Inter, Helvetica, sans-serif" font-size="11" fill="#8a8a8a" letter-spacing="2">FIG. 01 — WIDGET, TYPE K</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="strip">
+  <div class="grid">
+    <div class="stat reveal">
+      <div class="big" data-count="38" data-suffix="%">0%</div>
+      <p>Average reduction in widget procurement cycle time across Acme customers.</p>
+    </div>
+    <div class="stat reveal">
+      <div class="big" data-count="2400" data-suffix="+">0</div>
+      <p>Manufacturing facilities running Acme as their system of record for widgets.</p>
+    </div>
+    <div class="stat reveal">
+      <div class="big" data-count="99" data-suffix=".98%">0</div>
+      <p>Order-to-spec accuracy, verified by automated tolerance checks at intake.</p>
+    </div>
+    <div class="stat reveal">
+      <div class="big"><i>4</i> wks</div>
+      <p>Median time from signed agreement to first tracked production order.</p>
+    </div>
+  </div>
+</section>
+
+<section class="platform" id="platform">
+  <div class="grid">
+    <div class="sec-label"><span class="num">01</span>The Platform</div>
+    <h2 class="sec-title reveal">One system. Three disciplines. Zero ambiguity.</h2>
+    <div class="cols">
+      <div class="col reveal">
+        <span class="idx">A</span>
+        <h3>Configure</h3>
+        <p>
+          Define widget geometry, material grade, tolerances, and finish in a
+          structured specification builder. Every parameter is validated against
+          supplier capability before a quote is ever requested — so unbuildable
+          parts never enter your pipeline.
+        </p>
+      </div>
+      <div class="col reveal">
+        <span class="idx">B</span>
+        <h3>Order</h3>
+        <p>
+          Issue RFQs to your approved supplier network, compare bids on
+          normalized terms, and convert awards to purchase orders in a single
+          action. Pricing, lead times, and tooling costs are reconciled
+          automatically against contract rates.
+        </p>
+      </div>
+      <div class="col reveal">
+        <span class="idx">C</span>
+        <h3>Track</h3>
+        <p>
+          Follow every lot through machining, inspection, and freight with
+          milestone-level telemetry. Exceptions surface the moment a tolerance
+          drifts or a shipment slips — not when the line goes down.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="process" id="process">
+  <div class="grid">
+    <div class="sec-label"><span class="num">02</span>How It Works</div>
+    <h2 class="sec-title reveal">From specification to dock in four movements.</h2>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="n">1</div>
+        <h4>Specify</h4>
+        <p>Your engineers author a master widget specification once. Acme versions it, governs changes, and distributes it to every relevant supplier.</p>
+      </div>
+      <div class="step reveal">
+        <div class="n">2</div>
+        <h4>Source</h4>
+        <p>Suppliers bid against the controlled spec. Deviations are flagged line by line, so commercial review takes hours instead of weeks.</p>
+      </div>
+      <div class="step reveal">
+        <div class="n">3</div>
+        <h4>Produce</h4>
+        <p>In-process inspection data flows directly from the shop floor into Acme. Out-of-tolerance work is quarantined before it ships.</p>
+      </div>
+      <div class="step reveal">
+        <div class="n">4</div>
+        <h4>Receive</h4>
+        <p>Advance ship notices, certificates of conformance, and freight tracking converge on a single receiving record. Close the loop, keep the audit trail.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="diagram-sec">
+  <div class="grid">
+    <div class="sec-label"><span class="num">03</span>The Flow</div>
+    <div class="diagram reveal">
+      <svg viewBox="0 0 900 220" fill="none" aria-hidden="true">
+        <!-- grid baseline -->
+        <line x1="0" y1="180" x2="900" y2="180" stroke="#111" stroke-width="2"/>
+        <!-- nodes -->
+        <g font-family="Inter, Helvetica, sans-serif" font-size="12" letter-spacing="2" fill="#111">
+          <rect x="0" y="120" width="140" height="60" fill="#111"/>
+          <text x="70" y="155" fill="#f4f2ee" text-anchor="middle">SPECIFY</text>
+          <rect x="253" y="120" width="140" height="60" stroke="#111" stroke-width="2"/>
+          <text x="323" y="155" text-anchor="middle">SOURCE</text>
+          <rect x="506" y="120" width="140" height="60" stroke="#111" stroke-width="2"/>
+          <text x="576" y="155" text-anchor="middle">PRODUCE</text>
+          <rect x="759" y="120" width="141" height="60" fill="#e2001a"/>
+          <text x="829" y="155" fill="#fff" text-anchor="middle">RECEIVE</text>
+        </g>
+        <!-- connectors -->
+        <line x1="140" y1="150" x2="253" y2="150" stroke="#111" stroke-width="2"/>
+        <polygon points="253,150 241,144 241,156" fill="#111"/>
+        <line x1="393" y1="150" x2="506" y2="150" stroke="#111" stroke-width="2"/>
+        <polygon points="506,150 494,144 494,156" fill="#111"/>
+        <line x1="646" y1="150" x2="759" y2="150" stroke="#111" stroke-width="2"/>
+        <polygon points="759,150 747,144 747,156" fill="#111"/>
+        <!-- telemetry ticks -->
+        <g stroke="#e2001a" stroke-width="3">
+          arc
+        </g>
+        <path d="M 60 120 A 90 90 0 0 1 200 60" stroke="#e2001a" stroke-width="3" fill="none"/>
+        <circle cx="200" cy="60" r="6" fill="#e2001a"/>
+        <text x="212" y="64" font-family="Inter, Helvetica, sans-serif" font-size="11" fill="#8a8a8a" letter-spacing="1">LIVE TELEMETRY</text>
+        <!-- tick marks -->
+        <g stroke="#111" stroke-width="1">
+          <line x1="70" y1="186" x2="70" y2="196"/>
+          <line x1="323" y1="186" x2="323" y2="196"/>
+          <line x1="576" y1="186" x2="576" y2="196"/>
+          <line x1="829" y1="186" x2="829" y2="196"/>
+        </g>
+        <g font-family="Inter, Helvetica, sans-serif" font-size="10" fill="#8a8a8a" letter-spacing="1">
+          <text x="70" y="212" text-anchor="middle">T+0 DAYS</text>
+          <text x="323" y="212" text-anchor="middle">T+5</text>
+          <text x="576" y="212" text-anchor="middle">T+21</text>
+          <text x="829" y="212" text-anchor="middle">T+28</text>
+        </g>
+      </svg>
+    </div>
+    <p class="diagram-caption">Fig. 02 — Median order lifecycle, 2024 customer cohort</p>
+  </div>
+</section>
+
+<section class="quote-sec" id="customers">
+  <div class="grid">
+    <div class="sec-label"><span class="num">04</span>Customers</div>
+    <blockquote class="reveal">
+      <span class="mark">“</span>We replaced four spreadsheets, two shared drives, and
+      a fax machine with Acme. Widget variance across our plants dropped by
+      half in the first quarter.<span class="mark">”</span>
+    </blockquote>
+    <p class="attribution reveal">
+      <strong>Marta Keller</strong> — Director of Operations, Haldenwerk AG, Tier-1 Automotive Supplier
+    </p>
+  </div>
+</section>
+
+<section class="cta" id="demo">
+  <div class="grid">
+    <div class="sec-label"><span class="num">05</span>Book a Demo</div>
+    <h2 class="reveal">See the system. <em>Then</em> decide.</h2>
+    <p class="reveal">
+      A thirty-minute working session with an Acme operations engineer. We will
+      configure a real widget from your catalog, route it to a live supplier
+      sandbox, and show you the full audit trail. No slideware.
+    </p>
+    <form id="demoForm" class="reveal">
+      <input type="email" id="email" placeholder="Work email address" required aria-label="Work email address">
+      <button class="btn" type="submit">Request Demo</button>
+    </form>
+    <p class="form-note" id="formNote">Thank you. An operations engineer will reply within one business day.</p>
+    <p class="fine reveal">No commitment. No procurement of your data. SOC 2 Type II certified.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="grid">
+    <div class="f-left">© 2025 Acme Widget Systems, Inc.</div>
+    <div class="f-mid">
+      <a href="#platform">Platform</a>
+      <a href="#process">Process</a>
+      <a href="#customers">Customers</a>
+      <a href="#demo">Demo</a>
+    </div>
+    <div class="f-right">Zürich · Chicago · Nagoya</div>
+  </div>
+</footer>
+
+<script>
+  // Count-up animation for stats
+  const counters = document.querySelectorAll('.stat .big[data-count]');
+  const animateCount = (el) => {
+    const target = parseFloat(el.dataset.count);
+    const suffix = el.dataset.suffix || '';
+    const dur = 1400;
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString('en-US') + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        if (e.target.dataset.count !== undefined || e.target.querySelector?.('[data-count]')) {}
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  const statIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const big = e.target.querySelector('.big[data-count]');
+        if (big) animateCount(big);
+        statIO.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.stat').forEach(el => statIO.observe(el));
+
+  // Demo form
+  document.getElementById('demoForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    if (!email) return;
+    document.getElementById('formNote').style.display = 'block';
+    document.getElementById('email').value = '';
+  });
+</script>
+
+</body>
+</html>

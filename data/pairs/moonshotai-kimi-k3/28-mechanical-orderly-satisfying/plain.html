@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom Widgets, Ordered to Spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1b2430;
+    --ink-soft:#46536a;
+    --paper:#f4f2ec;
+    --paper-2:#ece9e0;
+    --line:#c9c4b6;
+    --accent:#e8551d;
+    --accent-dark:#c24310;
+    --steel:#7d8898;
+    --mono:'IBM Plex Mono',monospace;
+    --sans:'Archivo',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:72px 72px;
+    background-position:center top;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--accent);color:#fff;}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 48px;}
+  .mono{font-family:var(--mono);}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(244,242,236,.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    max-width:1280px;margin:0 auto;padding:0 48px;
+    height:68px;display:flex;align-items:center;gap:40px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.5px;text-decoration:none;color:var(--ink);}
+  .logo-mark{width:30px;height:30px;}
+  .nav-links{display:flex;gap:32px;margin-left:auto;align-items:center;}
+  .nav-links a{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);text-decoration:none;position:relative;transition:color .2s;
+  }
+  .nav-links a:not(.btn):hover{color:var(--accent);}
+  .nav-links a:not(.btn)::after{
+    content:'';position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--accent);transition:width .25s;
+  }
+  .nav-links a:not(.btn):hover::after{width:100%;}
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--accent);color:#fff;text-decoration:none;border:none;cursor:pointer;
+    padding:14px 26px;position:relative;
+    box-shadow:4px 4px 0 var(--ink);
+    transition:transform .12s ease, box-shadow .12s ease, background .2s;
+  }
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);background:var(--accent-dark);}
+  .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink);}
+  .btn.small{padding:10px 18px;}
+  .btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--line);}
+  .btn.ghost:hover{box-shadow:6px 6px 0 var(--line);background:#fff;}
+
+  /* ---------- SECTION LABELS ---------- */
+  .kicker{
+    display:inline-flex;align-items:center;gap:12px;
+    font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);
+    margin-bottom:18px;
+  }
+  .kicker::before{content:'';width:34px;height:2px;background:var(--accent);}
+  h2{font-size:44px;font-weight:800;letter-spacing:-1.2px;line-height:1.08;margin-bottom:16px;}
+  .lede{font-size:17px;line-height:1.65;color:var(--ink-soft);max-width:560px;}
+
+  section{padding:110px 0;position:relative;}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:84px 0 90px;}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;}
+  .hero h1{
+    font-size:66px;font-weight:800;letter-spacing:-2.4px;line-height:1.02;margin:20px 0 24px;
+  }
+  .hero h1 .underline{position:relative;white-space:nowrap;}
+  .hero h1 .underline svg{
+    position:absolute;left:0;bottom:-10px;width:100%;height:14px;
+  }
+  .hero p.sub{font-size:18px;line-height:1.65;color:var(--ink-soft);max-width:520px;margin-bottom:36px;}
+  .hero-cta{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+  .hero-meta{
+    margin-top:44px;display:flex;gap:36px;
+    font-family:var(--mono);font-size:12px;color:var(--steel);letter-spacing:.05em;
+  }
+  .hero-meta span b{display:block;color:var(--ink);font-size:15px;margin-bottom:2px;}
+
+  .spec-card{
+    background:#fff;border:1.5px solid var(--ink);
+    box-shadow:10px 10px 0 rgba(27,36,48,.12);
+    position:relative;
+  }
+  .spec-card-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 18px;border-bottom:1.5px solid var(--ink);
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  }
+  .spec-card-head .dots{display:flex;gap:6px;}
+  .spec-card-head .dots i{width:9px;height:9px;border:1.5px solid var(--ink);border-radius:50%;display:block;}
+  .spec-card-head .dots i:first-child{background:var(--accent);border-color:var(--accent);}
+  .spec-card svg{display:block;width:100%;height:auto;}
+
+  /* conveyor animations */
+  @keyframes beltmove{to{stroke-dashoffset:-40;}}
+  @keyframes crawl{from{transform:translateX(0);}to{transform:translateX(-240px);}}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .gear{transform-origin:center;animation:spin 8s linear infinite;}
+  .gear.rev{animation-direction:reverse;animation-duration:5s;}
+  .widget-group{animation:crawl 6s linear infinite;}
+  .belt-dashes{animation:beltmove .9s linear infinite;stroke-dasharray:8 32;}
+  @keyframes stamp{0%,72%{transform:translateY(0);}80%{transform:translateY(14px);}90%,100%{transform:translateY(0);}}
+  .stamper{animation:stamp 3s ease-in-out infinite;}
+
+  /* ---------- LOGOS ---------- */
+  .logos{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--paper-2);padding:34px 0;}
+  .logos-row{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
+  .logos-row .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--steel);}
+  .logos-row .co{font-weight:700;font-size:17px;letter-spacing:-.3px;color:#8b92a0;display:flex;align-items:center;gap:8px;transition:color .2s;}
+  .logos-row .co:hover{color:var(--ink);}
+  .logos-row .co svg{width:18px;height:18px;}
+
+  /* ---------- FEATURES ---------- */
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:64px;border:1.5px solid var(--ink);background:#fff;}
+  .feat{
+    padding:40px 36px 44px;border-right:1.5px solid var(--ink);position:relative;
+    transition:background .25s;
+  }
+  .feat:last-child{border-right:none;}
+  .feat:hover{background:var(--paper-2);}
+  .feat .num{
+    position:absolute;top:18px;right:22px;font-family:var(--mono);font-size:11px;color:var(--steel);letter-spacing:.15em;
+  }
+  .feat .icon{width:64px;height:64px;margin-bottom:26px;}
+  .feat h3{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:12px;}
+  .feat p{font-size:15px;line-height:1.65;color:var(--ink-soft);}
+  .feat ul{list-style:none;margin-top:18px;}
+  .feat li{
+    font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding:7px 0 7px 22px;position:relative;
+    border-bottom:1px dashed var(--line);
+  }
+  .feat li:last-child{border-bottom:none;}
+  .feat li::before{content:'';position:absolute;left:0;top:13px;width:9px;height:9px;border:2px solid var(--accent);}
+
+  /* ---------- PROCESS ---------- */
+  .process{background:var(--ink);color:var(--paper);overflow:hidden;}
+  .process .kicker{color:#ffb08c;}
+  .process .kicker::before{background:#ffb08c;}
+  .process h2{color:#fff;}
+  .process .lede{color:#a9b3c2;}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:64px;}
+  .step{
+    border:1px solid #3a465a;padding:34px 30px 38px;position:relative;background:#222d3d;
+    transition:transform .25s,border-color .25s;
+  }
+  .step:hover{transform:translateY(-6px);border-color:var(--accent);}
+  .step .big-num{
+    font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.15em;
+    display:flex;align-items:center;gap:12px;margin-bottom:22px;
+  }
+  .step .big-num::after{content:'';flex:1;height:1px;background:#3a465a;}
+  .step h3{font-size:21px;color:#fff;margin-bottom:12px;letter-spacing:-.4px;}
+  .step p{font-size:14.5px;line-height:1.65;color:#a9b3c2;}
+  .step svg{width:44px;height:44px;margin-bottom:22px;}
+  .step .arrow{
+    position:absolute;right:-26px;top:50%;transform:translateY(-50%);z-index:2;color:var(--accent);
+  }
+
+  /* ---------- STATS ---------- */
+  .stats{border-bottom:1px solid var(--line);}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);margin-top:56px;border:1.5px solid var(--ink);background:#fff;}
+  .stat{padding:38px 32px;border-right:1.5px solid var(--ink);}
+  .stat:last-child{border-right:none;}
+  .stat .val{font-size:52px;font-weight:800;letter-spacing:-2px;line-height:1;display:flex;align-items:baseline;}
+  .stat .val .suffix{font-size:26px;color:var(--accent);margin-left:2px;}
+  .stat .cap{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);margin-top:12px;}
+
+  /* ---------- QUOTE ---------- */
+  .quote-wrap{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+  blockquote{
+    font-size:27px;font-weight:600;letter-spacing:-.6px;line-height:1.4;
+    border-left:4px solid var(--accent);padding-left:32px;
+  }
+  .attr{margin-top:28px;padding-left:32px;display:flex;align-items:center;gap:16px;}
+  .attr .ava{
+    width:52px;height:52px;border:1.5px solid var(--ink);background:var(--paper-2);
+    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:16px;
+  }
+  .attr .who b{display:block;font-size:15px;}
+  .attr .who span{font-family:var(--mono);font-size:12px;color:var(--steel);}
+
+  /* ---------- DEMO FORM ---------- */
+  .demo{background:var(--paper-2);border-top:1px solid var(--line);}
+  .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start;}
+  .demo-points{margin-top:36px;list-style:none;}
+  .demo-points li{
+    display:flex;gap:18px;padding:20px 0;border-bottom:1px solid var(--line);align-items:flex-start;
+  }
+  .demo-points li:last-child{border-bottom:none;}
+  .demo-points .tick{
+    flex:0 0 30px;width:30px;height:30px;border:1.5px solid var(--ink);background:#fff;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .demo-points b{display:block;font-size:16px;margin-bottom:4px;letter-spacing:-.2px;}
+  .demo-points p{font-size:14px;color:var(--ink-soft);line-height:1.55;}
+  form{
+    background:#fff;border:1.5px solid var(--ink);box-shadow:10px 10px 0 rgba(27,36,48,.12);
+    padding:40px;
+  }
+  .form-head{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    display:flex;justify-content:space-between;color:var(--steel);
+    padding-bottom:20px;border-bottom:1px dashed var(--line);margin-bottom:26px;
+  }
+  .field{margin-bottom:20px;}
+  .field label{
+    display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:8px;
+  }
+  .field input,.field select{
+    width:100%;padding:13px 15px;border:1.5px solid var(--ink);background:var(--paper);
+    font-family:var(--sans);font-size:15px;color:var(--ink);outline:none;
+    transition:box-shadow .15s, background .15s;appearance:none;border-radius:0;
+  }
+  .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231b2430' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
+  .field input:focus,.field select:focus{box-shadow:3px 3px 0 var(--accent);background:#fff;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  form .btn{width:100%;justify-content:center;padding:17px;margin-top:8px;font-size:14px;}
+  .form-note{font-family:var(--mono);font-size:11.5px;color:var(--steel);text-align:center;margin-top:16px;letter-spacing:.04em;}
+  .form-success{
+    display:none;text-align:center;padding:60px 20px;
+  }
+  .form-success .big-check{
+    width:74px;height:74px;border:2px solid var(--accent);border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;
+  }
+  .form-success h3{font-size:26px;margin-bottom:10px;letter-spacing:-.5px;}
+  .form-success p{color:var(--ink-soft);font-size:15px;line-height:1.6;}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--ink);color:#8f9aac;padding:56px 0 40px;}
+  .foot-grid{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;}
+  .foot-grid .logo{color:#fff;}
+  .foot-links{display:flex;gap:28px;}
+  .foot-links a{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#8f9aac;text-decoration:none;transition:color .2s;}
+  .foot-links a:hover{color:var(--accent);}
+  .foot-bottom{
+    margin-top:40px;padding-top:24px;border-top:1px solid #3a465a;
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  }
+
+  /* ---------- REVEAL ---------- */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  .reveal.d1{transition-delay:.1s;} .reveal.d2{transition-delay:.2s;} .reveal.d3{transition-delay:.3s;}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+        <rect x="4" y="4" width="24" height="24" stroke="#1b2430" stroke-width="2.5"/>
+        <path d="M10 22 L16 9 L22 22" stroke="#e8551d" stroke-width="3" fill="none" stroke-linejoin="round"/>
+        <circle cx="16" cy="17" r="2.4" fill="#1b2430"/>
+      </svg>
+      ACME
+    </a>
+    <div class="nav-links">
+      <a href="#platform">Platform</a>
+      <a href="#how">How It Works</a>
+      <a href="#results">Results</a>
+      <a href="#demo" class="btn small">Book a Demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker">Widget Procurement, Engineered</span>
+      <h1>Every widget.<br>To spec. <span class="underline">On time.<svg viewBox="0 0 200 14" preserveAspectRatio="none"><path d="M2 10 Q 50 2 100 8 T 198 6" stroke="#e8551d" stroke-width="4" fill="none"/></svg></span></h1>
+      <p class="sub">Acme is the ordering platform operations teams use to configure custom widgets, route them through vetted suppliers, and track every unit from purchase order to the loading dock — in one orderly system.</p>
+      <div class="hero-cta">
+        <a href="#demo" class="btn">Book a Demo
+          <svg width="15" height="12" viewBox="0 0 15 12" fill="none"><path d="M9 1l5 5-5 5M14 6H0" stroke="currentColor" stroke-width="2"/></svg>
+        </a>
+        <a href="#how" class="btn ghost">See How It Works</a>
+      </div>
+      <div class="hero-meta">
+        <span><b>SOC 2 Type II</b>Certified</span>
+        <span><b>99.98%</b>Order Accuracy</span>
+        <span><b>15 min</b>Demo, No Prep Needed</span>
+      </div>
+    </div>
+
+    <!-- Spec sheet / conveyor illustration -->
+    <div class="spec-card">
+      <div class="spec-card-head">
+        <span>FIG. 01 — ORDER LINE, LIVE</span>
+        <span class="dots"><i></i><i></i><i></i></span>
+      </div>
+      <svg viewBox="0 0 560 420" xmlns="http://www.w3.org/2000/svg">
+        <!-- background hatch -->
+        <defs>
+          <pattern id="hatch" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="10" stroke="#e8e4d8" stroke-width="1.5"/>
+          </pattern>
+        </defs>
+        <rect width="560" height="420" fill="#fdfcfa"/>
+        <rect x="0" y="290" width="560" height="130" fill="url(#hatch)"/>
+
+        <!-- dimension lines -->
+        <line x1="60" y1="372" x2="500" y2="372" stroke="#7d8898" stroke-width="1"/>
+        <line x1="60" y1="366" x2="60" y2="378" stroke="#7d8898" stroke-width="1"/>
+        <line x1="500" y1="366" x2="500" y2="378" stroke="#7d8898" stroke-width="1"/>
+        <text x="280" y="392" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#7d8898" letter-spacing="2">THROUGHPUT: 1 UNIT / 2.0 S</text>
+
+        <!-- conveyor frame -->
+        <rect x="40" y="300" width="480" height="14" fill="#d9d4c6" stroke="#1b2430" stroke-width="2"/>
+        <line class="belt-dashes" x1="48" y1="307" x2="512" y2="307" stroke="#1b2430" stroke-width="3"/>
+        <!-- legs -->
+        <line x1="90" y1="314" x2="90" y2="350" stroke="#1b2430" stroke-width="3"/>
+        <line x1="470" y1="314" x2="470" y2="350" stroke="#1b2430" stroke-width="3"/>
+
+        <!-- gears -->
+        <g class="gear" style="transform-origin:70px 300px;">
+          <g transform="translate(70 300)">
+            <circle r="20" fill="#f4f2ec" stroke="#1b2430" stroke-width="2.5"/>
+            <circle r="6" fill="#e8551d" stroke="#1b2430" stroke-width="2"/>
+            <g stroke="#1b2430" stroke-width="5">
+              <line x1="0" y1="-26" x2="0" y2="-20"/><line x1="0" y1="20" x2="0" y2="26"/>
+              <line x1="-26" y1="0" x2="-20" y2="0"/><line x1="20" y1="0" x2="26" y2="0"/>
+              <line x1="-18.4" y1="-18.4" x2="-14" y2="-14"/><line x1="18.4" y1="18.4" x2="14" y2="14"/>
+              <line x1="18.4" y1="-18.4" x2="14" y2="-14"/><line x1="-18.4" y1="18.4" x2="-14" y2="14"/>
+            </g>
+          </g>
+        </g>
+        <g class="gear rev" style="transform-origin:490px 300px;">
+          <g transform="translate(490 300)">
+            <circle r="20" fill="#f4f2ec" stroke="#1b2430" stroke-width="2.5"/>
+            <circle r="6" fill="#e8551d" stroke="#1b2430" stroke-width="2"/>
+            <g stroke="#1b2430" stroke-width="5">
+              <line x1="0" y1="-26" x2="0" y2="-20"/><line x1="0" y1="20" x2="0" y2="26"/>
+              <line x1="-26" y1="0" x2="-20" y2="0"/><line x1="20" y1="0" x2="26" y2="0"/>
+              <line x1="-18.4" y1="-18.4" x2="-14" y2="-14"/><line x1="18.4" y1="18.4" x2="14" y2="14"/>
+              <line x1="18.4" y1="-18.4" x2="14" y2="-14"/><line x1="-18.4" y1="18.4" x2="-14" y2="14"/>
+            </g>
+          </g>
+        </g>
+
+        <!-- moving widgets (two copies offset by 240 for loop) -->
+        <g class="widget-group">
+          <!-- set 1 -->
+          <g transform="translate(90 262)">
+            <rect width="46" height="38" fill="#e8551d" stroke="#1b2430" stroke-width="2.5"/>
+            <circle cx="23" cy="19" r="8" fill="#fdfcfa" stroke="#1b2430" stroke-width="2.5"/>
+          </g>
+          <g transform="translate(210 262)">
+            <rect width="46" height="38" fill="#f4f2ec" stroke="#1b2430" stroke-width="2.5"/>
+            <circle cx="23" cy="19" r="8" fill="#e8551d" stroke="#1b2430" stroke-width="2.5"/>
+          </g>
+          <g transform="translate(330 262)">
+            <rect width="46" height="38" fill="#e8551d" stroke="#1b2430" stroke-width="2.5"/>
+            <circle cx="23" cy="19" r="8" fill="#fdfcfa" stroke="#1b2430" stroke-width="2.5"/>
+          </g>
+          <g transform="translate(450 262)">
+            <rect width="46" height="38" fill="#f4f2ec" stroke="#1b2430" stroke-width="2.5"/>
+            <circle cx="23" cy="19" r="8" fill="#e8551d" stroke="#1b2430" stroke-width="2.5"/>
+          </g>
+          <!-- set 2 (offset +480... actually shift 240*2) -->
+          <g transform="translate(570 262)">
+            <rect width="46" height="38" fill="#e8551d" stroke="#1b2430" stroke-width="2.5"/>
+            <circle cx="23" cy="19" r="8" fill="#fdfcfa" stroke="#1b2430" stroke-width="2.5"/>
+          </g>
+          <g transform="translate(690 262)">
+            <rect width="46" height="38" fill="#f4f2ec" stroke="#1b2430" stroke-width="2.5"/>
+            <circle cx="23" cy="19" r="8" fill="#e8551d" stroke="#1b2430" stroke-width="2.5"/>
+          </g>
+        </g>
+
+        <!-- QC stamper -->
+        <g class="stamper">
+          <rect x="258" y="120" width="44" height="70" fill="#fdfcfa" stroke="#1b2430" stroke-width="2.5"/>
+          <rect x="248" y="190" width="64" height="16" fill="#1b2430"/>
+          <line x1="280" y1="120" x2="280" y2="88" stroke="#1b2430" stroke-width="6"/>
+        </g>
+        <text x="280" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#e8551d" letter-spacing="2">QC GATE 04</text>
+
+        <!-- callout -->
+        <line x1="420" y1="150" x2="470" y2="150" stroke="#7d8898" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <circle cx="420" cy="150" r="3.5" fill="#e8551d"/>
+        <text x="475" y="146" font-family="IBM Plex Mono" font-size="10" fill="#46536a">WGT-2048</text>
+        <text x="475" y="160" font-family="IBM Plex Mono" font-size="10" fill="#7d8898">TOL ±0.02</text>
+
+        <!-- corner marks -->
+        <path d="M20 20 h18 M20 20 v18" stroke="#1b2430" stroke-width="2" fill="none"/>
+        <path d="M540 20 h-18 M540 20 v18" stroke="#1b2430" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LOGOS ============ -->
+<div class="logos">
+  <div class="wrap logos-row">
+    <span class="lbl">Trusted by operations teams at</span>
+    <span class="co"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>Halvard Mills</span>
+    <span class="co"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2.5"/></svg>Northfield Fabrication</span>
+    <span class="co"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l9 18H3z" stroke="currentColor" stroke-width="2.5" fill="none"/></svg>Apogee Components</span>
+    <span class="co"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12h18M12 3v18" stroke="currentColor" stroke-width="2.5"/></svg>Corvus Industrial</span>
+    <span class="co"><svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="5" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="12" r="5" stroke="currentColor" stroke-width="2.5"/></svg>Bremmer &amp; Sons</span>
+  </div>
+</div>
+
+<!-- ============ FEATURES ============ -->
+<section id="platform">
+  <div class="wrap">
+    <span class="kicker reveal">The Platform</span>
+    <h2 class="reveal">Three tools. One tidy<br>supply chain.</h2>
+    <p class="lede reveal d1">Everything your ops team needs to move widgets from drawing board to dock door — without spreadsheets, phone tag, or guesswork.</p>
+
+    <div class="feat-grid reveal d2">
+      <div class="feat">
+        <span class="num">MODULE / 01</span>
+        <svg class="icon" viewBox="0 0 64 64" fill="none">
+          <rect x="8" y="8" width="48" height="48" stroke="#1b2430" stroke-width="2.5"/>
+          <line x1="20" y1="24" x2="44" y2="24" stroke="#1b2430" stroke-width="2.5"/>
+          <line x1="20" y1="33" x2="38" y2="33" stroke="#1b2430" stroke-width="2.5"/>
+          <circle cx="20" cy="44" r="3" stroke="#e8551d" stroke-width="2.5"/>
+          <line x1="28" y1="44" x2="44" y2="44" stroke="#e8551d" stroke-width="2.5"/>
+          <path d="M50 2 h12 M50 62 h12" stroke="#e8551d" stroke-width="2.5"/>
+        </svg>
+        <h3>Configure</h3>
+        <p>Build widgets from 40+ parametric templates. Set dimensions, materials, tolerances, and finishes — with live pricing that updates as you dial in the spec.</p>
+        <ul>
+          <li>Instant spec validation</li>
+          <li>Live unit &amp; volume pricing</li>
+          <li>Saved configs for reorder</li>
+        </ul>
+      </div>
+      <div class="feat">
+        <span class="num">MODULE / 02</span>
+        <svg class="icon" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="32" r="22" stroke="#1b2430" stroke-width="2.5"/>
+          <path d="M32 16v16l11 7" stroke="#e8551d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M32 4v6M32 54v6M4 32h6M54 32h6" stroke="#1b2430" stroke-width="2.5"/>
+        </svg>
+        <h3>Order</h3>
+        <p>Acme routes every order to the best-fit supplier in our vetted network based on capability, capacity, and cost. Approvals and POs flow through automatically.</p>
+        <ul>
+          <li>Smart supplier matching</li>
+          <li>Multi-level approval chains</li>
+          <li>Auto-generated POs</li>
+        </ul>
+      </div>
+      <div class="feat">
+        <span class="num">MODULE / 03</span>
+        <svg class="icon" viewBox="0 0 64 64" fill="none">
+          <path d="M8 48 L22 30 L34 40 L56 14" stroke="#e8551d" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+          <circle cx="56" cy="14" r="4" fill="#e8551d"/>
+          <line x1="8" y1="56" x2="56" y2="56" stroke="#1b2430" stroke-width="2.5"/>
+          <line x1="8" y1="8" x2="8" y2="56" stroke="#1b2430" stroke-width="2.5"/>
+          <line x1="20" y1="50" x2="20" y2="56" stroke="#1b2430" stroke-width="2" stroke-dasharray="3 3"/>
+          <line x1="32" y1="50" x2="32" y2="56" stroke="#1b2430" stroke-width="2" stroke-dasharray="3 3"/>
+          <line x1="44" y1="50" x2="44" y2="56" stroke="#1b2430" stroke-width="2" stroke-dasharray="3 3"/>
+        </svg>
+        <h3>Track</h3>
+        <p>Follow every unit through machining, QC, and freight with milestone-level tracking. Delays trigger alerts before they hit your production schedule.</p>
+        <ul>
+          <li>Unit-level milestones</li>
+          <li>Delay &amp; exception alerts</li>
+          <li>ERP &amp; MES integrations</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROCESS ============ -->
+<section class="process" id="how">
+  <div class="wrap">
+    <span class="kicker reveal">Assembly Procedure</span>
+    <h2 class="reveal">From spec to dock<br>in three steps.</h2>
+    <p class="lede reveal d1">No procurement black boxes. Every order moves through the same visible, auditable pipeline.</p>
+
+    <div class="steps">
+      <div class="step reveal">
+        <svg viewBox="0 0 44 44" fill="none">
+          <rect x="6" y="6" width="32" height="32" stroke="#e8551d" stroke-width="2.5"/>
+          <line x1="14" y1="17" x2="30" y2="17" stroke="#f4f2ec" stroke-width="2.5"/>
+          <line x1="14" y1="24" x2="26" y2="24" stroke="#f4f2ec" stroke-width="2.5"/>
+          <line x1="14" y1="31" x2="22" y2="31" stroke="#f4f2ec" stroke-width="2.5"/>
+        </svg>
+        <span class="big-num">STEP 01</span>
+        <h3>Draw it up</h3>
+        <p>Pick a template or upload a drawing. Acme validates manufacturability on the spot and prices the run before you commit to anything.</p>
+        <svg class="arrow" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" stroke-width="2.5"/></svg>
+      </div>
+      <div class="step reveal d1">
+        <svg viewBox="0 0 44 44" fill="none">
+          <circle cx="22" cy="22" r="16" stroke="#f4f2ec" stroke-width="2.5"/>
+          <circle cx="22" cy="22" r="5" stroke="#e8551d" stroke-width="2.5"/>
+          <path d="M22 2v6M22 36v6M2 22h6M36 22h6" stroke="#e8551d" stroke-width="2.5"/>
+        </svg>
+        <span class="big-num">STEP 02</span>
+        <h3>Approve &amp; route</h3>
+        <p>Your approval chain signs off in-app. Acme assigns the order to a qualified supplier with open capacity and locks the delivery date.</p>
+        <svg class="arrow" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 5l5 5-5 5" stroke="currentColor" stroke-width="2.5"/></svg>
+      </div>
+      <div class="step reveal d2">
+        <svg viewBox="0 0 44 44" fill="none">
+          <path d="M6 34 L16 22 L24 28 L38 10" stroke="#e8551d" stroke-width="2.5" fill="none"/>
+          <path d="M6 42h32" stroke="#f4f2ec" stroke-width="2.5"/>
+          <circle cx="38" cy="10" r="3.5" fill="#e8551d"/>
+        </svg>
+        <span class="big-num">STEP 03</span>
+        <h3>Watch it arrive</h3>
+        <p>Milestone updates flow into your dashboard and ERP. If anything slips, you know about it days early — with a recovery plan attached.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="stats" id="results">
+  <div class="wrap">
+    <span class="kicker reveal">Measured Output</span>
+    <h2 class="reveal">The numbers hold<br>their tolerance.</h2>
+
+    <div class="stats-grid reveal d1">
+      <div class="stat">
+        <div class="val"><span data-count="98" data-decimals="0">0</span><span class="suffix">.4%</span></div>
+        <div class="cap">On-time delivery rate</div>
+      </div>
+      <div class="stat">
+        <div class="val"><span data-count="31" data-decimals="0">0</span><span class="suffix">%</span></div>
+        <div class="cap">Lower procurement cost</div>
+      </div>
+      <div class="stat">
+        <div class="val"><span data-count="12" data-decimals="0">0</span><span class="suffix"> days</span></div>
+        <div class="cap">Median lead time saved</div>
+      </div>
+      <div class="stat">
+        <div class="val"><span data-count="340" data-decimals="0">0</span><span class="suffix">+</span></div>
+        <div class="cap">Manufacturers on Acme</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUOTE ============ -->
+<section>
+  <div class="wrap quote-wrap">
+    <div class="reveal">
+      <blockquote>“We used to chase widget orders across four inboxes and a shared spreadsheet. Now the whole plant sees the same board, and I haven’t expedited a shipment in eight months.”</blockquote>
+      <div class="attr">
+        <div class="ava">MK</div>
+        <div class="who">
+          <b>Marta Keller</b>
+          <span>VP Operations, Northfield Fabrication</span>
+        </div>
+      </div>
+    </div>
+    <div class="reveal d1">
+      <div class="spec-card">
+        <div class="spec-card-head">
+          <span>FIG. 02 — SLA AUDIT, Q3</span>
+          <span class="mono" style="color:var(--accent)">PASS</span>
+        </div>
+        <svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg">
+          <rect width="560" height="260" fill="#fdfcfa"/>
+          <!-- bar chart -->
+          <g stroke="#c9c4b6" stroke-width="1">
+            <line x1="60" y1="40" x2="520" y2="40"/><line x1="60" y1="90" x2="520" y2="90"/>
+            <line x1="60" y1="140" x2="520" y2="140"/><line x1="60" y1="190" x2="520" y2="190"/>
+          </g>
+          <g font-family="IBM Plex Mono" font-size="10" fill="#7d8898">
+            <text x="20" y="44">100</text><text x="28" y="94">75</text><text x="28" y="144">50</text><text x="28" y="194">25</text>
+          </g>
+          <g>
+            <rect x="95" y="140" width="52" height="70" fill="#d9d4c6" stroke="#1b2430" stroke-width="2"/>
+            <rect x="175" y="120" width="52" height="90" fill="#d9d4c6" stroke="#1b2430" stroke-width="2"/>
+            <rect x="255" y="98" width="52" height="112" fill="#d9d4c6" stroke="#1b2430" stroke-width="2"/>
+            <rect x="335" y="70" width="52" height="140" fill="#d9d4c6" stroke="#1b2430" stroke-width="2"/>
+            <rect x="415" y="46" width="52" height="164" fill="#e8551d" stroke="#1b2430" stroke-width="2"/>
+          </g>
+          <line x1="60" y1="210" x2="520" y2="210" stroke="#1b2430" stroke-width="2"/>
+          <g font-family="IBM Plex Mono" font-size="10" fill="#46536a" text-anchor="middle">
+            <text x="121" y="228">MAY</text><text x="201" y="228">JUN</text><text x="281" y="228">JUL</text>
+            <text x="361" y="228">AUG</text><text x="441" y="228">SEP</text>
+          </g>
+          <text x="441" y="36" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" fill="#e8551d">98.4%</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEMO ============ -->
+<section class="demo" id="demo">
+  <div class="wrap demo-grid">
+    <div class="reveal">
+      <span class="kicker">Final Inspection</span>
+      <h2>Book your<br>15-minute demo.</h2>
+      <p class="lede">Bring one real widget spec. We’ll configure it live, route it to a supplier, and show you exactly what tracking looks like — start to finish.</p>
+      <ul class="demo-points">
+        <li>
+          <span class="tick"><svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M1 5.5l4 4L13 1" stroke="#e8551d" stroke-width="2.5"/></svg></span>
+          <div><b>Your spec, live on screen</b><p>We configure a real part from your catalog during the call — not a canned demo dataset.</p></div>
+        </li>
+        <li>
+          <span class="tick"><svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M1 5.5l4 4L13 1" stroke="#e8551d" stroke-width="2.5"/></svg></span>
+          <div><b>Pricing before you hang up</b><p>You’ll leave with an actual quoted run and a delivery window for your part.</p></div>
+        </li>
+        <li>
+          <span class="tick"><svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M1 5.5l4 4L13 1" stroke="#e8551d" stroke-width="2.5"/></svg></span>
+          <div><b>No contracts, no pressure</b><p>Fifteen minutes, one engineer, zero slide decks. If it’s not a fit, we’ll say so.</p></div>
+        </li>
+      </ul>
+    </div>
+
+    <form id="demoForm" class="reveal d1" novalidate>
+      <div class="form-head"><span>FORM 27-B / DEMO REQUEST</span><span>REV 4.1</span></div>
+      <div id="formFields">
+        <div class="field-row">
+          <div class="field">
+            <label for="fname">Full Name</label>
+            <input type="text" id="fname" placeholder="Dana Reyes" required>
+          </div>
+          <div class="field">
+            <label for="fcompany">Company</label>
+            <input type="text" id="fcompany" placeholder="Reyes Manufacturing Co." required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="femail">Work Email</label>
+          <input type="email" id="femail" placeholder="dana@reyesmfg.com" required>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="fsize">Company Size</label>
+            <select id="fsize">
+              <option>50 – 200 employees</option>
+              <option>200 – 500 employees</option>
+              <option>500 – 1,000 employees</option>
+              <option>1,000+ employees</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fvolume">Monthly Widget Volume</label>
+            <select id="fvolume">
+              <option>Under 1,000 units</option>
+              <option>1,000 – 10,000 units</option>
+              <option>10,000 – 50,000 units</option>
+              <option>50,000+ units</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn">Request Demo Slot
+          <svg width="15" height="12" viewBox="0 0 15 12" fill="none"><path d="M9 1l5 5-5 5M14 6H0" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <p class="form-note">RESPONSE WITHIN 1 BUSINESS DAY · NO SPAM, EVER</p>
+      </div>
+      <div class="form-success" id="formSuccess">
+        <span class="big-check"><svg width="34" height="26" viewBox="0 0 34 26" fill="none"><path d="M2 13l10 10L32 2" stroke="#e8551d" stroke-width="4"/></svg></span>
+        <h3>Request received.</h3>
+        <p>Stamped, filed, and routed to our team.<br>Watch your inbox — a demo slot is on its way.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <a class="logo" href="#">
+        <svg class="logo-mark" viewBox="0 0 32 32" fill="none">
+          <rect x="4" y="4" width="24" height="24" stroke="#f4f2ec" stroke-width="2.5"/>
+          <path d="M10 22 L16 9 L22 22" stroke="#e8551d" stroke-width="3" fill="none" stroke-linejoin="round"/>
+          <circle cx="16" cy="17" r="2.4" fill="#f4f2ec"/>
+        </svg>
+        ACME
+      </a>
+      <div class="foot-links">
+        <a href="#platform">Platform</a>
+        <a href="#how">How It Works</a>
+        <a href="#results">Results</a>
+        <a href="#demo">Book a Demo</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2025 ACME WIDGET SYSTEMS, INC.</span>
+      <span>BUILT TO SPEC · SHIPPED ON TIME</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Animated counters
+  const counterIO = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      counterIO.unobserve(el);
+      const target = +el.dataset.count;
+      const dur = 1400, start = performance.now();
+      const tick = now => {
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * eased);
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('[data-count]').forEach(el => counterIO.observe(el));
+
+  // Demo form
+  document.getElementById('demoForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const req = ['fname', 'fcompany', 'femail'].map(id => document.getElementById(id));
+    let valid = true;
+    req.forEach(f => {
+      const bad = !f.value.trim() || (f.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.value));
+      f.style.boxShadow = bad ? '3px 3px 0 #e8551d' : '';
+      if (bad) valid = false;
+    });
+    if (!valid) return;
+    document.getElementById('formFields').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  });
+</script>
+</body>
+</html>

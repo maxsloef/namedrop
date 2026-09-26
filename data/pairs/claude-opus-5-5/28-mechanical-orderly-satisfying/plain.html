@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom widgets, configured, ordered and tracked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+:root{
+  --paper:#ECEAE3;
+  --paper-2:#E2DFD5;
+  --paper-3:#D8D4C8;
+  --ink:#141618;
+  --ink-2:#1E2124;
+  --ink-3:#2B2F33;
+  --steel:#6C7277;
+  --steel-2:#9AA0A4;
+  --line:rgba(20,22,24,.14);
+  --line-strong:rgba(20,22,24,.32);
+  --line-dark:rgba(236,234,227,.12);
+  --sig:#FF5A1F;
+  --sig-dim:#C9461A;
+  --ok:#7FD18B;
+  --mono:'JetBrains Mono', ui-monospace, monospace;
+  --sans:'Archivo', system-ui, sans-serif;
+  --snap:cubic-bezier(.2,.9,.1,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:17px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.wrap{width:1280px;margin:0 auto;position:relative}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.display{font-stretch:118%;font-weight:700;letter-spacing:-.02em;line-height:.98}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:14px;
+  font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  padding:18px 24px 17px;
+  background:var(--sig);color:var(--ink);
+  border:1.5px solid var(--ink);
+  box-shadow:0 4px 0 var(--ink);
+  transform:translateY(0);
+  transition:transform .08s var(--snap), box-shadow .08s var(--snap), background .15s;
+}
+.btn:hover{background:#FF6A33}
+.btn:active{transform:translateY(4px);box-shadow:0 0 0 var(--ink)}
+.btn .arr{display:inline-block;width:18px;height:10px;position:relative}
+.btn .arr::before{content:"";position:absolute;left:0;right:2px;top:4px;height:2px;background:currentColor}
+.btn .arr::after{content:"";position:absolute;right:0;top:0;width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);transform-origin:center;top:1px}
+.btn.ghost{background:transparent;box-shadow:0 4px 0 transparent;border-color:var(--line-strong)}
+.btn.ghost:hover{border-color:var(--ink);background:rgba(20,22,24,.04)}
+.btn.ghost:active{box-shadow:none}
+
+/* ---------- Nav ---------- */
+nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(236,234,227,.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+nav .wrap{display:flex;align-items:center;height:72px}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;font-stretch:125%;font-size:22px;letter-spacing:-.01em}
+.logo svg{display:block}
+.nav-links{display:flex;gap:36px;margin-left:72px}
+.nav-links a{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);position:relative;padding:4px 0}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:0;background:var(--sig);transition:width .25s var(--snap)}
+.nav-links a:hover::after{width:100%}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:28px}
+.nav-right .status{display:flex;align-items:center;gap:8px;color:var(--steel)}
+.led{width:8px;height:8px;background:var(--ok);border-radius:50%;box-shadow:0 0 0 3px rgba(127,209,139,.2)}
+nav .btn{padding:12px 18px 11px;box-shadow:0 3px 0 var(--ink)}
+nav .btn:active{transform:translateY(3px)}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;
+  padding:72px 0 96px;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:80px 80px;
+  background-position:-1px -1px;
+  border-bottom:1px solid var(--line-strong);
+}
+.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg, rgba(236,234,227,0) 60%, var(--paper) 100%);
+}
+.hero .wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:0 32px;z-index:1}
+.hero-copy{grid-column:1 / span 6;padding-top:36px}
+.eyebrow{display:inline-flex;align-items:center;gap:12px;padding:8px 12px;border:1px solid var(--line-strong);background:var(--paper);color:var(--ink-3)}
+.eyebrow b{background:var(--ink);color:var(--paper);padding:2px 6px;font-weight:500}
+.hero h1{font-size:80px;margin:32px 0 28px}
+.hero h1 .ul{position:relative;white-space:nowrap}
+.hero h1 .ul::after{
+  content:"";position:absolute;left:0;right:0;bottom:4px;height:10px;background:var(--sig);z-index:-1;
+  transform-origin:left;transform:scaleX(0);animation:draw 0.9s .5s var(--snap) forwards;
+}
+@keyframes draw{to{transform:scaleX(1)}}
+.hero-lede{font-size:20px;line-height:1.5;color:var(--ink-3);max-width:540px}
+.hero-ctas{display:flex;gap:16px;margin-top:40px}
+.hero-note{margin-top:22px;color:var(--steel);display:flex;align-items:center;gap:10px}
+.hero-note::before{content:"";width:24px;height:1px;background:var(--steel)}
+.hero-specs{margin-top:56px;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ink);max-width:560px}
+.hero-specs div{padding:16px 0 0}
+.hero-specs div + div{padding-left:20px;border-left:1px solid var(--line)}
+.hero-specs strong{display:block;font-size:30px;font-stretch:112%;font-weight:700;letter-spacing:-.01em}
+.hero-specs span{color:var(--steel)}
+
+/* ---------- Configurator ---------- */
+.config{
+  grid-column:7 / span 6;
+  background:var(--ink);
+  color:var(--paper);
+  border:1.5px solid var(--ink);
+  box-shadow:10px 10px 0 var(--paper-3), 10px 10px 0 1.5px var(--ink);
+  position:relative;
+}
+.config-head{display:flex;align-items:center;height:48px;padding:0 18px;border-bottom:1px solid var(--line-dark);color:var(--steel-2)}
+.config-head .dots{display:flex;gap:6px;margin-right:16px}
+.config-head .dots i{width:9px;height:9px;border:1px solid var(--steel);display:block}
+.config-head .dots i:first-child{background:var(--sig);border-color:var(--sig)}
+.config-head .pn{margin-left:auto;color:var(--paper)}
+.config-body{display:grid;grid-template-columns:300px 1fr;border-bottom:1px solid var(--line-dark)}
+.stage{
+  position:relative;border-right:1px solid var(--line-dark);
+  background-image:
+    linear-gradient(var(--line-dark) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
+  background-size:20px 20px;background-position:-1px -1px;
+}
+.stage svg{display:block;width:300px;height:330px}
+.stage .corner{position:absolute;color:var(--steel);font-size:10px}
+.stage .corner.tl{top:10px;left:12px}
+.stage .corner.br{bottom:10px;right:12px}
+.controls{padding:18px 22px 20px;display:flex;flex-direction:column;gap:18px}
+.ctl-label{display:flex;justify-content:space-between;color:var(--steel-2);margin-bottom:10px;font-size:11px}
+.ctl-label output{color:var(--paper);font-weight:700}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;display:block}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--ink-3)}
+input[type=range]::-moz-range-track{height:2px;background:var(--ink-3)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:22px;background:var(--sig);border:2px solid var(--ink);outline:1px solid var(--sig);margin-top:-10px;transition:transform .1s}
+input[type=range]::-moz-range-thumb{width:12px;height:20px;background:var(--sig);border:2px solid var(--ink);border-radius:0}
+input[type=range]:active::-webkit-slider-thumb{transform:scaleY(.85)}
+input[type=range]:focus-visible{outline:1px dashed var(--sig);outline-offset:4px}
+.ticks{display:flex;justify-content:space-between;margin-top:4px;padding:0 6px}
+.ticks i{width:1px;height:6px;background:var(--ink-3);transition:background .15s, height .15s}
+.ticks i.on{background:var(--sig);height:9px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--ink-3)}
+.seg button{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:9px 0;color:var(--steel-2);transition:background .12s, color .12s}
+.seg button + button{border-left:1px solid var(--ink-3)}
+.seg button:hover{color:var(--paper)}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink)}
+.stepper{display:grid;grid-template-columns:40px 1fr 40px;border:1px solid var(--ink-3);height:38px}
+.stepper button{font-family:var(--mono);font-size:18px;color:var(--paper);transition:background .1s}
+.stepper button:hover{background:var(--ink-3)}
+.stepper button:active{background:var(--sig);color:var(--ink)}
+.stepper .val{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;border-left:1px solid var(--ink-3);border-right:1px solid var(--ink-3)}
+.readout{display:grid;grid-template-columns:repeat(4,1fr)}
+.readout div{padding:14px 18px 16px}
+.readout div + div{border-left:1px solid var(--line-dark)}
+.readout .mono{color:var(--steel-2);font-size:10px}
+.readout strong{display:block;font-family:var(--mono);font-size:20px;font-weight:500;margin-top:4px;letter-spacing:-.02em}
+.dfm{display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--line-dark);font-size:11px}
+.dfm .badge{padding:3px 8px;font-weight:700;background:var(--ok);color:var(--ink);transition:background .15s}
+.dfm.fail .badge{background:var(--sig)}
+.dfm .msg{color:var(--steel-2);text-transform:none;letter-spacing:.02em;font-size:12px}
+.dfm .rules{margin-left:auto;color:var(--steel)}
+.flash{animation:flash .35s var(--snap)}
+@keyframes flash{0%{color:var(--sig)}100%{color:inherit}}
+
+/* ---------- Logos ---------- */
+.logos{padding:40px 0;border-bottom:1px solid var(--line)}
+.logos .wrap{display:flex;align-items:center;gap:48px}
+.logos .mono{color:var(--steel);white-space:nowrap;width:220px;line-height:1.6}
+.logo-row{display:flex;flex:1;justify-content:space-between;align-items:center}
+.logo-row span{font-weight:700;font-size:19px;color:var(--ink-3);opacity:.72;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.logo-row span i{display:block;width:14px;height:14px;background:var(--ink-3)}
+.logo-row span:nth-child(1){font-stretch:125%}
+.logo-row span:nth-child(1) i{border-radius:50%}
+.logo-row span:nth-child(2){font-stretch:70%;font-size:22px;text-transform:uppercase}
+.logo-row span:nth-child(2) i{transform:rotate(45deg);width:11px;height:11px}
+.logo-row span:nth-child(3){font-weight:500;font-style:italic}
+.logo-row span:nth-child(3) i{clip-path:polygon(50% 0,100% 100%,0 100%)}
+.logo-row span:nth-child(4){font-family:var(--mono);font-size:15px;font-weight:700}
+.logo-row span:nth-child(4) i{background:none;border:3px solid var(--ink-3)}
+.logo-row span:nth-child(5){font-stretch:100%;text-transform:uppercase;letter-spacing:.14em;font-size:15px}
+.logo-row span:nth-child(5) i{width:20px;height:8px}
+.logo-row span:nth-child(6){font-stretch:112%;font-weight:800}
+.logo-row span:nth-child(6) i{border-radius:0 50% 50% 0}
+
+/* ---------- Section scaffolding ---------- */
+section{position:relative}
+.sec{padding:128px 0}
+.sec-head{display:grid;grid-template-columns:repeat(12,1fr);gap:32px;margin-bottom:72px;align-items:end}
+.sec-tag{grid-column:1 / -1;display:flex;align-items:center;gap:16px;color:var(--steel);margin-bottom:8px}
+.sec-tag::after{content:"";flex:1;height:1px;background:var(--line-strong)}
+.sec-tag b{color:var(--ink);font-weight:700}
+.sec-head h2{grid-column:1 / span 7;font-size:60px}
+.sec-head p{grid-column:9 / span 4;color:var(--ink-3);font-size:18px}
+
+/* ---------- Process ---------- */
+.rail{position:relative;height:28px;margin:0 0 40px}
+.rail .track{position:absolute;left:0;right:0;top:13px;height:2px;background:var(--line-strong)}
+.rail .fill{position:absolute;left:0;top:13px;height:2px;width:0;background:var(--sig);transition:width 1.8s var(--snap)}
+.rail.in .fill{width:100%}
+.rail .node{position:absolute;top:6px;width:16px;height:16px;background:var(--paper);border:2px solid var(--ink);transition:background .2s}
+.rail .node:nth-of-type(1){left:0}
+.rail .node:nth-of-type(2){left:calc(33.333% + 10px)}
+.rail .node:nth-of-type(3){left:calc(66.666% + 21px)}
+.rail.in .node{background:var(--sig)}
+.rail.in .node:nth-of-type(1){transition-delay:.05s}
+.rail.in .node:nth-of-type(2){transition-delay:.65s}
+.rail.in .node:nth-of-type(3){transition-delay:1.25s}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.step{border:1.5px solid var(--ink);background:var(--paper);display:flex;flex-direction:column}
+.step-top{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line-strong)}
+.step-top .num{font-family:var(--mono);font-weight:700;font-size:13px}
+.step-top .mono{color:var(--steel)}
+.step-art{height:200px;border-bottom:1px solid var(--line-strong);background:var(--paper-2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.step-body{padding:24px 24px 28px}
+.step h3{font-size:30px;font-stretch:115%;font-weight:700;letter-spacing:-.015em;margin-bottom:12px}
+.step p{color:var(--ink-3);font-size:16px}
+.step ul{list-style:none;margin-top:20px;border-top:1px solid var(--line)}
+.step li{font-family:var(--mono);font-size:12px;padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:10px;color:var(--ink-2)}
+.step li::before{content:"■";color:var(--sig);font-size:9px;line-height:18px}
+
+/* step illustrations */
+.art-config .field{width:220px}
+.art-config .row{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11px;padding:7px 10px;border:1px solid var(--line-strong);background:var(--paper);margin-bottom:-1px}
+.art-config .row b{font-weight:700}
+.art-config .row .chk{width:12px;height:12px;background:var(--ink);position:relative}
+.art-config .row .chk::after{content:"";position:absolute;left:3px;top:1px;width:4px;height:7px;border:solid var(--paper);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.art-config .row.warn{border-color:var(--sig);background:#FFE7DC;position:relative;z-index:1}
+.art-config .row.warn .chk{background:var(--sig)}
+.art-config .row.warn .chk::after{content:"!";border:0;transform:none;left:4px;top:-2px;color:var(--ink);font-weight:700;font-size:11px;width:auto;height:auto}
+.art-order{display:flex;gap:10px;align-items:flex-end}
+.art-order .col{display:flex;flex-direction:column;gap:4px;align-items:center}
+.art-order .blk{width:36px;background:var(--ink);transform-origin:bottom}
+.art-order .col span{font-family:var(--mono);font-size:10px;color:var(--steel)}
+.art-order .blk.hi{background:var(--sig)}
+.art-order .blk.lo{background:transparent;border:1.5px solid var(--ink)}
+.step.in .art-order .blk{animation:rise .7s var(--snap) both}
+@keyframes rise{from{transform:scaleY(0)}}
+.art-track{width:250px}
+.art-track .line{display:flex;align-items:center;gap:0}
+.art-track .st{width:14px;height:14px;border:2px solid var(--ink);background:var(--paper);flex:none}
+.art-track .st.done{background:var(--ink)}
+.art-track .st.now{background:var(--sig);animation:pulse 1.4s infinite}
+.art-track .seg-l{flex:1;height:2px;background:var(--ink)}
+.art-track .seg-l.dash{background:repeating-linear-gradient(90deg,var(--ink) 0 4px,transparent 4px 8px)}
+.art-track .lbls{display:flex;justify-content:space-between;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--steel)}
+.art-track .eta{margin-top:18px;border:1px solid var(--line-strong);background:var(--paper);padding:10px 12px;font-family:var(--mono);font-size:11px;display:flex;justify-content:space-between}
+.art-track .eta b{color:var(--sig-dim)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,90,31,.5)}50%{box-shadow:0 0 0 6px rgba(255,90,31,0)}}
+
+/* ---------- Tracking board ---------- */
+.dark{background:var(--ink);color:var(--paper)}
+.dark .sec-tag{color:var(--steel-2)}
+.dark .sec-tag b{color:var(--paper)}
+.dark .sec-tag::after{background:var(--line-dark)}
+.dark .sec-head p{color:var(--steel-2)}
+.board-wrap{display:grid;grid-template-columns:1fr 320px;border:1px solid var(--ink-3)}
+.board-top{grid-column:1 / -1;display:grid;grid-template-columns:repeat(4,1fr) 320px;border-bottom:1px solid var(--ink-3)}
+.board-top > div{padding:20px 24px;border-right:1px solid var(--ink-3)}
+.board-top > div:last-child{border-right:0;display:flex;align-items:center;gap:10px;color:var(--steel-2)}
+.board-top .mono{color:var(--steel-2);font-size:11px}
+.board-top strong{display:block;font-family:var(--mono);font-size:30px;font-weight:500;margin-top:6px;letter-spacing:-.03em}
+.board-top strong.sig{color:var(--sig)}
+.board{border-right:1px solid var(--ink-3)}
+.b-row{display:grid;grid-template-columns:118px 1.3fr 76px 1fr 300px 92px;align-items:center;height:54px;border-bottom:1px solid var(--ink-2);padding:0 20px;font-size:14px;transition:background .5s}
+.b-row:last-child{border-bottom:0}
+.b-row.head{height:40px;color:var(--steel);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--ink-3)}
+.b-row .id{font-family:var(--mono);font-size:12px;color:var(--steel-2)}
+.b-row .part{font-weight:600}
+.b-row .part small{display:block;font-family:var(--mono);font-size:10px;color:var(--steel);font-weight:400;letter-spacing:.04em}
+.b-row .qty,.b-row .eta{font-family:var(--mono);font-size:12px}
+.b-row .eta{text-align:right}
+.b-row .eta.late{color:var(--sig)}
+.b-row .dest{color:var(--steel-2);font-size:13px}
+.stages{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.stages i{height:14px;border:1px solid var(--ink-3);transition:background .3s, border-color .3s}
+.stages i.done{background:var(--paper-3);border-color:var(--paper-3)}
+.stages i.now{background:var(--sig);border-color:var(--sig)}
+.stages-head{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.stages-head span{font-size:9px}
+.b-row.bump{background:rgba(255,90,31,.12)}
+.log{display:flex;flex-direction:column}
+.log-h{padding:12px 18px;border-bottom:1px solid var(--ink-3);color:var(--steel);display:flex;justify-content:space-between;height:40px;align-items:center;font-size:10px}
+.log-list{list-style:none;flex:1;overflow:hidden;position:relative;max-height:432px}
+.log-list li{padding:11px 18px;border-bottom:1px solid var(--ink-2);font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--steel-2);animation:slidein .4s var(--snap)}
+.log-list li b{color:var(--paper);font-weight:500}
+.log-list li em{font-style:normal;color:var(--sig)}
+.log-list li time{display:block;color:var(--steel);font-size:10px}
+@keyframes slidein{from{transform:translateY(-100%);opacity:0}}
+
+/* ---------- Metrics ---------- */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
+.metric{padding:36px 28px 32px;position:relative}
+.metric + .metric{border-left:1px solid var(--line-strong)}
+.metric .val{font-size:76px;font-stretch:112%;font-weight:700;letter-spacing:-.035em;line-height:1;display:flex;align-items:baseline}
+.metric .val small{font-size:32px;margin-left:4px;letter-spacing:-.01em}
+.metric .gauge{height:6px;background:var(--paper-3);margin:24px 0 18px;position:relative;overflow:hidden}
+.metric .gauge i{position:absolute;inset:0;background:var(--ink);transform-origin:left;transform:scaleX(0);transition:transform 1.6s var(--snap)}
+.metric.in .gauge i{transform:scaleX(var(--g))}
+.metric .gauge::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 2px),var(--paper) calc(10% - 2px) 10%)}
+.metric p{font-size:16px;color:var(--ink-3)}
+.metric .mono{color:var(--steel);display:block;margin-bottom:22px}
+.fine{margin-top:20px;color:var(--steel);font-size:11px}
+
+/* ---------- Features ---------- */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line-strong);border-left:1px solid var(--line-strong)}
+.feat{padding:32px 32px 36px;border-right:1px solid var(--line-strong);border-bottom:1px solid var(--line-strong);position:relative;transition:background .2s}
+.feat:hover{background:var(--paper-2)}
+.feat::before{content:"";position:absolute;top:-1px;left:-1px;width:0;height:3px;background:var(--sig);transition:width .35s var(--snap)}
+.feat:hover::before{width:calc(100% + 2px)}
+.feat .ic{width:44px;height:44px;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;margin-bottom:28px;background:var(--paper)}
+.feat h3{font-size:22px;font-stretch:112%;font-weight:700;letter-spacing:-.01em;margin-bottom:10px}
+.feat p{color:var(--ink-3);font-size:16px}
+.feat .code{position:absolute;top:32px;right:32px;color:var(--steel)}
+.erp{display:flex;gap:6px;flex-wrap:wrap;margin-top:18px}
+.erp span{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border:1px solid var(--line-strong)}
+
+/* ---------- Quote ---------- */
+.quote{background:var(--paper-2);border-top:1px solid var(--line-strong);border-bottom:1px solid var(--line-strong)}
+.quote .wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:32px;padding:112px 0}
+.q-mark{grid-column:1 / span 2}
+.q-mark div{width:88px;height:88px;background:var(--sig);border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:96px;font-weight:800;line-height:1;padding-top:40px;box-shadow:6px 6px 0 var(--ink)}
+.q-body{grid-column:3 / span 8}
+.q-body blockquote{font-size:42px;font-stretch:108%;font-weight:500;line-height:1.18;letter-spacing:-.018em}
+.q-who{display:flex;align-items:center;gap:20px;margin-top:40px}
+.q-who .av{width:56px;height:56px;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:16px}
+.q-who strong{display:block;font-size:17px}
+.q-who span{color:var(--steel);font-size:15px}
+.q-side{grid-column:11 / span 2;align-self:end;border-top:1.5px solid var(--ink);padding-top:14px}
+.q-side div{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line-strong);font-family:var(--mono);font-size:12px}
+.q-side div span{color:var(--steel)}
+
+/* ---------- Demo ---------- */
+.demo .wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:32px}
+.demo-copy{grid-column:1 / span 5}
+.demo-copy h2{font-size:72px;margin:8px 0 28px}
+.demo-copy h2 span{color:var(--sig)}
+.demo-copy > p{font-size:19px;color:var(--steel-2);max-width:460px}
+.agenda{margin-top:48px;border-top:1px solid var(--ink-3)}
+.agenda div{display:grid;grid-template-columns:90px 1fr;padding:18px 0;border-bottom:1px solid var(--ink-3);align-items:baseline}
+.agenda .mono{color:var(--sig)}
+.agenda p{color:var(--paper);font-size:16px}
+.agenda p small{display:block;color:var(--steel-2);font-size:14px;margin-top:2px}
+.form-card{grid-column:7 / span 6;background:var(--paper);color:var(--ink);border:1.5px solid var(--paper);position:relative;min-height:640px}
+.form-head{display:flex;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--line-strong);color:var(--steel)}
+.form-head b{color:var(--ink)}
+form{padding:28px 28px 32px;display:grid;grid-template-columns:1fr 1fr;gap:24px 24px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field.full{grid-column:1 / -1}
+.field label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.field input,.field select{
+  font:inherit;font-size:17px;padding:12px 14px;
+  border:1.5px solid var(--line-strong);background:#F5F3EE;color:var(--ink);border-radius:0;
+  transition:border-color .12s, box-shadow .12s;
+  appearance:none;-webkit-appearance:none;
+}
+.field select{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+.field input:focus,.field select:focus{outline:none;border-color:var(--ink);box-shadow:3px 3px 0 var(--sig)}
+.field input::placeholder{color:var(--steel-2)}
+.seg-l{display:grid;grid-template-columns:repeat(4,1fr);border:1.5px solid var(--line-strong)}
+.seg-l label{position:relative;cursor:pointer;text-align:center}
+.seg-l label + label{border-left:1.5px solid var(--line-strong)}
+.seg-l input{position:absolute;opacity:0;pointer-events:none}
+.seg-l span{display:block;padding:12px 0;font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.04em;text-transform:none;color:var(--ink-3);transition:background .1s, color .1s}
+.seg-l input:checked + span{background:var(--ink);color:var(--paper)}
+.seg-l input:focus-visible + span{outline:2px solid var(--sig);outline-offset:-4px}
+.form-foot{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:24px;border-top:1px solid var(--line-strong)}
+.form-foot p{font-size:13px;color:var(--steel);max-width:260px;line-height:1.45}
+.success{position:absolute;inset:57px 0 0 0;background:var(--paper);display:none;flex-direction:column;align-items:flex-start;justify-content:center;padding:48px}
+.success.show{display:flex}
+.stamp{border:3px solid var(--sig);color:var(--sig);padding:10px 18px;font-family:var(--mono);font-weight:700;font-size:20px;letter-spacing:.14em;transform:rotate(-4deg) scale(1.6);opacity:0;margin-bottom:36px}
+.success.show .stamp{animation:stamp .35s .1s var(--snap) forwards}
+@keyframes stamp{to{transform:rotate(-4deg) scale(1);opacity:1}}
+.success h3{font-size:40px;font-stretch:115%;font-weight:700;letter-spacing:-.02em;line-height:1.05;margin-bottom:16px}
+.success p{color:var(--ink-3);max-width:440px}
+.ticket{margin-top:32px;width:100%;border-top:1.5px solid var(--ink)}
+.ticket div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line-strong);font-family:var(--mono);font-size:13px}
+.ticket div span{color:var(--steel)}
+
+/* ---------- Footer ---------- */
+footer{background:var(--ink);color:var(--steel-2);border-top:1px solid var(--ink-3)}
+footer .wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:32px;padding:64px 0 40px}
+.f-brand{grid-column:1 / span 4}
+.f-brand .logo{color:var(--paper)}
+.f-brand p{margin-top:18px;font-size:15px;max-width:300px}
+.f-col{grid-column:span 2}
+.f-col h4{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--paper);font-weight:500;margin-bottom:16px}
+.f-col a{display:block;font-size:15px;padding:4px 0;transition:color .15s}
+.f-col a:hover{color:var(--sig)}
+.f-base{grid-column:1 / -1;display:flex;justify-content:space-between;padding-top:28px;margin-top:24px;border-top:1px solid var(--ink-3);color:var(--steel)}
+
+/* ---------- Reveal ---------- */
+.js .rv{opacity:0;transform:translateY(16px);transition:opacity .6s var(--snap), transform .6s var(--snap)}
+.js .rv.in{opacity:1;transform:none}
+.js .rv.d1{transition-delay:.08s}.js .rv.d2{transition-delay:.16s}.js .rv.d3{transition-delay:.24s}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo" aria-label="Acme home">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <path d="M12 1h6v4.2l2.7 1.1 3-3 4.2 4.2-3 3 1.1 2.7H30v6h-4.2l-1.1 2.7 3 3-4.2 4.2-3-3-2.7 1.1V30h-6v-4.2l-2.7-1.1-3 3-4.2-4.2 3-3L4.2 18H0v-6h4.2l1.1-2.7-3-3 4.2-4.2 3 3L12 5.2z" fill="#141618"/>
+        <rect x="10" y="10" width="10" height="10" fill="#FF5A1F"/>
+      </svg>
+      ACME
+    </a>
+    <div class="nav-links">
+      <a href="#process">Platform</a>
+      <a href="#tracking">Tracking</a>
+      <a href="#results">Results</a>
+      <a href="#features">Integrations</a>
+    </div>
+    <div class="nav-right">
+      <span class="status mono"><span class="led"></span>All lines operational</span>
+      <a href="#demo" class="btn">Book a demo</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="eyebrow mono"><b>v4.2</b> Widget operations platform</span>
+      <h1 class="display">Every widget, to spec. Every order, <span class="ul">in view.</span></h1>
+      <p class="hero-lede">Acme gives operations teams at mid-sized manufacturers one place to configure custom widgets, route them for approval, order from vetted production lines, and track every lot from the machine to your receiving dock.</p>
+      <div class="hero-ctas">
+        <a href="#demo" class="btn">Book a 30-minute demo <span class="arr"></span></a>
+        <a href="#process" class="btn ghost">See how it works</a>
+      </div>
+      <p class="hero-note mono">No slide deck. We configure one of your real parts, live.</p>
+      <div class="hero-specs">
+        <div><strong>212</strong><span class="mono">Plants running Acme</span></div>
+        <div><strong>1.9M</strong><span class="mono">Widgets shipped / mo</span></div>
+        <div><strong>47</strong><span class="mono">Qualified lines</span></div>
+      </div>
+    </div>
+
+    <div class="config rv" aria-label="Interactive widget configurator">
+      <div class="config-head mono">
+        <span class="dots"><i></i><i></i><i></i></span>
+        Configurator — try it
+        <span class="pn" id="partNo">AW-S24-B10</span>
+      </div>
+      <div class="config-body">
+        <div class="stage">
+          <span class="corner tl mono">Front view · 1:1.4</span>
+          <span class="corner br mono" id="modLabel">m = 2.0</span>
+          <svg viewBox="0 0 300 330" id="gearSvg" aria-hidden="true">
+            <g id="dims"></g>
+            <g id="gearRot"><path id="gearPath" fill-rule="evenodd"/></g>
+            <g id="gearOver"></g>
+          </svg>
+        </div>
+        <div class="controls">
+          <div>
+            <div class="ctl-label mono"><span>Tooth count</span><output id="teethOut">24</output></div>
+            <input type="range" id="teeth" min="12" max="48" step="4" value="24" aria-label="Tooth count">
+            <div class="ticks" id="teethTicks"></div>
+          </div>
+          <div>
+            <div class="ctl-label mono"><span>Bore diameter</span><output id="boreOut">10 mm</output></div>
+            <input type="range" id="bore" min="6" max="20" step="2" value="10" aria-label="Bore diameter">
+            <div class="ticks" id="boreTicks"></div>
+          </div>
+          <div>
+            <div class="ctl-label mono"><span>Material</span><output id="matOut">Steel 1045</output></div>
+            <div class="seg" id="material" role="group" aria-label="Material">
+              <button aria-pressed="true" data-m="steel">Steel</button>
+              <button aria-pressed="false" data-m="brass">Brass</button>
+              <button aria-pressed="false" data-m="alu">Alum.</button>
+              <button aria-pressed="false" data-m="nylon">Nylon</button>
+            </div>
+          </div>
+          <div>
+            <div class="ctl-label mono"><span>Lot quantity</span><output>units</output></div>
+            <div class="stepper">
+              <button id="qDown" aria-label="Decrease quantity">−</button>
+              <div class="val" id="qtyVal">1,000</div>
+              <button id="qUp" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="readout">
+        <div><span class="mono">Unit price</span><strong id="rUnit">$2.14</strong></div>
+        <div><span class="mono">Lot total</span><strong id="rTotal">$2,140</strong></div>
+        <div><span class="mono">Lead time</span><strong id="rLead">12 d</strong></div>
+        <div><span class="mono">Tolerance</span><strong id="rTol">±0.02</strong></div>
+      </div>
+      <div class="dfm mono" id="dfm">
+        <span class="badge" id="dfmBadge">DFM PASS</span>
+        <span class="msg" id="dfmMsg">Manufacturable on 14 qualified lines.</span>
+        <span class="rules">38 rules checked</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LOGOS ============ -->
+<div class="logos">
+  <div class="wrap">
+    <span class="mono">Ordering widgets on Acme<br>at 212 plants, including</span>
+    <div class="logo-row">
+      <span><i></i>Harlan Fluidics</span>
+      <span><i></i>Norrbeck Tooling</span>
+      <span><i></i>Castell Motion</span>
+      <span><i></i>PIKE&amp;VANE</span>
+      <span><i></i>Oberlin Pumps</span>
+      <span><i></i>Tessaro</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROCESS ============ -->
+<section class="sec" id="process">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag mono"><b>§01</b> How it works</div>
+      <h2 class="display rv">Three steps. No spreadsheets, no phone tag.</h2>
+      <p class="rv d1">Custom widgets used to live in PDFs, email threads, and a planner's memory. Acme turns the whole run — spec to delivery — into one sequence your team can see and trust.</p>
+    </div>
+
+    <div class="rail" id="rail">
+      <div class="track"></div><div class="fill"></div>
+      <span class="node"></span><span class="node"></span><span class="node"></span>
+    </div>
+
+    <div class="steps">
+      <article class="step rv">
+        <div class="step-top"><span class="num">01</span><span class="mono">Configure</span></div>
+        <div class="step-art art-config">
+          <div class="field">
+            <div class="row"><span>TEETH</span><b>32</b><span class="chk"></span></div>
+            <div class="row"><span>BORE</span><b>12 mm</b><span class="chk"></span></div>
+            <div class="row warn"><span>FINISH</span><b>Anodize</b><span class="chk"></span></div>
+            <div class="row"><span>MATERIAL</span><b>Steel 1045</b><span class="chk"></span></div>
+          </div>
+        </div>
+        <div class="step-body">
+          <h3>Configure</h3>
+          <p>Build parts from validated parameters. Acme checks bore, tooth count, material, and finish against manufacturability rules as you type — so nothing impossible reaches the floor.</p>
+          <ul>
+            <li>Live DFM checks on every field</li>
+            <li>Reusable templates per product family</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="step rv d1">
+        <div class="step-top"><span class="num">02</span><span class="mono">Order</span></div>
+        <div class="step-art">
+          <div class="art-order">
+            <div class="col"><div class="blk" style="height:64px;animation-delay:.1s"></div><span>L-04</span></div>
+            <div class="col"><div class="blk hi" style="height:112px;animation-delay:.2s"></div><span>L-11</span></div>
+            <div class="col"><div class="blk" style="height:88px;animation-delay:.3s"></div><span>L-17</span></div>
+            <div class="col"><div class="blk lo" style="height:40px;animation-delay:.4s"></div><span>L-22</span></div>
+            <div class="col"><div class="blk" style="height:76px;animation-delay:.5s"></div><span>L-31</span></div>
+          </div>
+        </div>
+        <div class="step-body">
+          <h3>Order</h3>
+          <p>Route for approval, split lots across qualified production lines by capacity and price, and lock quotes in one pass. Purchase orders post to your ERP automatically.</p>
+          <ul>
+            <li>Multi-step approval chains</li>
+            <li>Capacity-aware lot splitting</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="step rv d2">
+        <div class="step-top"><span class="num">03</span><span class="mono">Track</span></div>
+        <div class="step-art">
+          <div class="art-track">
+            <div class="line">
+              <span class="st done"></span><span class="seg-l"></span>
+              <span class="st done"></span><span class="seg-l"></span>
+              <span class="st now"></span><span class="seg-l dash"></span>
+              <span class="st"></span>
+            </div>
+            <div class="lbls"><span>MACH</span><span>QC</span><span>SHIP</span><span>DOCK</span></div>
+            <div class="eta"><span>AC-10482 ETA</span><b>THU 14:00 · −0.5 d</b></div>
+          </div>
+        </div>
+        <div class="step-body">
+          <h3>Track</h3>
+          <p>Every lot checks in at each station. See what's machining, what's in QC, and what's on the truck — with ETA drift flagged before it turns into a line stoppage.</p>
+          <ul>
+            <li>Station-level scan events</li>
+            <li>Drift alerts to Slack, Teams, or email</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRACKING ============ -->
+<section class="sec dark" id="tracking">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag mono"><b>§02</b> Live order board</div>
+      <h2 class="display rv">Your whole widget supply chain on one screen.</h2>
+      <p class="rv d1">This is the board your planners open at 7 a.m. Every lot, every station, every plant — updating as parts move. The board below is running on sample data.</p>
+    </div>
+
+    <div class="board-wrap rv">
+      <div class="board-top">
+        <div><span class="mono">Lots in production</span><strong id="kLots">1,284</strong></div>
+        <div><span class="mono">Shipped today</span><strong id="kShip">96</strong></div>
+        <div><span class="mono">On-time (30 d)</span><strong>99.1%</strong></div>
+        <div><span class="mono">ETA drift alerts</span><strong class="sig" id="kAlert">2</strong></div>
+        <div class="mono"><span class="led"></span>Live · refreshed <span id="kClock">00:00:00</span></div>
+      </div>
+      <div class="board">
+        <div class="b-row head">
+          <span>Order</span><span>Part</span><span>Qty</span><span>Destination</span>
+          <div class="stages-head"><span>CFG</span><span>APR</span><span>MACH</span><span>QC</span><span>SHIP</span><span>DOCK</span></div>
+          <span style="text-align:right">ETA</span>
+        </div>
+        <div id="rows"></div>
+      </div>
+      <div class="log">
+        <div class="log-h mono"><span>Event stream</span><span id="evCount">0 events</span></div>
+        <ul class="log-list" id="log"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ METRICS ============ -->
+<section class="sec" id="results">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag mono"><b>§03</b> Measured results</div>
+      <h2 class="display rv">Fewer surprises. Shorter lead times. Calmer Mondays.</h2>
+      <p class="rv d1">Median outcomes across 212 customer plants, measured six months after go-live against each plant's own baseline.</p>
+    </div>
+    <div class="metrics">
+      <div class="metric rv" style="--g:.41">
+        <span class="mono">Rework</span>
+        <div class="val"><span>−</span><span data-count="41">0</span><small>%</small></div>
+        <div class="gauge"><i></i></div>
+        <p>Spec-related rework, because impossible parts never get ordered.</p>
+      </div>
+      <div class="metric rv d1" style="--g:.62">
+        <span class="mono">Lead time</span>
+        <div class="val"><span data-count="9.5" data-dec="1">0</span><small>days</small></div>
+        <div class="gauge"><i></i></div>
+        <p>Shorter average lead time from approved spec to receiving dock.</p>
+      </div>
+      <div class="metric rv d2" style="--g:.991">
+        <span class="mono">Delivery</span>
+        <div class="val"><span data-count="99.1" data-dec="1">0</span><small>%</small></div>
+        <div class="gauge"><i></i></div>
+        <p>Of lots arrive on or before the committed date.</p>
+      </div>
+      <div class="metric rv d3" style="--g:.55">
+        <span class="mono">Planner time</span>
+        <div class="val"><span data-count="6.2" data-dec="1">0</span><small>hrs/wk</small></div>
+        <div class="gauge"><i></i></div>
+        <p>Returned to each planner who used to chase order status by phone.</p>
+      </div>
+    </div>
+    <p class="fine mono">Source: Acme customer outcomes report, Q1 2025. n = 212 plants, 38 industries.</p>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="sec" id="features" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag mono"><b>§04</b> Platform</div>
+      <h2 class="display rv">Built for the way plants actually run.</h2>
+      <p class="rv d1">Acme plugs into the systems you already trust and enforces the rules your engineers already wrote down. Nothing to rip out.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat rv">
+        <span class="code mono">F-01</span>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#141618" stroke-width="1.8"><path d="M3 6h16M3 11h10M3 16h13"/><rect x="15" y="9" width="4" height="4" fill="#FF5A1F" stroke="none"/></svg></div>
+        <h3>Manufacturability rules engine</h3>
+        <p>Encode tolerance stacks, material limits, and finish compatibility once. Every configuration is checked in real time.</p>
+      </div>
+      <div class="feat rv d1">
+        <span class="code mono">F-02</span>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#141618" stroke-width="1.8"><path d="M2 7h14l-3-3M20 15H6l3 3"/></svg></div>
+        <h3>Two-way ERP sync</h3>
+        <p>Purchase orders, receipts, and part masters stay in lockstep with your system of record. No double entry.</p>
+        <div class="erp"><span>SAP S/4HANA</span><span>NetSuite</span><span>Epicor</span><span>Dynamics 365</span></div>
+      </div>
+      <div class="feat rv d2">
+        <span class="code mono">F-03</span>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#141618" stroke-width="1.8"><rect x="2" y="3" width="6" height="6"/><rect x="14" y="3" width="6" height="6"/><rect x="8" y="13" width="6" height="6" fill="#FF5A1F" stroke="#141618"/><path d="M5 9v2h12V9M11 11v2"/></svg></div>
+        <h3>Approval chains</h3>
+        <p>Engineering, quality, and purchasing sign off in order, with thresholds by cost, material, or plant. Audit trail included.</p>
+      </div>
+      <div class="feat rv">
+        <span class="code mono">F-04</span>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#141618" stroke-width="1.8"><circle cx="5" cy="5" r="2.5"/><circle cx="17" cy="5" r="2.5"/><circle cx="11" cy="17" r="2.5" fill="#FF5A1F"/><path d="M7 6.5l3 8M15 6.5l-3 8M7.5 5h7"/></svg></div>
+        <h3>Qualified supplier network</h3>
+        <p>47 audited production lines across North America and the EU, scored on quality, capacity, and on-time rate every week.</p>
+      </div>
+      <div class="feat rv d1">
+        <span class="code mono">F-05</span>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#141618" stroke-width="1.8"><path d="M3 4v14M7 4v14M10 4v14M15 4v14M19 4v14"/><path d="M12.5 4v14" stroke="#FF5A1F" stroke-width="2.5"/></svg></div>
+        <h3>Lot-level traceability</h3>
+        <p>Heat numbers, inspection reports, and certificates of conformance attached to every lot, searchable in seconds.</p>
+      </div>
+      <div class="feat rv d2">
+        <span class="code mono">F-06</span>
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#141618" stroke-width="1.8"><path d="M4 3h10l4 4v12H4z"/><path d="M8 11h6M8 15h4"/><rect x="13" y="3" width="5" height="4" fill="#FF5A1F" stroke="none"/></svg></div>
+        <h3>Spec revision control</h3>
+        <p>Every change is versioned and diffed. In-flight orders are flagged when a spec moves, so the old rev never ships.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUOTE ============ -->
+<section class="quote">
+  <div class="wrap">
+    <div class="q-mark rv"><div>“</div></div>
+    <div class="q-body rv d1">
+      <blockquote>We used to chase widget orders through four inboxes and a whiteboard. Now I open one screen at seven in the morning and I know exactly what's landing at each plant this week.</blockquote>
+      <div class="q-who">
+        <div class="av">DO</div>
+        <div><strong>Dana Okafor</strong><span>Director of Operations, Castell Motion</span></div>
+      </div>
+    </div>
+    <div class="q-side rv d2 mono">
+      <div><span>Plants</span>3</div>
+      <div><span>SKUs</span>1,140</div>
+      <div><span>Live in</span>6 wks</div>
+      <div><span>Rework</span>−52%</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEMO ============ -->
+<section class="sec dark demo" id="demo">
+  <div class="wrap">
+    <div class="demo-copy">
+      <div class="sec-tag mono" style="margin-bottom:24px"><b>§05</b> Book a demo</div>
+      <h2 class="display rv">Bring a part. We'll build it <span>live.</span></h2>
+      <p class="rv d1">Thirty minutes with a solutions engineer who has worked a plant floor. You'll see one of your own widgets configured, priced, and routed — start to finish.</p>
+      <div class="agenda rv d2">
+        <div><span class="mono">00:00</span><p>Your current workflow<small>Where orders stall today, and what it costs you.</small></p></div>
+        <div><span class="mono">00:08</span><p>Live configuration<small>One of your parts, built with your tolerances.</small></p></div>
+        <div><span class="mono">00:20</span><p>Tracking &amp; ERP walkthrough<small>How lots and POs flow into your systems.</small></p></div>
+        <div><span class="mono">00:26</span><p>Pricing for your volume<small>A written quote in your inbox the same day.</small></p></div>
+      </div>
+    </div>
+
+    <div class="form-card rv d1">
+      <div class="form-head mono"><span><b>Demo request</b> · Form DR-01</span><span>≈ 60 seconds</span></div>
+      <form id="demoForm" novalidate>
+        <div class="field">
+          <label for="fName">Full name</label>
+          <input id="fName" name="name" type="text" placeholder="Dana Okafor" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="fEmail">Work email</label>
+          <input id="fEmail" name="email" type="email" placeholder="dana@castellmotion.com" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="fCo">Company</label>
+          <input id="fCo" name="company" type="text" placeholder="Castell Motion" required autocomplete="organization">
+        </div>
+        <div class="field">
+          <label for="fRole">Role</label>
+          <select id="fRole" name="role">
+            <option>Operations / Plant management</option>
+            <option>Procurement / Purchasing</option>
+            <option>Manufacturing engineering</option>
+            <option>Supply chain planning</option>
+            <option>Executive</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>Number of plants</label>
+          <div class="seg-l">
+            <label><input type="radio" name="plants" value="1"><span>1</span></label>
+            <label><input type="radio" name="plants" value="2-4" checked><span>2–4</span></label>
+            <label><input type="radio" name="plants" value="5-9"><span>5–9</span></label>
+            <label><input type="radio" name="plants" value="10+"><span>10+</span></label>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="fErp">Primary ERP</label>
+          <select id="fErp" name="erp">
+            <option>SAP S/4HANA</option>
+            <option>Oracle NetSuite</option>
+            <option>Epicor Kinetic</option>
+            <option>Microsoft Dynamics 365</option>
+            <option>Other / none yet</option>
+          </select>
+        </div>
+        <div class="form-foot">
+          <p>We'll reply within one business day. No newsletters unless you ask.</p>
+          <button type="submit" class="btn" id="submitBtn">Request demo <span class="arr"></span></button>
+        </div>
+      </form>
+      <div class="success" id="success" aria-live="polite">
+        <div class="stamp">RECEIVED</div>
+        <h3>Request logged. We'll be in touch shortly.</h3>
+        <p>A solutions engineer will email you within one business day with times that work. If you have a drawing or spec sheet handy, reply with it and we'll build that part in the demo.</p>
+        <div class="ticket">
+          <div><span>Ticket</span><b id="tNo">DR-00000</b></div>
+          <div><span>Company</span><b id="tCo">—</b></div>
+          <div><span>Response by</span><b id="tBy">—</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="f-brand">
+      <a href="#" class="logo">
+        <svg width="26" height="26" viewBox="0 0 30 30" aria-hidden="true">
+          <path d="M12 1h6v4.2l2.7 1.1 3-3 4.2 4.2-3 3 1.1 2.7H30v6h-4.2l-1.1 2.7 3 3-4.2 4.2-3-3-2.7 1.1V30h-6v-4.2l-2.7-1.1-3 3-4.2-4.2 3-3L4.2 18H0v-6h4.2l1.1-2.7-3-3 4.2-4.2 3 3L12 5.2z" fill="#ECEAE3"/>
+          <rect x="10" y="10" width="10" height="10" fill="#FF5A1F"/>
+        </svg>
+        ACME
+      </a>
+      <p>The widget operations platform for mid-sized manufacturers. Configure, order, and track — in one place.</p>
+    </div>
+    <div class="f-col"><h4>Platform</h4><a href="#process">Configurator</a><a href="#process">Ordering</a><a href="#tracking">Tracking</a><a href="#features">Rules engine</a></div>
+    <div class="f-col"><h4>Integrations</h4><a href="#features">SAP S/4HANA</a><a href="#features">NetSuite</a><a href="#features">Epicor</a><a href="#features">Dynamics 365</a></div>
+    <div class="f-col"><h4>Company</h4><a href="#">About</a><a href="#">Careers</a><a href="#">Supplier program</a><a href="#">Security</a></div>
+    <div class="f-col"><h4>Get started</h4><a href="#demo">Book a demo</a><a href="#results">Customer results</a><a href="#">Pricing</a><a href="#">Contact sales</a></div>
+    <div class="f-base mono"><span>© 2025 Acme Widget Systems, Inc.</span><span>ISO 9001 · SOC 2 Type II · ITAR-ready</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+  const fmt = (n, d=0) => n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+  /* ---------- Tween numbers ---------- */
+  const tweens = new WeakMap();
+  function tween(el, to, opts={}){
+    const {dec=0, prefix='', suffix='', dur=450} = opts;
+    const from = parseFloat(el.dataset.v ?? to);
+    el.dataset.v = to;
+    if (reduce || from === to){ el.textContent = prefix + fmt(to,dec) + suffix; return; }
+    const start = performance.now();
+    cancelAnimationFrame(tweens.get(el));
+    const step = t => {
+      const p = Math.min(1,(t-start)/dur), e = 1 - Math.pow(1-p,4);
+      el.textContent = prefix + fmt(from + (to-from)*e, dec) + suffix;
+      if (p<1) tweens.set(el, requestAnimationFrame(step));
+    };
+    tweens.set(el, requestAnimationFrame(step));
+  }
+
+  /* ---------- Configurator ---------- */
+  const MATS = {
+    steel:{name:'Steel 1045', code:'S', fill:'#B7BCC0', rate:1.60, lead:12, tol:0.02},
+    brass:{name:'Brass C360', code:'B', fill:'#CFA65A', rate:3.10, lead:15, tol:0.02},
+    alu:  {name:'Alum. 6061', code:'A', fill:'#D9DDE0', rate:2.05, lead:10, tol:0.03},
+    nylon:{name:'Nylon PA66', code:'N', fill:'#EAE5D6', rate:0.55, lead:7,  tol:0.08}
+  };
+  const QTYS = [250,500,1000,2500,5000,10000,25000];
+  const state = {teeth:24, bore:10, mat:'steel', qi:2};
+  const CX=150, CY=172;
+
+  function buildTicks(id, count){
+    const t = document.getElementById(id); t.innerHTML='';
+    for(let i=0;i<count;i++) t.appendChild(document.createElement('i'));
+  }
+  buildTicks('teethTicks',10); buildTicks('boreTicks',8);
+  function setTicks(id, idx){ document.querySelectorAll('#'+id+' i').forEach((el,i)=>el.classList.toggle('on', i<=idx)); }
+
+  function gearPath(n, R, r, br){
+    let d=''; const step = 2*Math.PI/n;
+    for(let i=0;i<n;i++){
+      const a = i*step - Math.PI/2;
+      [[r,a],[R,a+step*.2],[R,a+step*.42],[r,a+step*.62]].forEach(([rad,ang],j)=>{
+        d += (i===0&&j===0?'M':'L') + (CX+rad*Math.cos(ang)).toFixed(2)+' '+(CY+rad*Math.sin(ang)).toFixed(2)+' ';
+      });
+    }
+    d += 'Z ';
+    d += `M ${CX+br} ${CY} A ${br} ${br} 0 1 0 ${CX-br} ${CY} A ${br} ${br} 0 1 0 ${CX+br} ${CY} Z`;
+    return d;
+  }
+
+  const gearEl = $('#gearPath'), rot = $('#gearRot'), over = $('#gearOver'), dims = $('#dims');
+  let angle = 0, speed = 0;
+
+  function render(changed){
+    const {teeth, bore, mat, qi} = state;
+    const m = MATS[mat], qty = QTYS[qi];
+    const module = 2.0, pitchD = module*teeth, od = pitchD + 2*module;
+    const R = 48 + teeth*2.3, r = R - 9 - teeth*0.06;
+    const br = Math.max(5, Math.min(R*0.8, bore/pitchD * R * 2 * 0.92));
+
+    gearEl.setAttribute('d', gearPath(teeth, R, r, br));
+    gearEl.setAttribute('fill', m.fill);
+    gearEl.setAttribute('stroke', '#141618'); gearEl.setAttribute('stroke-width','1');
+
+    // overlay: hub ring, lightening holes, keyway (rotating)
+    let o = `<circle cx="${CX}" cy="${CY}" r="${(br+ (R-br)*0.28).toFixed(1)}" fill="none" stroke="#141618" stroke-opacity=".35" stroke-width="1"/>`;
+    o += `<circle cx="${CX}" cy="${CY}" r="${(r-6).toFixed(1)}" fill="none" stroke="#141618" stroke-opacity=".25" stroke-width="1" stroke-dasharray="3 3"/>`;
+    if (teeth >= 28){
+      const hr = (R - br)*0.16, hd = br + (R-br)*0.55;
+      for(let i=0;i<6;i++){ const a=i*Math.PI/3; o+=`<circle cx="${(CX+hd*Math.cos(a)).toFixed(1)}" cy="${(CY+hd*Math.sin(a)).toFixed(1)}" r="${hr.toFixed(1)}" fill="#141618" stroke="#141618"/>`; }
+    }
+    o += `<rect x="${CX-3}" y="${CY-br-4}" width="6" height="6" fill="#141618"/>`;
+    // rotating group gets the overlay too
+    rot.innerHTML = ''; rot.appendChild(gearEl);
+    rot.insertAdjacentHTML('beforeend', o);
+
+    // static dims
+    const y = CY - R - 16, xl = CX - R, xr = CX + R;
+    const orange = '#FF5A1F';
+    dims.innerHTML = `
+      <line x1="${CX}" y1="${CY-R-6}" x2="${CX}" y2="${CY+R+14}" stroke="${orange}" stroke-width=".8" stroke-dasharray="6 3 1 3" opacity=".7"/>
+      <line x1="${CX-R-14}" y1="${CY}" x2="${CX+R+14}" y2="${CY}" stroke="${orange}" stroke-width=".8" stroke-dasharray="6 3 1 3" opacity=".7"/>`;
+    over.innerHTML = `
+      <line x1="${xl}" y1="${y}" x2="${xr}" y2="${y}" stroke="${orange}" stroke-width="1"/>
+      <line x1="${xl}" y1="${y-6}" x2="${xl}" y2="${CY-6}" stroke="${orange}" stroke-width=".6" opacity=".6"/>
+      <line x1="${xr}" y1="${y-6}" x2="${xr}" y2="${CY-6}" stroke="${orange}" stroke-width=".6" opacity=".6"/>
+      <path d="M${xl} ${y} l7 -3 v6z M${xr} ${y} l-7 -3 v6z" fill="${orange}"/>
+      <rect x="${CX-38}" y="${y-9}" width="76" height="18" fill="#141618"/>
+      <text x="${CX}" y="${y+4}" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="${orange}">Ø${od.toFixed(0)} mm</text>`;
+
+    speed = reduce ? 0 : 360 / (teeth * 1.1); // deg per second
+
+    // readouts
+    $('#teethOut').textContent = teeth;
+    $('#boreOut').textContent = bore + ' mm';
+    $('#matOut').textContent = m.name;
+    $('#qtyVal').textContent = fmt(qty);
+    $('#modLabel').textContent = 'm = 2.0 · z = ' + teeth;
+    const pn = `AW-${m.code}${teeth}-B${bore}`;
+    $('#partNo').textContent = pn;
+
+    const volFactor = Math.pow(1000/qty, 0.18);
+    const unit = m.rate * Math.pow(teeth/24, 1.15) * (1 + bore/80) * volFactor;
+    const lead = Math.round(m.lead + teeth/12 + Math.log10(qty/250)*2.4);
+    tween($('#rUnit'), unit, {dec:2, prefix:'$'});
+    tween($('#rTotal'), Math.round(unit*qty), {prefix:'$'});
+    tween($('#rLead'), lead, {suffix:' d'});
+    $('#rTol').textContent = '±' + m.tol.toFixed(2);
+
+    // DFM
+    const maxBore = pitchD * 0.45;
+    const dfm = $('#dfm');
+    let msg, pass = true;
+    if (bore > maxBore){ pass=false; msg = `Bore exceeds 45% of pitch Ø (${maxBore.toFixed(1)} mm max). Increase teeth or reduce bore.`; }
+    else if (mat==='nylon' && qty < 1000){ pass=false; msg = 'Nylon PA66 requires molding: minimum lot is 1,000 units.'; }
+    else { const lines = {steel:14, brass:9, alu:12, nylon:6}[mat] + (teeth<=32?2:0); msg = `Manufacturable on ${lines} qualified lines.`; }
+    dfm.classList.toggle('fail', !pass);
+    $('#dfmBadge').textContent = pass ? 'DFM PASS' : 'DFM FLAG';
+    $('#dfmMsg').textContent = msg;
+
+    setTicks('teethTicks', (teeth-12)/4);
+    setTicks('boreTicks', (bore-6)/2);
+
+    if (changed){
+      const pnEl = $('#partNo'); pnEl.classList.remove('flash'); void pnEl.offsetWidth; pnEl.classList.add('flash');
+    }
+  }
+
+  $('#teeth').addEventListener('input', e => { state.teeth = +e.target.value; render(true); });
+  $('#bore').addEventListener('input', e => { state.bore = +e.target.value; render(true); });
+  document.querySelectorAll('#material button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#material button').forEach(x => x.setAttribute('aria-pressed', x===b));
+    state.mat = b.dataset.m; render(true);
+  }));
+  $('#qDown').addEventListener('click', () => { if(state.qi>0){state.qi--; render(true);} });
+  $('#qUp').addEventListener('click', () => { if(state.qi<QTYS.length-1){state.qi++; render(true);} });
+
+  render(false);
+
+  let last = performance.now();
+  function spin(t){
+    const dt = (t - last)/1000; last = t;
+    angle = (angle + speed*dt) % 360;
+    rot.setAttribute('transform', `rotate(${angle.toFixed(2)} ${CX} ${CY})`);
+    requestAnimationFrame(spin);
+  }
+  requestAnimationFrame(spin);
+
+  /* ---------- Order board ---------- */
+  const STAGES = ['Configured','Approved','Machining','QC passed','Shipped','Docked'];
+  const PARTS = [
+    ['Drive widget, 32T','AW-S32-B12'],['Idler widget, 20T','AW-A20-B8'],['Pump widget, 24T','AW-B24-B10'],
+    ['Cam widget, 16T','AW-S16-B6'],['Feed widget, 40T','AW-N40-B14'],['Timing widget, 28T','AW-A28-B10'],
+    ['Reducer widget, 44T','AW-S44-B16'],['Valve widget, 12T','AW-B12-B6'],['Conveyor widget, 36T','AW-S36-B12']
+  ];
+  const DESTS = ['Dayton, OH · Plant 2','Grand Rapids, MI','Joliet, IL · Plant 1','Greenville, SC','Monterrey, MX','Erie, PA','Fort Wayne, IN','Tulsa, OK'];
+  const DAYS = ['Mon','Tue','Wed','Thu','Fri'];
+  let seq = 10480;
+  const rand = a => a[Math.floor(Math.random()*a.length)];
+  function newOrder(stage){
+    const p = rand(PARTS);
+    return {id:'AC-'+(seq++), part:p[0], pn:p[1], qty:rand([500,1000,1200,2500,4000,5000]), dest:rand(DESTS), stage, eta: rand(DAYS)+' '+rand(['08:00','10:30','14:00','16:00']), late: false};
+  }
+  const orders = [newOrder(5),newOrder(4),newOrder(3),newOrder(2),newOrder(3),newOrder(1),newOrder(0),newOrder(2)];
+  orders[4].late = true; orders[6].late = true;
+
+  const rowsEl = $('#rows');
+  function rowHTML(o){
+    const cells = STAGES.map((_,i)=>`<i class="${i<o.stage?'done':i===o.stage?'now':''}"></i>`).join('');
+    return `<span class="id">${o.id}</span>
+      <span class="part">${o.part}<small>${o.pn}</small></span>
+      <span class="qty">${fmt(o.qty)}</span>
+      <span class="dest">${o.dest}</span>
+      <div class="stages">${cells}</div>
+      <span class="eta ${o.late?'late':''}">${o.stage===5?'Delivered':o.eta}${o.late&&o.stage<5?' ▲':''}</span>`;
+  }
+  const rowEls = orders.map(o => { const d=document.createElement('div'); d.className='b-row'; d.innerHTML=rowHTML(o); rowsEl.appendChild(d); return d; });
+
+  const logEl = $('#log'); let evCount = 0;
+  function clock(){ const d=new Date(); return d.toTimeString().slice(0,8); }
+  function log(o, text){
+    evCount++;
+    const li = document.createElement('li');
+    li.innerHTML = `<time>${clock()}</time><b>${o.id}</b> → ${text}`;
+    logEl.prepend(li);
+    while (logEl.children.length > 9) logEl.lastChild.remove();
+    $('#evCount').textContent = evCount + ' events';
+  }
+  orders.slice(0,5).reverse().forEach(o => log(o, STAGES[o.stage]));
+
+  let lots = 1284, shipped = 96;
+  function tick(){
+    const idx = Math.floor(Math.random()*orders.length);
+    const o = orders[idx], el = rowEls[idx];
+    if (o.stage >= 5){
+      const n = newOrder(0); orders[idx] = n;
+      el.innerHTML = rowHTML(n);
+      log(n, 'Configured · <em>DFM pass</em>');
+      tween($('#kLots'), ++lots);
+    } else {
+      o.stage++;
+      if (o.stage===4){ tween($('#kShip'), ++shipped); }
+      if (o.stage===5){ tween($('#kLots'), --lots); if(o.late){o.late=false;} }
+      el.innerHTML = rowHTML(o);
+      const extra = o.stage===3 ? ' · <em>0 defects</em>' : o.stage===5 ? ' · <em>received</em>' : '';
+      log(o, STAGES[o.stage] + extra);
+    }
+    $('#kAlert').textContent = orders.filter(x=>x.late && x.stage<5).length;
+    el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+    setTimeout(()=>el.classList.remove('bump'), 700);
+  }
+  setInterval(()=>{ $('#kClock').textContent = clock(); }, 1000);
+  $('#kClock').textContent = clock();
+  let boardTimer = null;
+
+  /* ---------- Observers ---------- */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const t = en.target;
+      t.classList.add('in');
+      if (t.classList.contains('metric')){
+        const c = t.querySelector('[data-count]');
+        const dec = +(c.dataset.dec||0); c.dataset.v = 0;
+        tween(c, parseFloat(c.dataset.count), {dec, dur:1600});
+      }
+      io.unobserve(t);
+    });
+  }, {threshold:.2});
+  document.querySelectorAll('.rv, .rail, .step').forEach(el => io.observe(el));
+
+  const boardIO = new IntersectionObserver(en => {
+    en.forEach(e => {
+      if (e.isIntersecting && !boardTimer) boardTimer = setInterval(tick, reduce ? 4000 : 1800);
+      else if (!e.isIntersecting && boardTimer){ clearInterval(boardTimer); boardTimer=null; }
+    });
+  }, {threshold:.15});
+  boardIO.observe($('#tracking'));
+
+  /* ---------- Demo form ---------- */
+  const form = $('#demoForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let ok = true;
+    form.querySelectorAll('[required]').forEach(inp => {
+      const bad = !inp.value.trim() || (inp.type==='email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(inp.value));
+      inp.style.borderColor = bad ? '#FF5A1F' : '';
+      if (bad && ok){ inp.focus(); ok = false; }
+    });
+    if (!ok) return;
+    const btn = $('#submitBtn');
+    btn.disabled = true; btn.innerHTML = 'Logging request…';
+    setTimeout(() => {
+      $('#tNo').textContent = 'DR-' + String(Math.floor(10000 + Math.random()*89999));
+      $('#tCo').textContent = $('#fCo').value.trim();
+      const d = new Date(); d.setDate(d.getDate() + (d.getDay()===5?3:d.getDay()===6?2:1));
+      $('#tBy').textContent = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) + ', 5:00 PM';
+      $('#success').classList.add('show');
+    }, 700);
+  });
+  form.querySelectorAll('input').forEach(i => i.addEventListener('input', () => i.style.borderColor=''));
+})();
+</script>
+</body>
+</html>

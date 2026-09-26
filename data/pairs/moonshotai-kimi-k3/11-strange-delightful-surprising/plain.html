@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Widgets, Weirdly Well</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1611;
+    --cream:#f5efe3;
+    --orange:#ff5c1a;
+    --teal:#0e7a6d;
+    --pink:#ffb3c7;
+    --yellow:#ffd23f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;
+    overflow-x:hidden;
+    cursor:none;
+  }
+  ::selection{background:var(--orange);color:var(--cream);}
+
+  /* ---------- custom cursor ---------- */
+  #cursor{
+    position:fixed;width:14px;height:14px;border-radius:50%;
+    background:var(--ink);pointer-events:none;z-index:9999;
+    transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;
+  }
+  #cursor.big{width:64px;height:64px;background:var(--orange);mix-blend-mode:multiply;}
+  #cursorLabel{
+    position:fixed;pointer-events:none;z-index:10000;font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+    transform:translate(14px,14px);opacity:0;transition:opacity .2s;color:var(--ink);
+  }
+
+  a,button{cursor:none;}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:22px 48px;mix-blend-mode:multiply;
+  }
+  .logo{font-family:'Fraunces',serif;font-weight:900;font-size:28px;letter-spacing:-.02em;text-decoration:none;color:var(--ink);}
+  .logo em{font-style:italic;color:var(--orange);}
+  .nav-links{display:flex;gap:32px;align-items:center;}
+  .nav-links a{color:var(--ink);text-decoration:none;font-size:14px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;position:relative;}
+  .nav-links a::after{content:'';position:absolute;left:0;bottom:-4px;height:2px;width:0;background:var(--orange);transition:width .3s cubic-bezier(.6,0,.2,1);}
+  .nav-links a:hover::after{width:100%;}
+  .btn{
+    display:inline-block;background:var(--ink);color:var(--cream);border:none;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;
+    padding:14px 30px;border-radius:100px;text-decoration:none;letter-spacing:.03em;
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .25s, border-radius .25s;
+    position:relative;
+  }
+  .btn:hover{background:var(--orange);transform:rotate(-3deg) scale(1.06);border-radius:6px;}
+  .btn.pill-nav{padding:11px 24px;font-size:13px;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:140px 48px 0;position:relative;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif;font-weight:900;
+    font-size:clamp(64px,8.5vw,138px);line-height:.92;letter-spacing:-.03em;
+    max-width:1200px;
+  }
+  .hero h1 .w{display:inline-block;white-space:pre;}
+  .hero h1 .w.odd{font-style:italic;color:var(--teal);}
+  .hero h1 .w.odder{color:var(--orange);font-style:italic;transform-origin:center;}
+  .hero-sub{
+    margin-top:36px;max-width:520px;font-size:19px;line-height:1.55;font-weight:400;
+  }
+  .hero-sub b{font-weight:700;border-bottom:3px solid var(--yellow);}
+  .hero-cta{margin-top:44px;display:flex;gap:20px;align-items:center;}
+  .btn.big-btn{font-size:18px;padding:20px 44px;}
+  .ghost-link{font-size:15px;font-weight:500;color:var(--ink);text-decoration:underline;text-decoration-style:wavy;text-decoration-color:var(--orange);text-underline-offset:6px;}
+
+  .belt-wrap{position:absolute;bottom:0;left:0;right:0;height:150px;overflow:hidden;pointer-events:none;}
+  #belt{width:100%;height:150px;display:block;}
+
+  .float-note{
+    position:absolute;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
+    color:var(--ink);opacity:.55;
+  }
+
+  /* ---------- ticker ---------- */
+  .ticker{
+    background:var(--ink);color:var(--cream);overflow:hidden;white-space:nowrap;
+    padding:16px 0;border-top:3px solid var(--ink);
+  }
+  .ticker-inner{display:inline-block;animation:tick 28s linear infinite;}
+  .ticker span{font-family:'Fraunces',serif;font-style:italic;font-size:20px;margin:0 28px;}
+  .ticker .dot{color:var(--orange);}
+  @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- sections ---------- */
+  section{padding:120px 48px;max-width:1440px;margin:0 auto;}
+  .kicker{font-size:13px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--teal);margin-bottom:20px;}
+  .kicker::before{content:'◉ ';color:var(--orange);}
+  h2{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(40px,4.5vw,64px);line-height:1;letter-spacing:-.02em;margin-bottom:24px;}
+  h2 em{font-style:italic;color:var(--orange);}
+  .lede{font-size:19px;line-height:1.6;max-width:560px;}
+
+  /* ---------- problem cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:64px;}
+  .card{
+    background:#fff;border:2px solid var(--ink);border-radius:20px;padding:38px 32px;
+    position:relative;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s;
+    box-shadow:0 0 0 var(--ink);
+  }
+  .card:nth-child(1):hover{transform:rotate(-2deg) translateY(-10px);box-shadow:8px 10px 0 var(--orange);}
+  .card:nth-child(2):hover{transform:rotate(1.5deg) translateY(-10px);box-shadow:8px 10px 0 var(--teal);}
+  .card:nth-child(3):hover{transform:rotate(-1deg) translateY(-10px);box-shadow:8px 10px 0 var(--pink);}
+  .card h3{font-family:'Fraunces',serif;font-size:26px;font-weight:900;margin:18px 0 12px;letter-spacing:-.01em;}
+  .card p{font-size:16px;line-height:1.55;}
+  .card .num{
+    position:absolute;top:20px;right:24px;font-family:'Fraunces',serif;font-style:italic;
+    font-size:20px;color:var(--orange);font-weight:700;
+  }
+  .card svg{width:64px;height:64px;}
+
+  /* ---------- how ---------- */
+  .how{background:var(--ink);color:var(--cream);border-radius:40px;max-width:1352px;padding:110px 80px;margin:40px auto;}
+  .how .kicker{color:var(--yellow);}
+  .how h2 em{color:var(--pink);}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:72px;}
+  .step .big{
+    font-family:'Fraunces',serif;font-size:100px;font-weight:900;font-style:italic;
+    line-height:1;color:transparent;-webkit-text-stroke:2px var(--cream);
+    transition:color .4s, -webkit-text-stroke .4s;
+  }
+  .step:hover .big{color:var(--orange);-webkit-text-stroke:2px var(--orange);}
+  .step h3{font-family:'Fraunces',serif;font-size:26px;margin:22px 0 12px;font-weight:700;}
+  .step p{font-size:16px;line-height:1.6;opacity:.8;}
+
+  /* ---------- stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:72px;border:2px solid var(--ink);border-radius:20px;overflow:hidden;background:#fff;}
+  .stat{padding:56px 40px;border-right:2px solid var(--ink);text-align:center;}
+  .stat:last-child{border-right:none;}
+  .stat .n{font-family:'Fraunces',serif;font-weight:900;font-size:64px;letter-spacing:-.03em;color:var(--orange);}
+  .stat .l{margin-top:10px;font-size:15px;line-height:1.4;}
+  .stat:nth-child(2) .n{color:var(--teal);}
+  .stat:nth-child(3) .n{color:var(--ink);}
+
+  /* ---------- demo CTA ---------- */
+  .cta{
+    text-align:center;padding:140px 48px 160px;position:relative;
+  }
+  .cta h2{font-size:clamp(48px,6vw,92px);}
+  .cta .lede{margin:24px auto 48px;}
+  .wiggle{display:inline-block;}
+  .stamp{
+    display:inline-block;margin-top:56px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+    opacity:.5;font-weight:600;
+  }
+
+  /* ---------- blob decoration ---------- */
+  .blob{position:absolute;pointer-events:none;z-index:-1;}
+
+  footer{
+    border-top:2px solid var(--ink);padding:36px 48px;display:flex;justify-content:space-between;
+    font-size:13px;max-width:1440px;margin:0 auto;letter-spacing:.04em;
+  }
+  footer em{font-family:'Fraunces',serif;}
+
+  .reveal{opacity:0;transform:translateY(40px) rotate(1deg);transition:opacity .8s ease,transform .8s cubic-bezier(.22,1,.36,1);}
+  .reveal.in{opacity:1;transform:none;}
+
+  @media (prefers-reduced-motion:reduce){
+    .ticker-inner{animation:none;}
+    *{transition:none!important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursorLabel"></div>
+
+<nav>
+  <a class="logo" href="#">Acme<em>.</em></a>
+  <div class="nav-links">
+    <a href="#problem" data-hover>The Problem</a>
+    <a href="#how" data-hover>How It Works</a>
+    <a href="#proof" data-hover>Proof</a>
+    <a href="#demo" class="btn pill-nav" data-hover>Book a Demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <span class="float-note" style="top:170px;right:64px;transform:rotate(6deg)">est. widgets · est. weirdness</span>
+  <h1 id="heroHeadline">Your widgets are <span class="w odd">waiting</span> to be <span class="w odder" id="jiggle">wonderful.</span></h1>
+  <p class="hero-sub">Acme is the platform where operations teams at mid-sized manufacturers <b>configure, order, and track custom widgets</b> across the whole supply chain — without the spreadsheet sorcery.</p>
+  <div class="hero-cta">
+    <a href="#demo" class="btn big-btn" data-hover>Book a demo →</a>
+    <a href="#how" class="ghost-link" data-hover>or see how the sausage is widgeted</a>
+  </div>
+  <div class="belt-wrap"><canvas id="belt"></canvas></div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner"></div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <p class="kicker reveal">The Problem</p>
+  <h2 class="reveal">Widget procurement is <em>held together</em> with duct tape and prayers.</h2>
+  <p class="lede reveal">You know the drill. A PO buried in an inbox. A spec sheet from 2019. A supplier who "totally got your voicemail." Meanwhile, the line is waiting.</p>
+  <div class="cards">
+    <div class="card reveal">
+      <span class="num">no. 01</span>
+      <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="#ff5c1a" stroke-width="4"/><path d="M32 18v16l11 8" stroke="#1a1611" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+      <h3>The 47-email quote</h3>
+      <p>Configuring one custom widget shouldn't require a thread longer than a novella. Acme turns spec-back-and-forth into a five-minute form your suppliers actually fill in.</p>
+    </div>
+    <div class="card reveal">
+      <span class="num">no. 02</span>
+      <svg viewBox="0 0 64 64"><rect x="10" y="22" width="44" height="32" rx="4" fill="none" stroke="#0e7a6d" stroke-width="4"/><path d="M10 34h44M22 14v12M42 14v12" stroke="#1a1611" stroke-width="4" stroke-linecap="round"/></svg>
+      <h3>The mystery shipment</h3>
+      <p>"It shipped." Where is it? Nobody knows. Acme tracks every widget from foundry to factory floor, so "somewhere in transit" stops being an acceptable answer.</p>
+    </div>
+    <div class="card reveal">
+      <span class="num">no. 03</span>
+      <svg viewBox="0 0 64 64"><path d="M14 50L32 12l18 38z" fill="none" stroke="#ffb3c7" stroke-width="4" stroke-linejoin="round"/><path d="M32 28v10" stroke="#1a1611" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="44" r="2.5" fill="#1a1611"/></svg>
+      <h3>The tolerance surprise</h3>
+      <p>Wrong alloy, wrong bore, wrong week. Acme validates every configuration against your suppliers' real capabilities before the order ever leaves your desk.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how" class="how reveal">
+  <p class="kicker">How It Works</p>
+  <h2>Three steps. <em>Zero</em> séances.</h2>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="big">01</div>
+      <h3>Configure it</h3>
+      <p>Drag, drop, spec. Materials, tolerances, finishes, quantities — Acme's configurator speaks fluent widget, so engineering and procurement finally agree on something.</p>
+    </div>
+    <div class="step reveal">
+      <div class="big">02</div>
+      <h3>Order it</h3>
+      <p>One click routes your order to vetted suppliers with live capacity. Quotes come back in hours, not fiscal quarters. Approvals happen inside the platform, not inside a reply-all nightmare.</p>
+    </div>
+    <div class="step reveal">
+      <div class="big">03</div>
+      <h3>Track it</h3>
+      <p>Watch every widget crawl across your supply chain on one gorgeous timeline. Delays flagged before they become disasters. Your morning standup gets eerily short.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section id="proof">
+  <p class="kicker reveal">The Proof</p>
+  <h2 class="reveal">Numbers that made our CFO <em>blush.</em></h2>
+  <div class="stats reveal">
+    <div class="stat">
+      <div class="n" data-count="63" data-suffix="%">0%</div>
+      <div class="l">shorter quote-to-order cycles across our manufacturing customers</div>
+    </div>
+    <div class="stat">
+      <div class="n" data-count="12000" data-suffix="+">0</div>
+      <div class="l">custom widget configurations shipped and tracked last year</div>
+    </div>
+    <div class="stat">
+      <div class="n" data-count="9" data-suffix=" days">0</div>
+      <div class="l">median time saved per procurement team, per month, per our very honest math</div>
+    </div>
+  </div>
+  <p class="reveal" style="margin-top:48px;font-family:'Fraunces',serif;font-style:italic;font-size:24px;max-width:760px;line-height:1.5;">
+    "We used to lose widgets the way you lose socks. Now I can tell you where every single one is, including the weird left-handed ones."
+    <span style="display:block;margin-top:16px;font-family:'Space Grotesk',sans-serif;font-style:normal;font-size:14px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;">— Dana K., Director of Operations, Halloran Fabrication</span>
+  </p>
+</section>
+
+<!-- CTA -->
+<section id="demo" class="cta">
+  <p class="kicker reveal" style="text-align:center;">The Moment of Truth</p>
+  <h2 class="reveal">See your widgets<br><span class="wiggle" id="wiggleWord">differently.</span></h2>
+  <p class="lede reveal">Thirty minutes. Your real supply chain. Our slightly too-enthusiastic demo team. You'll leave knowing exactly where Acme fits — and wondering how you tolerated the duct tape this long.</p>
+  <div class="reveal">
+    <a href="mailto:demo@acme-widgets.example?subject=I%20want%20the%20widget%20demo" class="btn big-btn" data-hover style="font-size:22px;padding:26px 64px;" id="bigCta">Book your demo</a>
+  </div>
+  <span class="stamp reveal">no credit card · no 90-slide deck · one (1) friendly human</span>
+</section>
+
+<footer>
+  <span>© 2025 Acme Widget Co. — <em>strangely good at supply chains.</em></span>
+  <span>Made with 100% recycled pixels.</span>
+</footer>
+
+<script>
+/* ---------- custom cursor ---------- */
+const cursor = document.getElementById('cursor');
+const label = document.getElementById('cursorLabel');
+let mx = innerWidth/2, my = innerHeight/2, cx = mx, cy = my;
+addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function loopCursor(){
+  cx += (mx-cx)*0.22; cy += (my-cy)*0.22;
+  cursor.style.left = cx+'px'; cursor.style.top = cy+'px';
+  label.style.left = cx+'px'; label.style.top = cy+'px';
+  requestAnimationFrame(loopCursor);
+})();
+document.querySelectorAll('[data-hover]').forEach(el=>{
+  el.addEventListener('mouseenter', ()=>{ cursor.classList.add('big'); label.style.opacity=1; label.textContent = el.id==='bigCta'?'do it':'go'; });
+  el.addEventListener('mouseleave', ()=>{ cursor.classList.remove('big'); label.style.opacity=0; });
+});
+
+/* ---------- hero headline word wobble ---------- */
+const jiggle = document.getElementById('jiggle');
+let t = 0;
+(function wob(){
+  t += 0.02;
+  jiggle.style.transform = `rotate(${Math.sin(t)*2.2}deg) scale(${1+Math.sin(t*1.3)*0.015})`;
+  jiggle.style.display = 'inline-block';
+  requestAnimationFrame(wob);
+})();
+
+/* ---------- conveyor belt canvas ---------- */
+const canvas = document.getElementById('belt');
+const ctx = canvas.getContext('2d');
+function sizeBelt(){ canvas.width = canvas.offsetWidth * devicePixelRatio; canvas.height = 150*devicePixelRatio; ctx.scale(devicePixelRatio,devicePixelRatio); }
+sizeBelt(); addEventListener('resize', ()=>{ ctx.setTransform(1,0,0,1,0,0); sizeBelt(); });
+
+const widgets = [];
+const colors = ['#ff5c1a','#0e7a6d','#ffb3c7','#ffd23f','#1a1611'];
+for(let i=0;i<14;i++){
+  widgets.push({ x: i*140 + Math.random()*40, y: 78 + Math.random()*14, r: 14+Math.random()*14,
+    rot: Math.random()*Math.PI*2, spin:(Math.random()-.5)*0.02, c: colors[i%colors.length], type: i%3 });
+}
+let beltOff = 0;
+function drawBelt(){
+  const w = canvas.offsetWidth, h = 150;
+  ctx.clearRect(0,0,w,h);
+  // belt line
+  ctx.strokeStyle = '#1a1611'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(0,118); ctx.lineTo(w,118); ctx.stroke();
+  // rollers
+  beltOff += 0.8;
+  ctx.fillStyle = '#1a1611';
+  for(let x = -(beltOff%60); x < w+60; x += 60){
+    ctx.beginPath(); ctx.arc(x, 132, 9, 0, Math.PI*2); ctx.fill();
+  }
+  widgets.forEach(wg=>{
+    wg.x -= 0.8; wg.rot += wg.spin;
+    if(wg.x < -60) { wg.x = w + 60; wg.c = colors[Math.floor(Math.random()*colors.length)]; }
+    const bob = Math.sin(Date.now()/500 + wg.x/60)*3;
+    ctx.save(); ctx.translate(wg.x, wg.y+bob); ctx.rotate(wg.rot);
+    ctx.fillStyle = wg.c; ctx.strokeStyle = '#1a1611'; ctx.lineWidth = 3;
+    if(wg.type===0){ // hex nut
+      ctx.beginPath();
+      for(let a=0;a<6;a++){ const ang=a*Math.PI/3; a?ctx.lineTo(Math.cos(ang)*wg.r,Math.sin(ang)*wg.r):ctx.moveTo(Math.cos(ang)*wg.r,Math.sin(ang)*wg.r); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#f5efe3'; ctx.beginPath(); ctx.arc(0,0,wg.r*0.38,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    } else if(wg.type===1){ // gear-ish square
+      ctx.fillRect(-wg.r,-wg.r,wg.r*2,wg.r*2); ctx.strokeRect(-wg.r,-wg.r,wg.r*2,wg.r*2);
+      ctx.fillStyle='#f5efe3'; ctx.beginPath(); ctx.arc(0,0,4,0,Math.PI*2); ctx.fill();
+    } else { // capsule
+      ctx.beginPath(); ctx.roundRect(-wg.r*1.4,-wg.r*0.7,wg.r*2.8,wg.r*1.4,wg.r*0.7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#1a1611'; ctx.beginPath(); ctx.arc(-wg.r*0.7,0,3,0,Math.PI*2); ctx.arc(wg.r*0.7,0,3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  });
+  requestAnimationFrame(drawBelt);
+}
+drawBelt();
+
+/* ---------- ticker content ---------- */
+const phrases = ['configure','order','track','repeat','no spreadsheets','fewer séances','real lead times','happy ops teams','left-handed widgets welcome'];
+const tick = phrases.concat(phrases).map(p=>`<span>${p}</span><span class="dot">✳</span>`).join('');
+document.getElementById('tickerInner').innerHTML = tick + tick;
+
+/* ---------- scroll reveal ---------- */
+const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- count-up stats ---------- */
+const statIO = new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting) return; statIO.unobserve(e.target);
+  const el = e.target, target = +el.dataset.count, suffix = el.dataset.suffix||'';
+  const t0 = performance.now(), dur = 1600;
+  (function step(now){
+    const p = Math.min((now-t0)/dur,1), ease = 1-Math.pow(1-p,3);
+    el.textContent = Math.round(target*ease).toLocaleString()+suffix;
+    if(p<1) requestAnimationFrame(step);
+  })(t0);
+}),{threshold:.6});
+document.querySelectorAll('[data-count]').forEach(el=>statIO.observe(el));
+
+/* ---------- big CTA magnetic pull ---------- */
+const bigCta = document.getElementById('bigCta');
+addEventListener('mousemove', e=>{
+  const r = bigCta.getBoundingClientRect();
+  const dx = e.clientX-(r.left+r.width/2), dy = e.clientY-(r.top+r.height/2);
+  const d = Math.hypot(dx,dy);
+  if(d<220){ bigCta.style.transform = `translate(${dx*0.12}px,${dy*0.12}px) rotate(${dx*0.01}deg)`; }
+  else bigCta.style.transform = '';
+});
+
+/* ---------- wiggle word on scroll into view ---------- */
+const wiggle = document.getElementById('wiggleWord');
+new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    wiggle.animate([
+      {transform:'rotate(0deg)'},{transform:'rotate(-3deg)'},{transform:'rotate(3deg)'},
+      {transform:'rotate(-2deg)'},{transform:'rotate(0deg)'}
+    ],{duration:600,easing:'ease-in-out'});
+  }
+}),{threshold:.5}).observe(wiggle);
+</script>
+</body>
+</html>

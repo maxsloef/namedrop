@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme — Custom Widgets, Without the Chaos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14201c;
+    --ink-soft:#3d4a45;
+    --ink-mute:#6b7772;
+    --paper:#f7f6f2;
+    --paper-2:#efede6;
+    --line:#e2dfd6;
+    --accent:#1d5c47;
+    --accent-deep:#154536;
+    --accent-tint:#e3ede8;
+    --white:#ffffff;
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.55;
+  }
+  ::selection{background:var(--accent);color:#fff;}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 40px;}
+  h1,h2,h3{font-weight:600;letter-spacing:-0.02em;line-height:1.12;}
+  .serif{font-family:'Fraunces',serif;font-weight:500;letter-spacing:-0.01em;}
+  a{color:inherit;text-decoration:none;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--accent);
+  }
+  .eyebrow::before{content:"";width:22px;height:2px;background:var(--accent);border-radius:2px;}
+
+  /* ---------- Nav ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(247,246,242,0.86);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px;}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-0.02em;}
+  .brand svg{display:block;}
+  .nav-links{display:flex;gap:34px;font-size:14.5px;font-weight:500;color:var(--ink-soft);}
+  .nav-links a{position:relative;padding:4px 0;transition:color .2s;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a::after{
+    content:"";position:absolute;left:0;bottom:-2px;width:0;height:2px;
+    background:var(--accent);transition:width .25s ease;border-radius:2px;
+  }
+  .nav-links a:hover::after{width:100%;}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    font-weight:600;font-size:15px;border-radius:10px;
+    padding:13px 24px;cursor:pointer;border:none;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(20,32,28,.12);}
+  .btn-primary:hover{background:var(--accent-deep);transform:translateY(-1px);box-shadow:0 8px 20px rgba(21,69,54,.22);}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--ink-mute);transform:translateY(-1px);}
+  .btn-sm{padding:10px 18px;font-size:14px;}
+  .btn .arrow{transition:transform .2s ease;}
+  .btn:hover .arrow{transform:translateX(3px);}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:96px 0 88px;position:relative;overflow:hidden;}
+  .hero-grid-lines{
+    position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:72px 72px;
+    mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,black 20%,transparent 75%);
+    -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 0%,black 20%,transparent 75%);
+  }
+  .hero-inner{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;}
+  .hero h1{font-size:56px;margin:22px 0 22px;}
+  .hero h1 em{font-family:'Fraunces',serif;font-style:italic;font-weight:500;color:var(--accent);}
+  .hero p.lede{font-size:18.5px;color:var(--ink-soft);max-width:480px;margin-bottom:34px;}
+  .hero-ctas{display:flex;gap:14px;align-items:center;}
+  .hero-note{margin-top:20px;font-size:13px;color:var(--ink-mute);display:flex;align-items:center;gap:8px;}
+  .hero-note svg{flex:none;}
+
+  /* Hero visual: dashboard card built with CSS/SVG */
+  .hero-visual{position:relative;}
+  .dash{
+    background:var(--white);border:1px solid var(--line);border-radius:18px;
+    box-shadow:0 24px 60px -24px rgba(20,32,28,.22), 0 2px 6px rgba(20,32,28,.05);
+    overflow:hidden;
+  }
+  .dash-top{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line);}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  .dash-top span{margin-left:8px;font-size:12px;font-weight:600;color:var(--ink-mute);letter-spacing:.04em;}
+  .dash-body{padding:22px;display:grid;gap:16px;}
+  .dash-row{display:flex;justify-content:space-between;align-items:baseline;}
+  .dash-row h4{font-size:13px;font-weight:600;color:var(--ink-mute);text-transform:uppercase;letter-spacing:.08em;}
+  .dash-row strong{font-size:26px;letter-spacing:-0.02em;}
+  .bars{display:flex;align-items:flex-end;gap:10px;height:110px;padding-top:6px;}
+  .bar{flex:1;border-radius:6px 6px 3px 3px;background:var(--accent-tint);position:relative;transform-origin:bottom;animation:grow 1s cubic-bezier(.2,.8,.2,1) both;}
+  .bar.hot{background:var(--accent);}
+  @keyframes grow{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+  .ship{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;background:var(--paper);}
+  .ship .badge{
+    flex:none;width:38px;height:38px;border-radius:10px;background:var(--accent-tint);
+    display:grid;place-items:center;color:var(--accent);
+  }
+  .ship-info{flex:1;min-width:0;}
+  .ship-info b{display:block;font-size:14px;letter-spacing:-0.01em;}
+  .ship-info small{color:var(--ink-mute);font-size:12.5px;}
+  .pill{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;background:var(--accent-tint);color:var(--accent-deep);white-space:nowrap;}
+  .pill.amber{background:#f4ead6;color:#8a6a1f;}
+  .float-card{
+    position:absolute;background:var(--white);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 16px 40px -16px rgba(20,32,28,.25);padding:14px 18px;
+    display:flex;align-items:center;gap:12px;font-size:13.5px;font-weight:600;
+    animation:floaty 5s ease-in-out infinite;
+  }
+  .float-card small{display:block;font-weight:500;color:var(--ink-mute);font-size:12px;}
+  .fc1{top:-24px;right:-18px;}
+  .fc2{bottom:-22px;left:-26px;animation-delay:2.4s;}
+  @keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+  .check-ic{width:30px;height:30px;border-radius:50%;background:var(--accent);display:grid;place-items:center;color:#fff;flex:none;}
+
+  /* ---------- Logos ---------- */
+  .logos{padding:34px 0 46px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--paper-2);}
+  .logos p{text-align:center;font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:24px;}
+  .logo-row{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
+  .logo-row span{
+    font-family:'Fraunces',serif;font-size:20px;font-weight:600;color:var(--ink-mute);
+    opacity:.75;transition:opacity .2s;letter-spacing:-0.01em;white-space:nowrap;
+  }
+  .logo-row span:hover{opacity:1;}
+
+  /* ---------- Sections ---------- */
+  section{padding:104px 0;}
+  .sec-head{max-width:640px;margin-bottom:60px;}
+  .sec-head h2{font-size:40px;margin:18px 0 16px;}
+  .sec-head p{font-size:17.5px;color:var(--ink-soft);}
+
+  /* Features */
+  .features{background:var(--white);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .feat{background:var(--white);padding:36px 32px;transition:background .25s;}
+  .feat:hover{background:var(--paper);}
+  .feat .ic{
+    width:46px;height:46px;border-radius:12px;background:var(--accent-tint);color:var(--accent);
+    display:grid;place-items:center;margin-bottom:22px;
+  }
+  .feat h3{font-size:19px;margin-bottom:10px;}
+  .feat p{font-size:15px;color:var(--ink-soft);}
+
+  /* How it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;counter-reset:step;}
+  .step{position:relative;padding-top:34px;}
+  .step::before{
+    counter-increment:step;content:"0" counter(step);
+    position:absolute;top:0;left:0;
+    font-family:'Fraunces',serif;font-size:15px;font-weight:600;color:var(--accent);
+    border-top:2px solid var(--accent);padding-top:12px;width:44px;
+  }
+  .step h3{font-size:20px;margin-bottom:10px;}
+  .step p{font-size:15px;color:var(--ink-soft);}
+
+  /* Stats band */
+  .stats{background:var(--accent-deep);color:#eaf2ee;border-radius:20px;padding:64px 56px;display:grid;grid-template-columns:repeat(3,1fr);gap:40px;}
+  .stat b{display:block;font-family:'Fraunces',serif;font-size:52px;font-weight:500;letter-spacing:-0.02em;line-height:1;margin-bottom:10px;}
+  .stat span{font-size:14.5px;color:#b9cdc4;}
+  .stat{border-left:1px solid rgba(255,255,255,.16);padding-left:32px;}
+  .stat:first-child{border-left:none;padding-left:0;}
+
+  /* Testimonial */
+  .quote-wrap{display:grid;grid-template-columns:1fr 1.6fr;gap:72px;align-items:start;}
+  blockquote{font-family:'Fraunces',serif;font-size:30px;line-height:1.35;font-weight:500;letter-spacing:-0.01em;}
+  blockquote::before{content:"“";color:var(--accent);}
+  blockquote::after{content:"”";color:var(--accent);}
+  .quote-attr{margin-top:28px;display:flex;align-items:center;gap:14px;}
+  .avatar{
+    width:48px;height:48px;border-radius:50%;flex:none;
+    background:linear-gradient(135deg,var(--accent),#3f8a6e);
+    display:grid;place-items:center;color:#fff;font-weight:700;font-size:15px;font-family:'Inter',sans-serif;
+  }
+  .quote-attr b{display:block;font-size:15px;font-family:'Inter',sans-serif;}
+  .quote-attr small{color:var(--ink-mute);font-size:13.5px;font-family:'Inter',sans-serif;}
+
+  /* CTA */
+  .cta{
+    background:var(--ink);color:#f2f0ea;border-radius:22px;
+    padding:88px 72px;text-align:center;position:relative;overflow:hidden;
+  }
+  .cta::before{
+    content:"";position:absolute;inset:0;
+    background-image:radial-gradient(circle at 20% 120%,rgba(61,138,110,.35),transparent 55%),
+                     radial-gradient(circle at 85% -20%,rgba(61,138,110,.25),transparent 50%);
+  }
+  .cta-inner{position:relative;}
+  .cta h2{font-size:44px;margin-bottom:18px;}
+  .cta h2 em{font-family:'Fraunces',serif;font-style:italic;font-weight:500;color:#8fd0b6;}
+  .cta p{color:#b9beb8;font-size:17px;max-width:520px;margin:0 auto 36px;}
+  .cta .btn-primary{background:#fff;color:var(--ink);}
+  .cta .btn-primary:hover{background:#e8e6df;}
+  .cta .btn-ghost{border-color:rgba(255,255,255,.25);color:#f2f0ea;margin-left:12px;}
+  .cta .btn-ghost:hover{border-color:rgba(255,255,255,.6);}
+
+  /* Footer */
+  footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--paper-2);}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
+  .foot-grid p{font-size:14px;color:var(--ink-mute);max-width:260px;margin-top:14px;}
+  .foot-col h5{font-size:12.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:16px;}
+  .foot-col a{display:block;font-size:14.5px;color:var(--ink-soft);padding:5px 0;transition:color .2s;}
+  .foot-col a:hover{color:var(--accent);}
+  .foot-base{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-mute);border-top:1px solid var(--line);padding-top:28px;}
+
+  /* Reveal on scroll */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1);}
+  .reveal.in{opacity:1;transform:none;}
+  .reveal.d1{transition-delay:.08s;}.reveal.d2{transition-delay:.16s;}.reveal.d3{transition-delay:.24s;}
+
+  @media (max-width:900px){
+    .hero-inner,.quote-wrap{grid-template-columns:1fr;}
+    .feat-grid,.steps,.stats{grid-template-columns:1fr;}
+    .stat{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.16);padding-top:28px;}
+    .nav-links{display:none;}
+    .hero h1{font-size:40px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect x="1" y="1" width="24" height="24" rx="6" fill="#1d5c47"/>
+        <path d="M8 18L13 7l5 11" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10.2 14h5.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      Acme
+    </a>
+    <nav class="nav-links">
+      <a href="#platform">Platform</a>
+      <a href="#how">How it works</a>
+      <a href="#results">Results</a>
+      <a href="#customers">Customers</a>
+    </nav>
+    <button class="btn btn-primary btn-sm" onclick="bookDemo()">Book a demo</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" style="padding-top:96px;">
+  <div class="hero-grid-lines"></div>
+  <div class="wrap hero-inner">
+    <div>
+      <span class="eyebrow">Widget operations, unified</span>
+      <h1>Custom widgets, <em>without the chaos.</em></h1>
+      <p class="lede">Acme gives operations teams at mid-sized manufacturers one place to configure, order, and track custom widgets across every plant and supplier in the chain.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary" onclick="bookDemo()">
+          Book a demo
+          <svg class="arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="btn btn-ghost" href="#how">See how it works</a>
+      </div>
+      <div class="hero-note">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#1d5c47" stroke-width="1.5"/><path d="M5.5 8l1.8 1.8L10.8 6" stroke="#1d5c47" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        30-minute walkthrough. Tailored to your product lines. No commitment.
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="dash">
+        <div class="dash-top">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span>ACME CONSOLE — Q3 ORDERS</span>
+        </div>
+        <div class="dash-body">
+          <div class="dash-row">
+            <h4>Units in production</h4>
+            <strong>12,480</strong>
+          </div>
+          <div class="bars">
+            <span class="bar" style="height:38%;animation-delay:.05s"></span>
+            <span class="bar" style="height:55%;animation-delay:.12s"></span>
+            <span class="bar" style="height:44%;animation-delay:.19s"></span>
+            <span class="bar" style="height:70%;animation-delay:.26s"></span>
+            <span class="bar" style="height:62%;animation-delay:.33s"></span>
+            <span class="bar hot" style="height:88%;animation-delay:.40s"></span>
+            <span class="bar" style="height:76%;animation-delay:.47s"></span>
+          </div>
+          <div class="ship">
+            <div class="badge">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 6l7-3.5L16 6v6l-7 3.5L2 12V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 6l7 3.5L16 6M9 9.5V15" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="ship-info">
+              <b>WG-4400 · Flanged housing, anodized</b>
+              <small>Plant 3, Dayton → Dock 12 · 2,400 units</small>
+            </div>
+            <span class="pill">On schedule</span>
+          </div>
+          <div class="ship">
+            <div class="badge">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M9 5.5V9l2.4 1.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="ship-info">
+              <b>WG-1180 · Torque coupling, 12mm bore</b>
+              <small>Supplier: Halden Metals · 800 units</small>
+            </div>
+            <span class="pill amber">QC review</span>
+          </div>
+        </div>
+      </div>
+      <div class="float-card fc1">
+        <span class="check-ic"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7.2l2.6 2.6L11 4.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div>PO #8812 approved<small>2 minutes ago · J. Marsh</small></div>
+      </div>
+      <div class="float-card fc2">
+        <span class="check-ic" style="background:#14201c;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div>Shipment received<small>Dock 12 · 2,400 units verified</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos">
+  <div class="wrap">
+    <p>Trusted by operations teams at</p>
+    <div class="logo-row">
+      <span>Northfield&nbsp;Mfg.</span>
+      <span>Calloway&nbsp;Industrial</span>
+      <span>Bram&nbsp;&amp;&nbsp;Hesse</span>
+      <span>Vulcan&nbsp;Components</span>
+      <span>Arden&nbsp;Fabrication</span>
+      <span>Meridian&nbsp;Works</span>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="platform">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">The platform</span>
+      <h2>Every step of the widget lifecycle, in one system of record.</h2>
+      <p>Stop stitching together spreadsheets, email threads, and supplier portals. Acme replaces the patchwork with a single workflow your whole team can trust.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 7h14M4 7v11h14V7M4 7l2-3.5h10L18 7" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 11h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+        <h3>Guided configuration</h3>
+        <p>Spec custom widgets with validated templates — tolerances, finishes, materials, and certifications enforced at entry, so bad orders never reach the floor.</p>
+      </div>
+      <div class="feat reveal d1">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 5h9v9H3zM12 8h4l3 3v3h-7V8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="7" cy="17" r="1.8" stroke="currentColor" stroke-width="1.7"/><circle cx="16" cy="17" r="1.8" stroke="currentColor" stroke-width="1.7"/></svg></div>
+        <h3>Live order tracking</h3>
+        <p>Follow every order from PO to dock with milestone updates from plants and suppliers. Exceptions surface early — not the week of the line run.</p>
+      </div>
+      <div class="feat reveal d2">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 18V9M11 18V4M18 18v-7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></div>
+        <h3>Supply-chain visibility</h3>
+        <p>See capacity, lead times, and quality scores across your supplier network. Reallocate volume before a bottleneck becomes a missed shipment.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M3 9h16M8 4v5" stroke="currentColor" stroke-width="1.7"/></svg></div>
+        <h3>Approvals that move</h3>
+        <p>Route quotes and change orders to the right approver automatically. Full audit trail included — no more hunting through inboxes for sign-off.</p>
+      </div>
+      <div class="feat reveal d1">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3l7 3v5c0 4.4-3 7.4-7 8.5C7 18.4 4 15.4 4 11V6l7-3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 11l2.2 2.2L14.5 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Quality built in</h3>
+        <p>Inspection criteria travel with the order. QC results, certs, and non-conformance reports attach to each lot, ready for audit at any time.</p>
+      </div>
+      <div class="feat reveal d2">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 6h14M4 11h14M4 16h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+        <h3>ERP-friendly</h3>
+        <p>Two-way sync with SAP, NetSuite, and Dynamics out of the box. Acme fits the stack you already run — no rip-and-replace required.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">How it works</span>
+      <h2>From spec to dock in three steps.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <h3>Configure</h3>
+        <p>Build the widget spec once using guided templates. Acme validates every parameter against manufacturing rules and flags conflicts before you commit.</p>
+      </div>
+      <div class="step reveal d1">
+        <h3>Order</h3>
+        <p>Send the order to the right plant or supplier with one click. Pricing, lead time, and capacity are confirmed up front — approvals route themselves.</p>
+      </div>
+      <div class="step reveal d2">
+        <h3>Track</h3>
+        <p>Watch production progress in real time. Get notified on exceptions, receive QC documentation automatically, and reconcile on delivery.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="results" style="padding-top:0;">
+  <div class="wrap">
+    <div class="stats reveal">
+      <div class="stat"><b data-count="38" data-suffix="%">0%</b><span>average reduction in order cycle time within the first two quarters</span></div>
+      <div class="stat"><b data-count="92" data-suffix="%">0%</b><span>of shipments tracked to milestone without a single manual check-in</span></div>
+      <div class="stat"><b data-count="4" data-suffix=" wks">0</b><span>typical time from kickoff to full team onboarding, start to finish</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section id="customers" style="padding-top:0;">
+  <div class="wrap quote-wrap">
+    <div class="reveal">
+      <span class="eyebrow">Customer story</span>
+      <h2 style="font-size:32px;margin-top:18px;">Calloway Industrial cut expedite fees by half in one quarter.</h2>
+    </div>
+    <div class="reveal d1">
+      <blockquote>We used to find out about late widgets when the line stopped. Now I see the risk three weeks out and reroute before it costs us anything. Acme paid for itself by March.</blockquote>
+      <div class="quote-attr">
+        <span class="avatar">DK</span>
+        <div>
+          <b>Dana Kowalski</b>
+          <small>Director of Operations, Calloway Industrial</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="cta reveal">
+      <div class="cta-inner">
+        <h2>See your supply chain <em>clearly.</em></h2>
+        <p>Book a 30-minute demo and we'll walk through your actual widget workflow — configuration, ordering, and tracking — on a live Acme workspace.</p>
+        <button class="btn btn-primary" onclick="bookDemo()">
+          Book a demo
+          <svg class="arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="btn btn-ghost" href="mailto:sales@acme.example">Talk to sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#">
+          <svg width="24" height="24" viewBox="0 0 26 26" fill="none">
+            <rect x="1" y="1" width="24" height="24" rx="6" fill="#1d5c47"/>
+            <path d="M8 18L13 7l5 11" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.2 14h5.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+          Acme
+        </a>
+        <p>The operations platform for custom widget manufacturing. Configure, order, and track — all in one place.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <a href="#platform">Platform</a>
+        <a href="#how">How it works</a>
+        <a href="#results">Results</a>
+        <a href="#">Integrations</a>
+      </div>
+      <div class="foot-col">
+        <h5>Company</h5>
+        <a href="#">About</a>
+        <a href="#">Careers</a>
+        <a href="#">Newsroom</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h5>Resources</h5>
+        <a href="#">Documentation</a>
+        <a href="#">Security</a>
+        <a href="#">Status</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>© 2025 Acme Systems, Inc. All rights reserved.</span>
+      <span>Privacy · Terms · SOC 2 Type II</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Animated stat counters
+  const statIO = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      statIO.unobserve(el);
+      const target = +el.dataset.count;
+      const suffix = el.dataset.suffix || '';
+      const dur = 1400, t0 = performance.now();
+      (function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * eased) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('[data-count]').forEach(el => statIO.observe(el));
+
+  // Demo booking (placeholder handler)
+  function bookDemo() {
+    const btn = event.currentTarget;
+    const original = btn.innerHTML;
+    btn.innerHTML = 'Opening calendar…';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.innerHTML = '✓ We\'ll be in touch shortly';
+      setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2600);
+    }, 900);
+  }
+</script>
+</body>
+</html>
